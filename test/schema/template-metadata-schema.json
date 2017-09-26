@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-06/schema#",
+  "title": "Template Gallery",
+  "type": "object",
+  "properties": {
+    "templates": {
+      "type": "array",
+      "items": {
+        "title": "Template",
+        "description": "A template from the template catalog",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "The name of the template",
+            "type": "string"
+          },
+          "summary": {
+            "description": "A description of the flow created with the template",
+            "type": "string"
+          },
+          "sourceApp": {
+            "description": "The trigger application that triggers the flow",
+            "type": "string"
+          },
+          "targetApps": {
+            "description": "A list of the target applications that triggering the flow effects",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1
+          },
+          "priorityNumber": {
+            "description": "Used to determine the order of the templates displayed in the gallery",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "urlToFlow": {
+            "description": " URL to the flow",
+            "type": "string"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "connectors": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "offerings": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+
+        },
+        "required": ["name", "summary", "sourceApp", "targetApps"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

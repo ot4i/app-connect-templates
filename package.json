@@ -1,0 +1,25 @@
+{
+  "name": "app-connect-templates",
+  "version": "0.0.1",
+  "description": "App Connect Templates",
+  "license": "IBM",
+  "engines": {
+    "node": "6.11",
+    "npm": "3.x"
+  },
+  "scripts": {
+    "pretest": "npm run lint",
+    "test": "mocha  \"test/**/*-test.js\"",
+    "lint": "standard"
+  },
+  "devDependencies": {
+    "chai": "^4.0.2",
+    "chai-json-schema": "^1.5.0",
+    "mocha": "^3.4.2",
+    "standard": "^10.0.3"
+  },
+  "standard": {
+    "globals": [],
+    "env": "mocha"
+  }
+}
