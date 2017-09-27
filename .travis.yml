@@ -9,8 +9,11 @@ env:
   global:
   - CXX=g++-4.8
 sudo: required
+notifications:
+  email: false
 before_install:
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -q
   - sudo apt-get install g++-4.8 -y
   - npm install -g npm@^3
+
