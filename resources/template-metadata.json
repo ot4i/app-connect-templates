@@ -1,23 +1,13 @@
 {
   "templates": [{
-    "name": "Create events from Salesforce leads",
+    "name": "Create contact from Salesforce lead",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["eventbrite", "slack"]
+    "targetApps": ["eventbrite", "googlesheet"]
   }, {
     "name": "Create Slack message from Asana task",
     "summary": "Asana to Slack",
     "sourceApp": "asana",
     "targetApps": ["slack"]
-  }, {
-    "name": "Send a notification email when a file appears in Box",
-    "summary": "Box to 3 applications",
-    "sourceApp": "box",
-    "targetApps": ["gmail", "marketo", "watsonlt"]
-  }, {
-    "name": "Create Salesforce and Box items from Marketo",
-    "summary": "Marketo to 2 applications",
-    "sourceApp": "marketo",
-    "targetApps": ["salesforce", "box"]
   }]
 }
