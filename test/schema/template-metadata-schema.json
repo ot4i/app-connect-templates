@@ -12,7 +12,8 @@
         "properties": {
           "name": {
             "description": "The name of the template",
-            "type": "string"
+            "type": "string",
+            "maxLength": 38
           },
           "summary": {
             "description": "A description of the flow created with the template",
