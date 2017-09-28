@@ -37,10 +37,6 @@
             "minimum": 1,
             "maximum": 10
           },
-          "urlToFlow": {
-            "description": " URL to the flow",
-            "type": "string"
-          },
           "tags": {
             "type": "array",
             "items": {
