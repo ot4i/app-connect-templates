@@ -2,7 +2,7 @@
   "name": "app-connect-templates",
   "version": "0.0.1",
   "description": "App Connect Templates",
-  "license": "IBM",
+  "license": "MIT",
   "engines": {
     "node": "6.11",
     "npm": "3.x"
