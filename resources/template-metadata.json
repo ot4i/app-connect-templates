@@ -3,11 +3,15 @@
     "name": "Create contact from Salesforce lead",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["eventbrite", "googlesheet"]
+    "targetApps": ["eventbrite", "googlesheet"],
+    "tags": ["Salesforce", "contact", "lead"],
+    "offerings": [ ]
   }, {
     "name": "Create Slack message from Asana task",
     "summary": "Asana to Slack",
     "sourceApp": "asana",
-    "targetApps": ["slack"]
+    "targetApps": ["slack"],
+    "tags": ["Slack", "Asana", "message", "task"],
+    "offerings": ["app connect professional"]
   }]
 }
