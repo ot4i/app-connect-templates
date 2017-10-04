@@ -31,12 +31,6 @@
             },
             "minItems": 1
           },
-          "priorityNumber": {
-            "description": "Used to determine the order of the templates displayed in the gallery",
-            "type": "integer",
-            "minimum": 1,
-            "maximum": 10
-          },
           "tags": {
             "type": "array",
             "items": {
