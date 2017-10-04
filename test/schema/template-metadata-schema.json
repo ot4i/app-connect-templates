@@ -34,26 +34,17 @@
           "tags": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "connectors": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                },
-                "offerings": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              }
+              "type": "string"
+            }
+          },
+          "offerings": {
+            "type": "array",
+            "items": {
+              "type": "string"
             }
           }
-
         },
-        "required": ["name", "summary", "sourceApp", "targetApps"],
+        "required": ["name", "summary", "sourceApp", "targetApps", "tags", "offerings"],
         "additionalProperties": false
       }
     }
