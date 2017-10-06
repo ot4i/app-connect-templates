@@ -13,5 +13,12 @@
     "targetApps": ["slack"],
     "tags": ["Slack", "Asana", "message", "task"],
     "offerings": ["app connect professional"]
+  }, {
+    "name": "Cognitive enrichment demo",
+    "summary": "Salesforce to 4 apps",
+    "sourceApp": "salesforce", 
+    "targetApps": ["watsonnnlclassifier", "watsontoneanalyzer", "salesforce", "slack"],
+    "tags": ["Slack", "Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "support", "cognitive" "new case"],
+    "offerings": ["app connect professional"]
   }]
 }
