@@ -18,7 +18,7 @@
     "summary": "Salesforce to 4 apps",
     "sourceApp": "salesforce", 
     "targetApps": ["watsonnnlclassifier", "watsontoneanalyzer", "salesforce", "slack"],
-    "tags": ["Slack", "Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "support", "cognitive" "new case"],
+    "tags": ["Slack", "Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "support", "cognitive", "new case"],
     "offerings": ["app connect professional"]
   }]
 }
