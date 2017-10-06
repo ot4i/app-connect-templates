@@ -16,8 +16,8 @@ chai.use(require('chai-json-schema'))
 const templateMetadataSchema = require('./schema/template-metadata-schema.json')
 const templateMetadata = require('../resources/template-metadata.json')
 
-describe('Template Metadata Schema', function () {
-  it('is valid', function () {
+describe('Template Metadata', function () {
+  it('is valid against the given schema', function () {
     expect(templateMetadata).to.be.jsonSchema(templateMetadataSchema)
   })
 })
