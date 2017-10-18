@@ -15,8 +15,12 @@
             "type": "string",
             "maxLength": 38
           },
-          "summary": {
+          "description": {
             "description": "A description of the flow created with the template",
+            "type": "string"
+          },
+          "summary": {
+            "description": "A summary of the flow created with the template",
             "type": "string"
           },
           "sourceApp": {
@@ -30,6 +34,10 @@
               "type": "string"
             },
             "minItems": 1
+          },
+          "instructions": {
+            "description": "Instructions for how to use the flow created with the template",
+            "type": "string"
           },
           "tags": {
             "type": "array",
