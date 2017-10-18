@@ -1,16 +1,20 @@
 {
   "templates": [{
     "name": "Create contact from Salesforce lead",
+    "description": "Creates a contact when a new lead is added in Salesforce.",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["eventbrite", "googlesheet"],
+    "instructions": "Click the Create flow button to create a flow based on this template. It will open in the flow editor.",
     "tags": ["Salesforce", "contact", "lead"],
-    "offerings": [ ]
+    "offerings": ["app connect professional"]
   }, {
     "name": "Create Slack message from Asana task",
+    "description": "Creates a Slack message when a new task is added in Asana.",
     "summary": "Asana to Slack",
     "sourceApp": "asana",
     "targetApps": ["slack"],
+    "instructions": "Click the Create flow button to create a flow based on this template. It will open in the flow editor.",
     "tags": ["Slack", "Asana", "message", "task"],
     "offerings": ["app connect professional"]
   }]
