@@ -47,4 +47,11 @@ describe('Template files', function () {
     }
     expect(missingFlowDocInMetadata).equals(false)
   })
+
+  it('must have a corresponding markdown file', function () {
+    for (let template of templateMetadata.templates) {
+      let fileName = `./markdown/${template.name}_instructions.md`
+      expect(fs.existsSync(fileName), `Missing file ${fileName}`).equals(true)
+    }
+  })
 })
