@@ -50,7 +50,7 @@ describe('Template files', function () {
 
   it('must have a corresponding markdown file', function () {
     for (let template of templateMetadata.templates) {
-      let fileName = `./markdown/${template.name}.md`
+      let fileName = `./markdown/${template.name}_instructions.md`
       expect(fs.existsSync(fileName), `Missing file ${fileName}`).equals(true)
     }
   })
