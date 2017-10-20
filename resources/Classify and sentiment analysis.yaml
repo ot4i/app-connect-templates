@@ -187,5 +187,5 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
                   - variable: SalesforceRetrieveAccountMetadata
                     $ref: '#/node-output/Salesforce Retrieve Account/response'
-  name: Classify and sentiment analysis for case
+  name: Classify and sentiment analysis
 models: {}
