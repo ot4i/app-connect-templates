@@ -17,5 +17,14 @@
     "instructions": "Click the Create flow button to create a flow based on this template. It will open in the flow editor.",
     "tags": ["Slack", "Asana", "message", "task"],
     "offerings": ["app connect professional"]
+  }, {
+    "name": "Classify and sentiment analysis for case",
+    "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
+    "summary": "Salesforce to 4 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "slack"],
+    "instructions": "Instructions to come with markdown capability.",
+    "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "cognitive", "Slack", "support" "tone analysis", "case", "new case"],
+    "offerings": ["app connect professional"]
   }]
 }
