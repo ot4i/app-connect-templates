@@ -24,7 +24,7 @@
     "sourceApp": "salesforce",
     "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "slack"],
     "instructions": "Instructions to come with markdown capability.",
-    "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "cognitive", "Slack", "support" "tone analysis", "case", "new case"],
+    "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   }]
 }
