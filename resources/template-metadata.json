@@ -18,7 +18,7 @@
     "tags": ["Slack", "Asana", "message", "task"],
     "offerings": ["app connect professional"]
   }, {
-    "name": "Classify and sentiment analysis for case",
+    "name": "Classify and sentiment analysis",
     "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
     "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
