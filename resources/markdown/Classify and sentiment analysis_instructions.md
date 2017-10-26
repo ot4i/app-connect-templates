@@ -1,14 +1,9 @@
-Some instructions with **bold**  and _italic_
-
-Also a:
-1. numbered
-1. list
-
-Plus a:
-- bulleted 
-- list
-
-
-Also here's a [link to somewhere](http://ibm.com)
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla quis sem at nibh elementum imperdiet. Duis sagittis ipsum. Praesent mauris. Fusce nec tellus sed augue semper porta. Mauris massa. Vestibulum lacinia arcu eget nulla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. 
+1. Clicking the ‘use this template’ button will take you to the App connect flow editor 
+2. In App Connect, connect to your Salesforce account [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/)
+3. In a separate window, log in to your salesforce account and add three custom fields to your cases _(1. Watson Tone Analysis 2. Watson Tone Analysis Performed 3. Watson Classification)_
+4. Go back into App Connect and connect to Watson Natural Language Classifier [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-natural-language-classifier/). 
+5. You will need to add training data into your Language Classifer instance for this flow to work. 
+6. In App Connect make sure in your flow that the Watson Natural Language Classifier has your correct classifier selected
+5. Connect to Watson Tone Analyzer 
+6. Connect to your Slack account and choose the channel you want to post the message to [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/)
+7. Select exit and turn on flow and you’re done!
