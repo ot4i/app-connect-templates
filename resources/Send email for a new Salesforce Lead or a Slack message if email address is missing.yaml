@@ -102,5 +102,7 @@ integration:
               output-schema: {}
         tags:
           - incomplete
-  name: Send email for a new Salesforce Lead or a Slack message if email address is missing    
+  name: >-
+    Send email for a new Salesforce Lead or a Slack message if email address is
+    missing
 models: {}

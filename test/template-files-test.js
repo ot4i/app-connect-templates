@@ -14,6 +14,7 @@ const fs = require('fs')
 const expect = chai.expect
 const jsonata = require('jsonata')
 
+const markdownDirectoryName = 'markdown'
 const templateMetadataFilename = 'template-metadata.json'
 const templateMetadata = require('../resources/' + templateMetadataFilename)
 
@@ -32,6 +33,12 @@ describe('Template files', function () {
     const indexOfMetadata = listOfFiles.indexOf(templateMetadataFilename)
     if (indexOfMetadata > -1) {
       listOfFiles.splice(indexOfMetadata, 1)
+    }
+
+    // Remove the markdown directory from the list we're checking against
+    const indexOfMarkdownDirectory = listOfFiles.indexOf(markdownDirectoryName)
+    if (indexOfMarkdownDirectory > -1) {
+      listOfFiles.splice(indexOfMarkdownDirectory, 1)
     }
 
     // Iterate through each flow doc name and remove the file extension so can directly compare with the metadata file
