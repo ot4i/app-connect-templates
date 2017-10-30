@@ -4,7 +4,7 @@
     "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
     "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "salesforce", "slack"],
+    "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "salesforce", "slack", "crm"],
     "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   },
@@ -14,7 +14,7 @@
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["slack", "gmail"],
-    "tags": ["Salesforce", "slack", "gmail", "marketing", "lead", "email"],
+    "tags": ["Salesforce", "slack", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
   },
   {   
@@ -23,7 +23,7 @@
     "summary": "Salesforce to Gmail",
     "sourceApp": "salesforce",
     "targetApps": ["gmail"],
-    "tags": ["Salesforce", "gmail", "marketing", "lead", "email"],
+    "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
   },
   {   
@@ -32,7 +32,16 @@
     "summary": "Salesforce to Trello",
     "sourceApp": "salesforce",
     "targetApps": ["trello"],
-    "tags": ["salesforce", "trello", "marketing", "campaign", "project management"],
+    "tags": ["salesforce", "trello", "marketing", "campaign", "project management", "crm"],
+    "offerings": ["app connect professional"]
+  },
+  {   
+    "name": "Create a new Trello card for a new Salesforce lead",
+    "description": "This template will create a new card in Trello when a new lead is created in Salesforce - make sure you never forget to follow up with that lead again!",
+    "summary": "Salesforce to Gmail",
+    "sourceApp": "salesforce",
+    "targetApps": ["trello"],
+    "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
     "offerings": ["app connect professional"]
   }]
 }
