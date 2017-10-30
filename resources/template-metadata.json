@@ -14,7 +14,16 @@
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["slack", "gmail"],
-    "tags": ["Salesforce", "slack", "gmail", "marketing"],
+    "tags": ["Salesforce", "slack", "gmail", "marketing", "lead", "email"],
+    "offerings": ["app connect professional"]
+  },
+  {   
+    "name": "Send Gmail message to new Salesforce lead",
+    "description": "This template will create and send an email via Gmail when a new lead is created in Salesforce. If there is no email provided for the lead then we log an error about the missing email.",
+    "summary": "Salesforce to Gmail",
+    "sourceApp": "salesforce",
+    "targetApps": ["gmail"],
+    "tags": ["Salesforce", "gmail", "marketing", "lead", "email"],
     "offerings": ["app connect professional"]
   }]
 }
