@@ -1,6 +1,6 @@
 {
   "templates": [{
-    "name": "Classify and sentiment analysis",
+    "name": "Classification and sentiment analysis on new Salesforce case",
     "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
     "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
