@@ -43,5 +43,14 @@
     "targetApps": ["trello"],
     "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
     "offerings": ["app connect professional"]
+  },
+  {   
+    "name": "Create a new Trello card when a new event in Eventbrite is added",
+    "description": "This template will create a new card in Trello when a new event is added in Eventbrite. You can tailor your Trello card as per your needs but for example, you can set yourself tasks to check those attendee lists in advance of the event. make sure you never forget to follow up with that lead again!",
+    "summary": "Eventbrite to Trello",
+    "sourceApp": "eventbrite",
+    "targetApps": ["trello"],
+    "tags": ["eventbrite", "trello", "marketing", "events", "project management"],
+    "offerings": ["app connect professional"]
   }]
 }
