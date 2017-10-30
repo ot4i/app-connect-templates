@@ -1,0 +1,49 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: card
+      connector-type: trello
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add New Card to List
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: >-
+                        Call {{$Trigger.FirstName}} at {{$Trigger.Phone}} within
+                        3 business days
+                  - idBoard:
+                      template: 59af090b40aa6a9553289141
+                  - idList:
+                      template: 59af09209fd9d52867c1e67a
+                  - name:
+                      template: >-
+                        New lead for {{$Trigger.Name}} on
+                        {{$Trigger.CreatedDate}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: Create a new Trello card for a new Salesforce lead
+models: {}
