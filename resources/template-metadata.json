@@ -8,4 +8,13 @@
     "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   }]
+  [{
+    "name": "Send email for a new Salesforce Lead or a Slack message if email address is missing",
+    "description": "Use this template to send your new Salesforce leads an email. If there is no email ID included then send a Slack message to your team that someone needs to call the lead.",
+    "summary": "Salesforce to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["slack", "gmail"],
+    "tags": ["Salesforce", "slack", "gmail", "marketing"],
+    "offerings": ["app connect professional"]
+  }]
 }
