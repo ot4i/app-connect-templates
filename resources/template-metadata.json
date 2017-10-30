@@ -9,7 +9,7 @@
     "offerings": ["app connect professional"]
   },
   {   
-    "name": "Send email for a new Salesforce Lead or a Slack message if email address is missing",
+    "name": "Send Gmail message for a new Salesforce Lead or a Slack message if email address is missing",
     "description": "Use this template to send your new Salesforce leads an email. If there is no email ID included then send a Slack message to your team that someone needs to call the lead.",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
