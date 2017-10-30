@@ -1,4 +1,5 @@
 1. Clicking the ‘use this template’ button will take you to the App connect flow editor 
+2. You will need to click on each app in your flow to be able to switch it on
 2. In App Connect, connect to your Salesforce account [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/)
 3. In a separate window, log in to your salesforce account and add three custom fields to your cases _(1. Watson Tone Analysis 2. Watson Tone Analysis Performed 3. Watson Classification)_
 4. Go back into App Connect and connect to Watson Natural Language Classifier [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-natural-language-classifier/). 
