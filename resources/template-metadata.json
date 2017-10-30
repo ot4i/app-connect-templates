@@ -43,14 +43,23 @@
     "targetApps": ["trello"],
     "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
     "offerings": ["app connect professional"]
+    },
+  {   
+    "name": "Create a new Trello card for a new Salesforce campaign",
+    "description": "This template will create a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
+    "summary": "Salesforce to Trello",
+    "sourceApp": "salesforce",
+    "targetApps": ["trello"],
+    "tags": ["salesforce", "trello", "marketing", "campaign", "project management", "crm"],
+    "offerings": ["app connect professional"]
   },
   {   
-    "name": "Create a new Trello card when a new event in Eventbrite is added",
-    "description": "This template will create a new card in Trello when a new event is added in Eventbrite. You can tailor your Trello card as per your needs but for example, you can set yourself tasks to check those attendee lists in advance of the event. make sure you never forget to follow up with that lead again!",
-    "summary": "Eventbrite to Trello",
+    "name": "Send Gmail message when a new event is added in Eventbrite",
+    "description": "This template will create and send an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
+    "summary": "Eventbrite to Gmail",
     "sourceApp": "eventbrite",
-    "targetApps": ["trello"],
-    "tags": ["eventbrite", "trello", "marketing", "events", "project management"],
+    "targetApps": ["gmail"],
+    "tags": ["eventbrite", "gmail", "marketing", "events", "email"],
     "offerings": ["app connect professional"]
   }]
 }
