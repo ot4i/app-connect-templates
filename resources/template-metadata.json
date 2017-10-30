@@ -4,8 +4,8 @@
     "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
     "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "salesforce", "slack", "crm"],
-    "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
+    "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "salesforce", "slack"],
+    "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "crm", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   },
   {   
