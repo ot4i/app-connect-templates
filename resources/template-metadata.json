@@ -25,5 +25,14 @@
     "targetApps": ["gmail"],
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email"],
     "offerings": ["app connect professional"]
+  },
+  {   
+    "name": "Create a new Trello card for a new Salesforce campaign",
+    "description": "This template will create a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
+    "summary": "Salesforce to Trello",
+    "sourceApp": "salesforce",
+    "targetApps": ["trello"],
+    "tags": ["salesforce", "trello", "marketing", "campaign", "project management"],
+    "offerings": ["app connect professional"]
   }]
 }
