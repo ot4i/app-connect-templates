@@ -56,7 +56,7 @@
   {   
     "name": "Create a new Trello card for a new Salesforce lead",
     "description": "This template creates a new card in Trello when a new lead is created in Salesforce - make sure you never forget to follow up with that lead again!",
-    "summary": "Salesforce to Gmail",
+    "summary": "Salesforce to Trello",
     "sourceApp": "salesforce",
     "targetApps": ["trello"],
     "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
