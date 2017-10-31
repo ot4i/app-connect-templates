@@ -1,0 +1,114 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    '{{$Trigger.event_id}}':
+                      =: Fill in your event ID
+                  execute:
+                    - create-action:
+                        name: MailChimp Add subscriber to a list
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - list_id:
+                                template: 71c6abec70
+                            - email_address:
+                                template: '{{$Trigger.profile.email}}'
+                            - merge_fields:
+                                mappings:
+                                  - FNAME:
+                                      template: '{{$Trigger.profile.first_name}}'
+                                  - LNAME:
+                                      template: '{{$Trigger.profile.last_name}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                    mappings: []
+                - condition:
+                    'event {{$Trigger.event_id}}':
+                      =: Fill in your event ID
+                  execute:
+                    - create-action:
+                        name: MailChimp Add subscriber to a list 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - list_id:
+                                template: c8bf281671
+                            - email_address:
+                                template: '{{$Trigger.profile.email}}'
+                            - merge_fields:
+                                mappings:
+                                  - FNAME:
+                                      template: '{{$Trigger.profile.first_name}}'
+                                  - LNAME:
+                                      template: '{{$Trigger.profile.last_name}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                      message: >-
+                        The attendee signed up for a different event (ID:
+                        {{$Trigger.event_id}})
+                      status-code: 200
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Add new Eventbrite attendees to MailChimp lists
+models: {}
