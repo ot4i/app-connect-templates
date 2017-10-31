@@ -19,7 +19,7 @@
   },
   {   
     "name": "Send Gmail message to new Salesforce lead",
-    "description": "This template will create and send an email via Gmail when a new lead is created in Salesforce. If there is no email provided for the lead then we log an error about the missing email.",
+    "description": "This template creates and sends an email via Gmail when a new lead is created in Salesforce. If there is no email provided for the lead then we log an error about the missing email.",
     "summary": "Salesforce to Gmail",
     "sourceApp": "salesforce",
     "targetApps": ["gmail"],
@@ -28,16 +28,16 @@
   },
   {   
     "name": "Create new leads in Marketo by capturing lead names and details in Slack",
-    "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), it then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
+    "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), and then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
     "summary": "Slack to 3 applications",
     "sourceApp": "slack",
-    "targetApps": ["gmail", "googlesheet", "marketo", "slack"],
+    "targetApps": ["googlesheet", "marketo", "slack"],
     "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "lead", "leadcapturing"],
     "offerings": ["app connect professional"]
   },
   {   
     "name": "Send a Gmail message when urgent ServiceNow incidents come in",
-    "description": "This template will send an email via Gmail when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
+    "description": "This template sends an email via Gmail when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
     "summary": "ServiceNow to Gmail",
     "sourceApp": "servicenow",
     "targetApps": ["gmail"],
@@ -46,7 +46,7 @@
   },
   {   
     "name": "Create a new Trello card for a new Salesforce campaign",
-    "description": "This template will create a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
+    "description": "This template creates a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
     "summary": "Salesforce to Trello",
     "sourceApp": "salesforce",
     "targetApps": ["trello"],
@@ -55,16 +55,16 @@
   },
   {   
     "name": "Create a new Trello card for a new Salesforce lead",
-    "description": "This template will create a new card in Trello when a new lead is created in Salesforce - make sure you never forget to follow up with that lead again!",
+    "description": "This template creates a new card in Trello when a new lead is created in Salesforce - make sure you never forget to follow up with that lead again!",
     "summary": "Salesforce to Gmail",
     "sourceApp": "salesforce",
     "targetApps": ["trello"],
     "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
     "offerings": ["app connect professional"]
-    },
+  },
   {   
     "name": "Create a new Trello card when a new event in Eventbrite is added",
-    "description": "This template will create a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.",
+    "description": "This template creates a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.",
     "summary": "Eventbrite to Trello",
     "sourceApp": "eventbrite",
     "targetApps": ["trello"],
@@ -72,8 +72,17 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Add new Eventbrite attendees to MailChimp lists",
+    "description": "This template adds attendees of Eventbrite events to different mailing lists in MailChimp, depending on the event that they sign up to.",
+    "summary": "Eventbrite to MailChimp",
+    "sourceApp": "eventbrite",
+    "targetApps": ["mailchimp"],
+    "tags": ["eventbrite", "mailchimp", "marketing", "events", "mailing list"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
-    "description": "This template will create and send an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
+    "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
     "summary": "Eventbrite to Gmail",
     "sourceApp": "eventbrite",
     "targetApps": ["gmail"],
