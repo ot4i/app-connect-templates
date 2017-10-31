@@ -1,6 +1,6 @@
-1. Clicking the ‘use this template’ button will take you to the App connect flow editor. You will need to click on each node in your flow to be able to switch it on. 
+1. Clicking **Create flow** will take you to the App connect flow editor. You'll need to click each node in your flow to be able to switch on the flow. 
 1. In App Connect, connect to your Slack account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/) 
-1. In App Connect, connect to your Eventbrite account 
-1. Click on the IF node and change the Event ID to your own Event ID - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-eventbrite/) 
-1. Connect to Mailchimp and select different mailing lists for each Mailchimp node - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-mailchimp/)
-1. Select **Exit and switch on** flow and you’re done!
+1. In App Connect, connect to your Eventbrite account. 
+1. Click the **If** node and change the Event IDs to the IDs of your own events - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-eventbrite/) 
+1. Connect to MailChimp and select your own mailing lists for each Mailchimp action - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-mailchimp/)
+1. Click **Exit and switch on** and you’re done!
