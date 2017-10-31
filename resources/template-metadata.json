@@ -25,7 +25,15 @@
     "targetApps": ["gmail"],
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
-  },
+ },
+  {   
+    "name": "For large Salesforce opportunities send an email and create an Asana task",
+    "description": "This template creates and sends an email via Gmail, and creates an Asana task, when a new high value opportunity is created in Salesforce.",
+    "summary": "Salesforce to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["gmail", "asana"],
+    "tags": ["Salesforce", "gmail", "asana", "sales", "opportunity", "email", "crm"],
+    "offerings": ["app connect professional"] },
   {   
     "name": "Create new leads in Marketo by capturing lead names and details in Slack",
     "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), and then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
