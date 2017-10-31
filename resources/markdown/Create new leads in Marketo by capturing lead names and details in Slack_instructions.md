@@ -1,7 +1,7 @@
-1. Clicking the ‘use this template’ button will take you to the App connect flow editor. You will need to click on each app in your flow to be able to switch it on.
-1. In App Connect, connect to your Slack account [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/)
-1. On the Slack trigger copy the callback URL to clipboard and create a custom slash command called '/customer' steps on how to set this up are [here](https://developer.ibm.com/integration/docs/app-connect/tutorials-for-ibm-app-connect/creating-event-driven-flow-can-use-slack-perform-action-another-application/) 
-1. Then connect to your Google Sheets account [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-google-sheets/) 
-1. Then connect to your Marketo account [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-marketo/)
-1. Then on the Slack action, choose the required channel and edit the message as per your business needs
-1. Select exit and turn on flow and you’re done!
+1. Clicking **Create flow** will take you to the App Connect flow editor. You'll need to click each node in your flow to be able to switch on the flow.
+1. In App Connect, connect to your Slack account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/).
+1. On the Slack "New message" event, copy the callback URL to the clipboard, and create a custom slash command called '/customer' - [more info here](https://developer.ibm.com/integration/docs/app-connect/tutorials-for-ibm-app-connect/creating-event-driven-flow-can-use-slack-perform-action-another-application/). 
+1. Connect to your Google Sheets account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-google-sheets/). 
+1. Connect to your Marketo account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-marketo/).
+1. On the Slack "Create message" action, choose the required channel and edit the message to meet your business needs.
+1. Click **Exit and switch on** and you’re done!
