@@ -27,6 +27,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Send a Gmail message when urgent ServiceNow incidents come in",
+    "description": "This template will send an email via Gmail when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
+    "summary": "ServiceNow to Gmail",
+    "sourceApp": "servicenow",
+    "targetApps": ["gmail"],
+    "tags": ["servicenow", "gmail", "support", "email", "incident"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Create a new Trello card for a new Salesforce campaign",
     "description": "This template will create a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
     "summary": "Salesforce to Trello",
