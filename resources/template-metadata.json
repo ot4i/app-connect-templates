@@ -8,7 +8,7 @@
     "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "crm", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send Gmail message for a new Salesforce Lead or a Slack message if email address is missing",
     "description": "Use this template to send your new Salesforce leads an email. If there is no email ID included then send a Slack message to your team that someone needs to call the lead.",
     "summary": "Salesforce to 2 applications",
@@ -17,7 +17,7 @@
     "tags": ["Salesforce", "slack", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send Gmail message to new Salesforce lead",
     "description": "This template creates and sends an email via Gmail when a new lead is created in Salesforce. If there is no email provided for the lead then we log an error about the missing email.",
     "summary": "Salesforce to Gmail",
@@ -25,16 +25,44 @@
     "targetApps": ["gmail"],
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
- },
-  {   
+  },
+   {
+    "name": "Create NetSuite ERP and Stripe products from Asana tasks to launch a Salesforce Pardot campaign",
+    "description": "When a new task is created in Asana, a new product is created in NetSuite ERP & Stripe, then a campaign for the new product is launched as a Salesforce Pardot Campaign.",
+    "summary": "Asana to 3 applications",
+    "sourceApp": "asana",
+    "targetApps": ["netsuiteerp", "salesforcepardot", "stripe"],
+    "tags": ["asana", "netsuiteerp", "salesforcepardot", "stripe", "marketing", "campaign", "product", "crm"],
+    "offerings": ["app connect professional"]
+},
+{
+ "name": "Creating targeted contact lists based on unconverted leads and geography",
+ "description": "This template triggers on a new Eventbrite event. It retrieves new unconverted leads from Salesforce and checks to see if their city features in the event.  If it does, they they are added to a newly created Eventbrite contact list which can be reviewed by the organisers, who are notified about this list creation in Slack.",
+ "summary": "Eventbrite to 3 applications",
+ "sourceApp": "eventbrite",
+ "targetApps": ["slack", "salesforce", "eventbrite"],
+ "tags": ["eventbrite", "slack", "salesforce", "contacts", "marketing", "leads", "events", "matching", "city", "notification"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Arrange welcome drinks for an Eventbrite event",
+ "description": "Use this template to organize welcome drinks for an Eventbrite event. Each attendee automatically receives a text message, via Twilio, which they can show on arrival to collect their complimentary drink. Your drinks order in Salesforce is automatically updated each time a new attendee registers. The organizer of the event is kept updated via Slack about the number of attendees registered, and is instructed to check and place the drinks order once your event is fully subscribed!",
+ "summary": "Eventbrite to 4 applications",
+ "sourceApp": "eventbrite",
+ "targetApps": ["slack", "salesforce", "eventbrite", "twilio"],
+ "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
+ "offerings": ["app connect professional"]
+},
+  {
     "name": "For large Salesforce opportunities send an email and create an Asana task",
     "description": "This template creates and sends an email via Gmail, and creates an Asana task, when a new high value opportunity is created in Salesforce.",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["gmail", "asana"],
     "tags": ["Salesforce", "gmail", "asana", "sales", "opportunity", "email", "crm"],
-    "offerings": ["app connect professional"] },
-  {   
+    "offerings": ["app connect professional"]
+  },
+  {
     "name": "Create new leads in Marketo by capturing lead names and details in Slack",
     "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), and then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
     "summary": "Slack to 3 applications",
@@ -43,7 +71,7 @@
     "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "lead", "leadcapturing"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send a Gmail message when urgent ServiceNow incidents come in",
     "description": "This template sends an email via Gmail when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
     "summary": "ServiceNow to Gmail",
@@ -52,7 +80,7 @@
     "tags": ["servicenow", "gmail", "support", "email", "incident"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card for a new Salesforce campaign",
     "description": "This template creates a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
     "summary": "Salesforce to Trello",
@@ -61,7 +89,7 @@
     "tags": ["salesforce", "trello", "marketing", "campaign", "project management", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card for a new Salesforce lead",
     "description": "This template creates a new card in Trello when a new lead is created in Salesforce - make sure you never forget to follow up with that lead again!",
     "summary": "Salesforce to Trello",
@@ -70,7 +98,7 @@
     "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card when a new event in Eventbrite is added",
     "description": "This template creates a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.",
     "summary": "Eventbrite to Trello",
@@ -79,7 +107,7 @@
     "tags": ["eventbrite", "trello", "marketing", "events", "project management"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Add new Eventbrite attendees to MailChimp lists",
     "description": "This template adds attendees of Eventbrite events to different mailing lists in MailChimp, depending on the event that they sign up to.",
     "summary": "Eventbrite to MailChimp",
@@ -88,7 +116,7 @@
     "tags": ["eventbrite", "mailchimp", "marketing", "events", "mailing list"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
     "summary": "Eventbrite to Gmail",
