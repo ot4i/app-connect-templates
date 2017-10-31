@@ -1,0 +1,107 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: RawMessage
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: default
+      connector-type: slack
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - spreadsheetID:
+                      template: 1Aegwd4YM6dMXy91pSM-wGXocNU6J9hZny_qgMZBjhkY
+                  - worksheetID:
+                      template: Sheet1
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$split($Trigger.messageBody , " ")[0]}}'
+                        - '2':
+                            template: '{{$split($Trigger.messageBody , " ")[1]}}'
+                        - '3':
+                            template: '{{$split($Trigger.messageBody , " ")[2]}}'
+                        - '4':
+                            template: '{{$split($Trigger.messageBody , " ")[3]}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Marketo Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - company:
+                      template: '{{$split($Trigger.messageBody , " ")[3]}}'
+                  - email:
+                      template: '{{$split($Trigger.messageBody , " ")[0]}}'
+                  - firstName:
+                      template: '{{$split($Trigger.messageBody , " ")[1]}}'
+                  - lastName:
+                      template: '{{$split($Trigger.messageBody , " ")[2]}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsCreaterow
+                    $ref: '#/node-output/Google Sheets Create row/response/payload'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: C5CQN6RL4
+                  - text:
+                      template: >-
+                        Created customer {{$split($Trigger.messageBody , "
+                        ")[1]}} {{$split($Trigger.messageBody , " ")[2]}} in
+                        Marketo. Id {{$MarketoCreatelead.id}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsCreaterow
+                    $ref: '#/node-output/Google Sheets Create row/response/payload'
+                  - variable: MarketoCreatelead
+                    $ref: '#/node-output/Marketo Create lead/response/payload'
+        tags:
+          - incomplete
+  name: Create new leads in Marketo by capturing lead names and details in Slack
+models: {}
