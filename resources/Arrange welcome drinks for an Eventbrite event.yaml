@@ -1,0 +1,526 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-3:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-5:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-7:
+      type: api-action
+      business-object: Attendee
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-8:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-10:
+      type: api-action
+      business-object: messages
+      connector-type: twilio
+      actions:
+        CREATE: {}
+    action-interface-9:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    '{{$Trigger.answers[0].answer}}':
+                      =: Wine
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve order product
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                          where:
+                            Description: Wine
+                          limit: 1
+                        allow-empty-output: false
+                        allow-truncation: false
+                    - upsert-action:
+                        name: Salesforce Update or create order product
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Quantity:
+                                expression: $SalesforceRetrieveorderproduct.Quantity +1
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveorderproduct
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product/response/payload
+                            - variable: SalesforceRetrieveorderproductMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product/response
+                        filter:
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveorderproduct
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product/response/payload
+                            - variable: SalesforceRetrieveorderproductMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product/response
+                          where:
+                            Description: Wine
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SalesforceRetrieveorderproduct
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Retrieve order
+                          product/response/payload
+                      - variable: SalesforceRetrieveorderproductMetadata
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Retrieve order
+                          product/response
+                      - variable: SalesforceUpdateorcreateorderproduct
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Update or create
+                          order product/response/payload
+                      - variable: SalesforceUpdateorcreateorderproductMetadata
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Update or create
+                          order product/response
+                    mappings:
+                      - Drink attendee ordered:
+                          template: '{{$SalesforceRetrieveorderproduct.Description}}'
+                      - Order ID:
+                          template: '{{$SalesforceRetrieveorderproduct.OrderId}}'
+                - condition:
+                    '{{$Trigger.answers[0].answer}}':
+                      =: Beer
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve order product 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                          where:
+                            Description: Beer
+                          limit: 1
+                        allow-empty-output: false
+                        allow-truncation: false
+                    - upsert-action:
+                        name: Salesforce Update or create order product 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Quantity:
+                                expression: $SalesforceRetrieveorderproduct2.Quantity +1
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveorderproduct2
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 2/response/payload
+                            - variable: SalesforceRetrieveorderproduct2Metadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 2/response
+                        filter:
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveorderproduct2
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 2/response/payload
+                            - variable: SalesforceRetrieveorderproduct2Metadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 2/response
+                          where:
+                            Description: Beer
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SalesforceRetrieveorderproduct2
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Retrieve order
+                          product 2/response/payload
+                      - variable: SalesforceRetrieveorderproduct2Metadata
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Retrieve order
+                          product 2/response
+                      - variable: SalesforceUpdateorcreateorderproduct2
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Update or create
+                          order product 2/response/payload
+                      - variable: SalesforceUpdateorcreateorderproduct2Metadata
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Update or create
+                          order product 2/response
+                    mappings:
+                      - Drink attendee ordered:
+                          template: '{{$SalesforceRetrieveorderproduct2.Description}}'
+                      - Order ID:
+                          template: '{{$SalesforceRetrieveorderproduct2.OrderId}}'
+                - condition:
+                    '{{$Trigger.answers[0].answer}}':
+                      =: Juice
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve order product 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        filter:
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                          where:
+                            Description: Juice
+                          limit: 1
+                        allow-empty-output: false
+                        allow-truncation: false
+                    - upsert-action:
+                        name: Salesforce Update or create order product 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - Quantity:
+                                expression: $SalesforceRetrieveorderproduct3.Quantity +1
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveorderproduct3
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 3/response/payload
+                            - variable: SalesforceRetrieveorderproduct3Metadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 3/response
+                        filter:
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveorderproduct3
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 3/response/payload
+                            - variable: SalesforceRetrieveorderproduct3Metadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve order
+                                product 3/response
+                          where:
+                            Description: Juice
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SalesforceRetrieveorderproduct3
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Retrieve order
+                          product 3/response/payload
+                      - variable: SalesforceRetrieveorderproduct3Metadata
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Retrieve order
+                          product 3/response
+                      - variable: SalesforceUpdateorcreateorderproduct3
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Update or create
+                          order product 3/response/payload
+                      - variable: SalesforceUpdateorcreateorderproduct3Metadata
+                        $ref: >-
+                          #/block/If/node-output/Salesforce Update or create
+                          order product 3/response
+                    mappings:
+                      - Drink attendee ordered:
+                          template: '{{$SalesforceRetrieveorderproduct3.Description}}'
+                      - Order ID:
+                          template: '{{$SalesforceRetrieveorderproduct3.OrderId}}'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    error:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                      message: >-
+                        Attendee {{$Trigger.profile.first_name}}
+                        {{$Trigger.profile.last_name}} did not order a drink.
+                      status-code: 400
+              output-schema:
+                required:
+                  - Order ID
+                  - Drink attendee ordered
+                properties:
+                  Order ID:
+                    type: string
+                    title: Order ID
+                  Drink attendee ordered:
+                    type: string
+                    title: Drink attendee ordered
+                type: object
+          - create-action:
+              name: Twilio Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-10'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Thanks for registering. Show this text message when you
+                        arrive to collect your complimentary {{$If."Drink
+                        attendee ordered"}}. See you soon.
+                  - From:
+                      template: <enter Twilio phone number here>
+                  - To:
+                      template: '{{$Trigger.profile.cell_phone}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/node-output/If/response/payload'
+          - retrieve-action:
+              name: Eventbrite Retrieve attendees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              filter:
+                where:
+                  event_id: <enter event id here>
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/node-output/If/response/payload'
+                  - variable: TwilioCreatemessage
+                    $ref: '#/node-output/Twilio Create message/response/payload'
+                limit: 10
+              allow-empty-output: false
+              allow-truncation: false
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: If
+                  $ref: '#/node-output/If/response/payload'
+                - variable: TwilioCreatemessage
+                  $ref: '#/node-output/Twilio Create message/response/payload'
+                - variable: EventbriteRetrieveattendees
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response/payload'
+                - variable: EventbriteRetrieveattendeesMetadata
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+              branch:
+                - condition:
+                    '{{$sum($EventbriteRetrieveattendees.quantity)}}':
+                      lt: '10'
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-8'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C7F1VAK0B
+                            - text:
+                                template: >-
+                                  There are
+                                  {{$sum($EventbriteRetrieveattendees.quantity)}}
+                                  attendees registered for our event.
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: If
+                              $ref: '#/node-output/If/response/payload'
+                            - variable: TwilioCreatemessage
+                              $ref: >-
+                                #/node-output/Twilio Create
+                                message/response/payload
+                            - variable: EventbriteRetrieveattendees
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response/payload
+                            - variable: EventbriteRetrieveattendeesMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage
+                        $ref: >-
+                          #/block/If 2/node-output/Slack Create
+                          message/response/payload
+                      - variable: If
+                        $ref: '#/node-output/If/response/payload'
+                      - variable: TwilioCreatemessage
+                        $ref: '#/node-output/Twilio Create message/response/payload'
+                      - variable: EventbriteRetrieveattendees
+                        $ref: >-
+                          #/node-output/Eventbrite Retrieve
+                          attendees/response/payload
+                      - variable: EventbriteRetrieveattendeesMetadata
+                        $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                    mappings: []
+                - condition:
+                    '{{$sum($EventbriteRetrieveattendees.quantity)}}':
+                      =: '10'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-9'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C7F1VAK0B
+                            - text:
+                                template: >-
+                                  Our event is now fully subscribed! Please
+                                  check and place order id: {{$If."Order ID"}}.
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: If
+                              $ref: '#/node-output/If/response/payload'
+                            - variable: TwilioCreatemessage
+                              $ref: >-
+                                #/node-output/Twilio Create
+                                message/response/payload
+                            - variable: EventbriteRetrieveattendees
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response/payload
+                            - variable: EventbriteRetrieveattendeesMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage2
+                        $ref: >-
+                          #/block/If 2/node-output/Slack Create message
+                          2/response/payload
+                      - variable: If
+                        $ref: '#/node-output/If/response/payload'
+                      - variable: TwilioCreatemessage
+                        $ref: '#/node-output/Twilio Create message/response/payload'
+                      - variable: EventbriteRetrieveattendees
+                        $ref: >-
+                          #/node-output/Eventbrite Retrieve
+                          attendees/response/payload
+                      - variable: EventbriteRetrieveattendeesMetadata
+                        $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    error:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: If
+                          $ref: '#/node-output/If/response/payload'
+                        - variable: TwilioCreatemessage
+                          $ref: '#/node-output/Twilio Create message/response/payload'
+                        - variable: EventbriteRetrieveattendees
+                          $ref: >-
+                            #/node-output/Eventbrite Retrieve
+                            attendees/response/payload
+                        - variable: EventbriteRetrieveattendeesMetadata
+                          $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                      message: Please check how many tickets have been ordered.
+                      status-code: 400
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Arrange welcome drinks for an Eventbrite event
+models: {}
