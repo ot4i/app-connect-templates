@@ -1,4 +1,4 @@
-1. Clicking **Create flow** will take you to the App connect flow editor. You'll need to click each node in your flow to be able to switch on the flow. 
+1. Clicking **Create flow** will take you to the App Connect flow editor. You'll need to click each node in your flow to be able to switch on the flow. 
 1. In App Connect, connect to your Slack account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/) 
 1. In App Connect, connect to your Eventbrite account. 
 1. Click the **If** node and change the Event IDs to the IDs of your own events - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-eventbrite/) 
