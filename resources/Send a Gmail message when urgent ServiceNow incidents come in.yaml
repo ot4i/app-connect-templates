@@ -1,0 +1,67 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: servicenow
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input: []
+              branch:
+                - condition:
+                    '{{$Trigger.urgency}}':
+                      =: '1'
+                  execute:
+                    - create-action:
+                        name: Gmail Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$Trigger.short_description}}'
+                            - Subject:
+                                template: 'New High Urgency Incident #{{$Trigger.sys_id}}'
+                            - To:
+                                template: tonycurcio@yahoo.com
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: GmailCreatemessage
+                        $ref: >-
+                          #/block/If/node-output/Gmail Create
+                          message/response/payload
+                    mappings: []
+              else:
+                execute: []
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  mappings: []
+                  input:
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Send a Gmail message when urgent ServiceNow incidents come in
+models: {}
