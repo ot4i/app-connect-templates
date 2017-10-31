@@ -27,6 +27,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Create new leads in Marketo by capturing lead names and details in Slack",
+    "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), it then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
+    "summary": "Slack to 3 applications",
+    "sourceApp": "slack",
+    "targetApps": ["gmail", "googlesheet", "marketo", "slack"],
+    "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "lead", "leadcapturing"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Send a Gmail message when urgent ServiceNow incidents come in",
     "description": "This template will send an email via Gmail when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
     "summary": "ServiceNow to Gmail",
