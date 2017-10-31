@@ -1,4 +1,4 @@
-1. Clicking **Create flow** will take you to the App Connect flow editor. You'll need to click each node in your flow to be able to switch on the flow.
+1. Clicking **Create flow** takes you to the App Connect flow editor. Click each node in your flow to validate it.
 1. In App Connect, connect to your Salesforce account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/). 
 1. Connect to your Slack account and choose the channel that you want to post the message to - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/). 
 1. Connect to your Gmail account and update the email subject and body to meet your business needs. 
