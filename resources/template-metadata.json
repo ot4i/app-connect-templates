@@ -35,6 +35,15 @@
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
  },
+{
+    "name": "Create NetSuite ERP and Stripe products from Asana tasks to launch a Salesforce Pardot campaign",
+    "description": "When a new task is created in Asana, a new product is created in NetSuite ERP & Stripe, then a campaign for the new product is launched as a Salesforce Pardot Campaign.",
+    "summary": "Asana to 3 applications",
+    "sourceApp": "asana",
+    "targetApps": ["netsuiteerp", "salesforcepardot", "stripe"],
+    "tags": ["asana", "netsuiteerp", "salesforcepardot", "stripe", "marketing", "campaign", "product", "crm"],
+    "offerings": ["app connect professional"]
+},                
   {   
     "name": "For large Salesforce opportunities send an email and create an Asana task",
     "description": "This template creates and sends an email via Gmail, and creates an Asana task, when a new high value opportunity is created in Salesforce.",
