@@ -107,6 +107,15 @@
     "tags": ["eventbrite", "trello", "marketing", "events", "project management"],
     "offerings": ["app connect professional"]
   },
+   {   
+    "name": "Invite Sales employees to an Eventbrite event",
+    "description": "This template retrieves details of your Sales staff from NetSuite HCM when a new event is created in Eventbrite.  It then sends them a message on Slack to invite them to the event.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["NetSuite HCM", "slack"],
+    "tags": ["eventbrite", "netsuite hcm", "slack", "crm", "messaging", "events"],
+    "offerings": ["app connect professional"]
+},
   {   
     "name": "Add new Eventbrite attendees to MailChimp lists",
     "description": "This template adds attendees of Eventbrite events to different mailing lists in MailChimp, depending on the event that they sign up to.",
