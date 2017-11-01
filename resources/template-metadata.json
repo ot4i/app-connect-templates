@@ -44,6 +44,15 @@
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
  },
+{
+    "name": "Create NetSuite ERP and Stripe products from Asana tasks to launch a Salesforce Pardot campaign",
+    "description": "When a new task is created in Asana, a new product is created in NetSuite ERP & Stripe, then a campaign for the new product is launched as a Salesforce Pardot Campaign.",
+    "summary": "Asana to 3 applications",
+    "sourceApp": "asana",
+    "targetApps": ["netsuiteerp", "salesforcepardot", "stripe"],
+    "tags": ["asana", "netsuiteerp", "salesforcepardot", "stripe", "marketing", "campaign", "product", "crm"],
+    "offerings": ["app connect professional"]
+},                
   {   
     "name": "For large Salesforce opportunities send an email and create an Asana task",
     "description": "This template creates and sends an email via Gmail, and creates an Asana task, when a new high value opportunity is created in Salesforce.",
@@ -53,6 +62,15 @@
     "tags": ["Salesforce", "gmail", "asana", "sales", "opportunity", "email", "crm"],
     "offerings": ["app connect professional"] 
   },
+{
+ "name": "Arrange welcome drinks for an Eventbrite event",
+ "description": "Use this template to organize welcome drinks for an Eventbrite event. Each attendee automatically receives a text message, via Twilio, which they can show on arrival to collect their complimentary drink. Your drinks order in Salesforce is automatically updated each time a new attendee registers. The organizer of the event is kept updated via Slack about the number of attendees registered, and is instructed to check and place the drinks order once your event is fully subscribed!",
+ "summary": "Eventbrite to 4 applications",
+ "sourceApp": "eventbrite",
+ "targetApps": ["slack", "salesforce", "eventbrite", "twilio"],
+ "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
+ "offerings": ["app connect professional"]
+},
    {   
     "name": "Sync a new Salesforce contact with Intacct",
     "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
@@ -112,7 +130,7 @@
     "description": "This template retrieves details of your Sales staff from NetSuite HCM when a new event is created in Eventbrite.  It then sends them a message on Slack to invite them to the event.",
     "summary": "Eventbrite to 2 applications",
     "sourceApp": "eventbrite",
-    "targetApps": ["NetSuite HCM", "slack"],
+    "targetApps": ["netsuitehc", "slack"],
     "tags": ["eventbrite", "netsuite hcm", "slack", "crm", "messaging", "events"],
     "offerings": ["app connect professional"]
 },
