@@ -49,7 +49,7 @@
     "description": "When a new task is created in Asana, a new product is created in NetSuite ERP & Stripe, then a campaign for the new product is launched as a Salesforce Pardot Campaign.",
     "summary": "Asana to 3 applications",
     "sourceApp": "asana",
-    "targetApps": ["netsuiteerp", "salesforcepardot", "stripe"],
+    "targetApps": ["netsuiteerp", "stripe", "salesforcepardot"],
     "tags": ["asana", "netsuiteerp", "salesforcepardot", "stripe", "marketing", "campaign", "product", "crm"],
     "offerings": ["app connect professional"]
 },                
@@ -67,7 +67,7 @@
  "description": "Use this template to organize welcome drinks for an Eventbrite event. Each attendee automatically receives a text message, via Twilio, which they can show on arrival to collect their complimentary drink. Your drinks order in Salesforce is automatically updated each time a new attendee registers. The organizer of the event is kept updated via Slack about the number of attendees registered, and is instructed to check and place the drinks order once your event is fully subscribed!",
  "summary": "Eventbrite to 4 applications",
  "sourceApp": "eventbrite",
- "targetApps": ["slack", "salesforce", "eventbrite", "twilio"],
+ "targetApps": ["salesforce", "twilio", "eventbrite", "slack"],
  "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
  "offerings": ["app connect professional"]
 },
