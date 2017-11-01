@@ -44,6 +44,15 @@
     "tags": ["Salesforce", "gmail", "asana", "sales", "opportunity", "email", "crm"],
     "offerings": ["app connect professional"] 
   },
+{
+ "name": "Arrange welcome drinks for an Eventbrite event",
+ "description": "Use this template to organize welcome drinks for an Eventbrite event. Each attendee automatically receives a text message, via Twilio, which they can show on arrival to collect their complimentary drink. Your drinks order in Salesforce is automatically updated each time a new attendee registers. The organizer of the event is kept updated via Slack about the number of attendees registered, and is instructed to check and place the drinks order once your event is fully subscribed!",
+ "summary": "Eventbrite to 4 applications",
+ "sourceApp": "eventbrite",
+ "targetApps": ["slack", "salesforce", "eventbrite", "twilio"],
+ "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
+ "offerings": ["app connect professional"]
+},
    {   
     "name": "Sync a new Salesforce contact with Intacct",
     "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
