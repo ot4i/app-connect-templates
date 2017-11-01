@@ -1,0 +1,236 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Event
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Contact
+      connector-type: eventbrite
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: ContactList
+      connector-type: eventbrite
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: ContactList
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Eventbrite Create contact list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - name:
+                      template: 'Potential leads for event {{$Trigger.name.html}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - retrieve-action:
+              name: Salesforce Retrieve Lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                where:
+                  IsConverted: 'false'
+                limit: 20
+              allow-empty-output: true
+              allow-truncation: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrieveLead '
+                input:
+                  - variable: SalesforceRetrieveLead
+                    $ref: '#/node-output/Salesforce Retrieve Lead/response/payload'
+              mode: parallel
+              continue-on-error: true
+              display-name: Salesforce Lead
+          - retrieve-action:
+              name: Eventbrite Retrieve contact lists
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              filter:
+                where:
+                  id: '{{$EventbriteCreatecontactlist.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteCreatecontactlist
+                    $ref: >-
+                      #/node-output/Eventbrite Create contact
+                      list/response/payload
+                limit: 1
+              allow-empty-output: false
+              allow-truncation: false
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: C7ES5KKV1
+                  - text:
+                      template: >-
+                        Created contact list
+                        {{$EventbriteRetrievecontactlists.name}} for event
+                        {{$Trigger.name.html}} : {{$Trigger.url}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteCreatecontactlist
+                    $ref: >-
+                      #/node-output/Eventbrite Create contact
+                      list/response/payload
+                  - variable: SalesforceRetrieveLead
+                    $ref: '#/node-output/Salesforce Retrieve Lead/response/payload'
+                  - variable: SalesforceRetrieveLeadMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Lead/response'
+                  - variable: EventbriteRetrievecontactlists
+                    $ref: >-
+                      #/node-output/Eventbrite Retrieve contact
+                      lists/response/payload
+                  - variable: EventbriteRetrievecontactlistsMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve contact lists/response'
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: EventbriteCreatecontactlist
+                  $ref: >-
+                    #/node-output/Eventbrite Create contact
+                    list/response/payload
+                - variable: SalesforceRetrieveLead
+                  $ref: '#/node-output/Salesforce Retrieve Lead/response/payload'
+                - variable: SalesforceRetrieveLeadMetadata
+                  $ref: '#/node-output/Salesforce Retrieve Lead/response'
+              branch:
+                - condition:
+                    '{{$contains($Trigger.description.html, $Foreachitem.City )}}':
+                      =: 'true'
+                  execute:
+                    - create-action:
+                        name: Eventbrite Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - contact_list_id:
+                                template: 8ea5e2ad-25bd-4719-be2a-0c08cd2a6023
+                            - email:
+                                template: '{{$Foreachitem.Email}}'
+                            - first_name:
+                                template: '{{$Foreachitem.FirstName}}'
+                            - last_name:
+                                template: '{{$Foreachitem.LastName}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackCreatemessage3
+                              $ref: >-
+                                #/block/If/node-output/Slack Create message
+                                3/response/payload
+                            - variable: EventbriteCreatecontactlist
+                              $ref: >-
+                                #/node-output/Eventbrite Create contact
+                                list/response/payload
+                            - variable: SalesforceRetrieveLead
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                Lead/response/payload
+                            - variable: SalesforceRetrieveLeadMetadata
+                              $ref: '#/node-output/Salesforce Retrieve Lead/response'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: EventbriteCreatecontact
+                        $ref: >-
+                          #/block/If/node-output/Eventbrite Create
+                          contact/response/payload
+                      - variable: EventbriteCreatecontactlist
+                        $ref: >-
+                          #/node-output/Eventbrite Create contact
+                          list/response/payload
+                      - variable: SalesforceRetrieveLead
+                        $ref: >-
+                          #/node-output/Salesforce Retrieve
+                          Lead/response/payload
+                      - variable: SalesforceRetrieveLeadMetadata
+                        $ref: '#/node-output/Salesforce Retrieve Lead/response'
+                    mappings: []
+              else:
+                execute: []
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  input:
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: EventbriteCreatecontactlist
+                      $ref: >-
+                        #/node-output/Eventbrite Create contact
+                        list/response/payload
+                    - variable: SalesforceRetrieveLead
+                      $ref: '#/node-output/Salesforce Retrieve Lead/response/payload'
+                    - variable: SalesforceRetrieveLeadMetadata
+                      $ref: '#/node-output/Salesforce Retrieve Lead/response'
+                  mappings: []
+              output-schema: {}
+  name: Creating targeted contact lists based on unconverted leads and geography
+models: {}
