@@ -121,7 +121,7 @@
     "description": "This template retrieves details of your Sales staff from NetSuite HCM when a new event is created in Eventbrite.  It then sends them a message on Slack to invite them to the event.",
     "summary": "Eventbrite to 2 applications",
     "sourceApp": "eventbrite",
-    "targetApps": ["NetSuite HCM", "slack"],
+    "targetApps": ["netsuitehc", "slack"],
     "tags": ["eventbrite", "netsuite hcm", "slack", "crm", "messaging", "events"],
     "offerings": ["app connect professional"]
 },
