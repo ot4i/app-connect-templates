@@ -1,0 +1,196 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: RawMessage
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: default
+      connector-type: slack
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: ticket
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: ticket
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input: []
+              branch:
+                - condition:
+                    '{{$Trigger.messageBody}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create ticket
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - short_description:
+                                template: >-
+                                  {{$substringAfter($Trigger.messageBody , "
+                                  ")}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                    - retrieve-action:
+                        name: ServiceNow Retrieve tickets
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            sys_id: '{{$ServiceNowCreateticket.sys_id}}'
+                          input:
+                            - variable: ServiceNowCreateticket
+                              $ref: >-
+                                #/block/If/node-output/ServiceNow Create
+                                ticket/response/payload
+                          limit: 1
+                        allow-empty-output: true
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                    - if:
+                        name: If 2
+                        input:
+                          - variable: ServiceNowCreateticket
+                            $ref: >-
+                              #/block/If/node-output/ServiceNow Create
+                              ticket/response/payload
+                          - variable: ServiceNowRetrievetickets
+                            $ref: >-
+                              #/block/If/node-output/ServiceNow Retrieve
+                              tickets/response/payload
+                          - variable: ServiceNowRetrieveticketsMetadata
+                            $ref: >-
+                              #/block/If/node-output/ServiceNow Retrieve
+                              tickets/response
+                        branch:
+                          - condition:
+                              '{{$ServiceNowCreateticket.sys_id}}':
+                                neq: ''
+                            execute:
+                              - create-action:
+                                  name: Gmail Create message 2
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-2
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            {{$substringAfter($Trigger.messageBody ,
+                                            " ")}}
+                                      - Subject:
+                                          template: >-
+                                            ServiceNow Ticket Created :
+                                            {{$ServiceNowRetrievetickets.sys_id}}  |
+                                            Date :
+                                            {{$ServiceNowRetrievetickets.sys_created_on}}
+                                    $map: 'http://ibm.com/appconnect/map/v1'
+                                    input:
+                                      - variable: ServiceNowCreateticket
+                                        $ref: >-
+                                          #/block/If/node-output/ServiceNow Create
+                                          ticket/response/payload
+                                      - variable: ServiceNowRetrievetickets
+                                        $ref: >-
+                                          #/block/If/node-output/ServiceNow
+                                          Retrieve tickets/response/payload
+                                      - variable: ServiceNowRetrieveticketsMetadata
+                                        $ref: >-
+                                          #/block/If/node-output/ServiceNow
+                                          Retrieve tickets/response
+                            map:
+                              $map: 'http://ibm.com/appconnect/map/v1'
+                              input:
+                                - variable: ServiceNowCreateticket
+                                  $ref: >-
+                                    #/block/If/node-output/ServiceNow Create
+                                    ticket/response/payload
+                                - variable: ServiceNowRetrievetickets
+                                  $ref: >-
+                                    #/block/If/node-output/ServiceNow Retrieve
+                                    tickets/response/payload
+                                - variable: ServiceNowRetrieveticketsMetadata
+                                  $ref: >-
+                                    #/block/If/node-output/ServiceNow Retrieve
+                                    tickets/response
+                              mappings: []
+                        else:
+                          execute: []
+                          completion-action:
+                            terminate:
+                              info:
+                                input:
+                                  - variable: ServiceNowCreateticket
+                                    $ref: >-
+                                      #/block/If/node-output/ServiceNow Create
+                                      ticket/response/payload
+                                  - variable: ServiceNowRetrievetickets
+                                    $ref: >-
+                                      #/block/If/node-output/ServiceNow Retrieve
+                                      tickets/response/payload
+                                  - variable: ServiceNowRetrieveticketsMetadata
+                                    $ref: >-
+                                      #/block/If/node-output/ServiceNow Retrieve
+                                      tickets/response
+                                message: >-
+                                  {{$ServiceNowRetrieveticketsMetadata."status-code"}}
+                                status-code: 200
+                        output-schema: {}
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: ServiceNowCreateticket
+                        $ref: >-
+                          #/block/If/node-output/ServiceNow Create
+                          ticket/response/payload
+                      - variable: ServiceNowRetrievetickets
+                        $ref: >-
+                          #/block/If/node-output/ServiceNow Retrieve
+                          tickets/response/payload
+                      - variable: ServiceNowRetrieveticketsMetadata
+                        $ref: >-
+                          #/block/If/node-output/ServiceNow Retrieve
+                          tickets/response
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input: []
+                      message: '{{$Trigger.archiveMessageURL}}'
+                      status-code: 200
+              output-schema:
+                required: []
+                properties: {}
+                type: object
+        tags:
+          - incomplete
+  name: >-
+    Open a ticket on ServiceNow from an identified issue in Slack and send an
+    email using Gmail
+models: {}
