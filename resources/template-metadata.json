@@ -71,6 +71,15 @@
  "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
  "offerings": ["app connect professional"]
 },
+{
+ "name": "Creating targeted contact lists based on unconverted leads and geography",
+ "description": "This template triggers on a new Eventbrite event. It retrieves new unconverted leads from Salesforce and checks to see if their city features in the event.  If it does, they they are added to a newly created Eventbrite contact list which can be reviewed by the organisers, who are notified about this list creation in Slack.",
+ "summary": "Eventbrite to 3 applications",
+ "sourceApp": "eventbrite",
+ "targetApps": ["eventbrite", "salesforce", "slack"],
+ "tags": ["eventbrite", "slack", "salesforce", "contacts", "marketing", "leads", "events", "matching", "city", "notification"],
+ "offerings": ["app connect professional"]
+},           
    {   
     "name": "Sync a new Salesforce contact with Intacct",
     "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
