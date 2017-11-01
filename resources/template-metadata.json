@@ -16,6 +16,15 @@
     "targetApps": ["servicenow", "gmail"],
     "tags": ["servicenow", "slack", "gmail", "support", "ticket", "email"],
     "offerings": ["app connect professional"]
+    },
+  {   
+    "name": "Create a case in Salesforce when a new incident is created in ServiceNow and alert team",
+    "description": "This template creates a new case in Salesforce when a new incident is created in ServiceNow. If this is an urgent incident, the flow then sends an email via Gmail and a message on Slack to alert the team when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
+    "summary": "ServiceNow to 3 applications",
+    "sourceApp": "servicenow",
+    "targetApps": ["salesforce", "gmail", "slack"],
+    "tags": ["servicenow", "gmail", "support", "email", "incident", "salesforce", "slack", "crm"],
+    "offerings": ["app connect professional"]
   },
   {   
     "name": "Send Gmail message for a new Salesforce Lead or a Slack message if email address is missing",
