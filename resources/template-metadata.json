@@ -9,6 +9,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Open a ticket on ServiceNow from an identified issue in Slack and send an email using Gmail",
+    "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow will send you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
+    "summary": "Slack to 2 applications",
+    "sourceApp": "slack",
+    "targetApps": ["servicenow", "gmail"],
+    "tags": ["servicenow", "slack", "gmail", "support", "ticket", "email"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Send Gmail message for a new Salesforce Lead or a Slack message if email address is missing",
     "description": "Use this template to send your new Salesforce leads an email. If there is no email ID included then send a Slack message to your team that someone needs to call the lead.",
     "summary": "Salesforce to 2 applications",
