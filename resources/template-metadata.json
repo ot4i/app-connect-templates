@@ -52,6 +52,15 @@
     "targetApps": ["gmail"],
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
+  },
+  {   
+    "name": "Sync Salesforce contacts and Mailchimp mailing list subscribers",
+    "description": "This template adds new Salesforce contacts to Mailchimp lists and sends an email via Gmail to alert you if a contact's email address is missing.",
+    "summary": "Salesforce to 3 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["salesforce", "gmail", "mailchimp"],
+    "tags": ["Salesforce", "gmail", "marketing", "contact", "email", "crm", "mailchimp"],
+    "offerings": ["app connect professional"]
  },
 {
     "name": "Create NetSuite ERP and Stripe products from Asana tasks to launch a Salesforce Pardot campaign",
