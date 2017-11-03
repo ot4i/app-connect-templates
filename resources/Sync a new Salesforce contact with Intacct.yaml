@@ -255,5 +255,5 @@ integration:
                     - variable: IntacctRetrievecontactsMetadata
                       $ref: '#/node-output/Intacct Retrieve contacts/response'
               output-schema: {}
-  name: Sync new Salesforce Contact with Intacct
+  name: Sync a new Salesforce contact with Intacct
 models: {}
