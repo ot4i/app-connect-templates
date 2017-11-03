@@ -238,5 +238,5 @@ integration:
                       message: OK
                       status-code: 200
               output-schema: {}
-  name: Language based incident assignment
+  name: Assign ServiceNow incidents on Slack based on the language
 models: {}
