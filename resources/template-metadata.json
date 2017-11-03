@@ -9,6 +9,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Sync new Salesforce cases and comments with ServiceNow",
+    "description": "This template looks for new cases added in your Salesforce account and syncs this by creating a new ticket in ServiceNow that includes the comments from the original case.",
+    "summary": "Salesforce to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["salesforce","servicenow"],
+    "tags": ["servicenow", "salesforce", "case", "support", "ticket"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Open a ticket on ServiceNow from an identified issue in Slack and send an email using Gmail",
     "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow will send you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
     "summary": "Slack to 2 applications",
