@@ -45,6 +45,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Sync new Salesforce cases and ServiceNow tickets",
+    "description": "The template creates a new ticket in ServiceNow when a new case is created in Salesforce - helping you to keep your support services in sync!",
+    "summary": "Salesforce to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["salesforce","servicenow"],
+    "tags": ["servicenow", "salesforce", "case", "support", "ticket"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Sync Marketo new leads with Salesforce Leads",
     "description": "Never miss a lead again! This templates creates or updates a new lead in Salesforce when a new lead is created in Marketo.",
     "summary": "Marketo to Salesforce",
