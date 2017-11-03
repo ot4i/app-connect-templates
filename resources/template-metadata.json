@@ -71,6 +71,15 @@
     "tags": ["Salesforce", "gmail", "marketing", "contact", "email", "crm", "mailchimp"],
     "offerings": ["app connect professional"]
  },
+   {
+    "name": "Assign ServiceNow incidents on Slack based on the language",
+    "description": "This template uses Watson Language Translator to detect the language of new ServiceNow incidents, then send messages to the appropriate Slack channels based on the language.  It also sends a message to a separate Slack channel for the most urgent incidents.",
+    "summary": "ServiceNow to 2 applications",
+    "sourceApp": "servicenow",
+    "targetApps": ["watsonlt", "slack"],
+    "tags": ["ServiceNow", "Watson Language Translator", "support", "cognitive", "Slack", "incident", "messaging", "language detection"],
+    "offerings": ["app connect professional"]
+},
 {
     "name": "Create NetSuite ERP and Stripe products from Asana tasks to launch a Salesforce Pardot campaign",
     "description": "When a new task is created in Asana, a new product is created in NetSuite ERP & Stripe, then a campaign for the new product is launched as a Salesforce Pardot Campaign.",
