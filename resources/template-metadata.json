@@ -45,7 +45,7 @@
     "offerings": ["app connect professional"]
   },
   {   
-    "name": "Sync new Salesforce cases and ServiceNow tickets",
+    "name": "Sync Salesforce new cases with ServiceNow tickets",
     "description": "The template creates a new ticket in ServiceNow when a new case is created in Salesforce - helping you to keep your support services in sync!",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
