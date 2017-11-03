@@ -115,7 +115,16 @@
  "targetApps": ["eventbrite", "salesforce", "slack"],
  "tags": ["eventbrite", "slack", "salesforce", "contacts", "marketing", "leads", "events", "matching", "city", "notification"],
  "offerings": ["app connect professional"]
-},           
+},   
+  {
+ "name": "Add attendee to Insightly and MailChimp",
+ "description": "This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.",
+ "summary": "Eventbrite to 2 applications",
+ "sourceApp": "eventbrite",
+ "targetApps": ["insightly", "mailchimp"],
+ "tags": ["eventbrite", "insightly", "mailchimp", "subscribe", "publicize", "promote", "marketing"],
+ "offerings": ["app connect professional"]
+},
    {   
     "name": "Sync a new Salesforce contact with Intacct",
     "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
