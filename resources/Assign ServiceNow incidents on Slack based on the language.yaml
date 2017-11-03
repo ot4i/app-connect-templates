@@ -1,0 +1,247 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: servicenow
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Identify
+      connector-type: watsonlt
+      actions:
+        IDENTIFY: {}
+      account-name: Account 1
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Watson Language Translator Identify
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: IDENTIFY
+              map:
+                mappings:
+                  - text:
+                      template: '{{$Trigger.short_description}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: WatsonLanguageTranslatorIdentify
+                  $ref: >-
+                    #/node-output/Watson Language Translator
+                    Identify/response/payload
+              branch:
+                - condition:
+                    '{{$WatsonLanguageTranslatorIdentify.languages[0].language}}':
+                      =: en
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C7V8QT9QE
+                            - text:
+                                template: >-
+                                  New incident: {{$Trigger.sys_id}}
+                                  {{$Trigger.short_description}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WatsonLanguageTranslatorIdentify
+                              $ref: >-
+                                #/node-output/Watson Language Translator
+                                Identify/response/payload
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage
+                        $ref: >-
+                          #/block/If/node-output/Slack Create
+                          message/response/payload
+                      - variable: WatsonLanguageTranslatorIdentify
+                        $ref: >-
+                          #/node-output/Watson Language Translator
+                          Identify/response/payload
+                    mappings:
+                      - team:
+                          template: English team
+                - condition:
+                    '{{$WatsonLanguageTranslatorIdentify.languages[0].language}}':
+                      =: fr
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C7UC6VD1Q
+                            - text:
+                                template: >-
+                                  Nouvel incident: {{$Trigger.sys_id}}
+                                  {{$Trigger.short_description}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WatsonLanguageTranslatorIdentify
+                              $ref: >-
+                                #/node-output/Watson Language Translator
+                                Identify/response/payload
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage2
+                        $ref: >-
+                          #/block/If/node-output/Slack Create message
+                          2/response/payload
+                      - variable: WatsonLanguageTranslatorIdentify
+                        $ref: >-
+                          #/node-output/Watson Language Translator
+                          Identify/response/payload
+                    mappings:
+                      - team:
+                          template: French team
+              else:
+                execute: []
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  input:
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: WatsonLanguageTranslatorIdentify
+                      $ref: >-
+                        #/node-output/Watson Language Translator
+                        Identify/response/payload
+                  mappings:
+                    - team:
+                        template: General
+              output-schema:
+                required:
+                  - team
+                properties:
+                  team:
+                    type: string
+                    title: team
+                type: object
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: WatsonLanguageTranslatorIdentify
+                  $ref: >-
+                    #/node-output/Watson Language Translator
+                    Identify/response/payload
+                - variable: If
+                  $ref: '#/node-output/If/response/payload'
+              branch:
+                - condition:
+                    '{{$Trigger.urgency}}':
+                      =: '1'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C7UDQ9KSQ
+                            - text:
+                                template: >-
+                                  New urgent incident raised against
+                                  {{$If.team}}: {{$Trigger.sys_id}}
+                                  {{$Trigger.short_description}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WatsonLanguageTranslatorIdentify
+                              $ref: >-
+                                #/node-output/Watson Language Translator
+                                Identify/response/payload
+                            - variable: If
+                              $ref: '#/node-output/If/response/payload'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage3
+                        $ref: >-
+                          #/block/If 2/node-output/Slack Create message
+                          3/response/payload
+                      - variable: WatsonLanguageTranslatorIdentify
+                        $ref: >-
+                          #/node-output/Watson Language Translator
+                          Identify/response/payload
+                      - variable: If
+                        $ref: '#/node-output/If/response/payload'
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: WatsonLanguageTranslatorIdentify
+                          $ref: >-
+                            #/node-output/Watson Language Translator
+                            Identify/response/payload
+                        - variable: If
+                          $ref: '#/node-output/If/response/payload'
+                      message: OK
+                      status-code: 200
+              output-schema: {}
+  name: Language based incident assignment
+models: {}
