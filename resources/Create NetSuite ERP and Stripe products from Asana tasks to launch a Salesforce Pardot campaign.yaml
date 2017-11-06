@@ -21,13 +21,13 @@ integration:
     action-interface-1:
       type: api-action
       business-object: products
-      connector-type: stripe
+      connector-type: netsuiteerp
       actions:
         CREATE: {}
-          action-interface-2:
+    action-interface-2:
       type: api-action
       business-object: products
-      connector-type: netsuiteerp
+      connector-type: stripe
       actions:
         CREATE: {}
     action-interface-3:
@@ -43,11 +43,15 @@ integration:
           - create-action:
               name: NetSuite ERP Create product
               target:
-                $ref: '#/integration/action-interfaces/action-interface-2'
+                $ref: '#/integration/action-interfaces/action-interface-1'
               map:
                 mappings:
                   - itemId:
-                      template: '{{$Trigger.name}}'
+                      template: '{{$Trigger.id}}'
+                  - parent:
+                      mappings:
+                        - name:
+                            template: '{{$Trigger.name}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
@@ -55,7 +59,7 @@ integration:
           - create-action:
               name: Stripe Create product
               target:
-                $ref: '#/integration/action-interfaces/action-interface-1'
+                $ref: '#/integration/action-interfaces/action-interface-2'
               map:
                 mappings:
                   - name:
@@ -64,6 +68,8 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: NetSuiteERPCreateproduct
+                    $ref: '#/node-output/NetSuite ERP Create product/response/payload'
           - create-action:
               name: Salesforce Pardot Create campaign
               target:
@@ -71,7 +77,7 @@ integration:
               map:
                 mappings:
                   - name:
-                      template: 'New {{$Trigger.name}} Launched'
+                      template: '{{$Trigger.name}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
@@ -80,8 +86,6 @@ integration:
                     $ref: '#/node-output/NetSuite ERP Create product/response/payload'
                   - variable: StripeCreateproduct
                     $ref: '#/node-output/Stripe Create product/response/payload'
-        tags:
-          - incomplete
   name: >-
     Create NetSuite ERP and Stripe products from Asana tasks to launch a
     Salesforce Pardot campaign
