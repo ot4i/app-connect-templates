@@ -189,6 +189,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Create a new Trello card for a new Salesforce case",
+    "description": "This template creates a new card in Trello when a new case is created in Salesforce - make sure you never forget to follow up with that new case again!",
+    "summary": "Salesforce to Trello",
+    "sourceApp": "salesforce",
+    "targetApps": ["trello"],
+    "tags": ["Salesforce", "trello", "support", "case", "project management", "crm"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Create a new Trello card when a new event in Eventbrite is added",
     "description": "This template creates a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.",
     "summary": "Eventbrite to Trello",
