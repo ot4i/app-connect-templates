@@ -59,6 +59,9 @@ integration:
                   - text:
                       template: '{{$Trigger.Subject}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
           - custom-action:
               name: Watson Tone Analyzer Get tone analysis
               target:
