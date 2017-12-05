@@ -12,6 +12,7 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: salesforce
+      account-name: Account 3
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -19,30 +20,35 @@ integration:
       connector-type: watsonnlclassifier
       actions:
         CLASSIFYTEXT: {}
+      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: Tone
       connector-type: watsontoneanalyzer
       actions:
         GETTONEANALYSIS: {}
+      account-name: Account 1
     action-interface-3:
       type: api-action
       business-object: Case
       connector-type: salesforce
       actions:
         UPSERTWITHWHERE: {}
+      account-name: Account 3
     action-interface-4:
       type: api-action
       business-object: Account
       connector-type: salesforce
       actions:
         RETRIEVEALL: {}
+      account-name: Account 3
     action-interface-5:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
+      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
@@ -59,20 +65,25 @@ integration:
                   - text:
                       template: '{{$Trigger.Subject}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
           - custom-action:
               name: Watson Tone Analyzer Get tone analysis
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               action: GETTONEANALYSIS
               map:
-                $map: 'http://ibm.com/appconnect/map/v1'
                 mappings:
-                  - version:
-                      template: '2017-05-08'
-                  - text:
-                      template: '{{$Trigger.Subject}}'
                   - content_type:
                       template: Plain Text
+                  - sentences:
+                      expression: 'true'
+                  - text:
+                      template: '{{$Trigger.Subject}}'
+                  - version:
+                      template: '2017-05-08'
+                $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -85,18 +96,18 @@ integration:
               target:
                 $ref: '#/integration/action-interfaces/action-interface-3'
               map:
-                $map: 'http://ibm.com/appconnect/map/v1'
                 mappings:
                   - Origin:
                       template: '{{$Trigger.Origin}}'
                   - WatsonToneAnalysis__c:
                       template: >-
                         {{$WatsonToneAnalyzerGettoneanalysis.document_tone.tone_categories[category_id="emotion_tone"].tones^(>score)[0].tone_name}}
-                  - Watson_Tone_Analysis_Performed__c:
-                      expression: 'True'
                   - Watson_Classification__c:
                       template: >-
                         {{$WatsonNaturalLanguageClassifierClassifytext.top_class}}
+                  - Watson_Tone_Analysis_Performed__c:
+                      expression: 'true'
+                $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -114,6 +125,14 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: WatsonNaturalLanguageClassifierClassifytext
+                    $ref: >-
+                      #/node-output/Watson Natural Language Classifier Classify
+                      text/response/payload
+                  - variable: WatsonToneAnalyzerGettoneanalysis
+                    $ref: >-
+                      #/node-output/Watson Tone Analyzer Get tone
+                      analysis/response/payload
           - retrieve-action:
               name: Salesforce Retrieve Account
               target:
@@ -124,6 +143,14 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: WatsonNaturalLanguageClassifierClassifytext
+                    $ref: >-
+                      #/node-output/Watson Natural Language Classifier Classify
+                      text/response/payload
+                  - variable: WatsonToneAnalyzerGettoneanalysis
+                    $ref: >-
+                      #/node-output/Watson Tone Analyzer Get tone
+                      analysis/response/payload
                   - variable: SalesforceUpdateorcreateCase
                     $ref: >-
                       #/node-output/Salesforce Update or create
@@ -139,15 +166,15 @@ integration:
               target:
                 $ref: '#/integration/action-interfaces/action-interface-5'
               map:
-                $map: 'http://ibm.com/appconnect/map/v1'
                 mappings:
+                  - channel:
+                      assign: C4GHPM484
                   - text:
                       template: >-
                         {{$Trigger.Id}}"{{$Trigger.Subject}}" created by
                         {{$SalesforceRetrieveAccount[0].Name}} with tone
-                        {{$WatsonToneAnalyzerGettoneanalysis.sentences_tone.tone_categories.category_name}}
-                  - channel:
-                      assign: C4GHPM484
+                        {{$WatsonToneAnalyzerGettoneanalysis.document_tone.tone_categories[category_id="emotion_tone"].tones^(>score)[0].tone_name}}
+                $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -169,7 +196,5 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
                   - variable: SalesforceRetrieveAccountMetadata
                     $ref: '#/node-output/Salesforce Retrieve Account/response'
-        tags:
-          - incomplete
   name: Classification and sentiment analysis on new Salesforce case
 models: {}
