@@ -12,14 +12,14 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: insightly
-      action-interfaces:
+  action-interfaces:
     action-interface-1:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
-        assemblies:
+  assemblies:
     assembly-1:
       assembly:
         execute:
