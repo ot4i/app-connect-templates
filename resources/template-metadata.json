@@ -252,7 +252,7 @@
     "offerings": ["app connect professional"]
 },
   {   
-    "name": "Create New Folder in Google Drive when a row is added in a Google Sheet",
+    "name": "Create new folder in Google Drive when a row is added in a Google Sheet",
     "description": "This template creates a new folder in GoogleDrive when a new row is added in a Google Sheet.",
     "summary": "Google Sheets to Google Drive",
     "sourceApp": "googlesheets",
