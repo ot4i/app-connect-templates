@@ -250,5 +250,14 @@
     "targetApps": ["gmail"],
     "tags": ["eventbrite", "gmail", "marketing", "events", "email"],
     "offerings": ["app connect professional"]
+},
+  {   
+    "name": "Create New Folder in Google Drive when a row is added in a GoogleSheet",
+    "description": "This template creates a new folder in GoogleDrive when a new row is added in a Google Sheet.",
+    "summary": "GoogleSheets to Google Drive",
+    "sourceApp": "googlesheets",
+    "targetApps": ["googledrive"],
+    "tags": ["googlesheets", "googledrive", "marketing", "spreadsheet", "files"],
+    "offerings": ["app connect professional"]
   }]
 }
