@@ -232,16 +232,7 @@
     "targetApps": ["slack"],
     "tags": ["insightly", "slack", "sales", "notification", "contact"],
     "offerings": ["app connect professional"]
-},
-   {   
-    "name": "Create new channel in Slack when a row is added in Google Sheets",
-    "description": "This template creates a new Slack channel when you add a row in your selected Google Sheet - making it even easier to create a new channel!",
-    "summary": "Google Sheets to Slack",
-    "sourceApp": "googlesheet",
-    "targetApps": ["slack"],
-    "tags": ["google sheet", "slack", "business ops", "business operations", "channel"],
-    "offerings": ["app connect professional"]
-},
+ },
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
