@@ -125,6 +125,15 @@
  "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
  "offerings": ["app connect professional"]
 },
+ {   
+    "name": "Email tone detector",
+    "description": "This template analyses the tone of your emails and alerts you when you receive emails with the same tone from the same sender. You specify the number of emails and the time period you want to monitor.",
+    "summary": "Gmail to 3 applications",
+    "sourceApp": "gmail",
+    "targetApps": ["watsontoneanalyzer","slack"],
+    "tags": ["watsontoneanalyzer", "slack", "sentiment", "support", "emails", "customer", "tone analysis", "detect", "situation", "notification"],
+    "offerings": ["app connect professional"]
+},
 {
  "name": "Creating targeted contact lists based on unconverted leads and geography",
  "description": "This template triggers on a new Eventbrite event. It retrieves new unconverted leads from Salesforce and checks to see if their city features in the event.  If it does, they they are added to a newly created Eventbrite contact list which can be reviewed by the organisers, who are notified about this list creation in Slack.",
