@@ -1,4 +1,4 @@
-1. Clicking **Create flow** takes you to the App connect flow editor. Click each node in your flow to validate it. 
+1. Clicking **Create flow** takes you to the App Connect flow editor. 
 1. In App Connect, connect to your ServiceNow account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-servicenow/). 
 1. Connect to your Watson Language Translator account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-language-translator/).
 1. Click the first If node and, if necessary, change the two-character language codes according to your business needs. If you change the language, you'll also need to expand **Output data** for each branch of the If node to change the name of the team who'll deal with the incident.
