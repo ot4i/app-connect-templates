@@ -1,4 +1,4 @@
-1. Clicking **Create flow** takes you to the App connect flow editor. Click on each node in your flow to validate it.
+1. Clicking **Create flow** takes you to the App Connect flow editor. 
 1. In App Connect, connect to your Salesforce account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/) 
 1. Connect to your Gmail account and update the email 'To' address from appConnectTemplate@mailinator.com, and if wanted change the subject and body 
 1. Connect to your Asana account and select a Project in which to create tasks - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-asana/)
