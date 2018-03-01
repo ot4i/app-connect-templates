@@ -1,5 +1,14 @@
 {
   "templates": [{
+    "name": "Scheduler to Slack 10 seconds",
+    "description": "Sends a message to Slack on startup and every 10 seconds afterwards.",
+    "summary": "Scheduler to Slack",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["slack"],
+    "tags": ["Slack", "scheduler"],
+    "offerings": ["app connect professional"]
+  },
+  {
     "name": "Classification and sentiment analysis on new Salesforce case",
     "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
     "summary": "Salesforce to 4 applications",
