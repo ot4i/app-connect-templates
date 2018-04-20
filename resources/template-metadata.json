@@ -180,7 +180,7 @@
     "offerings": ["app connect professional"]
   },
   {   
-    "name": "Create new contact in HubSpot CRM when a row is added in Google Sheets",
+    "name": "Create new contact in HubSpot CRM when a row is added in Google Sheet",
     "description": "This template creates a new contact in HubSpot CRM when a row is added in Google Sheets.",
     "summary": "Google Sheets to HubSpot CRM",
     "sourceApp": "googlesheet",
