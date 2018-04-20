@@ -180,6 +180,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Create new contact in HubSpot CRM when a row is added in Google Sheets",
+    "description": "This template creates a new contact in HubSpot CRM when a row is added in Google Sheets.",
+    "summary": "Google Sheets to HubSpot CRM",
+    "sourceApp": "googlesheet",
+    "targetApps": ["hubspotcrm"],
+    "tags": ["google sheet", "hubspot", "crm", "contact", "new lead"],
+    "offerings": ["app connect professional"]
+  },
+  {   
     "name": "Create a new Trello card for a new Salesforce campaign",
     "description": "This template creates a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
     "summary": "Salesforce to Trello",
