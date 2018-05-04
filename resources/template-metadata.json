@@ -215,6 +215,15 @@
     "tags": ["eventbrite", "trello", "marketing", "events", "project management"],
     "offerings": ["app connect professional"]
   },
+  {
+  "name": "Create a Trello card for every new Insightly task",
+  "description": "This template creates a new card in Trello when a new task is created in Insightly.",
+  "summary": "Insightly to Trello",
+  "sourceApp": "insightly",
+  "targetApps": ["trello"],
+  "tags": ["insightly", "trello", "business", "task", "card", "crm"],
+  "offerings": ["app connect professional"]
+},
    {   
     "name": "Invite Sales employees to an Eventbrite event",
     "description": "This template retrieves details of your Sales staff from NetSuite HCM when a new event is created in Eventbrite.  It then sends them a message on Slack to invite them to the event.",
