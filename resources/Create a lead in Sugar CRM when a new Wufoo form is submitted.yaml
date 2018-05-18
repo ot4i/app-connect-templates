@@ -1,0 +1,46 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: z22eegy0x5wki2
+            parentFilter:
+              Hash: z22eegy0x5wki2
+      connector-type: wufoo
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: sugarcrm
+      actions:
+        CREATE: {}
+      account-name: Account 1
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Sugar CRM Create Lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - first_name:
+                      template: '{{$Trigger.Field1}}'
+                  - last_name:
+                      template: '{{$Trigger.Field2}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: Create a lead in Sugar CRM when a new Wufoo form is submitted
+models: {}
