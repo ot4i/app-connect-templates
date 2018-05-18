@@ -269,6 +269,15 @@
     "tags": ["marketo", "trello", "lead", "card"],
     "offerings": ["app connect professional"]
   },
+{
+ "name": "Create a lead in Sugar CRM when a new Wufoo form is submitted",
+ "description": "Use this template to create a lead in Sugar CRM when a new form entry is submitted from Wufoo.",
+ "summary": "Wufoo to Sugar CRM",
+ "sourceApp": "wufoo",
+ "targetApps": ["sugarcrm"],
+ "tags": ["wufoo", "sugarcrm", "sales", "marketing", "lead", "form"],
+ "offerings": ["app connect professional"]
+},
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
