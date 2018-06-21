@@ -279,7 +279,7 @@
  "offerings": ["app connect professional"]
 },
 {  
-  "name": "Update or create a Salesforce contact for a new event attendee and post to Slack depending on action",
+  "name": "Update or create Salesforce contact for a new event attendee and post to Slack depending on action",
   "description": "This template updates or creates a Salesforce contact when a new attendee signs up for an Eventbrite event, depending on whether the Salesforce contact exists. It then posts a message to a Slack channel, depending on whether the contact was created or updated.",
   "summary": "Eventbrite to 2 applications",
   "sourceApp": "eventbrite",
