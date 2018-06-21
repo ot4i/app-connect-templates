@@ -278,6 +278,15 @@
  "tags": ["wufoo", "sugarcrm", "sales", "marketing", "lead", "form"],
  "offerings": ["app connect professional"]
 },
+{  
+  "name": "Update or create a Salesforce contact for a new event attendee and post to Slack depending on action",
+  "description": "This template updates or creates a Salesforce contact when a new attendee signs up for an Eventbrite event, depending on whether the Salesforce contact exists. It then posts a message to a Slack channel, depending on whether the contact was created or updated.",
+  "summary": "Eventbrite to 2 applications",
+  "sourceApp": "eventbrite",
+  "targetApps": ["salesforce", "slack"],
+  "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification"],
+  "offerings": ["app connect professional"]
+},
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
