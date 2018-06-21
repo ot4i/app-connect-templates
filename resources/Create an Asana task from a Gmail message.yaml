@@ -38,5 +38,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: NewGmailMessageCreateAsanaTask
+  name: Create an Asana task from a new Gmail message
 models: {}
