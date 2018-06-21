@@ -201,6 +201,6 @@ integration:
                       status-code: 200
               output-schema: {}
   name: >-
-    Update or create Salesforce contact for a new event attendee and post to
+    Update or create a Salesforce contact for a new event attendee and post to
     Slack depending on action
 models: {}
