@@ -45,8 +45,6 @@ integration:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
                 mappings:
-                  - Birthdate:
-                      template: '{{$Trigger.profile.birth_date}}'
                   - Email:
                       template: '{{$Trigger.profile.email}}'
                   - FirstName:
