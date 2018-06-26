@@ -298,7 +298,7 @@
 },
 {
  "name": "Send me a Slack notification for every new Asana task",
- "description": "Use this template to send a slack notification when new task is created in Asana.",
+ "description": "Use this template to send a Slack notification when a new task is created in Asana.",
  "summary": "Asana to Slack",
  "sourceApp": "asana",
  "targetApps": ["slack"],
