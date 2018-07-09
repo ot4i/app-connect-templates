@@ -15,7 +15,7 @@ integration:
               scheduleConfiguration:
                 calendar:
                   cronExp: 00 00 1 * *
-                  runOnceOncheck: true
+                  runOnceOncheck: false
                   timeZone: GMT
                   every: month
       connector-type: streaming-connector-scheduler
@@ -57,16 +57,9 @@ integration:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 2
+      account-name: Account 3
       actions:
         UPSERTWITHWHERE: {}
-    action-interface-8:
-      type: api-action
-      business-object: worksheetRow
-      connector-type: googlesheet
-      account-name: Account 1
-      actions:
-        CREATE: {}
     action-interface-3:
       type: api-action
       business-object: message
@@ -74,6 +67,13 @@ integration:
       account-name: Account 1
       actions:
         CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
@@ -84,8 +84,6 @@ integration:
               pagination-type: TOKEN
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
-        tags:
-          - incomplete
     assembly-2:
       assembly:
         execute:
@@ -102,41 +100,27 @@ integration:
                   - Country:
                       template: '{{$Batchprocess.Country}}'
                   - Description:
-                      template: '{{$Batchprocess.Description}}'
+                      template: Description
                   - Email:
                       template: '{{$Batchprocess.Email}}'
-                  - EmailBouncedDate:
-                      template: '{{$Batchprocess.EmailBouncedDate}}'
-                  - EmailBouncedReason:
-                      template: '{{$Batchprocess.EmailBouncedReason}}'
                   - FirstName:
                       template: '{{$Batchprocess.FirstName}}'
-                  - GeocodeAccuracy:
-                      template: '{{$Batchprocess.GeocodeAccuracy}}'
-                  - Industry:
-                      template: '{{$Batchprocess.Industry}}'
                   - LastName:
                       template: '{{$Batchprocess.LastName}}'
-                  - LeadSource:
-                      template: '{{$Batchprocess.LeadSource}}'
+                  - Latitude:
+                      expression: '$Batchprocess.Latitude '
+                  - Longitude:
+                      expression: '$Batchprocess.Longitude '
                   - Phone:
                       template: '{{$Batchprocess.Phone}}'
                   - PostalCode:
                       template: '{{$Batchprocess.PostalCode}}'
-                  - Rating:
-                      template: '{{$Batchprocess.Rating}}'
-                  - Salutation:
-                      template: '{{$Batchprocess.Salutation}}'
                   - State:
                       template: '{{$Batchprocess.State}}'
-                  - Status:
-                      template: '{{$Batchprocess.Status}}'
                   - Street:
                       template: '{{$Batchprocess.Street}}'
-                  - Title:
-                      template: '{{$Batchprocess.Title}}'
                   - Website:
-                      template: '{{$Batchprocess.Website}}'
+                      template: Website
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Batchprocess
@@ -155,37 +139,30 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: Google Sheets Create row 2
+              name: Gmail Create email
               target:
-                $ref: '#/integration/action-interfaces/action-interface-8'
+                $ref: '#/integration/action-interfaces/action-interface-4'
               map:
                 mappings:
-                  - fields:
-                      mappings:
-                        - '1':
-                            template: '{{$Batchprocess.start}}'
-                        - '2':
-                            template: '{{$Batchprocess.end}}'
-                        - '3':
-                            template: >-
-                              ({{$toMillis($Batchprocess.end )-
-                              $toMillis($Batchprocess.start )/60000}})
-                        - '4':
-                            template: '{{$Batchprocess.status}}'
-                        - '5':
-                            template: '{{$Batchprocess.recordsProcessed.total}}'
-                        - '6':
-                            template: '{{$Batchprocess.recordsProcessed.success}}'
-                        - '7':
-                            template: '{{$Batchprocess.recordsProcessed.error}}'
-                        - '8':
-                            template: '{{$Batchprocess.recordsProcessed.canceled}}'
-                        - '9':
-                            template: '{{$Batchprocess.batchInstanceId}}'
-                  - spreadsheetID:
-                      template: 1DOFjNIf1iBVnJW4LfHYwzoY_LXwq3ILZZxUYYExQyoQ
-                  - worksheetID:
-                      template: Sheet1
+                  - Body:
+                      template: >-
+                        Batch status: {{$Batchprocess.status}}.
+
+                        Number of records processed:
+                        {{$Batchprocess.recordsProcessed.total}} of which
+                        {{$Batchprocess.recordsProcessed.success}} were
+                        successful, {{$Batchprocess.recordsProcessed.error}}
+                        failed and {{$Batchprocess.recordsProcessed.canceled}}
+                        were canceled.
+
+                        Batch End Time: {{$Batchprocess.end}} 
+
+                        Batch id for problem determination :
+                        {{$Batchprocess.batchInstanceId}}
+                  - Subject:
+                      template: 'Results of batch started at {{$Batchprocess.start}}'
+                  - To:
+                      template: my@email.com
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
