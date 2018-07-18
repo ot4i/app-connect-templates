@@ -332,6 +332,15 @@
  "tags": ["asana", "insightly", "business", "notification", "task", "crm"],
  "offerings": ["app connect professional"]
 },
+{
+ "name": "Copy messages between Slack channels",
+ "description": "Use this template to copy messages between two Slack channels. This can be between channels in the same Slack account or between channels in different Slack accounts.",
+ "summary": "Slack to Slack",
+ "sourceApp": "slack",
+ "targetApps": ["slack"],
+ "tags": ["slack", "channels", "message", "copy", "callback", "callback url"],
+ "offerings": ["app connect professional"]
+},
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
