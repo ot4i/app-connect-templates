@@ -88,7 +88,16 @@
     "targetApps": ["asana"],
     "tags": ["gmail", "asana"],
     "offerings": ["app connect professional"]
-  },                
+  },             
+  {   
+    "name": "Post a Slack message for new Gmail message",
+    "description": "This template creates a new message in Slack whenever a new Gmail message is received.",
+    "summary": "Gmail to Slack",
+    "sourceApp": "gmail",
+    "targetApps": ["slack"],
+    "tags": ["gmail", "slack", "email"],
+    "offerings": ["app connect professional"]
+  }, 
   {   
     "name": "Sync Salesforce contacts and Mailchimp mailing list subscribers",
     "description": "This template adds new Salesforce contacts to Mailchimp lists and sends an email via Gmail to alert you if a contact's email address is missing.",
