@@ -323,6 +323,15 @@
  "tags": ["asana", "slack", "business", "notification", "task"],
  "offerings": ["app connect professional"]
 },
+{
+ "name": "Create an Asana task for every new Insigthly task",
+ "description": "Use this template to create task in Asana when a new task added in Insightly.",
+ "summary": "Insigthly to Asana",
+ "sourceApp": "insightly",
+ "targetApps": ["asana"],
+ "tags": ["asana", "insightly", "business", "notification", "task", "crm"],
+ "offerings": ["app connect professional"]
+},
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
