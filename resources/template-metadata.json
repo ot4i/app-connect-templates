@@ -81,6 +81,15 @@
     "offerings": ["app connect professional"]
   },
   {   
+    "name": "Send Gmail message for new Slack message",
+    "description": "This template sends a new Gmail message whenever a new message is received in Slack.",
+    "summary": "Slack to Gmail",
+    "sourceApp": "slack",
+    "targetApps": ["gmail"],
+    "tags": ["gmail", "slack", "email"],
+    "offerings": ["app connect professional"]
+  }, 
+  {   
     "name": "Create an Asana task from a Gmail message",
     "description": "This template creates a new task in Asana whenever a new Gmail message is received.",
     "summary": "Gmail to Asana",
