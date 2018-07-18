@@ -90,7 +90,7 @@
     "offerings": ["app connect professional"]
   },             
   {   
-    "name": "Post a Slack message for new Gmail message",
+    "name": "Post Slack message for new Gmail message",
     "description": "This template creates a new message in Slack whenever a new Gmail message is received.",
     "summary": "Gmail to Slack",
     "sourceApp": "gmail",
