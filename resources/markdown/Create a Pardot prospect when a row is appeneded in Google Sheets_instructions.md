@@ -7,4 +7,4 @@
 1. In App Connect, connect to your Salesforce Pardot account.  
 1. Click the **Google Sheets** node and select the spreadsheet and worksheet you want to use.
 1. Click the **Salesforce Pardot** node and check the mappings for First name, Last name and Email to make sure they match your spreadsheet.
-1. Click **Exit and switch on** and you’re done!
+1. Start the flow and you’re done!
