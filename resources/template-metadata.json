@@ -340,6 +340,24 @@
  "targetApps": ["slack"],
  "tags": ["slack", "channels", "message", "copy", "callback", "callback url"],
  "offerings": ["app connect professional"]
+},
+{
+ "name": "Create a Pardot prospect when a row is appeneded in Google Sheets",
+ "description": "Use this template to create new prospect in Salesforce Pardot when a new row is appended in Google Sheets.",
+ "summary": "Google Sheets to Pardot",
+ "sourceApp": "googlesheet",
+ "targetApps": ["salesforcepardot"],
+ "tags": ["googlesheet", "salesforcepardot"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Use a Slack slash command to send a Twilio SMS message",
+ "description": "Use this template to send a Twilio SMS  directly from Slack using a slash command.",
+ "summary": "Slack to Twilio",
+ "sourceApp": "slack",
+ "targetApps": ["twilio"],
+ "tags": ["slack", "twilio"],
+ "offerings": ["app connect professional"]
 },                
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
