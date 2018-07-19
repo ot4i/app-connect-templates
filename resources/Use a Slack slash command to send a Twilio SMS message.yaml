@@ -35,9 +35,9 @@ integration:
                   - Body:
                       template: '{{$Trigger.messageBody}}'
                   - From:
-                      template: '+17207705070'
+                      template: '+11111111111'
                   - To:
-                      template: ++14026032345
+                      template: ++22222222222
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
