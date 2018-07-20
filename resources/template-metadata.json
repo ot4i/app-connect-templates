@@ -341,6 +341,15 @@
  "tags": ["slack", "channels", "message", "copy", "callback", "callback url"],
  "offerings": ["app connect professional"]
 },
+{
+ "name": "Send me a Twilio SMS for every new Salesforce contact",
+ "description": "Use this template to send an SMS from Twilio when a new contact is added in Salesforce.",
+ "summary": "Salesforce to Twilio",
+ "sourceApp": "salesforce",
+ "targetApps": ["twilio"],
+ "tags": ["salesforce", "twilio", "sms", "contact", "opportunity", "business"],
+ "offerings": ["app connect professional"]
+},                
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
