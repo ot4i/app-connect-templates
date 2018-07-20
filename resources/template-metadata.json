@@ -351,12 +351,12 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Use a Slack slash command to send a Twilio SMS message",
- "description": "Use this template to send a Twilio SMS  directly from Slack using a slash command.",
- "summary": "Slack to Twilio",
- "sourceApp": "slack",
+ "name": "Send me a Twilio SMS for every new Salesforce contact",
+ "description": "Use this template to send an SMS from Twilio when a new contact is added in Salesforce.",
+ "summary": "Salesforce to Twilio",
+ "sourceApp": "salesforce",
  "targetApps": ["twilio"],
- "tags": ["slack", "twilio"],
+ "tags": ["salesforce", "twilio", "sms", "contact", "opportunity", "business"],
  "offerings": ["app connect professional"]
 },                
   {   
