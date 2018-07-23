@@ -277,5 +277,14 @@
       "targetApps": ["gmail"],
       "tags": ["eventbrite", "gmail", "marketing", "events", "email"],
       "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Trying For Error",
+      "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
+      "summary": "Eventbrite to Gmail",
+      "sourceApp": "eventbrite",
+      "targetApps": ["gmail"],
+      "tags": ["eventbrite", "gmail", "marketing", "events", "email"],
+      "offerings": ["app connect professional"]
     }]
 }
