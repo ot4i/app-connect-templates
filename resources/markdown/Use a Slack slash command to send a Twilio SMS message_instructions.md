@@ -7,5 +7,5 @@ To refer to these instructions while editing the flow, open [the github page](ht
 1. Click on the **Twilio** node and update the **From** field with your Twilio number and **To** field where you want the message to go to.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
-Want to see the flow working? Go into Slack and post a message using the custom slash command you've defined, and await the message on your phone.
+Want to see the flow working? Go to Slack and post a message using the custom slash command you've defined, and eagerly await the message to the phone number you used in your flow.
 
