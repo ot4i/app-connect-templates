@@ -377,6 +377,15 @@
  "tags": ["googlesheet", "twilio", "sms", "row", "business"],
  "offerings": ["app connect professional"]
 },
+{
+ "name": "Send me a Twilio SMS when a new message arrives in Gmail",
+ "description": "Use this template to send an SMS from Twilio when a new email arrives in your Gmail account.",
+ "summary": "Gmail to Twilio",
+ "sourceApp": "gmail",
+ "targetApps": ["twilio"],
+ "tags": ["gmail", "twilio", "sms", "email", "business"],
+ "offerings": ["app connect professional"]
+},                
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
