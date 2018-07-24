@@ -385,7 +385,16 @@
  "targetApps": ["twilio"],
  "tags": ["gmail", "twilio", "sms", "email", "business"],
  "offerings": ["app connect professional"]
-},                
+}, 
+{
+ "name": "Create new contact in IBM Watson Campaign when a new contact is added in Salesforce",
+ "description": "Use this template to create a new contact in IBM Watson Campaign when a new contact is created in the Salesforce.",
+ "summary": "Salesforce to IBM Watson Campaign",
+ "sourceApp": "salesforce",
+ "targetApps": ["silverpop"],
+ "tags": ["salesforce", "silverpop", "marketing", "email", "contact"],
+ "offerings": ["app connect professional"]
+},               
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
