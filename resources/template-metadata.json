@@ -377,6 +377,33 @@
  "tags": ["googlesheet", "twilio", "sms", "row", "business"],
  "offerings": ["app connect professional"]
 },
+{
+ "name": "Send me a Twilio SMS when a new message arrives in Gmail",
+ "description": "Use this template to send an SMS from Twilio when a new email arrives in your Gmail account.",
+ "summary": "Gmail to Twilio",
+ "sourceApp": "gmail",
+ "targetApps": ["twilio"],
+ "tags": ["gmail", "twilio", "sms", "email", "business"],
+ "offerings": ["app connect professional"]
+}, 
+{
+ "name": "Create new contact in IBM Watson Campaign when a new contact is added in Salesforce",
+ "description": "Use this template to create a new contact in IBM Watson Campaign when a new contact is created in the Salesforce.",
+ "summary": "Salesforce to IBM Watson Campaign",
+ "sourceApp": "salesforce",
+ "targetApps": ["silverpop"],
+ "tags": ["salesforce", "silverpop", "marketing", "email", "contact"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Send me a Slack notification for every new Salesforce opportunity",
+ "description": "Use this template to send a Slack notification to the sales team when a new opportunity is added in Salesforce.",
+ "summary": "Salesforce to Slack",
+ "sourceApp": "salesforce",
+ "targetApps": ["slack"],
+ "tags": ["salesforce", "slack", "sales", "opportunity", "notification"],
+ "offerings": ["app connect professional"]
+},                
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
