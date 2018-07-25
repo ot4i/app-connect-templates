@@ -1,4 +1,6 @@
-1. Clicking **Create flow** takes you to the App Connect flow editor. Click each node in your flow to validate it.
-1. In App Connect, connect to your Asana account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-asana/).
-1. Connect to your Slack account and choose the channel that you want to post the message to - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/).
-1. Click **Exit and switch on** and you’re done!
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Send%20me%20a%20Slack%20notification%20for%20every%20new%20Asana%20task_instructions.md) (opens in a new window).
+
+1. Click **Create flow** to start using the template. Click each node in your flow to validate it.
+1. Connect to your [Asana account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-asana/).
+1. Connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/) and choose the channel that you want to post the message to.
+1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.

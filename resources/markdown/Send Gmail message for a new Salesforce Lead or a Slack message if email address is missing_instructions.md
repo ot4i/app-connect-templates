@@ -1,5 +1,7 @@
-1. Clicking **Create flow** takes you to the App Connect flow editor. 
-1. In App Connect, connect to your Salesforce account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/). 
-1. Connect to your Slack account and choose the channel that you want to post the message to - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/). 
-1. Connect to your Gmail account and update the email subject and body to meet your business needs. 
-1. Click **Exit and switch on** and you’re done!
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Send%20Gmail%20message%20for%20a%20new%20Salesforce%20Lead%20or%20a%20Slack%20message%20if%20email%20address%20is%20missing_instructions.md) (opens in a new window).
+
+1. Click **Create flow** to start using the template.
+1. Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+1. Connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/) and choose the channel that you want to post the message to.
+1. Connect to your Gmail account and update the email subject and body to meet your business needs.
+1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
