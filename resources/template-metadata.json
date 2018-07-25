@@ -394,7 +394,16 @@
  "targetApps": ["silverpop"],
  "tags": ["salesforce", "silverpop", "marketing", "email", "contact"],
  "offerings": ["app connect professional"]
-},               
+},
+{
+ "name": "Send me a Slack notification for every new Salesforce opportunity",
+ "description": "Use this template to send a Slack notification to the sales team when a new opportunity is added in Salesforce.",
+ "summary": "Salesforce to Slack",
+ "sourceApp": "salesforce",
+ "targetApps": ["slack"],
+ "tags": ["salesforce", "slack", "marketing", "opportunity", "notification"],
+ "offerings": ["app connect professional"]
+},                
   {   
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
