@@ -401,7 +401,7 @@
  "summary": "Salesforce to Slack",
  "sourceApp": "salesforce",
  "targetApps": ["slack"],
- "tags": ["salesforce", "slack", "marketing", "opportunity", "notification"],
+ "tags": ["salesforce", "slack", "sales", "opportunity", "notification"],
  "offerings": ["app connect professional"]
 },                
   {   
