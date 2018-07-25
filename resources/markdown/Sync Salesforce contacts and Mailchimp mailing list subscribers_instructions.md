@@ -1,7 +1,7 @@
-1. Clicking **Create flow** takes you to the App Connect flow editor. 
-1. In App Connect, connect to your Salesforce account - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/). 
-1. Click on the Salesforce retrieve contact action node to validate it. 
-1. Click on the IF node to validate it. 
-1. Connect to your Gmail account and edit the email address, subject and body as per your business needs. 
-1. Connect to your Mailchimp account and select the list you want to add a contact to - [more info here](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-mailchimp/).
-1. Click **Exit and switch on** and you’re done!
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Sync%20Salesforce%20contacts%20and%20Mailchimp%20mailing%20list%20subscribers_instructions.md) (opens in a new window).
+
+1. Click **Create flow** to start using the template.
+1. Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+1. Connect to your Gmail account and edit the email address, subject and body as per your business needs.
+1. Connect to your [Mailchimp account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-mailchimp/) and select the list you want to add a contact to.
+1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
