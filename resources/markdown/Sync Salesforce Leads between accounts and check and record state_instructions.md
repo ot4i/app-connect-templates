@@ -4,6 +4,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
 1. Connect to your source [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
 1. Connect to your target Salesforce account.
 1. Connect to your Gmail account.
-1. Update the **To** field of the **Create mail** Gamil node with the address to send the email to, and update the email **Subject** and **Body** to meet your business needs. 
+1. Update the **To** field of the **Create mail** Gmail node with the address to send the email to, and update the email **Subject** and **Body** to meet your business needs. 
 1. Connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/) and select a channel where you want batch level error messages to be sent.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
