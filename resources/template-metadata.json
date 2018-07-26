@@ -315,8 +315,8 @@
     "offerings": ["app connect professional"]
   },{
     "name": "Sync Salesforce Leads between accounts and check and record state",
-    "description": "This template schedules a monthly synchronisation (batch) between the Leads of two Salesforce accounts. When it completes, a Gmail message is sent with the results of the operation.  You can use this template to perform check the status of a batch.",
-    "summary": "Salesforce to two applications",
+    "description": "This template schedules a monthly synchronisation (batch) between the Leads of two Salesforce accounts. When it completes, a Gmail message is sent with the results of the operation.  You can use this template to perform a check on the status of a batch process.",
+    "summary": "Salesforce to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["salesforce","gmail","slack"],
     "tags": ["batch", "completion", "scheduler","salesforce", "gmail", "email", "slack"],
