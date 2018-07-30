@@ -420,6 +420,14 @@
     "targetApps": ["salesforce","gmail","slack"],
     "tags": ["batch", "completion", "scheduler","salesforce", "gmail", "email", "slack"],
     "offerings": ["app connect professional"]
+  },{
+    "name": "API to create contact in Salesforce",
+    "description": "This is the template for an API used to create a new contact in Salesforce. It is based on the Creating flows for an API tutorial: https://developer.ibm.com/integration/docs/app-connect/tutorials-for-ibm-app-connect/creating-flows-api/.",
+    "summary": "API to Salesforce",
+    "sourceApp": "api",
+    "targetApps": ["salesforce"],
+    "tags": ["api", "salesforce"],
+    "offerings": ["app connect professional"]
   }
                ]
 }
