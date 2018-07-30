@@ -422,7 +422,7 @@
     "offerings": ["app connect professional"]
   },{
     "name": "An API to create a contact in Salesforce using a name and email address",
-    "description": "This is the template for an API used to create a new contact in Salesforce. It is based on the Creating flows for an API tutorial: https://developer.ibm.com/integration/docs/app-connect/tutorials-for-ibm-app-connect/creating-flows-api/.",
+    "description": "This is the template for an API used to create a new contact in Salesforce.",
     "summary": "API to Salesforce",
     "sourceApp": "api",
     "targetApps": ["salesforce"],
