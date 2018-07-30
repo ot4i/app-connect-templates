@@ -420,6 +420,14 @@
     "targetApps": ["salesforce","gmail","slack"],
     "tags": ["batch", "completion", "scheduler","salesforce", "gmail", "email", "slack"],
     "offerings": ["app connect professional"]
+  },{
+    "name": "An API to create a contact in Salesforce using a name and email address",
+    "description": "This is the template for an API used to create a new contact in Salesforce.",
+    "summary": "API to Salesforce",
+    "sourceApp": "api",
+    "targetApps": ["salesforce"],
+    "tags": ["api", "salesforce"],
+    "offerings": ["app connect professional"]
   }
                ]
 }
