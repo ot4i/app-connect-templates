@@ -415,7 +415,7 @@
   },{
     "name": "Sync Salesforce Leads between accounts and check and record state",
     "description": "This template schedules a monthly synchronisation (batch) between the Leads of two Salesforce accounts. When it completes, a Gmail message is sent with the results of the operation.  You can use this template to perform a check on the status of a batch process.",
-    "summary": "Salesforce to 2 applications",
+    "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["salesforce","gmail","slack"],
     "tags": ["batch", "completion", "scheduler","salesforce", "gmail", "email", "slack"],
@@ -423,7 +423,7 @@
   },{
     "name": "An API to create a contact in Salesforce using a name and email address",
     "description": "This is the template for an API used to create a new contact in Salesforce.",
-    "summary": "API to Salesforce",
+    "summary": "1 flow using 1 application",
     "sourceApp": "api",
     "targetApps": ["salesforce"],
     "tags": ["api", "salesforce"],
