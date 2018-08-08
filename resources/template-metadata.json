@@ -429,12 +429,12 @@
     "tags": ["api", "salesforce"],
     "offerings": ["app connect professional"]
   },{
- "name": "Download a PDF Attachment from Salesforce and Add the PDF Document To Watson Discovery Service",
- "description": "Use this template to download an attachment from Salesforce and add the same document to IBM Watson Discovery Service",
- "summary": "Salesforce to IBM Watson Discovery Service",
- "sourceApp": "Scheduler to 2 applications",
+ "name": "Download a PDF attachment from Salesforce and add the PDF document to the Watson Discovery Service",
+ "description": "Use this template to download an attachment from Salesforce and add the same document to the IBM Watson Discovery Service.",
+ "summary": "Scheduler to 2 applications",
+ "sourceApp": "streaming-connector-scheduler",
  "targetApps": ["salesforce", "watsondiscovery"],
- "tags": ["salesforce", "watsondiscovery", "document", "upload", "encoding"],
+ "tags": ["salesforce", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
  "offerings": ["app connect professional"]
 }
                ]
