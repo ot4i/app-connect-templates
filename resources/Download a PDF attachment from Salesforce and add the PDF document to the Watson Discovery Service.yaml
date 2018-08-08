@@ -82,5 +82,5 @@ integration:
                     $ref: >-
                       #/node-output/Salesforce Download attachment
                       content/response/payload
-  name: WDS
+  name: Download a PDF attachment from Salesforce and add the PDF document to the Watson Discovery Service
 models: {}
