@@ -1,0 +1,237 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createLeads:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: leads
+          output-context:
+            data: leads
+      options:
+        resources:
+          - business-object: leads
+            model:
+              $ref: '#/models/leads'
+            triggers:
+              create: createLeads
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      account-name: Account 1
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Sheets Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - spreadsheetID: 1lJoRsYmAuhTJFyLACKuwhR8pk-ANhbGMvxX0cWZ4sBM
+                    - worksheetID: Sheet1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 25
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - set-variable:
+              name: Set variable
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      trimmed_data:
+                        type: array
+                        items:
+                          type: object
+                          properties: {}
+                mappings:
+                  - variable:
+                      mappings:
+                        - trimmed_data:
+                            expression: >-
+                              $GoogleSheetsRetrieverows[[1..$count($GoogleSheetsRetrieverows)-1]]
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Setvariable.variable.trimmed_data '
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+              mode: parallel
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                mappings: []
+              display-name: undefined Object
+          - response:
+              name: response-1
+              reply-maps:
+                - title: leads successfully created
+                  status-code: '201'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: GoogleSheetsRetrieverows
+                        $ref: >-
+                          #/node-output/Google Sheets Retrieve
+                          rows/response/payload
+                      - variable: GoogleSheetsRetrieverowsMetadata
+                        $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                      - variable: Setvariable
+                        $ref: '#/node-output/Set variable/response/payload'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings:
+                      - event_name:
+                          template: '{{$Request.event_name}}'
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: GoogleSheetsRetrieverows
+                      $ref: >-
+                        #/node-output/Google Sheets Retrieve
+                        rows/response/payload
+                    - variable: GoogleSheetsRetrieverowsMetadata
+                      $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                    - variable: Setvariable
+                      $ref: '#/node-output/Set variable/response/payload'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+                - variable: GoogleSheetsRetrieverows
+                  $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                - variable: GoogleSheetsRetrieverowsMetadata
+                  $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+              branch:
+                - condition:
+                    '{{$Foreachitem.values[4]}}': '{{$Request.event_name}}'
+                  execute:
+                    - upsert-action:
+                        name: Salesforce Update or create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Company:
+                                template: '{{$Foreachitem.values[3]}}'
+                            - Email:
+                                template: '{{$Foreachitem.values[2]}}'
+                            - FirstName:
+                                template: '{{$Foreachitem.values[0]}}'
+                            - LastName:
+                                template: '{{$Foreachitem.values[1]}}'
+                            - LeadSource:
+                                template: 'From event: "{{$Foreachitem.values[4]}}"'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleSheetsRetrieverows
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response/payload
+                            - variable: GoogleSheetsRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                        filter:
+                          where:
+                            Email: '{{$Foreachitem.values[2]}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleSheetsRetrieverows
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response/payload
+                            - variable: GoogleSheetsRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    API to create or update leads in Salesforce based on a Google Sheets spreadsheet
+models:
+  leads:
+    name: leads
+    properties:
+      event_name:
+        required: false
+        id: true
+        type: string
+    plural: leads
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
