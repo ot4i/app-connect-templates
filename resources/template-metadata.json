@@ -347,7 +347,7 @@
  "summary": "Google Sheets to Pardot",
  "sourceApp": "googlesheet",
  "targetApps": ["salesforcepardot"],
- "tags": ["googlesheet", "salesforcepardot"],
+ "tags": ["googlesheets", "salesforcepardot"],
  "offerings": ["app connect professional"]
 },
 {
@@ -374,7 +374,7 @@
  "summary": "Google Sheets to Twilio",
  "sourceApp": "googlesheet",
  "targetApps": ["twilio"],
- "tags": ["googlesheet", "twilio", "sms", "row", "business"],
+ "tags": ["googlesheets", "twilio", "sms", "row", "business"],
  "offerings": ["app connect professional"]
 },
 {
@@ -425,7 +425,7 @@
     "description": "This template creates an API to create or update leads in Salesforce for a specific event based on data collected in a Google Sheets spreadsheet.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
-    "targetApps": ["googlesheets", "salesforce"],
+    "targetApps": ["googlesheet", "salesforce"],
     "tags": ["api", "salesforce", "googlesheets"],
     "offerings": ["app connect professional"]
   },{
