@@ -11,7 +11,7 @@ Before you use this flow, you must have a Google Sheets spreadsheet with the fol
 
 Any other columns after the first five specified here will be ignored by this flow.
 
-# Using the template
+## Using the template
 
 1. Click **Create flow** to start using the template.
 1. Click **Operations**, then **Edit flow** for the _Create leads_ operation.
