@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/API%20to%20create%20contact%20in%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/apendrich-api-sf-gs/resources/markdown/API%20to%20create%20or%20update%20leads%20in%20Salesforce%20based%20on%20data%20collected%20in%20a%20Google%20Sheets%20spreadsheet_instructions.md) (opens in a new window).
 
 This API takes an event name in the call. The event name is used to compare against data in a Google Sheets spreadsheet. Any leads found in the spreadsheet for the event name specified in the call will be either added to, or updated in Salesforce depending on whether or not a lead with the same email address already exists in Salesforce. The original spreadsheet remains unchanged by this flow.
 
