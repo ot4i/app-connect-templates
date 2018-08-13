@@ -222,8 +222,7 @@ integration:
                 execute: []
               output-schema: {}
   name: >-
-    API to create or update leads in Salesforce based on data collected in a
-    Google Sheets spreadsheet
+    API to create or update leads in Salesforce based on a Google Sheets spreadsheet
 models:
   leads:
     name: leads
