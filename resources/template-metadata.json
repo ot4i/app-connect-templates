@@ -421,7 +421,7 @@
     "tags": ["batch", "completion", "scheduler","salesforce", "gmail", "email", "slack"],
     "offerings": ["app connect professional"]
   },{
-    "name": "API to create or update leads in Salesforce based on data collected in a Google Sheets spreadsheet",
+    "name": "API to create or update leads in Salesforce based on a Google Sheets spreadsheet",
     "description": "This template creates an API to create or update leads in Salesforce for a specific event based on data collected in a Google Sheets spreadsheet.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
