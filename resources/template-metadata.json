@@ -444,6 +444,14 @@
  "targetApps": ["salesforce", "watsondiscovery"],
  "tags": ["salesforce", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
  "offerings": ["app connect professional"]
+},{
+"name": "Retrieve file content from Google Drive then add the document to the Watson Discovery Service",
+ "description": "Use this template to retrieve file content from Google Drive and add the same document to the IBM Watson Discovery Service.",
+ "summary": "Scheduler to 2 applications",
+ "sourceApp": "streaming-connector-scheduler",
+ "targetApps": ["googledrive", "watsondiscovery"],
+ "tags": ["googledrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
+"offerings": ["app connect professional"]
 }
                ]
 }
