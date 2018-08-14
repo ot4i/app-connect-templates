@@ -114,5 +114,5 @@ integration:
                     $ref: >-
                       #/node-output/Google Drive Retrieve file
                       content/response/payload
-  name: WDS
+  name: Retrieve file content from Google Drive then add the document to the Watson Discovery Service
 models: {}
