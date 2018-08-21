@@ -452,6 +452,13 @@
  "targetApps": ["googledrive", "watsondiscovery"],
  "tags": ["googledrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
 "offerings": ["app connect professional"]
-}
-               ]
+},{
+    "name": "Using the For each node and JSONata to process high priority issues",
+    "description": "Use this template to receive a notification in the log for high priority issues.",
+    "summary": "Scheduler to Atlassian Jira Service Desk",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["atlassianjira"],
+    "tags": ["scheduler", "atlassianjira", "service desk", "tickets", "issues", "priority", "incidents", "JSONata", "for each", "log", "logging", "high", "highest"],
+    "offerings": ["app connect professional"]
+  }]
 }
