@@ -1,0 +1,109 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incidents
+      connector-type: atlassianjira
+      actions:
+        RETRIEVEALL: {}
+      account-name: Account 1
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Atlassian JIRA Service Desk Retrieve issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 1000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: >-
+                  $filter($AtlassianJIRAServiceDeskRetrieveissues,function($v,
+                  $i, $a){$contains($v.fields.priority.name, "High")})
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AtlassianJIRAServiceDeskRetrieveissues
+                    $ref: >-
+                      #/node-output/Atlassian JIRA Service Desk Retrieve
+                      issues/response/payload
+                  - variable: AtlassianJIRAServiceDeskRetrieveissuesMetadata
+                    $ref: >-
+                      #/node-output/Atlassian JIRA Service Desk Retrieve
+                      issues/response
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AtlassianJIRAServiceDeskRetrieveissues
+                    $ref: >-
+                      #/node-output/Atlassian JIRA Service Desk Retrieve
+                      issues/response/payload
+                  - variable: AtlassianJIRAServiceDeskRetrieveissuesMetadata
+                    $ref: >-
+                      #/node-output/Atlassian JIRA Service Desk Retrieve
+                      issues/response
+                mappings: []
+              display-name: Atlassian JIRA Service Desk Issue (Priority='High' or 'Highest')
+    assembly-2:
+      assembly:
+        execute:
+          - logging:
+              name: Log
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AtlassianJIRAServiceDeskRetrieveissues
+                    $ref: >-
+                      #/node-output/Atlassian JIRA Service Desk Retrieve
+                      issues/response/payload
+                  - variable: AtlassianJIRAServiceDeskRetrieveissuesMetadata
+                    $ref: >-
+                      #/node-output/Atlassian JIRA Service Desk Retrieve
+                      issues/response
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: >-
+                        Atlassian JIRA Issue  {{$Foreachitem.id}}
+                        {{$Foreachitem.fields.priority.name}}
+  name: Using the For each node and JSONata to process high priority issues
+models: {}
