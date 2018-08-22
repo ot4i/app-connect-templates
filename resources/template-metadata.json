@@ -469,6 +469,15 @@
     "targetApps": ["ibmdb2", "watsonnlclassifier", "salesforce"],
     "tags": ["Salesforce", "IBM Watson Natural Language Classifier", "crm", "cognitive", "IBM Db2", "batch process"],
     "offerings": ["app connect professional"]
+},
+   {
+    "name": "Populate a Salesforce campaign with leads captured in IBM Db2",
+    "description": "This template detects when a new campaign is created in Salesforce, identifies leads from the associated trade show whose details were stored in an IBM Db2 database, and then populates Salesforce with these leads.",
+    "summary": "Salesforce to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["ibmdb2", "salesforce"],
+    "tags": ["Salesforce", "crm", "IBM Db2", "batch process"],
+    "offerings": ["app connect professional"]
 }
                ]
 }
