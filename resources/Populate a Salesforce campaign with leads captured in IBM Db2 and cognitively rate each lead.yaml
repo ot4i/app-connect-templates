@@ -1,0 +1,164 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Campaign
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      account-name: Account 1
+    trigger-interface-2:
+      type: extract-trigger
+      triggers:
+        RETRIEVEALL:
+          input-context:
+            data: DB2ADMIN2_Leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+      connector-type: ibmdb2
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
+    action-interface-2:
+      type: api-action
+      business-object: ClassifyText
+      connector-type: watsonnlclassifier
+      account-name: Account 1
+      actions:
+        CLASSIFYTEXT: {}
+    action-interface-3:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: CampaignMember
+      connector-type: salesforce
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - batch-retrieve-action:
+              name: Batch process
+              filter:
+                where:
+                  conference: '{{$Trigger.Conference__c}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+              pagination-type: SKIP_LIMIT
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM Watson Natural Language Classifier Classify text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CLASSIFYTEXT
+              map:
+                mappings:
+                  - classifier_id:
+                      template: 3b0af2x553-nlc-875
+                  - text:
+                      template: '{{$Batchprocess.leadtxt}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Salesforce Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - City:
+                      template: '{{$Batchprocess.city}}'
+                  - Company:
+                      template: '{{$Batchprocess.company}}'
+                  - Country:
+                      template: '{{$Batchprocess.country}}'
+                  - Description:
+                      template: >-
+                        {{$exists($Batchprocess.leadtxt)?$Batchprocess.leadtxt
+                        :'met at conference' &   $Trigger.Conference__c }}
+                  - Email:
+                      template: '{{$Batchprocess.email}}'
+                  - FirstName:
+                      template: '{{$Batchprocess.firstname}}'
+                  - LastName:
+                      template: '{{$Batchprocess.lastname}}'
+                  - Phone:
+                      template: '{{$Batchprocess.phone}}'
+                  - PostalCode:
+                      template: '{{$Batchprocess.postalcd}}'
+                  - Rating:
+                      template: >-
+                        {{$IBMWatsonNaturalLanguageClassifierClassifytext.top_class}}
+                  - State:
+                      template: '{{$Batchprocess.region}}'
+                  - Street:
+                      template: >-
+                        {{$Batchprocess.address1}}, {{$Batchprocess.address2}},
+                        {{$Batchprocess.address3}}, {{$Batchprocess.address4}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMWatsonNaturalLanguageClassifierClassifytext
+                    $ref: >-
+                      #/block/Batch process/node-output/IBM Watson Natural
+                      Language Classifier Classify text/response/payload
+          - create-action:
+              name: Salesforce Create campaign member
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - CampaignId:
+                      template: '{{$Trigger.Id}}'
+                  - LeadId:
+                      template: '{{$SalesforceCreatelead.Id}}'
+                  - Status:
+                      template: Received
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMWatsonNaturalLanguageClassifierClassifytext
+                    $ref: >-
+                      #/block/Batch process/node-output/IBM Watson Natural
+                      Language Classifier Classify text/response/payload
+                  - variable: SalesforceCreatelead
+                    $ref: >-
+                      #/block/Batch process/node-output/Salesforce Create
+                      lead/response/payload
+  name: >-
+    Populate a Salesforce campaign with leads captured in IBM Db2 and
+    cognitively rate each lead
+models: {}
