@@ -18,9 +18,9 @@ This template references entities that you can create as follows:
 
 1. Click **Create flow** to start using the template.
 1. Click each node to review its configuration. If necessary:
-   1. Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
-   1. Connect to your [IBM Db2 account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-ibm-db2/).
-   1. Connect to your [IBM Watson Natural Language Classifier account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-natural-language-classifier/).
+   - Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+   - Connect to your [IBM Db2 account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-ibm-db2/).
+   - Connect to your [IBM Watson Natural Language Classifier account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-natural-language-classifier/).
 1. In the IBM Db2 node, check that the **Where** condition matches the CONFERENCE column in the Db2 table to the **Conference** custom field in your Salesforce campaign.
 1. In the IBM Watson Natural Language Classifier node, select the correct classifier; for example, **LeadClassifier**.
 1. In the Salesforce "Create lead" node, ensure the **Rating** field is mapped to the Watson Natural Language Classifier **Top Class** field, which identifies the class with the highest confidence.
