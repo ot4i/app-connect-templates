@@ -460,5 +460,15 @@
     "targetApps": ["atlassianjira"],
     "tags": ["scheduler", "atlassianjira", "service desk", "tickets", "issues", "priority", "incidents", "JSONata", "for each", "log", "logging", "high", "highest"],
     "offerings": ["app connect professional"]
-  }]
+  },
+   {
+    "name": "Populate a Salesforce campaign with leads captured in IBM Db2 and cognitively rate each lead",
+    "description": "This template detects when a new campaign is created in Salesforce, identifies leads from the associated trade show whose details were stored in an IBM Db2 database, and then populates Salesforce with these leads. The template also uses cognitive analysis to rate the Salesforce leads as Hot, Warm, or Cold.",
+    "summary": "Salesforce to 3 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["ibmdb2", "watsonnlclassifier", "salesforce"],
+    "tags": ["Salesforce", "IBM Watson Natural Language Classifier", "crm", "cognitive", "IBM Db2", "batch process"],
+    "offerings": ["app connect professional"]
+}
+               ]
 }
