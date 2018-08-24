@@ -18,7 +18,7 @@ integration:
       triggers:
         RETRIEVEALL:
           input-context:
-            data: DB2ADMIN2_Leads
+            data: DB2INST1_Leads
           assembly:
             $ref: '#/integration/assemblies/assembly-2'
       connector-type: ibmdb2
