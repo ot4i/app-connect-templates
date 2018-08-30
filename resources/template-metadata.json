@@ -437,6 +437,14 @@
     "tags": ["api", "salesforce"],
     "offerings": ["app connect professional"]
   },{
+    "name": "API to create leads in Salesforce using a csv file from Box",
+    "description": "This API takes a URL to a Box document, and an optional event name. Using that information it retrieves the document, parses it to find the new leads generated and creates or updates those leads in Salesforce.",
+    "summary": "1 flow using 3 applications",
+    "sourceApp": "api",
+    "targetApps": ["salesforce"],
+    "tags": ["api", "box", "if", "salesforce"],
+    "offerings": ["app connect professional"]
+  },{
  "name": "Download a PDF attachment from Salesforce and add the PDF document to the Watson Discovery Service",
  "description": "Use this template to download an attachment from Salesforce and add the same document to the IBM Watson Discovery Service.",
  "summary": "Scheduler to 2 applications",
