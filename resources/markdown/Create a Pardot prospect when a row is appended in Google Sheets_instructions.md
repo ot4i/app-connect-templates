@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20Pardot%20prospect%20when%20a%20row%20is%20appeneded%20in%20Google%20Sheets_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20Pardot%20prospect%20when%20a%20row%20is%20appended%20in%20Google%20Sheets_instructions.md) (opens in a new window).
 
 1. Before you use this template, make sure that you have a Google Sheets spreadsheet containing a sheet with the following header columns:
     * First name
