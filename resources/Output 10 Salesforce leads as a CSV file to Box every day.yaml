@@ -1,0 +1,106 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: File
+      connector-type: box
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - create-action:
+              name: Box Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - content:
+                      format:
+                        type: csv
+                        options:
+                          includeHeaders: true
+                          headerOrder:
+                            - Name
+                            - Email
+                          eol: LF
+                          alwaysQuotes: false
+                      foreach:
+                        input: '$SalesforceRetrieveleads '
+                        iterator: contentItem
+                        mappings:
+                          - Email:
+                              template: '{{$contentItem.Email}}'
+                          - Name:
+                              template: '{{$contentItem.Name}}'
+                  - fileType:
+                      template: Text
+                  - name:
+                      template: >-
+                        {{$formatDate($toMillis($Trigger.currentEventTime),
+                        "YYYY-MM-DD")}}.csv
+                  - parent_id:
+                      template: '52754712841'
+                stringFormatSchemas:
+                  properties.`content`:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            Name:
+                              type: string
+                            Email:
+                              type: string
+                        title: Items
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveleads
+                    $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                  - variable: SalesforceRetrieveleadsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve leads/response'
+  name: Output 10 Salesforce leads as a CSV file to Box every day
+models: {}
