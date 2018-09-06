@@ -102,5 +102,5 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
                   - variable: SalesforceRetrieveleadsMetadata
                     $ref: '#/node-output/Salesforce Retrieve leads/response'
-  name: Output 10 Salesforce leads as a CSV file to Box every day
+  name: At regular intervals extract Salesforce lead details and upload Box file with CSV output
 models: {}
