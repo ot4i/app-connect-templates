@@ -486,6 +486,13 @@
     "targetApps": ["ibmdb2", "salesforce"],
     "tags": ["Salesforce", "crm", "IBM Db2", "batch process"],
     "offerings": ["app connect professional"]
-}
-               ]
+}, {
+    "name": "At regular intervals extract Salesforce lead details and upload Box file with CSV output",
+    "description": "This template gathers 10 leads from Salesforce, uses their names and email addresses to build a CSV file, then outputs the file to Box. The flow triggers once per day at 00:00 UTC.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["salesforce", "box"],
+    "tags": ["CSV", "Comma-Separated Values", "Salesforce", "Box"],
+    "offerings": ["app connect professional"]
+  }]
 }
