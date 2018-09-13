@@ -494,5 +494,14 @@
     "targetApps": ["salesforce", "box"],
     "tags": ["CSV", "Comma-Separated Values", "Salesforce", "Box"],
     "offerings": ["app connect professional"]
+  },
+   {
+    "name": "Sync products from IBM Db2 to Salesforce Commerce Cloud",
+    "description": "Use this template to schedule a flow that runs once a day to retrieve new product records that were added to an IBM Db2 database, and then create corresponding products in Salesforce Commerce Cloud.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["ibmdb2", "sfcommerceclouddata"],
+    "tags": ["scheduler", "ibmdb2", "sfcommerceclouddata", "database", "db2", "products", "sync", "web", "retrieve", "add", "commerce"],
+    "offerings": ["app connect professional"]
   }]
 }
