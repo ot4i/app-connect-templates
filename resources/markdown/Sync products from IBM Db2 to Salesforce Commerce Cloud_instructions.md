@@ -12,7 +12,7 @@ This template references entities that you can create as follows:
 
 1. Click **Create flow** to start using the template.
 1. Click each node to review its configuration. If necessary:
-  - Connect to your [IBM Db2](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-ibm-db2/).
-  - Connect to your [Salesforce Commerce Cloud](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/how-to-use-ibm-app-connect-with-salesforce-commerce-cloud/).
+   - Connect to your [IBM Db2](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-ibm-db2/).
+   - Connect to your [Salesforce Commerce Cloud](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/how-to-use-ibm-app-connect-with-salesforce-commerce-cloud/).
 1. Validate all the mappings and ensure that they are correct.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
