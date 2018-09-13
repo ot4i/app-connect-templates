@@ -1,0 +1,141 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 18 * * *
+                  runOnceOncheck: false
+                  timeZone: GMT
+                  every: day
+      connector-type: streaming-connector-scheduler
+      account-name: Account 1
+    trigger-interface-2:
+      type: extract-trigger
+      triggers:
+        RETRIEVEALL:
+          input-context:
+            data: DB2INST1_Productsfcc
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+      connector-type: ibmdb2
+      account-name: Account 1
+  action-interfaces:
+    action-interface-3:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
+    action-interface-2:
+      type: api-action
+      business-object: products
+      connector-type: sfcommerceclouddata
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      todays_date:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - todays_date:
+                            template: '{{$substring($now(), 0, 10)}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - batch-retrieve-action:
+              name: Batch process
+              filter:
+                where:
+                  prdCreatedDate: '{{$Setvariable.variable.todays_date}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                limit: 10
+              pagination-type: SKIP_LIMIT
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+    assembly-2:
+      assembly:
+        execute:
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Batchprocess}}'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+              sample-data: >-
+                {"prdId":4,"prdName":"product4","prdCost":0.4,"prdCreatedDate":"2018-07-23T00:00:00.048Z"}
+              output-schema:
+                $schema: 'http://json-schema.org/draft-04/schema#'
+                type: object
+                properties:
+                  prdId:
+                    type: number
+                  prdName:
+                    type: string
+                  prdCost:
+                    type: number
+                  prdCreatedDate:
+                    type: string
+                  catalog:
+                    type: string
+                title: Parsed JSON
+          - create-action:
+              name: Salesforce Commerce Cloud Digital Data Create product
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - id:
+                      template: '{{$JSONParserParse.prdId}}'
+                  - name:
+                      template: '{{$JSONParserParse.prdName}}'
+                  - owning_catalog_id:
+                      template: '{{$JSONParserParse.catalog}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/Batch process/node-output/JSON Parser
+                      Parse/response/payload
+  name: Sync products from IBM Db2 to Salesforce Commerce Cloud 
+models: {}
