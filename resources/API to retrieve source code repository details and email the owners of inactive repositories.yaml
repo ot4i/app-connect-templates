@@ -592,7 +592,7 @@ integration:
                             - Body:
                                 template: >-
                                   Repository {{$Foreachitem.name}} has not been
-                                  updated since {{$Foreachitem.updated_on}}
+                                  updated since {{$Foreachitem.updated_on}}.
 
                                   Please archive this repository if it's no
                                   longer being updated or used.
