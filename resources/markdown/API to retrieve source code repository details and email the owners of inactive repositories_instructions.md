@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 You'll need an API with a `repositories` resource to retrieve information about repositories in a source control management hosting service.
 
-If you do not have access to an API with this kind of information and you want to test this flow, you can use the following URL which references the Bitbucket API. `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`
+If you do not have access to an API with this kind of information and you want to test this flow, you can use the following URL which retrieves records from the Bitbucket `repositories` resource using ‘limit’ and ‘token’ API query parameters. `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`
 
 ## Using the template
 
