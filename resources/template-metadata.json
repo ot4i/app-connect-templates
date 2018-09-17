@@ -505,7 +505,7 @@
     "offerings": ["app connect professional"]
   }, {
     "name": "API to retrieve source code repository details and email the owners of inactive repositories",
-    "description": "se this template to find inactive source code repositories, then send an email to the repository owner so that they know which repositories to archive.",
+    "description": "Use this template to find inactive source code repositories, then send an email to the repository owner so that they know which repositories to archive.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
     "targetApps": ["http", "gmail"],
