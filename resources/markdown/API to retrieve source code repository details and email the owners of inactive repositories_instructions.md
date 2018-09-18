@@ -19,15 +19,14 @@ If you do not have access to an API with this kind of information and you want t
 
 ## Testing the template
 
-1. Click the **Manage** tab &gt; **Manage API with IBM API Connect**. 
-1. Expose and share the flow as an API.
-1. Open the API Portal. 
- - (Optional) If this is your first time using the Portal, click **Settings** &gt; **Portal** &gt; **Select Portal** &gt; **IBM Developer Portal**. 
- - Click the Portal URL link that is generated. Note: It can take up to 2 hours for the Portal to become accessible. 
-1. Once you're in the API portal, use the **Try it** link. 
+1. Click the **Manage** tab &gt; **Sharing Outside of Cloud Foundry organization
+** .
+1. Click on **Create API key** button.
+1. Click the API Portal link that is generated.
+1. Once you're in the API portal, use the **Try it** link.
 1. Enter a value for the `token` and `limit` parameters.
-1. Click **Call operation**. 
+1. Click **Call operation**.
 
 The results of the API are displayed using the pagination parameters that you specified.
 
-Check for messages about inactive repositories that were sent to the Gmail account that you specified in the flow. 
+Check for messages about inactive repositories that were sent to the Gmail account that you specified in the flow.
