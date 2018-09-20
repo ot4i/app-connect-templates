@@ -11,8 +11,8 @@ If you do not have access to an API with this kind of information and you want t
 1. Click **Create flow** to start using the template.
 1. Click **Operations** &gt; **Edit flow** for the _Retrieve repository with filter_ operation.
 1. Click each node to review its configuration. If necessary:
- - Connect to your [HTTP invoke method](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-http/). (To test this template, you can use the following URL in the **Override the HTTP endpoint host name and port of the URL used in the flow:** field - `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`).
- - Connect to your [Gmail account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-gmail/).
+   - Connect to your [HTTP invoke method](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-http/). (To test this template, you can use the following URL in the **Override the HTTP endpoint host name and port of the URL used in the flow:** field - `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`).
+   - Connect to your [Gmail account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-gmail/).
 1. In the Gmail node, update the mandatory **To** field by adding a valid email address.
 1. Click **Done**.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
@@ -21,7 +21,7 @@ If you do not have access to an API with this kind of information and you want t
 
 1. Click the **Manage** tab &gt; **Sharing Outside of Cloud Foundry organization
 ** .
-1. Click on **Create API key** button.
+1. Click **Create API key**.
 1. Click the API Portal link that is generated.
 1. Once you're in the API portal, use the **Try it** link.
 1. Enter a value for the `token` and `limit` parameters.

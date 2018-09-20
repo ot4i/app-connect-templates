@@ -509,7 +509,7 @@
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
     "targetApps": ["http", "gmail"],
-    "tags": ["http node", "gmail", "JSON parse", "forEach", "retrieve with pagination", "pagination"],
+    "tags": ["http node", "gmail", "JSON parse", "forEach", "retrieve with pagination", "pagination", "api flow"],
     "offerings": ["app connect professional"]
   }]
 }
