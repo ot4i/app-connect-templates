@@ -8,7 +8,7 @@
     "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "crm", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Sync new Salesforce cases and comments with ServiceNow",
     "description": "This template looks for new cases added in your Salesforce account and syncs this by creating a new ticket in ServiceNow that includes the comments from the original case.",
     "summary": "Salesforce to 2 applications",
@@ -17,7 +17,7 @@
     "tags": ["servicenow", "salesforce", "case", "support", "ticket"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Open a ticket on ServiceNow from an identified issue in Slack and send an email using Gmail",
     "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow will send you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
     "summary": "Slack to 2 applications",
@@ -35,7 +35,7 @@
     "tags": ["slack", "watsonlt", "translate", "translation", "french", "english", "chat", "language"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a case in Salesforce when a new incident is created in ServiceNow and alert team",
     "description": "This template creates a new case in Salesforce when a new incident is created in ServiceNow. If this is an urgent incident, the flow then sends an email via Gmail and a message on Slack to alert the team when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
     "summary": "ServiceNow to 3 applications",
@@ -44,7 +44,7 @@
     "tags": ["servicenow", "gmail", "support", "email", "incident", "salesforce", "slack", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Sync Salesforce new cases with ServiceNow tickets",
     "description": "The template creates a new ticket in ServiceNow when a new case is created in Salesforce - helping you to keep your support services in sync!",
     "summary": "Salesforce to 2 applications",
@@ -53,7 +53,7 @@
     "tags": ["servicenow", "salesforce", "case", "support", "ticket"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Sync Marketo new leads with Salesforce Leads",
     "description": "Never miss a lead again! This templates creates or updates a new lead in Salesforce when a new lead is created in Marketo.",
     "summary": "Marketo to Salesforce",
@@ -62,7 +62,7 @@
     "tags": ["Salesforce", "marketo", "marketing", "lead", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send Gmail message for a new Salesforce Lead or a Slack message if email address is missing",
     "description": "Use this template to send your new Salesforce leads an email. If there is no email ID included then send a Slack message to your team that someone needs to call the lead.",
     "summary": "Salesforce to 2 applications",
@@ -71,7 +71,7 @@
     "tags": ["Salesforce", "slack", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send Gmail message to new Salesforce lead",
     "description": "This template creates and sends an email via Gmail when a new lead is created in Salesforce. If there is no email provided for the lead then we log an error about the missing email.",
     "summary": "Salesforce to Gmail",
@@ -80,7 +80,7 @@
     "tags": ["Salesforce", "gmail", "marketing", "lead", "email", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send Gmail message for new Slack message",
     "description": "This template sends a new Gmail message whenever a new message is received in Slack.",
     "summary": "Slack to Gmail",
@@ -88,8 +88,8 @@
     "targetApps": ["gmail"],
     "tags": ["gmail", "slack", "email"],
     "offerings": ["app connect professional"]
-  }, 
-  {   
+  },
+  {
     "name": "Create an Asana task from a Gmail message",
     "description": "This template creates a new task in Asana whenever a new Gmail message is received.",
     "summary": "Gmail to Asana",
@@ -97,8 +97,8 @@
     "targetApps": ["asana"],
     "tags": ["gmail", "asana"],
     "offerings": ["app connect professional"]
-  },             
-  {   
+  },
+  {
     "name": "Post Slack message for new Gmail message",
     "description": "This template creates a new message in Slack whenever a new Gmail message is received.",
     "summary": "Gmail to Slack",
@@ -106,8 +106,8 @@
     "targetApps": ["slack"],
     "tags": ["gmail", "slack", "email"],
     "offerings": ["app connect professional"]
-  }, 
-  {   
+  },
+  {
     "name": "Sync Salesforce contacts and Mailchimp mailing list subscribers",
     "description": "This template adds new Salesforce contacts to Mailchimp lists and sends an email via Gmail to alert you if a contact's email address is missing.",
     "summary": "Salesforce to 3 applications",
@@ -133,15 +133,15 @@
     "targetApps": ["netsuiteerp", "stripe", "salesforcepardot"],
     "tags": ["asana", "netsuiteerp", "salesforcepardot", "stripe", "marketing", "campaign", "product", "crm"],
     "offerings": ["app connect professional"]
-},                
-  {   
+},
+  {
     "name": "For large Salesforce opportunities send an email and create an Asana task",
     "description": "This template creates and sends an email via Gmail, and creates an Asana task, when a new high value opportunity is created in Salesforce.",
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["gmail", "asana"],
     "tags": ["Salesforce", "gmail", "asana", "sales", "opportunity", "email", "crm"],
-    "offerings": ["app connect professional"] 
+    "offerings": ["app connect professional"]
   },
 {
  "name": "Arrange welcome drinks for an Eventbrite event",
@@ -152,7 +152,7 @@
  "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
  "offerings": ["app connect professional"]
 },
- {   
+ {
     "name": "Email tone detector",
     "description": "This template analyses the tone of your emails and alerts you when you receive emails with the same tone from the same sender. You specify the number of emails and the time period you want to monitor.",
     "summary": "Gmail to 3 applications",
@@ -169,7 +169,7 @@
  "targetApps": ["eventbrite", "salesforce", "slack"],
  "tags": ["eventbrite", "slack", "salesforce", "contacts", "marketing", "leads", "events", "matching", "city", "notification"],
  "offerings": ["app connect professional"]
-},   
+},
   {
  "name": "Add attendee to Insightly and MailChimp",
  "description": "This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.",
@@ -179,7 +179,7 @@
  "tags": ["eventbrite", "insightly", "mailchimp", "subscribe", "publicize", "promote", "marketing"],
  "offerings": ["app connect professional"]
 },
-   {   
+   {
     "name": "Sync a new Salesforce contact with Intacct",
     "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
     "summary": "Salesforce to 3 applications",
@@ -188,7 +188,7 @@
     "tags": ["salesforce", "intacct", "yammer", "crm", "accounting", "messaging"],
     "offerings": ["app connect professional"]
 },
-  {   
+  {
     "name": "Create new leads in Marketo by capturing lead names and details in Slack",
     "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), and then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
     "summary": "Slack to 3 applications",
@@ -197,7 +197,7 @@
     "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "lead", "leadcapturing"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Send a Gmail message when urgent ServiceNow incidents come in",
     "description": "This template sends an email via Gmail when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
     "summary": "ServiceNow to Gmail",
@@ -206,7 +206,7 @@
     "tags": ["servicenow", "gmail", "support", "email", "incident"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card for a new Salesforce campaign",
     "description": "This template creates a new card in Trello when a new campaign is created in Salesforce - make sure you never forget to finish that campaign again!",
     "summary": "Salesforce to Trello",
@@ -215,7 +215,7 @@
     "tags": ["salesforce", "trello", "marketing", "campaign", "project management", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card for a new Salesforce lead",
     "description": "This template creates a new card in Trello when a new lead is created in Salesforce - make sure you never forget to follow up with that lead again!",
     "summary": "Salesforce to Trello",
@@ -224,7 +224,7 @@
     "tags": ["Salesforce", "trello", "marketing", "lead", "project management", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card for a new Salesforce case",
     "description": "This template creates a new card in Trello when a new case is created in Salesforce - make sure you never forget to follow up with that new case again!",
     "summary": "Salesforce to Trello",
@@ -233,7 +233,7 @@
     "tags": ["Salesforce", "trello", "support", "case", "project management", "crm"],
     "offerings": ["app connect professional"]
   },
-  {   
+  {
     "name": "Create a new Trello card when a new event in Eventbrite is added",
     "description": "This template creates a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.",
     "summary": "Eventbrite to Trello",
@@ -251,7 +251,7 @@
   "tags": ["insightly", "trello", "business", "task", "card", "crm"],
   "offerings": ["app connect professional"]
 },
-   {   
+   {
     "name": "Invite Sales employees to an Eventbrite event",
     "description": "This template retrieves details of your Sales staff from NetSuite HCM when a new event is created in Eventbrite.  It then sends them a message on Slack to invite them to the event.",
     "summary": "Eventbrite to 2 applications",
@@ -260,7 +260,7 @@
     "tags": ["eventbrite", "netsuite hcm", "slack", "crm", "messaging", "events"],
     "offerings": ["app connect professional"]
 },
-  {   
+  {
     "name": "Add new Eventbrite attendees to MailChimp lists",
     "description": "This template adds attendees of Eventbrite events to different mailing lists in MailChimp, depending on the event that they sign up to.",
     "summary": "Eventbrite to MailChimp",
@@ -269,7 +269,7 @@
     "tags": ["eventbrite", "mailchimp", "marketing", "events", "mailing list"],
     "offerings": ["app connect professional"]
   },
-   {   
+   {
     "name": "Send me a Slack notification for every new Insightly contact",
     "description": "Use this template to send a Slack notification to your chosen channel whenever a new contact is added in Insightly.",
     "summary": "Insightly to Slack",
@@ -305,7 +305,7 @@
  "tags": ["wufoo", "sugarcrm", "sales", "marketing", "lead", "form"],
  "offerings": ["app connect professional"]
 },
-{  
+{
   "name": "Update or create Salesforce contact for a new event attendee and post to Slack depending on action",
   "description": "This template updates or creates a Salesforce contact when a new attendee signs up for an Eventbrite event, depending on whether the Salesforce contact exists. It then posts a message to a Slack channel, depending on whether the contact was created or updated.",
   "summary": "Eventbrite to 2 applications",
@@ -358,7 +358,7 @@
  "targetApps": ["twilio"],
  "tags": ["slack", "twilio"],
  "offerings": ["app connect professional"]
-},  
+},
 {
  "name": "Send me a Twilio SMS for every new Salesforce contact",
  "description": "Use this template to send an SMS from Twilio when a new contact is added in Salesforce.",
@@ -367,7 +367,7 @@
  "targetApps": ["twilio"],
  "tags": ["salesforce", "twilio", "sms", "contact", "opportunity", "business"],
  "offerings": ["app connect professional"]
-}, 
+},
 {
  "name": "Send me a Twilio SMS when a new row is added in Google Sheets",
  "description": "Use this template to send an SMS from Twilio when a new row is added in Google Sheets.",
@@ -385,7 +385,7 @@
  "targetApps": ["twilio"],
  "tags": ["gmail", "twilio", "sms", "email", "business"],
  "offerings": ["app connect professional"]
-}, 
+},
 {
  "name": "Create new contact in IBM Watson Campaign when a new contact is added in Salesforce",
  "description": "Use this template to create a new contact in IBM Watson Campaign when a new contact is created in the Salesforce.",
@@ -403,8 +403,8 @@
  "targetApps": ["slack"],
  "tags": ["salesforce", "slack", "sales", "opportunity", "notification"],
  "offerings": ["app connect professional"]
-},                
-  {   
+},
+  {
     "name": "Send Gmail message when a new event is added in Eventbrite",
     "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
     "summary": "Eventbrite to Gmail",
@@ -502,6 +502,14 @@
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["ibmdb2", "sfcommerceclouddata"],
     "tags": ["scheduler", "ibmdb2", "sfcommerceclouddata", "database", "db2", "products", "sync", "web", "retrieve", "add", "commerce"],
+    "offerings": ["app connect professional"]
+  }, {
+    "name": "API to retrieve source code repository details and email the owners of inactive repositories",
+    "description": "Use this template to find inactive source code repositories, then send an email to the repository owner so that they know which repositories to archive.",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["http", "gmail"],
+    "tags": ["http node", "gmail", "JSON parse", "forEach", "retrieve with pagination", "pagination"],
     "offerings": ["app connect professional"]
   }]
 }
