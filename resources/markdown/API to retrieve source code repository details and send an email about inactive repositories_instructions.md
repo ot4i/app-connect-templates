@@ -21,7 +21,7 @@ If you do not have access to an API with this kind of information and you want t
 
 1. Click the **Manage** tab &gt; **Sharing Outside of Cloud Foundry organization
 ** .
-1. Click on **Create API key** button.
+1. Click **Create API key**.
 1. Click the API Portal link that is generated.
 1. Once you're in the API portal, use the **Try it** link.
 1. Enter a value for the `token` and `limit` parameters.
