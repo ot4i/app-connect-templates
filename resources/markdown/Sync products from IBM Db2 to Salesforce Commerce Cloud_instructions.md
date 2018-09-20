@@ -4,7 +4,15 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 This template references entities that you can create as follows:
 
-- In your IBM Db2 instance, create a database table named **PRODUCTSFCC** in the **DB2INST1** schema.
+- In your IBM Db2 instance, create a database table named **PRODUCTSFCC** in the **DB2INST1** schema with the following 5 columns: 
+
+| Name | Type | 
+| :---  | :---  |
+| `PRD_ID` | `BIGINT` | 
+| `PRD_NAME` | `VARCHAR(50 OCTETS)` | 
+| `PRD_COST` | `DOUBLE` | 
+| `PRD_CREATED_DATE` | `DATE` | 
+| `CATALOG` | `VARCHAR(50 OCTETS)` |
 
   Insert some sample data into the PRODUCTSFCC table.
 
