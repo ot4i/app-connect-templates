@@ -596,11 +596,6 @@ integration:
 
                                   Please archive this repository if it's no
                                   longer being updated or used.
-
-
-                                  Regards,
-
-                                  Admin Team
                             - Subject:
                                 template: >-
                                   {{$Foreachitem.owner.username}} has an
