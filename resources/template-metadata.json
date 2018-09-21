@@ -511,7 +511,7 @@
     "targetApps": ["http", "gmail"],
     "tags": ["http node", "gmail", "JSON parse", "forEach", "retrieve with pagination", "pagination", "api flow"],
     "offerings": ["app connect professional"]
-  }
+  },
    {
     "name": "Load NetSuite ERP products into Salesforce",
     "description": "Use this template to load products from NetSuite ERP into Salesforce at a regular occurring scheduled interval.",
