@@ -1,0 +1,248 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        lookupProduct_catalog:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Product_catalog
+          output-context:
+            data: Product_catalog
+      options:
+        resources:
+          - business-object: Product_catalog
+            model:
+              $ref: '#/models/Product_catalog'
+            triggers:
+              lookup: lookupProduct_catalog
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: products
+      connector-type: netsuiteerp
+      account-name: Sales Team Account
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: DB2INST1_Inventory
+      connector-type: ibmdb2
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: api
+                  $ref: '#/trigger/api/parameters'
+              branch:
+                - condition:
+                    '{{$api.PID}}':
+                      neq: ''
+                  execute:
+                    - retrieve-action:
+                        name: NetSuite ERP Retrieve products
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          where:
+                            itemId: '{{$api.PID}}'
+                          input:
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
+                          limit: 1
+                        allow-truncation: false
+                        pagination-type: TOKEN
+                        allow-empty-output: false
+                    - retrieve-action:
+                        name: IBM Db2 Retrieve INVENTORY records
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            pid: '{{$api.PID}}'
+                          input:
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
+                            - variable: NetSuiteERPRetrieveproducts
+                              $ref: >-
+                                #/block/If/node-output/NetSuite ERP Retrieve
+                                products/response/payload
+                            - variable: NetSuiteERPRetrieveproductsMetadata
+                              $ref: >-
+                                #/block/If/node-output/NetSuite ERP Retrieve
+                                products/response
+                          limit: 1
+                        allow-truncation: false
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: false
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: NetSuiteERPRetrieveproducts
+                        $ref: >-
+                          #/block/If/node-output/NetSuite ERP Retrieve
+                          products/response/payload
+                      - variable: NetSuiteERPRetrieveproductsMetadata
+                        $ref: >-
+                          #/block/If/node-output/NetSuite ERP Retrieve
+                          products/response
+                      - variable: IBMDb2RetrieveINVENTORYrecords
+                        $ref: >-
+                          #/block/If/node-output/IBM Db2 Retrieve INVENTORY
+                          records/response/payload
+                      - variable: IBMDb2RetrieveINVENTORYrecordsMetadata
+                        $ref: >-
+                          #/block/If/node-output/IBM Db2 Retrieve INVENTORY
+                          records/response
+                    mappings:
+                      - available_qty:
+                          template: '{{$IBMDb2RetrieveINVENTORYrecords[0].quantity}}'
+                      - desc:
+                          template: '{{$NetSuiteERPRetrieveproducts[0].salesDescription}}'
+                      - in_stock:
+                          template: >-
+                            {{$IBMDb2RetrieveINVENTORYrecords[0].instock = 'Y' ?
+                            'true' : 'false'}} 
+                      - location:
+                          template: '{{$IBMDb2RetrieveINVENTORYrecords[0].location}}'
+                      - name:
+                          template: '{{$NetSuiteERPRetrieveproducts[0].displayName}}'
+                      - pid:
+                          template: '{{$api.PID}}'
+                      - price:
+                          template: '{{$NetSuiteERPRetrieveproducts[0].costEstimate}}'
+              else:
+                execute: []
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  input:
+                    - variable: api
+                      $ref: '#/trigger/api/parameters'
+                  mappings:
+                    - desc:
+                        template: PID is needed or not found
+              output-schema:
+                required:
+                  - desc
+                properties:
+                  pid:
+                    type: string
+                    title: pid
+                  name:
+                    type: string
+                    title: name
+                  desc:
+                    type: string
+                    title: desc
+                  in_stock:
+                    type: string
+                    title: in_stock
+                  available_qty:
+                    type: string
+                    title: available_qty
+                  location:
+                    type: string
+                    title: location
+                  price:
+                    type: string
+                    title: price
+                title: Output Schema
+                type: object
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Product_catalog successfully add custom operation
+                  status-code: '200'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: If
+                        $ref: '#/node-output/If/response/payload'
+                    mappings:
+                      - Product_ID:
+                          template: '{{$If.pid}}'
+                      - available_qty:
+                          template: '{{$If.available_qty}}'
+                      - description:
+                          template: '{{$If.desc}}'
+                      - instock:
+                          template: '{{$If.in_stock}}'
+                      - location:
+                          template: '{{$If.location}}'
+                      - name:
+                          template: '{{$If.name}}'
+                      - price:
+                          template: '{{$If.price}}'
+                  input:
+                    - variable: api
+                      $ref: '#/trigger/api/parameters'
+                    - variable: If
+                      $ref: '#/node-output/If/response/payload'
+  name: Product Catalog and Stock Lookup
+models:
+  Product_catalog:
+    name: Product_catalog
+    properties:
+      Product_ID:
+        required: false
+        id: true
+        type: string
+      name:
+        required: false
+        id: false
+        type: string
+      description:
+        required: false
+        id: false
+        type: string
+      price:
+        required: false
+        id: false
+        type: string
+      instock:
+        required: false
+        id: false
+        type: string
+      available_qty:
+        required: false
+        id: false
+        type: string
+      location:
+        required: false
+        id: false
+        type: string
+    plural: Product_catalog
+    description: ' '
+    operations:
+      lookup: '#/integration/assemblies/assembly-1'
+    methods:
+      lookup:
+        name: Lookup
+        display:
+          name: Product Catalog
+        accessType: WRITE
+        accepts:
+          - arg: PID
+            type: string
+            http:
+              source: query
+        returns:
+          arg: data
+          type: Product_catalog
+          root: true
+        http:
+          verb: GET
+          path: /Lookup
