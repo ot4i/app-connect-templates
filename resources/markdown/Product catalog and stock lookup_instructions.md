@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Product%20Catalog%20and%20Stock%20Lookup_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Product%20catalog%20and%20stock%20lookup_instructions.md) (opens in a new window).
 
 ## Prerequisites
 
