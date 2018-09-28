@@ -522,7 +522,7 @@
     "offerings": ["app connect professional"]
   },
 {
-    "name": "Product Catalog and Stock Lookup",
+    "name": "Product catalog and stock lookup",
     "description": "This template creates an API to retrieve products from NetSuite and inventory records from a Db2 database in order to use Salesforce to lookup product catalog and stock levels in external ERP and warehouse systems.",
     "summary": "1 flow to 2 applications",
     "sourceApp": "api",
