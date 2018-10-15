@@ -1,0 +1,102 @@
+{
+  "tutorials": [{
+    "name": "Introduction: Creating an event-driven flow",
+    "description": "In an event-driven flow you identify an event that can occur in your source application and actions that can be performed in one or more target applications. The flow is triggered when the event occurs.",
+    "summary": "",
+    "sourceApp": "",
+    "targetApps": [""],
+    "tags": ["generic", "event-driven flow", "event", "flow", "intro", "introduction"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Introduction: Creating flows for an API",
+    "description": "A flow for an API contains a request, one or more target application actions, and a response for an API operation. The flow is triggered by calling the API operation such as from mobile and web applications.",
+    "summary": "api to salesforce",
+    "sourceApp": "api",
+    "targetApps": ["salesforce"],
+    "tags": ["api", "salesforce", "customers", "create", "model", "properties", "request", "response"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Introduction: Creating flows for an API (Part 2)",
+    "description": "In this tutorial you’re going to create an API which will retrieve and update contact details in Salesforce.",
+    "summary": "api to Salesforce",
+    "sourceApp": "api",
+    "targetApps": ["salesforce"],
+    "tags": ["api", "salesforce", "customers", "retrieve", "model", "properties", "request", "response", "update", "contact"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding a Mailchimp subscriber when a new message is added to Slack",
+    "description": "Learn how easy it is to create an event-driven flow that is triggered by a new message in Slack so that you can perform an action in another app.",
+    "summary": "Slack to mailchimp",
+    "sourceApp": "slack",
+    "targetApps": ["mailchimp"],
+    "tags": ["slack", "mailchimp", "event-driven flow", "flow", "mailing list", "contacts", "attendees", "marketing"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding a new card in Trello when a new case is added in Salesforce",
+    "description": "Learn how easy it is to create an event driven flow that adds a new card in Trello when a new case is added in Salesforce.",
+    "summary": "Salesforce to Trello",
+    "sourceApp": "salesforce",
+    "targetApps": ["trello"],
+    "tags": ["salesforce", "trello", "crm", "case", "card", "business", "track"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding a notification card to a flow",
+    "description": "The notification node enables you to create a notification card that is sent when certain conditions occur.",
+    "summary": "Notification node",
+    "sourceApp": "",
+    "targetApps": [""],
+    "tags": ["notification", "toolbox", "node", "trigger action"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding attendees for an Eventbrite event as Insightly leads and MailChimp list subscribers",
+    "description": "Learn how to use App Connect Designer to create an event-driven flow that creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["insightly", "mailchimp"],
+    "tags": ["eventbrite", "insightly", "mailchimp", "attendee", "create", "lead", "subscriber", "event management", "crm", "sales", "oppportunities", "subscribe", "campaign"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding attendees for an Eventbrite event as SugarCRM leads",
+    "description": "Learn how to use App Connect Designer to create an event-driven flow that when someone registers for an event in Eventbrite, creates a lead in SugarCRM and sends the attendee an email depending on whether or not they are an existing lead.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["sugarcrm", "gmail"],
+    "tags": ["eventbrite", "sugarcrm", "gmail", "attendees", "lead", "email", "crm", "event management", "sales", "opportunities", "toolbox", "if", "marketing"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding attendees for an Eventbrite event to a MailChimp mailing list",
+    "description": "Learn how easy it is to use App Connect to connect Eventbrite to MailChimp so that every time someone signs up to your event in Eventbrite, the attendee is added automatically to a mailing list in MailChimp.",
+    "summary": "Eventbrite to Mailchimp",
+    "sourceApp": "eventbrite",
+    "targetApps": ["mailchimp"],
+    "tags": ["eventbrite", "mailchimp", "if", "node", "toolbox", "attendees", "subscriber", "event-driven flow", "condition", "else"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Adding conditional logic to a flow",
+    "description": "Learn how to use an “If” node in an App Connect flow to perform different actions depending on the data that it receives from applications in your flow.",
+    "summary": "Using an if node",
+    "sourceApp": "",
+    "targetApps": [],
+    "tags": ["if", "node", "toolbox", "event-driven flow", "condition", "conditional", "processing"],
+    "offerings": ["app connect professional"]
+ },
+
+  {
+    "name": "Adding data to Google Sheets when a new lead is added to Salesforce",
+    "description": "Learn how easy it is to use App Connect to connect Salesforce to Google Sheets so that every time a new lead is added in Salesforce, details of that lead are added automatically to a row in a Google Sheets spreadsheet.",
+    "summary": "Salesforce to Google Sheets",
+    "sourceApp": "salesforce",
+    "targetApps": ["googlesheets"],
+    "tags": ["salesforce", "googlesheets", "lead", "spreadsheet", "business", "sales", "event-driven flow", "row"],
+    "offerings": ["app connect professional"]
+  }]
+}
