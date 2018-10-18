@@ -520,5 +520,14 @@
     "targetApps": ["netsuiteerp", "salesforce"],
     "tags": ["scheduler", "salesforce", "netsuiteerp", "scheduler", "JSON parser", "products", "sync", "load", "retrieve", "add", "create"],
     "offerings": ["app connect professional"]
+  },
+   {
+    "name": "Sync leads between Salesforce accounts and send email with the sync result",
+    "description": "Use this template to start a batch process using the scheduler node to retrieve leads from Salesforce Account 1 and then create or update leads in Salesforce Account 2. The flow will send a message to Slack to alert you when the batch process has started, and an email will be sent to your preferred email address with the status of the sync.",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["salesforce", "slack", "gmail"],
+    "tags": ["scheduler", "salesforce", "slack", "gmail", "batch", "process", "sync", "email", "retrieve", "add", "create", "update", "upsert", "leads", ""],
+    "offerings": ["app connect professional"]
   }]
 }
