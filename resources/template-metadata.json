@@ -529,5 +529,14 @@
     "targetApps": ["salesforce", "slack", "gmail"],
     "tags": ["scheduler", "salesforce", "slack", "gmail", "batch", "process", "sync", "email", "retrieve", "add", "create", "update", "upsert", "leads", ""],
     "offerings": ["app connect professional"]
+  },
+   {
+    "name": "Classifying Salesforce cases and posting a message in Slack",
+    "description": "Use this template to classify the text from a Salesforce case. Then, after the text has been classified, automatically create a message in Slack identifying the type of case that has been raised and the case number.",
+    "summary": "Salesforce to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["watsonnlclassifier", "slack"],
+    "tags": ["watson", "salesforce", "slack", "classifier", "natural", "language", "case", "classification", "train"],
+    "offerings": ["app connect professional"]
   }]
 }
