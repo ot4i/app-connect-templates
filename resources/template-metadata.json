@@ -179,15 +179,6 @@
  "tags": ["eventbrite", "insightly", "mailchimp", "subscribe", "publicize", "promote", "marketing"],
  "offerings": ["app connect professional"]
 },
-   {
-    "name": "Sync a new Salesforce contact with Intacct",
-    "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
-    "summary": "Salesforce to 3 applications",
-    "sourceApp": "salesforce",
-    "targetApps": ["salesforce", "intacct", "yammer"],
-    "tags": ["salesforce", "intacct", "yammer", "crm", "accounting", "messaging"],
-    "offerings": ["app connect professional"]
-},
   {
     "name": "Create new leads in Marketo by capturing lead names and details in Slack",
     "description": "Capturing leads at an event is never an easy task - consolidating these after the event is even harder. This template allows you to record your leads via the Slack phone app. This then records the contact in a Google sheet (to audit the creation), and then creates the contact in Marketo. A response is then sent on Slack giving the newly created Marketo contact id.",
