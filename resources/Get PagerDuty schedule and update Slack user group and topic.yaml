@@ -308,7 +308,7 @@ integration:
                             template: application/x-www-form-urlencoded
                   - url:
                       template: >-
-                        https://ibm-cloud.slack.com/api/users.lookupByEmail?token=&email={{$JSONParserParse.oncalls.user.email}}
+                        https://my-company.slack.com/api/users.lookupByEmail?token=&email={{$JSONParserParse.oncalls.user.email}}
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
@@ -457,7 +457,7 @@ integration:
                       template: POST
                   - url:
                       template: >-
-                        https://ibm-cloud.slack.com/api/usergroups.users.update?token=&usergroup=&users={{$JSONParserParse2.user.id}}
+                        https://my-company.slack.com/api/usergroups.users.update?token=&usergroup=&users={{$JSONParserParse2.user.id}}
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
@@ -516,7 +516,7 @@ integration:
                       template: POST
                   - url:
                       template: >-
-                        https://slack.com/api/channels.setTopic?token=&channel=&topic=@{{$JSONParserParse2.user.name}}
+                        https://my-company.slack.com/api/channels.setTopic?token=&channel=&topic=@{{$JSONParserParse2.user.name}}
                         is on call - contact via @slack-group-name
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
