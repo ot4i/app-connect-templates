@@ -529,5 +529,14 @@
     "targetApps": ["watsonnlclassifier", "slack"],
     "tags": ["watson", "salesforce", "slack", "classifier", "natural", "language", "case", "classification", "train"],
     "offerings": ["app connect professional"]
+  },
+   {
+    "name": "Get PagerDuty schedule and update Slack group and topic",
+    "description": "Use this template to manage members of a Slack group based on a PagerDuty schedule.",
+    "summary": "PagerDuty to Slack",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["http"],
+    "tags": ["scheduler", "pagerduty", "JSON parser", "slack", "operations", "devops"],
+    "offerings": ["app connect professional"]
   }]
 }
