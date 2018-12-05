@@ -4,7 +4,7 @@ Before you use this flow, you must have:
 
 **PagerDuty v2 API user token**
 
-- You can create this in PagerDuty from your `My Profile` on the `User Settings` tab.  
+- You can create this in PagerDuty under the `User Settings` tab on `My Profile`.
 - Copy the API key as this will be required in the flow.
 
 **Slack App**
