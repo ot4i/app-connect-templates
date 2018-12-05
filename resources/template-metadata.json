@@ -531,7 +531,7 @@
     "offerings": ["app connect professional"]
   },
    {
-    "name": "Get PagerDuty schedule and update Slack group and topic",
+    "name": "Get PagerDuty schedule and update Slack user group and topic",
     "description": "Use this template to manage members of a Slack group based on a PagerDuty schedule.",
     "summary": "PagerDuty to Slack",
     "sourceApp": "streaming-connector-scheduler",
