@@ -5,7 +5,7 @@ Before you use this flow, you must have:
 ### PagerDuty
 
 **Schedule**
-You will need to know the ID for the schedule you wish to query.  The number at the end of the URL when viewing the schedule (e.g. https://ibm.pagerduty.com/schedules#AB12345).
+You will need to know the ID for the schedule you wish to query.  The number at the end of the URL when viewing the schedule (e.g. https://my-company.pagerduty.com/schedules#AB12345).
 
 **v2 API user token**
 - You can create this in PagerDuty under the **User Settings** tab on **My Profile**.
@@ -14,10 +14,10 @@ You will need to know the ID for the schedule you wish to query.  The number at 
 ### Slack
 
 **User group**
-You will need to know the ID for the user group you wish to update.  The number at the end of the URL when viewing the group (e.g. https://home.slack.com/usergroups/CD12345).
+You will need to know the ID for the user group you wish to update.  The number at the end of the URL when viewing the group (e.g. https://my-company.slack.com/usergroups/CD12345).
 
 **Channel**
-You will need to know the ID for the channel whose topic you wish to update.  The number at the end of the URL when viewing the channel (e.g. https://home.slack.com/messages/EF12345).
+You will need to know the ID for the channel whose topic you wish to update.  The number at the end of the URL when viewing the channel (e.g. https://my-company.slack.com/messages/EF12345).
 
 **Slack App**
 You can create this from the [Slack apps](https://api.slack.com/apps/) page.
