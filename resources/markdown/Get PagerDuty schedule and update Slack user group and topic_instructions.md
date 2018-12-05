@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/marion-pdtoslack/resources/markdown/Get%20PagerDuty%20schedule%20and%20update%20Slack%20group%20and%20topic_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/marion-pdtoslack/resources/markdown/Get%20PagerDuty%20schedule%20and%20update%20Slack%20user%20group%20and%20topic_instructions.md) (opens in a new window).
 
 Before you use this flow, you must have:
 
