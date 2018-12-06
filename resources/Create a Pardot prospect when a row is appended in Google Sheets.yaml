@@ -37,11 +37,11 @@ integration:
               map:
                 mappings:
                   - email:
-                      template: '{{$Trigger.fields.3}}'
+                      template: '{{$Trigger.fields."3"}}'
                   - first_name:
-                      template: '{{$Trigger.fields.1}}'
+                      template: '{{$Trigger.fields."1"}}'
                   - last_name:
-                      template: '{{$Trigger.fields.2}}'
+                      template: '{{$Trigger.fields."2"}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
