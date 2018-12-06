@@ -38,8 +38,8 @@ integration:
                 mappings:
                   - Body:
                       template: >-
-                        New event {{$Trigger.fields.1}} planned in
-                        {{$Trigger.fields.2}}
+                        New event {{$Trigger.fields."1"}} planned in
+                        {{$Trigger.fields."2"}}
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
