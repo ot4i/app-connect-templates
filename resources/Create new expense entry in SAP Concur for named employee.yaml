@@ -1,0 +1,144 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlesheet
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1HnGw4c0pu09MlnCMJcjkc38obC1QpHwsPxPUn8A5NiM
+            worksheetID: Expense
+            parentFilter:
+              spreadsheetID: 1HnGw4c0pu09MlnCMJcjkc38obC1QpHwsPxPUn8A5NiM
+              worksheetID: Expense
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: expense-group-configurations
+      connector-type: concur
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: reports
+      connector-type: concur
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: expenses
+      connector-type: concur
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 2
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: SAP Concur Retrieve all expense expensegroupconfigurations
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - retrieve-action:
+              name: SAP Concur Retrieve reports
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 2
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: SAP Concur Create expense entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - ExpenseTypeCode:
+                      template: >-
+                        {{$SAPConcurRetrieveallexpenseexpensegroupconfigurations[0].Policies[0].ExpenseTypes[0].Code}}
+                  - PaymentTypeID:
+                      template: >-
+                        {{$SAPConcurRetrieveallexpenseexpensegroupconfigurations[0].PaymentTypes[0].ID}}
+                  - ReportID:
+                      template: '{{$SAPConcurRetrievereports[0].ID}}'
+                  - TransactionAmount:
+                      expression: '$Trigger.fields."2" '
+                  - TransactionCurrencyCode:
+                      template: USD
+                  - TransactionDate:
+                      template: '2018-12-13T10:54:11.515Z'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SAPConcurRetrieveallexpenseexpensegroupconfigurations
+                    $ref: >-
+                      #/node-output/SAP Concur Retrieve all expense
+                      expensegroupconfigurations/response/payload
+                  - variable: >-
+                      SAPConcurRetrieveallexpenseexpensegroupconfigurationsMetadata
+                    $ref: >-
+                      #/node-output/SAP Concur Retrieve all expense
+                      expensegroupconfigurations/response
+                  - variable: SAPConcurRetrievereports
+                    $ref: '#/node-output/SAP Concur Retrieve reports/response/payload'
+                  - variable: SAPConcurRetrievereportsMetadata
+                    $ref: '#/node-output/SAP Concur Retrieve reports/response'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - channel:
+                      template: CED2SLTHC
+                  - text:
+                      template: >-
+                        A new expense entries created for employee : 
+                        {{$Trigger.fields."1"}}  in concur .  ExpenseID :
+                        {{$SAPConcurCreateexpenseentry.ID}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SAPConcurRetrieveallexpenseexpensegroupconfigurations
+                    $ref: >-
+                      #/node-output/SAP Concur Retrieve all expense
+                      expensegroupconfigurations/response/payload
+                  - variable: >-
+                      SAPConcurRetrieveallexpenseexpensegroupconfigurationsMetadata
+                    $ref: >-
+                      #/node-output/SAP Concur Retrieve all expense
+                      expensegroupconfigurations/response
+                  - variable: SAPConcurRetrievereports
+                    $ref: '#/node-output/SAP Concur Retrieve reports/response/payload'
+                  - variable: SAPConcurRetrievereportsMetadata
+                    $ref: '#/node-output/SAP Concur Retrieve reports/response'
+                  - variable: SAPConcurCreateexpenseentry
+                    $ref: >-
+                      #/node-output/SAP Concur Create expense
+                      entry/response/payload
+  name: Create  a new  expense entry in concur for a given report
+models: {}
