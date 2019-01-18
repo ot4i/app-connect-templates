@@ -538,5 +538,14 @@
     "targetApps": ["http"],
     "tags": ["scheduler", "pagerduty", "JSON parser", "slack", "operations", "devops"],
     "offerings": ["app connect professional"]
+  },
+   {
+    "name": "Create new expense entry in SAP Concur for named employee",
+    "description": "Use this template to create an expense entry in SAP Concur when an employee expense is added to a spreadsheet in Google Sheets.  Then, after the expense entry has been made, automatically create a message in Slack that notifies you of the new expense entry.",
+    "summary": "Google Sheets to 2 applications",
+    "sourceApp": "googlesheet",
+    "targetApps": ["sapconcur", "slack"],
+    "tags": ["googlesheets", "retrieve", "slack", "create", "sap concur", "expense"],
+    "offerings": ["app connect professional"]
   }]
 }
