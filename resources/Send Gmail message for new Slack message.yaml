@@ -13,13 +13,11 @@ integration:
           options:
             webhookURLSuffix: default
       connector-type: slack
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

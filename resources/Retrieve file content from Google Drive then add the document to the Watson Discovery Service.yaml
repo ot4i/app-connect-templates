@@ -19,27 +19,23 @@ integration:
                   runOnceOncheck: false
                   timeZone: GMT
                   every: day
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Files
       connector-type: googledrive
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-2:
       type: api-action
       business-object: Files
       connector-type: googledrive
-      account-name: Account 1
       actions:
         DOWNLOADCONTENT: {}
     action-interface-3:
       type: api-action
       business-object: document
       connector-type: watsondiscovery
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

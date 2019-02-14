@@ -24,14 +24,12 @@ integration:
       type: api-action
       business-object: worksheetRow
       connector-type: googlesheet
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 1
       actions:
         UPSERTWITHWHERE: {}
   assemblies:
