@@ -17,13 +17,11 @@ integration:
               spreadsheetID: 1ujT_dgyA-W3DYGL3LWQKvoQHo2Jd6wXmWJooVwRWiFk
               worksheetID: Sheet1
       connector-type: googlesheet
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: messages
       connector-type: twilio
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

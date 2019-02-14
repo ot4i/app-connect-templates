@@ -15,7 +15,6 @@ integration:
             parentFilter:
               Hash: z22eegy0x5wki2
       connector-type: wufoo
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -23,7 +22,6 @@ integration:
       connector-type: sugarcrm
       actions:
         CREATE: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:

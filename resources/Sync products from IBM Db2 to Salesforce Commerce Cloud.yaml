@@ -19,7 +19,6 @@ integration:
                   timeZone: GMT
                   every: day
       connector-type: streaming-connector-scheduler
-      account-name: Account 1
     trigger-interface-2:
       type: extract-trigger
       triggers:
@@ -29,7 +28,6 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-2'
       connector-type: ibmdb2
-      account-name: Account 1
   action-interfaces:
     action-interface-3:
       type: batch-action
@@ -42,7 +40,6 @@ integration:
       type: api-action
       business-object: products
       connector-type: sfcommerceclouddata
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
