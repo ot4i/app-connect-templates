@@ -27,7 +27,7 @@ describe('Template files', function () {
     }
   })
 
-  it.only('must not contain account-name in action or trigger interfaces', function () {
+  it('must not contain account-name in action or trigger interfaces', function () {
     let noAccountNameFound = true
     for (let template of templateMetadata.templates) {
       let fileName = `./resources/${template.name}.yaml`
