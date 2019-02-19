@@ -12,27 +12,23 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: salesforce
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: TravelAgencies
       connector-type: sapodata
-      account-name: Account 5
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: TravelAgencies
       connector-type: sapodata
-      account-name: Account 5
       actions:
         UPDATEALL: {}
     action-interface-3:
       type: api-action
       business-object: TravelAgencies
       connector-type: sapodata
-      account-name: Account 5
       actions:
         CREATE: {}
   assemblies:
