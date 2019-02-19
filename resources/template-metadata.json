@@ -531,12 +531,12 @@
     "offerings": ["app connect professional"]
   },
    {
-    "name": "Get PagerDuty schedule and update Slack user group and topic",
-    "description": "Use this template to manage members of a Slack group based on a PagerDuty schedule.",
-    "summary": "PagerDuty to Slack",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["http"],
-    "tags": ["scheduler", "pagerduty", "JSON parser", "slack", "operations", "devops"],
+    "name": "Update or Create a TravelAgency in SAP via Data when a new Contact is created in Salesforce",
+    "description": "Use this template to update or create a TravelAgency in SAP via OData when a new Contact is created in Salesforce",
+    "summary": "Salesforce to Sapodata",
+    "sourceApp": "salesforce",
+    "targetApps": ["sapodata"],
+    "tags": ["retrieve", "update", "sapodata", "salesforce", "create", "contact"],
     "offerings": ["app connect professional"]
   }]
 }
