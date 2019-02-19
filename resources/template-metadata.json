@@ -540,8 +540,8 @@
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Update or Create a TravelAgency in SAP via OData when a new Contact is created in Salesforce",
-    "description": "Use this template to update or create a TravelAgency in SAP via OData when a new Contact is created in Salesforce",
+    "name": "Update or create a travel agency in SAP via OData when a new contact is created in Salesforce",
+    "description": "Use this template to update or create a travel agency in SAP when a contact is created in Salesforce. The flow checks if an agency number exists in SAP; if it does, the flow updates the agency by using data from Salesforce. If the agency doesn't exist in SAP, it is created. ",
     "summary": "Salesforce to Sapodata",
     "sourceApp": "salesforce",
     "targetApps": ["sapodata"],
