@@ -12,13 +12,11 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: salesforce
-      account-name: Account 3
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: BAPI_CUSTOMER_GETDETAIL
       connector-type: sap
-      account-name: Account 7
       options:
         filter:
           interfaceType: RFC
@@ -78,7 +76,6 @@ integration:
       type: api-action
       business-object: BAPI_CUSTOMER_CHANGEFROMDATA
       connector-type: sap
-      account-name: Account 7
       options:
         filter:
           interfaceType: RFC
@@ -142,10 +139,64 @@ integration:
             $ref: '#/node-output/SAP Invoke BAPI_CUSTOMER_GETDETAIL/response/payload'
           - variable: SAPInvokeBAPICUSTOMERGETDETAILMetadata
             $ref: '#/node-output/SAP Invoke BAPI_CUSTOMER_GETDETAIL/response'
+    action-interface-5:
+      type: notification-card
+      actions: {}
+      options:
+        card:
+          layout:
+            direction: vertical
+            style: layoutA
+            items:
+              - direction: horizontal
+                style: header
+                items:
+                  - style: icon
+                    widget_id: icon
+                  - direction: vertical
+                    items:
+                      - style: title
+                        widget_id: nameLabel
+                      - style: subtitle
+                        widget_id: timestamp
+              - direction: vertical
+                style: content
+                items:
+                  - widget_id: descriptionLabel
+              - style: buttons
+                widget_id: btnGrp1
+          widgets:
+            - id: icon
+              widget: icon
+            - id: timestamp
+              widget: timestamp
+            - id: btnGrp1
+              widget: buttonGroup
+              widget_ids: []
+            - id: nameLabel
+              widget: text
+              binding: description
+              value: New notification
+            - id: descriptionLabel
+              widget: text
+              value: heyoo
+        input:
+          - variable: Trigger
+            $ref: '#/trigger/payload'
   assemblies:
     assembly-1:
       assembly:
         execute:
+          - notification:
+              name: Notification 3
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
           - custom-action:
               name: SAP Invoke BAPI_CUSTOMER_GETDETAIL
               target:
@@ -276,5 +327,5 @@ integration:
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-4'
               output-schema: {}
-  name: Sync Salesforce contacts for Sap
+  name: Sync Salesforce and SAP customer contact details
 models: {}
