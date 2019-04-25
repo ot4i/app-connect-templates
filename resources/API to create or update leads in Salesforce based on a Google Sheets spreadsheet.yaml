@@ -26,7 +26,7 @@ integration:
       connector-type: googlesheet
       actions:
         RETRIEVEALL: {}
-    action-interface-2:
+    action-interface-3:
       type: api-action
       business-object: Lead
       connector-type: salesforce
@@ -43,7 +43,7 @@ integration:
               filter:
                 where:
                   and:
-                    - spreadsheetID: 1lJoRsYmAuhTJFyLACKuwhR8pk-ANhbGMvxX0cWZ4sBM
+                    - spreadsheetID: 1Gt2dNNe4D-zXL8kIjpS8U7J6SiqfmLfrlKqxFm7jrmo
                     - worksheetID: Sheet1
                 input:
                   - variable: Request
@@ -52,38 +52,13 @@ integration:
               allow-truncation: true
               pagination-type: SKIP_LIMIT
               allow-empty-output: true
-          - set-variable:
-              name: Set variable
-              map:
-                $map: 'http://ibm.com/appconnect/map/v1'
-                input:
-                  - variable: Request
-                    $ref: '#/trigger/payload'
-                  - variable: GoogleSheetsRetrieverows
-                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
-                  - variable: GoogleSheetsRetrieverowsMetadata
-                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
-                customSchemas:
-                  properties.`variable`:
-                    type: object
-                    properties:
-                      trimmed_data:
-                        type: array
-                        items:
-                          type: object
-                          properties: {}
-                mappings:
-                  - variable:
-                      mappings:
-                        - trimmed_data:
-                            expression: >-
-                              $GoogleSheetsRetrieverows[[1..$count($GoogleSheetsRetrieverows)-1]]
           - for-each:
               name: For each
               assembly:
-                $ref: '#/integration/assemblies/assembly-2'
+                $ref: '#/integration/assemblies/assembly-3'
               source:
-                expression: '$Setvariable.variable.trimmed_data '
+                expression: >-
+                  $GoogleSheetsRetrieverows[[1..$count($GoogleSheetsRetrieverows)-1]]
                 input:
                   - variable: Request
                     $ref: '#/trigger/payload'
@@ -91,8 +66,6 @@ integration:
                     $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
                   - variable: GoogleSheetsRetrieverowsMetadata
                     $ref: '#/node-output/Google Sheets Retrieve rows/response'
-                  - variable: Setvariable
-                    $ref: '#/node-output/Set variable/response/payload'
               mode: parallel
               continue-on-error: true
               map:
@@ -106,10 +79,8 @@ integration:
                     $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
                   - variable: GoogleSheetsRetrieverowsMetadata
                     $ref: '#/node-output/Google Sheets Retrieve rows/response'
-                  - variable: Setvariable
-                    $ref: '#/node-output/Set variable/response/payload'
                 mappings: []
-              display-name: undefined Object
+              display-name: Google Sheets worksheet row
           - response:
               name: response-1
               reply-maps:
@@ -146,7 +117,7 @@ integration:
                       $ref: '#/node-output/Set variable/response/payload'
                     - variable: Foreach
                       $ref: '#/node-output/For each/response/payload'
-    assembly-2:
+    assembly-3:
       assembly:
         execute:
           - if:
@@ -160,8 +131,6 @@ integration:
                   $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
                 - variable: GoogleSheetsRetrieverowsMetadata
                   $ref: '#/node-output/Google Sheets Retrieve rows/response'
-                - variable: Setvariable
-                  $ref: '#/node-output/Set variable/response/payload'
               branch:
                 - condition:
                     '{{$Foreachitem.values[4]}}': '{{$Request.event_name}}'
@@ -169,13 +138,11 @@ integration:
                     - upsert-action:
                         name: Salesforce Update or create lead
                         target:
-                          $ref: '#/integration/action-interfaces/action-interface-2'
+                          $ref: '#/integration/action-interfaces/action-interface-3'
                         map:
                           mappings:
                             - Company:
                                 template: '{{$Foreachitem.values[3]}}'
-                            - Email:
-                                template: '{{$Foreachitem.values[2]}}'
                             - FirstName:
                                 template: '{{$Foreachitem.values[0]}}'
                             - LastName:
@@ -196,8 +163,6 @@ integration:
                               $ref: >-
                                 #/node-output/Google Sheets Retrieve
                                 rows/response
-                            - variable: Setvariable
-                              $ref: '#/node-output/Set variable/response/payload'
                         filter:
                           where:
                             Email: '{{$Foreachitem.values[2]}}'
@@ -214,13 +179,12 @@ integration:
                               $ref: >-
                                 #/node-output/Google Sheets Retrieve
                                 rows/response
-                            - variable: Setvariable
-                              $ref: '#/node-output/Set variable/response/payload'
               else:
                 execute: []
               output-schema: {}
   name: >-
-    API to create or update leads in Salesforce based on a Google Sheets spreadsheet
+    API to create or update leads in Salesforce based on a Google Sheets
+    spreadsheet
 models:
   leads:
     name: leads
