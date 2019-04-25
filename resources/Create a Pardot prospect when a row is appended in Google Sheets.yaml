@@ -17,7 +17,6 @@ integration:
               spreadsheetID: 1RdI7Wa2blNj34yLJfSduLUbyS5UBb_pt9Dl4gRoB7Zc
               worksheetID: Sheet1
       connector-type: googlesheet
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -25,7 +24,6 @@ integration:
       connector-type: salesforcepardot
       actions:
         CREATE: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:

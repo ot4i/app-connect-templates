@@ -19,7 +19,6 @@ integration:
                   timeZone: GMT
                   every: month
       connector-type: streaming-connector-scheduler
-      account-name: Account 1
     trigger-interface-2:
       type: extract-trigger
       triggers:
@@ -29,7 +28,6 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-2'
       connector-type: salesforce
-      account-name: Account 1
     trigger-interface-3:
       type: batch-completion-trigger
       triggers:
@@ -52,40 +50,34 @@ integration:
       connector-type: gmail
       actions:
         CREATE: {}
-      account-name: Account 1
     action-interface-4:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-6:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-7:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-1:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 2
       actions:
         UPSERTWITHWHERE: {}
     action-interface-8:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 2
       actions:
         CREATE: {}
   assemblies:
