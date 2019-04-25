@@ -18,20 +18,17 @@ integration:
                   value: '15'
                   runOnceOncheck: true
       connector-type: streaming-connector-scheduler
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: products
       connector-type: netsuiteerp
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: Product2
       connector-type: salesforce
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

@@ -19,20 +19,17 @@ integration:
                   runOnceOncheck: true
                   timeZone: UTC
                   every: day
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: File
       connector-type: box
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

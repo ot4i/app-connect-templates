@@ -24,14 +24,12 @@ integration:
       type: api-action
       business-object: request
       connector-type: http
-      account-name: Account 1
       actions:
         INVOKE: {}
     action-interface-1:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
