@@ -24,21 +24,18 @@ integration:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 1
       actions:
         UPSERTWITHWHERE: {}
     action-interface-1:
       type: api-action
       business-object: File
       connector-type: box
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-3:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 1
       actions:
         UPSERTWITHWHERE: {}
   assemblies:

@@ -12,7 +12,6 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
-      account-name: Account 1
     trigger-interface-2:
       type: extract-trigger
       triggers:
@@ -22,7 +21,6 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-2'
       connector-type: ibmdb2
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: batch-action
@@ -35,21 +33,18 @@ integration:
       type: api-action
       business-object: ClassifyText
       connector-type: watsonnlclassifier
-      account-name: Account 1
       actions:
         CLASSIFYTEXT: {}
     action-interface-3:
       type: api-action
       business-object: Lead
       connector-type: salesforce
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-4:
       type: api-action
       business-object: CampaignMember
       connector-type: salesforce
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
