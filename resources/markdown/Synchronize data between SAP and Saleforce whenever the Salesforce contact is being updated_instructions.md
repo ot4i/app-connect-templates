@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Synchronize%20data%20between%20SAP%20and%20Saleforce%20whenever%20the%20salesforce%20contact%20is%20being%20updated_instructions.md) (opens in a new window).
 ## Prerequisites
-- To connect to SAP, you need to setup an IBM App Connect Agent while creating a connection. To edit or view the agent, use the Private network connections App Connect menu on the App Connect Dashboard.
+- To connect to SAP, you need to setup an IBM App Connect Agent while creating a connection. To set up, edit, or view the agent, use the Private network connections App Connect menu on the App Connect Dashboard.
 ## Using the template
 1. Click **Create flow** to start using the template.
 1. Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
