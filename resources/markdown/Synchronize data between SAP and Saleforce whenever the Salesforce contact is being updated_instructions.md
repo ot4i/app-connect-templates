@@ -9,4 +9,4 @@ To refer to these instructions while editing the flow, open [the github page](ht
 1. To start the flow, open the options menu [&#8942;] from the banner, then click **Start flow**.
 1. Test your flow by updating an existing contact in your Salesforce account.  
  
-When your flow runs, the **If** node checks whether the customerID exists in SAP whose contact details got updated in Salesforce. If the same customerID exists in SAP, the flow updates the customer data with the specified values from your Salesforce account and creates a notification of CUSTOMER FOUND..  If the customer doesn't exist in SAP, the flow creates a notification of CUSTOMER NOT FOUND. 
+When your flow runs, the **If** node checks whether the customerID exists in SAP whose contact details got updated in Salesforce. If the same customerID exists in SAP, the flow updates the customer data with the specified values from your Salesforce account and creates a notification of CUSTOMER FOUND.  If the customer doesn't exist in SAP, the flow creates a notification of CUSTOMER NOT FOUND. 
