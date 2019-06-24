@@ -99,6 +99,15 @@
     "offerings": ["app connect professional"]
   },
   {
+    "name": "Welcome guide part 2 - announce new Eventbrite attendee on Slack and send voucher",
+    "description": "This template contains the flow created in part 2 of the Welcome to App Connect videos. When new attendees register for an Eventbrite event, a message is posted to Slack, and if the attendee is walking to the event they'll also receive a text message via Twilio.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["slack", "twilio"],
+    "tags": ["eventbrite", "slack", "twilio"],
+    "offerings": ["app connect professional"]
+  },              
+  {
     "name": "Post Slack message for new Gmail message",
     "description": "This template creates a new message in Slack whenever a new Gmail message is received.",
     "summary": "Gmail to Slack",
