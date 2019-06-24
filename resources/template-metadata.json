@@ -556,5 +556,15 @@
       "offerings": [
         "app connect professional"
       ]
-    }]
+    },
+    {
+      "name": "Welcome guide flow to announce new Eventbrite attendee on Slack",
+      "description": "This template creates the flow demonstrated in the 'Welcome to IBM App Connect [Part 1 of 4]: Create a simple event-driven flow' video. Whenever a new attendee is added to an Eventbrite event, a message is create in Slack.",
+      "summary": "Eventbrite to Slack",
+      "sourceApp": "eventbrite",
+      "targetApps": ["slack"],
+      "tags": ["eventbrite","slack"],
+      "offerings": ["app connect professional"]
+    }
+  ]
 }
