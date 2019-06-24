@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20flow%20to%20announce%20new%20Eventbrite%20attendee%20on%20Slack_instructions.md) (opens in a new window).
 
-This template creates the flow from the Welcome guide used to send a [Slack message when new attendees register for the Sunflower festival Eventbrite event](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s).
+This template creates the flow from the [Welcome guide video](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s) of how to send a Slack message when new attendees register for the Sunflower festival Eventbrite event.
 
 ## Prerequisites
 
