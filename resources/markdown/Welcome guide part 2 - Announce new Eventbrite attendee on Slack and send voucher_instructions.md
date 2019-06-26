@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%202%20-%20announce%20new%20Eventbrite%20attendee%20on%20Slack%20and%20send%20voucher_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%202%20-%20Announce%20new%20Eventbrite%20attendee%20on%20Slack%20and%20send%20voucher_instructions.md) (opens in a new window).
 
 This template creates the flow from the [Welcome guide video](https://www.youtube.com/watch?v=FpZNNginPAM&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) to send a free drink voucher to attendees walking to the Sunflower festival Eventbrite event.
 
