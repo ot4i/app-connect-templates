@@ -123,6 +123,6 @@ integration:
                   - variable: SalesforceRetrieveproductsMetadata
                     $ref: '#/node-output/Salesforce Retrieve products/response'
   name: >-
-    Welcome guide part 3 - Create a csv file in Box of the products in
+    Welcome guide part 3 - Create a CSV file in Box of the products in
     Salesforce
 models: {}
