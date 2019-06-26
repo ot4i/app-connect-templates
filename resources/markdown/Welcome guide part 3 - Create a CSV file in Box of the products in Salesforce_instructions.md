@@ -11,6 +11,7 @@ To use this flow, you'll need to create some products in Salesforce to represent
 
 For example:
 Product Name|Product Code|Product Family
+--- | --- | ---
 Iris|IR1457|Bulb
 Daffodil|DA4758|Bulb
 Tulip|TU4736|Bulb
