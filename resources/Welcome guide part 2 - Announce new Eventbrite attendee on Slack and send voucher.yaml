@@ -82,6 +82,6 @@ integration:
                 execute: []
               output-schema: {}
   name: >-
-    Welcome guide part 2 - announce new Eventbrite attendee on Slack and send
+    Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send
     voucher
 models: {}
