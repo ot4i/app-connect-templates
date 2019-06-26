@@ -40,5 +40,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Welcome guide flow to announce new Eventbrite attendee on Slack
+  name: Welcome guide part 1 -  Announce new Eventbrite attendee on Slack
 models: {}
