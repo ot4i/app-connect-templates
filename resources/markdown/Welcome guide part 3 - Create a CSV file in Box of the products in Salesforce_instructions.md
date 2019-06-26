@@ -9,27 +9,16 @@ To use this flow, you'll need to create some products in Salesforce to represent
 * Product Code: A six digit code, the first two should be letters and the last four should be numbers
 * Product Family: Either "Bulb" or "Seeds"
 
-For example:
-Product Name|Product Code|Product Family
---- | --- | ---
-Iris|IR1457|Bulb
-Daffodil|DA4758|Bulb
-Tulip|TU4736|Bulb
-Crocus|CR0527|Bulb
-Hyacinth|HY1358|Bulb
-Snowdrop|SN5691|Bulb
-Begonia|BE5732|Seeds
-Cornflower|CO1357|Seeds
-Dahlia|DA0561|Seeds
-Geranium|GE5295|Seeds
-Lupin|LU5037|Seeds
-Poppy|PO0474|Seeds
-Sunflower|SU1532|Seeds
-Marigold|MA4534|Seeds
-Pansy|PA6847|Seeds
-Night scented stocks|NI7649|Seeds
-Nigella|NI3344|Seeds
-Petunia|PT5648|Seeds
+[For example](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/sunflowerFestivalProductsSample.csv):
+* Product Name,Product Code,Product Family
+* Iris,IR1457,Bulb
+* Daffodil,DA4758,Bulb
+* Tulip,TU4736,Bulb
+* Crocus,CR0527,Bulb
+* Poppy,PO0474,Seeds
+* Sunflower,SU1532,Seeds
+* Marigold,MA4534,Seeds
+* Pansy,PA6847,Seeds
 
 ## Using the template
 
