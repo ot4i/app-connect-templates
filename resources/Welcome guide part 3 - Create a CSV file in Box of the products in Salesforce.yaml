@@ -1,0 +1,128 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Family: Seeds
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 100
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: Box Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - content:
+                      format:
+                        type: csv
+                        options:
+                          includeHeaders: true
+                          headerOrder:
+                            - name
+                            - code-letters
+                            - code-numbers
+                            - created date
+                          eol: LF
+                          alwaysQuotes: false
+                      foreach:
+                        input: '$SalesforceRetrieveproducts '
+                        iterator: contentItem
+                        mappings:
+                          - code-letters:
+                              template: '{{$substring($contentItem.ProductCode, 0, 2)}}'
+                          - code-numbers:
+                              template: '{{$substring($contentItem.ProductCode, 2, 4)}}'
+                          - created date:
+                              template: '{{$contentItem.CreatedDate}}'
+                          - name:
+                              template: '{{$contentItem.Name}}'
+                  - fileType:
+                      template: Text
+                  - name:
+                      template: 'products-{{$now()}}.csv'
+                  - parent_id:
+                      template: '67738248378'
+                stringFormatSchemas:
+                  properties.`content`:
+                    type: object
+                    properties:
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                            code-letters:
+                              type: string
+                            code-numbers:
+                              type: string
+                            created date:
+                              type: string
+                        title: Items
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+  name: >-
+    Welcome guide part 3 - Create a CSV file in Box of the products in
+    Salesforce
+models: {}
