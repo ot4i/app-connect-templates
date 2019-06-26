@@ -9,7 +9,7 @@ To use this flow, you'll need to create some products in Salesforce to represent
 * Product Code: A six digit code, the first two should be letters and the last four should be numbers
 * Product Family: Either "Bulb" or "Seeds"
 
-[For example](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/sunflowerFestivalProductsSample.csv):
+[For example](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/sample/sunflowerFestivalProductsSample.csv):
 * Product Name,Product Code,Product Family
 * Iris,IR1457,Bulb
 * Daffodil,DA4758,Bulb
