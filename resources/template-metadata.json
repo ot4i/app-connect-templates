@@ -558,7 +558,7 @@
       ]
     },
     {
-      "name": "Welcome guide flow to announce new Eventbrite attendee on Slack",
+      "name": "Welcome guide part 1 -  Announce new Eventbrite attendee on Slack",
       "description": "This template creates the flow demonstrated in the 'Welcome to IBM App Connect [Part 1 of 4]: Create a simple event-driven flow' video. Whenever a new attendee is added to an Eventbrite event, a message is create in Slack.",
       "summary": "Eventbrite to Slack",
       "sourceApp": "eventbrite",
@@ -567,7 +567,7 @@
       "offerings": ["app connect professional"]
     },
     {
-      "name": "Welcome guide part 2 - announce new Eventbrite attendee on Slack and send voucher",
+      "name": "Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send voucher",
       "description": "This template contains the flow created in part 2 of the Welcome to App Connect videos. When new attendees register for an Eventbrite event, a message is posted to Slack, and if the attendee is walking to the event they'll also receive a text message via Twilio.",
       "summary": "Eventbrite to 2 applications",
       "sourceApp": "eventbrite",
