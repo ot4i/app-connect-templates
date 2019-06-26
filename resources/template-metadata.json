@@ -574,6 +574,15 @@
       "targetApps": ["slack", "twilio"],
       "tags": ["eventbrite", "slack", "twilio"],
       "offerings": ["app connect professional"]
-    } 
+    },
+    {
+      "name": "Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce",
+      "description": "This template contains the flow created in part 3 of the Welcome to App Connect videos. Use it to retrieve a list of products for a particular product family from Salesforce, and use the products to generate a CSV file in box on a schedule.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "scheduler",
+      "targetApps": ["salesforce", "box"],
+      "tags": ["scheduler", "salesforce", "box"],
+      "offerings": ["app connect professional"]
+    }  
   ]
 }
