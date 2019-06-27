@@ -583,6 +583,15 @@
       "targetApps": ["salesforce", "box"],
       "tags": ["scheduler", "salesforce", "box"],
       "offerings": ["app connect professional"]
-    }  
+    },
+    {
+      "name": "Welcome guide part 4 - Flower order API",
+      "description": "This template contains the API created in part 4 of the Welcome to App Connect videos. The API includes a flow to create a Trello card when new flowers are ordered for the festival, and it updates Salesforce with the quantity of flowers needed.",
+      "summary": "1 flow using 2 applications",
+      "sourceApp": "api",
+      "targetApps": ["trello", "salesforce"],
+      "tags": ["api", "salesforce", "trello"],
+      "offerings": ["app connect professional"]
+    }    
   ]
 }
