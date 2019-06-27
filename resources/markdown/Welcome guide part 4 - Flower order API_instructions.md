@@ -9,17 +9,9 @@ To use this flow, you'll need:
 * An order with order products in Salesforce.
 
 To setup the order in Salesforce, you'll need to create:
-* Flower products with:
-** Name
-** Product code
-** Product family (Seeds or Bulb)
-** Active status set to 'true'
-* A price book
-** Enter all your products into the active price book
-* An order, with order products for each flower product you have
-** To create the order you'll need to create:
-*** An account
-*** A contract
+* Flower products with: Name, Product code, Product family (Seeds or Bulb), Active status set to 'true'.
+* A price book. Once this is created, enter all your products into the active price book.
+* An order, with order products for each flower product you have. To create the order you'll need to create an account and a  contract.
 
 ## Using the template
 
