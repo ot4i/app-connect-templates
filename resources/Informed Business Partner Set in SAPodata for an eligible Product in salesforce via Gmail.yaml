@@ -1,0 +1,522 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        geteligiblebusinesspartnersetSalesforce_To_SAP:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Salesforce_To_SAP
+          output-context:
+            data: Salesforce_To_SAP
+      options:
+        resources:
+          - business-object: Salesforce_To_SAP
+            model:
+              $ref: '#/models/Salesforce_To_SAP'
+            triggers:
+              geteligiblebusinesspartnerset: geteligiblebusinesspartnersetSalesforce_To_SAP
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: BusinessPartnerSet
+      connector-type: sapodata
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: notification-card
+      actions: {}
+      options:
+        card:
+          layout:
+            direction: vertical
+            style: layoutA
+            items:
+              - direction: horizontal
+                style: header
+                items:
+                  - style: icon
+                    widget_id: icon
+                  - direction: vertical
+                    items:
+                      - style: title
+                        widget_id: nameLabel
+                      - style: subtitle
+                        widget_id: timestamp
+              - direction: vertical
+                style: content
+                items:
+                  - widget_id: descriptionLabel
+              - style: buttons
+                widget_id: btnGrp1
+          widgets:
+            - id: icon
+              widget: icon
+            - id: timestamp
+              widget: timestamp
+            - id: btnGrp1
+              widget: buttonGroup
+              widget_ids: []
+            - id: nameLabel
+              widget: text
+              binding: description
+              value: New notification
+            - id: descriptionLabel
+              widget: text
+              value: >-
+                No Business Partner Set eligible for the Product
+                {{$SalesforceRetrieveproducts.Name}}
+        input:
+          - variable: api
+            $ref: '#/trigger/api/parameters'
+          - variable: SalesforceRetrieveproducts
+            $ref: '#/node-output/Salesforce Retrieve products/response/payload'
+          - variable: SalesforceRetrieveproductsMetadata
+            $ref: '#/node-output/Salesforce Retrieve products/response'
+          - variable: SAPviaODataRetrieveBusinessPartnerSet
+            $ref: >-
+              #/node-output/SAP (via OData) Retrieve
+              BusinessPartnerSet/response/payload
+          - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+            $ref: '#/node-output/SAP (via OData) Retrieve BusinessPartnerSet/response'
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Id: '{{$api.product_id}}'
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - retrieve-action:
+              name: SAP (via OData) Retrieve BusinessPartnerSet
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  CreatedAt:
+                    gt: '{{$SalesforceRetrieveproducts[0].CreatedDate}}'
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                limit: 5
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: api
+                  $ref: '#/trigger/api/parameters'
+                - variable: SalesforceRetrieveproducts
+                  $ref: '#/node-output/Salesforce Retrieve products/response/payload'
+                - variable: SalesforceRetrieveproductsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve products/response'
+                - variable: SAPviaODataRetrieveBusinessPartnerSet
+                  $ref: >-
+                    #/node-output/SAP (via OData) Retrieve
+                    BusinessPartnerSet/response/payload
+                - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                  $ref: >-
+                    #/node-output/SAP (via OData) Retrieve
+                    BusinessPartnerSet/response
+              branch:
+                - condition:
+                    '{{$SAPviaODataRetrieveBusinessPartnerSetMetadata."status-code"}}': '400'
+                  execute:
+                    - notification:
+                        name: Notification
+                        map:
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          mappings: []
+                          input:
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
+                            - variable: SalesforceRetrieveproducts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                products/response/payload
+                            - variable: SalesforceRetrieveproductsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                products/response
+                            - variable: SAPviaODataRetrieveBusinessPartnerSet
+                              $ref: >-
+                                #/node-output/SAP (via OData) Retrieve
+                                BusinessPartnerSet/response/payload
+                            - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                              $ref: >-
+                                #/node-output/SAP (via OData) Retrieve
+                                BusinessPartnerSet/response
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+              else:
+                execute:
+                  - for-each:
+                      name: For each
+                      assembly:
+                        $ref: '#/integration/assemblies/assembly-2'
+                      source:
+                        expression: '$SAPviaODataRetrieveBusinessPartnerSet '
+                        input:
+                          - variable: api
+                            $ref: '#/trigger/api/parameters'
+                          - variable: SalesforceRetrieveproducts
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              products/response/payload
+                          - variable: SalesforceRetrieveproductsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              products/response
+                          - variable: SAPviaODataRetrieveBusinessPartnerSet
+                            $ref: >-
+                              #/node-output/SAP (via OData) Retrieve
+                              BusinessPartnerSet/response/payload
+                          - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                            $ref: >-
+                              #/node-output/SAP (via OData) Retrieve
+                              BusinessPartnerSet/response
+                      mode: sequential
+                      continue-on-error: true
+                      map:
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: api
+                            $ref: '#/trigger/api/parameters'
+                          - variable: JSONParserParse
+                            $ref: >-
+                              #/block/For each/node-output/JSON Parser
+                              Parse/response/payload
+                          - variable: GmailCreateemail
+                            $ref: >-
+                              #/block/For each/node-output/Gmail Create
+                              email/response/payload
+                          - variable: SalesforceRetrieveproducts
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              products/response/payload
+                          - variable: SalesforceRetrieveproductsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              products/response
+                          - variable: SAPviaODataRetrieveBusinessPartnerSet
+                            $ref: >-
+                              #/node-output/SAP (via OData) Retrieve
+                              BusinessPartnerSet/response/payload
+                          - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                            $ref: >-
+                              #/node-output/SAP (via OData) Retrieve
+                              BusinessPartnerSet/response
+                        mappings: []
+                      display-name: SAP (via OData) BusinessPartnerSet
+              output-schema: {}
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Salesforce_To_SAP successfully add custom operation
+                  status-code: '200'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: SalesforceRetrieveproducts
+                        $ref: >-
+                          #/node-output/Salesforce Retrieve
+                          products/response/payload
+                      - variable: SalesforceRetrieveproductsMetadata
+                        $ref: '#/node-output/Salesforce Retrieve products/response'
+                      - variable: SAPviaODataRetrieveBusinessPartnerSet
+                        $ref: >-
+                          #/node-output/SAP (via OData) Retrieve
+                          BusinessPartnerSet/response/payload
+                      - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                        $ref: >-
+                          #/node-output/SAP (via OData) Retrieve
+                          BusinessPartnerSet/response
+                    mappings:
+                      - product_id:
+                          template: '{{$SalesforceRetrieveproducts[0].Id}}'
+                      - statusCode:
+                          template: >-
+                            {{$SAPviaODataRetrieveBusinessPartnerSetMetadata."status-code"}}
+                  input:
+                    - variable: api
+                      $ref: '#/trigger/api/parameters'
+                    - variable: SalesforceRetrieveproducts
+                      $ref: >-
+                        #/node-output/Salesforce Retrieve
+                        products/response/payload
+                    - variable: SalesforceRetrieveproductsMetadata
+                      $ref: '#/node-output/Salesforce Retrieve products/response'
+                    - variable: SAPviaODataRetrieveBusinessPartnerSet
+                      $ref: >-
+                        #/node-output/SAP (via OData) Retrieve
+                        BusinessPartnerSet/response/payload
+                    - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                      $ref: >-
+                        #/node-output/SAP (via OData) Retrieve
+                        BusinessPartnerSet/response
+    assembly-2:
+      assembly:
+        execute:
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Foreachitem}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: SAPviaODataRetrieveBusinessPartnerSet
+                    $ref: >-
+                      #/node-output/SAP (via OData) Retrieve
+                      BusinessPartnerSet/response/payload
+                  - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                    $ref: >-
+                      #/node-output/SAP (via OData) Retrieve
+                      BusinessPartnerSet/response
+              sample-data: |-
+                {
+                    "Address": {
+                      "City": "Walldorf",
+                      "PostalCode": "69190",
+                      "Street": "Dietmar-Hopp-Allee",
+                      "Building": "16",
+                      "Country": "DE",
+                      "AddressType": "02"
+                    },
+                    "BusinessPartnerID": "0100000000",
+                    "CompanyName": "SAP",
+                    "WebAddress": "http://www.sap.com",
+                    "EmailAddress": "do.not.reply@sap.com",
+                    "PhoneNumber": "0622734567",
+                    "FaxNumber": "0622734004",
+                    "LegalForm": "SE",
+                    "CurrencyCode": "EUR",
+                    "BusinessPartnerRole": "01",
+                    "CreatedAt": "2019-07-01T10:07:19.000Z",
+                    "ChangedAt": "2019-07-01T10:07:19.000Z",
+                    "ToSalesOrders": {
+                      "__deferred": {
+                        "uri": "https://sapes5.sapdevcenter.com/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/BusinessPartnerSet('0100000000')/ToSalesOrders"
+                      }
+                    },
+                    "ToContacts": {
+                      "__deferred": {
+                        "uri": "https://sapes5.sapdevcenter.com/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/BusinessPartnerSet('0100000000')/ToContacts"
+                      }
+                    },
+                    "ToProducts": {
+                      "__deferred": {
+                        "uri": "https://sapes5.sapdevcenter.com/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/BusinessPartnerSet('0100000000')/ToProducts"
+                      }
+                    },
+                    "odata_details": {
+                      "id": "https://sapes5.sapdevcenter.com/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/BusinessPartnerSet('0100000000')",
+                      "uri": "https://sapes5.sapdevcenter.com/sap/opu/odata/IWBEP/GWSAMPLE_BASIC/BusinessPartnerSet('0100000000')",
+                      "type": "GWSAMPLE_BASIC.BusinessPartner",
+                      "etag": "W/\"datetime'2019-07-01T10%3A07%3A19.0000000'\""
+                    }
+                  }
+              output-schema:
+                $schema: 'http://json-schema.org/draft-04/schema#'
+                type: object
+                properties:
+                  Address:
+                    type: object
+                    properties:
+                      City:
+                        type: string
+                      PostalCode:
+                        type: string
+                      Street:
+                        type: string
+                      Building:
+                        type: string
+                      Country:
+                        type: string
+                      AddressType:
+                        type: string
+                  BusinessPartnerID:
+                    type: string
+                  CompanyName:
+                    type: string
+                  WebAddress:
+                    type: string
+                  EmailAddress:
+                    type: string
+                  PhoneNumber:
+                    type: string
+                  FaxNumber:
+                    type: string
+                  LegalForm:
+                    type: string
+                  CurrencyCode:
+                    type: string
+                  BusinessPartnerRole:
+                    type: string
+                  CreatedAt:
+                    type: string
+                  ChangedAt:
+                    type: string
+                  ToSalesOrders:
+                    type: object
+                    properties:
+                      __deferred:
+                        type: object
+                        properties:
+                          uri:
+                            type: string
+                  ToContacts:
+                    type: object
+                    properties:
+                      __deferred:
+                        type: object
+                        properties:
+                          uri:
+                            type: string
+                  ToProducts:
+                    type: object
+                    properties:
+                      __deferred:
+                        type: object
+                        properties:
+                          uri:
+                            type: string
+                  odata_details:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      uri:
+                        type: string
+                      type:
+                        type: string
+                      etag:
+                        type: string
+                title: Parsed JSON
+          - create-action:
+              name: Gmail Create email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Hi Team ,
+
+                        Find the product available to trade
+                        {{$SalesforceRetrieveproducts.Name}}
+
+                        Product Details
+                         {{$SalesforceRetrieveproducts}}
+                          Metadata details for the Odata record
+                          {{$JSONParserParse.odata_details}}
+                  - Subject:
+                      template: Welcome mail from Salesforce
+                  - To:
+                      template: shefalivaish09@gmail.com
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/For each/node-output/JSON Parser
+                      Parse/response/payload
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: SAPviaODataRetrieveBusinessPartnerSet
+                    $ref: >-
+                      #/node-output/SAP (via OData) Retrieve
+                      BusinessPartnerSet/response/payload
+                  - variable: SAPviaODataRetrieveBusinessPartnerSetMetadata
+                    $ref: >-
+                      #/node-output/SAP (via OData) Retrieve
+                      BusinessPartnerSet/response
+  name: >-
+    Informed Business Partner Set in SAP odata for an eligible Product in
+    salesforce via Gmail
+models:
+  Salesforce_To_SAP:
+    name: Salesforce_To_SAP
+    properties:
+      product_id:
+        required: false
+        id: true
+        type: string
+      statusCode:
+        required: false
+        id: false
+        type: string
+    plural: Salesforce_To_SAP
+    description: ' '
+    operations:
+      geteligiblebusinesspartnerset: '#/integration/assemblies/assembly-1'
+    methods:
+      geteligiblebusinesspartnerset:
+        name: getEligibleBusinessPartnerSet
+        display:
+          name: getEligibleBusinessPartnerSet
+        accessType: WRITE
+        accepts:
+          - arg: product_id
+            type: string
+            http:
+              source: path
+            required: true
+        returns:
+          arg: data
+          type: Salesforce_To_SAP
+          root: true
+        http:
+          verb: GET
+          path: '/:product_id/geteligiblebusinesspartnerset'
