@@ -592,6 +592,33 @@
       "targetApps": ["trello", "salesforce"],
       "tags": ["api", "salesforce", "trello"],
       "offerings": ["app connect professional"]
-    }    
+    },
+    {
+      "name": "Welcome guide setup 1 - Add products to Salesforce",
+      "description": "Use this flow in conjuction with the templates for 'Welcome guide part 3' and 'Welcome guide part 4' to set up Salesforce products.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["googlesheet", "salesforce"],
+      "tags": ["scheduler", "salesforce", "trello"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Welcome guide setup 2 - Create Sunflower Festival order in Salesforce",
+      "description": "Use this template to create the Salesforce order needed for the 'Welcome guide part 4' template.",
+      "summary": "Scheduler to Salesforce",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["salesforce"],
+      "tags": ["salesforce", "salesforce"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Welcome guide setup 3 - Delete flowers and order from Salesforce",
+      "description": "This template contains a flow to delete the objects created in 'Welcome guide setup 1' and 'Welcome guide setup 2'.",
+      "summary": "Scheduler to Salesforce",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["salesforce"],
+      "tags": ["salesforce", "scheduler"],
+      "offerings": ["app connect professional"]
+    }             
   ]
 }
