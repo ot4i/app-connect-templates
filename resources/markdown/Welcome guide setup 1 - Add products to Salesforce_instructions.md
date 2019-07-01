@@ -21,3 +21,9 @@ In Google Sheets, create a sheet with the [products to add to Salesforce](https:
 ## Clean up
 
 If you need to delete the products you've created, you can use the 'Welcome guide setup 3 - Delete flowers and order from Salesforce' template.
+
+## Related templates:
+
+Welcome guide setup 2 - Create Sunflower Festival order in Salesforce.
+
+Welcome guide setup 3 - Delete flowers and order from Salesforce.
