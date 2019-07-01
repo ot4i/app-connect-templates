@@ -26,5 +26,4 @@ If you need to delete the products you've created, you can use the 'Welcome guid
 
 Welcome guide setup 2 - Create Sunflower Festival order in Salesforce.
 
-
 Welcome guide setup 3 - Delete flowers and order from Salesforce.
