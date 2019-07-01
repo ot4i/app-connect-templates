@@ -1,0 +1,87 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: messages
+      connector-type: twilio
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: CKW5TC0J2
+                  - text:
+                      template: >-
+                        We have a new attendee {{$Trigger.profile.first_name}}
+                        {{$Trigger.profile.last_name}} - they work for
+                        {{$Trigger.profile.company}}!
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackCreatemessage
+                  $ref: '#/node-output/Slack Create message/response/payload'
+              branch:
+                - condition:
+                    '{{$contains($string($Trigger.answers), "Walking")}}':
+                      =: 'true'
+                  execute:
+                    - create-action:
+                        name: Twilio Create messages
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: "Great that you're walking, {{$Trigger.profile.first_name}} - have a drink on us \U0001F33B"
+                            - From:
+                                template: '+000000000000'
+                            - To:
+                                template: '{{$Trigger.profile.cell_phone}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackCreatemessage
+                              $ref: >-
+                                #/node-output/Slack Create
+                                message/response/payload
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send
+    voucher
+models: {}

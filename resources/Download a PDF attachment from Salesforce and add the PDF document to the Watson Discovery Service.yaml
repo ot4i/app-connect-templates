@@ -19,20 +19,17 @@ integration:
                   runOnceOncheck: false
                   timeZone: GMT
                   every: day
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Attachment
       connector-type: salesforce
-      account-name: Account 2
       actions:
         DOWNLOADCONTENT: {}
     action-interface-2:
       type: api-action
       business-object: document
       connector-type: watsondiscovery
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

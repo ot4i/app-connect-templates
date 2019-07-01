@@ -17,13 +17,11 @@ integration:
               workspace-id: '421739420611048'
               project: '424817963840523'
       connector-type: asana
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

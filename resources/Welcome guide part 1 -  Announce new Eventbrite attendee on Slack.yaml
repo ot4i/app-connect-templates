@@ -3,16 +3,15 @@ integration:
   type: trigger-action
   trigger-interfaces:
     trigger-interface-1:
+      connector-type: eventbrite
       type: event-trigger
       triggers:
         CREATED:
           input-context:
-            data: leads
+            data: Attendee
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
-          options:
-            webhookURLSuffix: default
-      connector-type: marketo
+          options: {}
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -31,12 +30,15 @@ integration:
               map:
                 mappings:
                   - channel:
-                      template: C4GHPM484
+                      template: CKW5TC0J2
                   - text:
-                      template: 'New lead {{$Trigger.id}} created in Marketo'
+                      template: >-
+                        We have a new attendee {{$Trigger.profile.first_name}}
+                        {{$Trigger.profile.last_name}} - they work for
+                        {{$Trigger.profile.company}}!
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Send me a Slack notification for every new Marketo lead
+  name: Welcome guide part 1 -  Announce new Eventbrite attendee on Slack
 models: {}

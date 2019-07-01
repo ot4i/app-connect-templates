@@ -11,13 +11,11 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
       connector-type: gmail
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Tasks
       connector-type: asana
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

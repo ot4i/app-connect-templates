@@ -12,7 +12,6 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: eventbrite
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -20,21 +19,18 @@ integration:
       connector-type: salesforce
       actions:
         UPSERTWITHWHERE: {}
-      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
-      account-name: Account 2
     action-interface-3:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:

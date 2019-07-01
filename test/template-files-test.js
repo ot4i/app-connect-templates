@@ -13,6 +13,7 @@ const chai = require('chai')
 const fs = require('fs')
 const expect = chai.expect
 const jsonata = require('jsonata')
+const jsyaml = require('js-yaml')
 
 const markdownDirectoryName = 'markdown'
 const templateMetadataFilename = 'template-metadata.json'
@@ -25,6 +26,22 @@ describe('Template files', function () {
       expect(fs.existsSync(fileName), `Missing file ${fileName}`).equals(true)
     }
   })
+
+  it('must not contain account-name in action or trigger interfaces', function () {
+    let noAccountNameFound = true
+    for (let template of templateMetadata.templates) {
+      let fileName = `./resources/${template.name}.yaml`
+      var doc = jsyaml.safeLoad(fs.readFileSync(fileName, 'utf8'))
+      const triggerInterfaceAccounts = jsonata('*."trigger-interfaces".*."account-name"').evaluate(doc)
+      const actionInterfaceAccounts = jsonata('*."action-interfaces".*."account-name"').evaluate(doc)
+      if (triggerInterfaceAccounts !== undefined || actionInterfaceAccounts !== undefined) {
+        console.log(`Please remove 'account-name' from the trigger-interfaces or action-interfaces in '${fileName}'`)
+        noAccountNameFound = false
+      }
+    }
+    expect(noAccountNameFound, `Found 'account-name' in some of the templates, check the logs above!`).equal(true)
+  })
+
   it('must all have an entry in template-metadata', function () {
     let flowNames = jsonata('templates.name').evaluate(templateMetadata)
     const listOfFiles = fs.readdirSync('./resources')

@@ -19,7 +19,6 @@ integration:
                   timeZone: Europe/London
                   every: day
       connector-type: streaming-connector-scheduler
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -27,26 +26,22 @@ integration:
       connector-type: http
       actions:
         INVOKE: {}
-      account-name: Account 1
     action-interface-3:
       type: api-action
       business-object: request
       connector-type: http
-      account-name: Account 1
       actions:
         INVOKE: {}
     action-interface-2:
       type: api-action
       business-object: request
       connector-type: http
-      account-name: Account 1
       actions:
         INVOKE: {}
     action-interface-4:
       type: api-action
       business-object: request
       connector-type: http
-      account-name: Account 1
       actions:
         INVOKE: {}
   assemblies:
