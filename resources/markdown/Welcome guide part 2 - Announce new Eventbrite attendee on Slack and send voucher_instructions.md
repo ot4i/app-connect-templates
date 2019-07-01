@@ -36,4 +36,6 @@ Set the question as a required field for your event.
 ## Related templates
 
 The previous template in this series is 'Welcome guide part 1 - Announce new Eventbrite attendee on Slack'.
+
+
 The next template in this series is 'Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce'.
