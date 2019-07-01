@@ -619,6 +619,15 @@
       "targetApps": ["salesforce"],
       "tags": ["salesforce", "scheduler"],
       "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Sync a new Salesforce contact with Intacct",
+      "description": "This template listens for new contacts in your Salesforce system, and creates the contact in your Intacct account if it doesn't already exist. It then uses your Yammer account to send a message to the team.",
+      "summary": "Salesforce to 3 applications",
+      "sourceApp": "salesforce",
+      "targetApps": ["salesforce", "intacct", "yammer"],
+      "tags": ["salesforce", "intacct", "yammer", "crm", "accounting", "messaging"],
+      "offerings": ["app connect professional"]
     }             
   ]
 }

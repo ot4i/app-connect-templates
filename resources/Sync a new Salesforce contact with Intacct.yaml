@@ -1,0 +1,259 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: contacts
+      connector-type: intacct
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Message
+      connector-type: yammer
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: contacts
+      connector-type: intacct
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: Message
+      connector-type: yammer
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve Account
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Id: '{{$Trigger.AccountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1
+              allow-empty-output: false
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+          - retrieve-action:
+              name: Intacct Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - lastname: '{{$Trigger.LastName}}'
+                    - firstname: '{{$Trigger.FirstName}}'
+                    - companyname: '{{$SalesforceRetrieveAccount[0].Name}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveAccount
+                    $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
+                  - variable: SalesforceRetrieveAccountMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Account/response'
+                limit: 1
+              allow-empty-output: true
+              allow-truncation: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveAccount
+                  $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
+                - variable: SalesforceRetrieveAccountMetadata
+                  $ref: '#/node-output/Salesforce Retrieve Account/response'
+                - variable: IntacctRetrievecontacts
+                  $ref: '#/node-output/Intacct Retrieve contacts/response/payload'
+                - variable: IntacctRetrievecontactsMetadata
+                  $ref: '#/node-output/Intacct Retrieve contacts/response'
+              branch:
+                - condition:
+                    '{{$IntacctRetrievecontactsMetadata."status-code"}}':
+                      =: '204'
+                  execute:
+                    - create-action:
+                        name: Intacct Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - cellphone:
+                                template: '{{$Trigger.MobilePhone}}'
+                            - companyname:
+                                template: '{{$SalesforceRetrieveAccount[0].Name}}'
+                            - contactid:
+                                template: '{{$Trigger.Id}}'
+                            - contactname:
+                                template: '{{$Trigger.Name}}'
+                            - email1:
+                                template: '{{$Trigger.Email}}'
+                            - fax:
+                                template: '{{$Trigger.Fax}}'
+                            - firstname:
+                                template: '{{$Trigger.FirstName}}'
+                            - lastname:
+                                template: '{{$Trigger.LastName}}'
+                            - mailaddress:
+                                mappings:
+                                  - address1:
+                                      template: '{{$Trigger.MailingStreet}}'
+                                  - city:
+                                      template: '{{$Trigger.MailingCity}}'
+                                  - country:
+                                      template: '{{$Trigger.MailingCountry}}'
+                                  - state:
+                                      template: '{{$Trigger.MailingState}}'
+                                  - zip:
+                                      template: '{{$Trigger.MailingPostalCode}}'
+                            - phone1:
+                                template: '{{$Trigger.Phone}}'
+                            - phone2:
+                                template: '{{$Trigger.OtherPhone}}'
+                            - prefix:
+                                template: '{{$Trigger.Title}}'
+                            - printas:
+                                template: >-
+                                  {{$Trigger.Name}} from
+                                  {{$SalesforceRetrieveAccount[0].Name}}
+                            - status:
+                                template: Active
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveAccount
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                Account/response/payload
+                            - variable: SalesforceRetrieveAccountMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                Account/response
+                    - create-action:
+                        name: Yammer Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - message_body:
+                                template: >-
+                                  New contact {{$Trigger.Name}} from account
+                                  {{$SalesforceRetrieveAccount[0].Name}}
+                                  received from Salesforce and created in
+                                  Intacct
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: IntacctCreatecontact
+                              $ref: >-
+                                #/block/If/node-output/Intacct Create
+                                contact/response/payload
+                            - variable: SalesforceRetrieveAccount
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                Account/response/payload
+                            - variable: SalesforceRetrieveAccountMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                Account/response
+                            - variable: IntacctRetrievecontacts
+                              $ref: >-
+                                #/node-output/Intacct Retrieve
+                                contacts/response/payload
+                            - variable: IntacctRetrievecontactsMetadata
+                              $ref: '#/node-output/Intacct Retrieve contacts/response'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SalesforceRetrieveAccount
+                        $ref: >-
+                          #/node-output/Salesforce Retrieve
+                          Account/response/payload
+                      - variable: SalesforceRetrieveAccountMetadata
+                        $ref: '#/node-output/Salesforce Retrieve Account/response'
+                      - variable: IntacctRetrievecontacts
+                        $ref: >-
+                          #/node-output/Intacct Retrieve
+                          contacts/response/payload
+                      - variable: IntacctRetrievecontactsMetadata
+                        $ref: '#/node-output/Intacct Retrieve contacts/response'
+                    mappings: []
+              else:
+                execute:
+                  - create-action:
+                      name: Yammer Create message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - message_body:
+                              template: >-
+                                New contact {{$Trigger.Name}} from account
+                                {{$SalesforceRetrieveAccount[0].Name}} received
+                                from Salesforce, already exists in Intacct
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrieveAccount
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              Account/response/payload
+                          - variable: SalesforceRetrieveAccountMetadata
+                            $ref: '#/node-output/Salesforce Retrieve Account/response'
+                          - variable: IntacctRetrievecontacts
+                            $ref: >-
+                              #/node-output/Intacct Retrieve
+                              contacts/response/payload
+                          - variable: IntacctRetrievecontactsMetadata
+                            $ref: '#/node-output/Intacct Retrieve contacts/response'
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  mappings: []
+                  input:
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: SalesforceRetrieveAccount
+                      $ref: >-
+                        #/node-output/Salesforce Retrieve
+                        Account/response/payload
+                    - variable: SalesforceRetrieveAccountMetadata
+                      $ref: '#/node-output/Salesforce Retrieve Account/response'
+                    - variable: IntacctRetrievecontacts
+                      $ref: '#/node-output/Intacct Retrieve contacts/response/payload'
+                    - variable: IntacctRetrievecontactsMetadata
+                      $ref: '#/node-output/Intacct Retrieve contacts/response'
+              output-schema: {}
+  name: Sync a new Salesforce contact with Intacct
+models: {}
