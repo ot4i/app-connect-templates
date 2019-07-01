@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%201%20-%20%20Announce%20new%20Eventbrite%20attendee%20on%20Slack_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome to IBM App Connect [Part 1 of 4]: Create a simple event-driven flow](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s) video of how to send a Slack message when new attendees register for the Sunflower festival Eventbrite event.
+This template creates the flow from the [Welcome to IBM App Connect \[Part 1 of 4\]: Create a simple event-driven flow](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s) video of how to send a Slack message when new attendees register for the Sunflower festival Eventbrite event.
 
 ## Prerequisites
 
