@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%202%20-%20Announce%20new%20Eventbrite%20attendee%20on%20Slack%20and%20send%20voucher_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome guide video](https://www.youtube.com/watch?v=FpZNNginPAM&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) to send a free drink voucher to attendees walking to the Sunflower festival Eventbrite event.
+This template creates the flow from the [Welcome to IBM App Connect \[Part 2 of 4\]: Add logic to an event-driven flow](https://www.youtube.com/watch?v=FpZNNginPAM&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) video to send a free drink voucher to attendees walking to the Sunflower festival Eventbrite event.
 
 ## Prerequisites
 
@@ -32,3 +32,8 @@ Set the question as a required field for your event.
 1. Click the Twilio "Create messages" action and connect to your Twilio account.
 1. In the Twilio action, update the "From" field to be your Twilio phone number.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+
+## Related templates
+
+The previous template in this series is 'Welcome guide part 1 - Announce new Eventbrite attendee on Slack'.
+The next template in this series is 'Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce'.
