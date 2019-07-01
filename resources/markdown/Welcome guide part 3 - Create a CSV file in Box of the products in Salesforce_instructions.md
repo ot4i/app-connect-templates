@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%203%20-%20Create%20a%20CSV%20file%20in%20Box%20of%20the%20products%20in%20Salesforce_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome guide video](https://www.youtube.com/watch?v=ALpxbNq-SkQ&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) to extract all the seed products from Salesforce, and put them in a CSV file in Box.
+This template creates the flow from the [Welcome to IBM App Connect \[Part 3 of  4\]: Visually map and transform your data](https://www.youtube.com/watch?v=ALpxbNq-SkQ&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) video to extract all the seed products from Salesforce, and put them in a CSV file in Box.
 
 ## Prerequisites
 
@@ -20,6 +20,8 @@ To use this flow, you'll need to create some products in Salesforce to represent
 * Marigold,MA4534,Seeds
 * Pansy,PA6847,Seeds
 
+You can use the template 'Welcome guide setup 1 - Add products to Salesforce' to help set up the products for this flow.
+
 ## Using the template
 
 1. Click **Create flow** to start using the template.
@@ -27,3 +29,13 @@ To use this flow, you'll need to create some products in Salesforce to represent
 1. Click the Box "Create file" action and connect to your [Box account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-box/).
 1. In the Box "Create file" action, choose the folder where you'd like the file to be created.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+
+## Related templates
+
+The previous template in this series is 'Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send voucher'.
+
+
+The next template in this series is 'Welcome guide part 4 - Flower order API'.
+
+
+The setup template is 'Welcome guide setup 1 - Add products to Salesforce'.
