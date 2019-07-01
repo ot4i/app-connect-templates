@@ -17,3 +17,9 @@ To run this flow you'll need to create flower products in Salesforce. To do this
 ## Clean up
 
 If you need to delete the order and products you've created, you can use the 'Welcome guide setup 3 - Delete flowers and order from Salesforce' template.
+
+## Related templates:
+
+Welcome guide setup 1 - Add products to Salesforce.
+
+Welcome guide setup 3 - Delete flowers and order from Salesforce.
