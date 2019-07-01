@@ -14,8 +14,8 @@ To setup the order in Salesforce, you'll need to create:
 * An order, with order products for each flower product you have. To create the order you'll need to create an account and a  contract.
 
 You can use the following templates to help with this setup in Salesforce:
-* Welcome guide setup 1 - Add products to Salesforce
-* Welcome guide setup 2 - Create Sunflower Festival order in Salesforce
+* Welcome guide setup 1 - Add products to Salesforce.
+* Welcome guide setup 2 - Create Sunflower Festival order in Salesforce.
 
 ## Using the template
 
@@ -31,5 +31,5 @@ You can use the following templates to help with this setup in Salesforce:
 The previous template in this series is 'Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce'.
 
 The setup templates are:
-* Welcome guide setup 1 - Add products to Salesforce
-* Welcome guide setup 2 - Create Sunflower Festival order in Salesforce
+* Welcome guide setup 1 - Add products to Salesforce.
+* Welcome guide setup 2 - Create Sunflower Festival order in Salesforce.
