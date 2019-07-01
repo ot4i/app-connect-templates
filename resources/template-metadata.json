@@ -596,6 +596,7 @@
     {
       "name": "Informed Business Partner Set in SAPodata for an eligible Product in Salesforce via Gmail",
       "description": "Send an email to all the  Business Partner Set in SAPodata whose creation date is greater than the Product creation date. Use this custom operation API to retrieve a Product by the product id in Salesforce and query Business Partner Set in SAPodata by its creation date. If no records exists give a notification stating No Business Partner Set eligible for the Product else send a welcome email to all the eligible Business Partner Set in SAPodata",
+      "summary": "Custom operation using 3 applications",
       "sourceApp": "api",
       "targetApps": ["salesforce", "sapodata", "gamil"],
       "tags": ["retrieve", "sapodata", "salesforce", "product"],
