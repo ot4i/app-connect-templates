@@ -104,7 +104,7 @@ integration:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
                 where:
-                  Id: '{{$api.product_id}}'
+                  Id: '{{$api.salesforce_product_id}}'
                 input:
                   - variable: api
                     $ref: '#/trigger/api/parameters'
@@ -268,7 +268,7 @@ integration:
                           #/node-output/SAP (via OData) Retrieve
                           BusinessPartnerSet/response
                     mappings:
-                      - product_id:
+                      - salesforce_product_id:
                           template: '{{$SalesforceRetrieveproducts[0].Id}}'
                       - statusCode:
                           template: >-
@@ -446,10 +446,8 @@ integration:
                   - Body:
                       template: >-
                         Hi Team ,
-
                         Find the product available to trade
                         {{$SalesforceRetrieveproducts.Name}}
-
                         Product Details
                          {{$SalesforceRetrieveproducts}}
                           Metadata details for the Odata record
@@ -483,13 +481,13 @@ integration:
                       #/node-output/SAP (via OData) Retrieve
                       BusinessPartnerSet/response
   name: >-
-    Informed Business Partner Set in SAP odata for an eligible Product in
+    Informed Business Partner Set in SAPodata for an eligible Product in
     salesforce via Gmail
 models:
   Salesforce_To_SAP:
     name: Salesforce_To_SAP
     properties:
-      product_id:
+      salesforce_product_id:
         required: false
         id: true
         type: string
@@ -508,7 +506,7 @@ models:
           name: getEligibleBusinessPartnerSet
         accessType: WRITE
         accepts:
-          - arg: product_id
+          - arg: salesforce_product_id
             type: string
             http:
               source: path
@@ -519,4 +517,4 @@ models:
           root: true
         http:
           verb: GET
-          path: '/:product_id/geteligiblebusinesspartnerset'
+          path: '/:salesforce_product_id/geteligiblebusinesspartnerset'
