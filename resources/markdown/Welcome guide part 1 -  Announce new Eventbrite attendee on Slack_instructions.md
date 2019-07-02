@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%201%20-%20%20Announce%20new%20Eventbrite%20attendee%20on%20Slack_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome guide video](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s) of how to send a Slack message when new attendees register for the Sunflower festival Eventbrite event.
+This template creates the flow from the [Welcome to IBM App Connect \[Part 1 of 4\]: Create a simple event-driven flow](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s) video of how to send a Slack message when new attendees register for the Sunflower festival Eventbrite event.
 
 ## Prerequisites
 
@@ -18,3 +18,9 @@ In the video of this flow, the event also collects information about the attende
 1. Click the Slack "Create message" action and connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/).
 1. In the Slack "Create message" action, choose the channel that you want to post the message to.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+
+## Related templates
+
+The next template in this series is 'Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send voucher'.
+
+

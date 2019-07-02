@@ -559,7 +559,7 @@
     },
     {
       "name": "Welcome guide part 1 -  Announce new Eventbrite attendee on Slack",
-      "description": "This template creates the flow demonstrated in the 'Welcome to IBM App Connect [Part 1 of 4]: Create a simple event-driven flow' video. Whenever a new attendee is added to an Eventbrite event, a message is create in Slack.",
+      "description": "This template creates the flow created in the 'Welcome to IBM App Connect [Part 1 of 4]: Create a simple event-driven flow' video. Whenever a new attendee is added to an Eventbrite event, a message is create in Slack.",
       "summary": "Eventbrite to Slack",
       "sourceApp": "eventbrite",
       "targetApps": ["slack"],
@@ -568,7 +568,7 @@
     },
     {
       "name": "Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send voucher",
-      "description": "This template contains the flow created in part 2 of the Welcome to App Connect videos. When new attendees register for an Eventbrite event, a message is posted to Slack, and if the attendee is walking to the event they'll also receive a text message via Twilio.",
+      "description": "This template contains the flow created in the 'Welcome to IBM App Connect [Part 2 of 4]: Add logic to an event-driven flow' video. When new attendees register for an Eventbrite event, a message is posted to Slack, and if the attendee is walking to the event they'll also receive a text message via Twilio.",
       "summary": "Eventbrite to 2 applications",
       "sourceApp": "eventbrite",
       "targetApps": ["slack", "twilio"],
@@ -577,7 +577,7 @@
     },
     {
       "name": "Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce",
-      "description": "This template contains the flow created in part 3 of the Welcome to App Connect videos. Use it to retrieve a list of products for a particular product family from Salesforce, and use the products to generate a CSV file in Box on a schedule.",
+      "description": "This template contains the flow created in the 'Welcome to IBM App Connect [Part 3 of 4]: Visually map and transform your data' video. Use it to retrieve a list of products for a particular product family from Salesforce, and use the products to generate a CSV file in Box on a schedule.",
       "summary": "Scheduler to 2 applications",
       "sourceApp": "streaming-connector-scheduler",
       "targetApps": ["salesforce", "box"],
@@ -586,7 +586,7 @@
     },
     {
       "name": "Welcome guide part 4 - Flower order API",
-      "description": "This template contains the API created in part 4 of the Welcome to App Connect videos. The API includes a flow to create a Trello card when new flowers are ordered for the festival, and it updates Salesforce with the quantity of flowers needed.",
+      "description": "This template contains the API created in the 'Welcome to IBM App Connect [Part 4 of 4]: Create flows for an API' video. The API includes a flow to create a Trello card when new flowers are ordered for the festival, and it updates Salesforce with the quantity of flowers needed.",
       "summary": "1 flow using 2 applications",
       "sourceApp": "api",
       "targetApps": ["trello", "salesforce"],
@@ -601,6 +601,33 @@
       "targetApps": ["salesforce", "sapodata", "gamil"],
       "tags": ["retrieve", "sapodata", "salesforce", "product"],
       "offerings": ["app connect professional"]
-    }
+    },
+    {
+      "name": "Welcome guide setup 1 - Add products to Salesforce",
+      "description": "Use this flow in conjuction with the templates for 'Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce' and 'Welcome guide part 4 - Flower order API' to set up Salesforce products.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["googlesheet", "salesforce"],
+      "tags": ["scheduler", "salesforce", "trello"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Welcome guide setup 2 - Create Sunflower Festival order in Salesforce",
+      "description": "Use this template to create the Salesforce order needed for the 'Welcome guide part 4 - Flower order API' template.",
+      "summary": "Scheduler to Salesforce",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["salesforce"],
+      "tags": ["salesforce", "salesforce"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Welcome guide setup 3 - Delete flowers and order from Salesforce",
+      "description": "This template contains a flow to delete the objects created in 'Welcome guide setup 1 - Add products to Salesforce' and 'Welcome guide setup 2 - Create Sunflower Festival order in Salesforce'.",
+      "summary": "Scheduler to Salesforce",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["salesforce"],
+      "tags": ["salesforce", "scheduler"],
+      "offerings": ["app connect professional"]
+    }          
   ]
 }
