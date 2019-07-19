@@ -619,6 +619,15 @@
       "targetApps": ["salesforce"],
       "tags": ["salesforce", "scheduler"],
       "offerings": ["app connect professional"]
-    }             
+    },
+    {
+ "name": "Extract employee leave records from Kronos to Google Sheets according to a schedule",
+ "description": "Use this template to retrieve employee leave records from Kronos and add the data to a Google Sheets spreadsheet.",
+ "summary": "Scheduler to 2 applications",
+ "sourceApp": "streaming-connector-scheduler",
+ "targetApps": ["kronos", "googlesheet"],
+ "tags": ["kronos", "googlesheets", "scheduler"],
+ "offerings": ["app connect professional"]
+}             
   ]
 }
