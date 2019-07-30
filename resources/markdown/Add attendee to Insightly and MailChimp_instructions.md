@@ -7,6 +7,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
 1. Click on the MailChimp node and select the list where the attendee needs to be added.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
-Want to see the flow working? Add a new attendee to your Eventbrite event, and check Insightly and MailChimp to see that they have been added.
+Want to see the flow working? Add a new attendee to your Eventbrite event, and then check Insightly and MailChimp to see that the attendee has been added to those applications.
 
 For more information about this template and to view the associated tutorial, see [Creating an event-driven flow that adds attendees for an Eventbrite event as Insightly leads and MailChimp list subscribers](https://developer.ibm.com/integration/docs/app-connect/tutorials-for-ibm-app-connect/creating-event-driven-flow-adds-attendees-eventbrite-event-insightly-leads-mailchimp-list-subscribers/).
