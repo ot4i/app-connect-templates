@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 1. On the Slack "New message" event, copy the callback URL and [configure a custom slash command](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/#considerations) called `/contact`.
 1. Click on the **MailChimp** node and connect to your [MailChimp account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-mailchimp/).
 1. Select your own mailing list for each Mailchimp action.
-    - If the **Email Address** field is empty, start typing ``message`` and then select **Message body**from the displayed list of objects
+    - If the **Email Address** field is empty, start typing ``message`` and then select **Message body** from the displayed list of objects
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
 To test your flow:
