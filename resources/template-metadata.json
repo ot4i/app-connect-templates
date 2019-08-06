@@ -626,7 +626,7 @@
       "summary": "Slack to Mailchimp",
       "sourceApp": "slack",
       "targetApps": ["mailchimp"],
-      "tags": ["slacke", "mailchimp"],
+      "tags": ["slack", "mailchimp"],
       "offerings": ["app connect professional"]
     }
   ]
