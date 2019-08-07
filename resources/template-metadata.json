@@ -619,6 +619,15 @@
       "targetApps": ["salesforce"],
       "tags": ["salesforce", "scheduler"],
       "offerings": ["app connect professional"]
-    }             
+    },
+    {
+      "name": "Add a Mailchimp subscriber from a Slack slash command",
+      "description": "Use this template to add a new member as a subscriber of a Mailchimp list from a Slack slash command.",
+      "summary": "Slack to Mailchimp",
+      "sourceApp": "slack",
+      "targetApps": ["mailchimp"],
+      "tags": ["slack", "mailchimp"],
+      "offerings": ["app connect professional"]
+    }
   ]
 }
