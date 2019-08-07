@@ -25,7 +25,7 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: Add a Mailchimp subscriber from a Slack slash command
+              name: Add member to a list
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
