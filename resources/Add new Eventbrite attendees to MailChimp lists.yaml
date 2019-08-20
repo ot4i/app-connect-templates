@@ -37,10 +37,10 @@ integration:
               branch:
                 - condition:
                     '{{$Trigger.event_id}}':
-                      =: Fill in your event ID
+                      =: Fill in one of your event IDs
                   execute:
                     - create-action:
-                        name: MailChimp Add subscriber to a list
+                        name: MailChimp Add member to a list
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-1'
                         map:
@@ -66,11 +66,11 @@ integration:
                         $ref: '#/trigger/payload'
                     mappings: []
                 - condition:
-                    'event {{$Trigger.event_id}}':
-                      =: Fill in your event ID
+                    '{{$Trigger.event_id}}':
+                      =: Fill in another event ID
                   execute:
                     - create-action:
-                        name: MailChimp Add subscriber to a list 2
+                        name: MailChimp Add member to a list 2
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         map:

@@ -621,6 +621,15 @@
       "offerings": ["app connect professional"]
     },
     {
+      "name": "Add a Mailchimp subscriber from a Slack slash command",
+      "description": "Use this template to add a new member as a subscriber of a Mailchimp list from a Slack slash command.",
+      "summary": "Slack to Mailchimp",
+      "sourceApp": "slack",
+      "targetApps": ["mailchimp"],
+      "tags": ["slack", "mailchimp"],
+      "offerings": ["app connect professional"]
+    },
+    {
       "name": "Use Slack to notify of unprocessed Kronos leave requests",
       "description": "This template contains a flow to notify you when leave requests in Kronos require attention. A scheduler runs the flow every Monday morning to retrieve leave records from Kronos then notify you on Slack if any requests have a status of 'pending'.",
       "summary": "Scheduler to 2 applications",
@@ -628,6 +637,6 @@
       "targetApps": ["kronos", "slack"],
       "tags": ["scheduler", "kronos", "for each", "if", "slack"],
       "offerings": ["app connect professional"]
-    } 
+    }
   ]
 }
