@@ -1,0 +1,166 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 08 * * MON
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: week
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leave
+      connector-type: kronos
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Kronos Retrieve employees leave records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - idsFilter: '3444,2663'
+                    - endDateFilter: '2019-06-31'
+                    - startDateFilter: '2019-01-01'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$KronosRetrieveemployeesleaverecords '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: KronosRetrieveemployeesleaverecords
+                    $ref: >-
+                      #/node-output/Kronos Retrieve employees leave
+                      records/response/payload
+                  - variable: KronosRetrieveemployeesleaverecordsMetadata
+                    $ref: >-
+                      #/node-output/Kronos Retrieve employees leave
+                      records/response
+              mode: sequential
+              continue-on-error: false
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: KronosRetrieveemployeesleaverecords
+                    $ref: >-
+                      #/node-output/Kronos Retrieve employees leave
+                      records/response/payload
+                  - variable: KronosRetrieveemployeesleaverecordsMetadata
+                    $ref: >-
+                      #/node-output/Kronos Retrieve employees leave
+                      records/response
+                mappings: []
+              display-name: Kronos leave request
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: KronosRetrieveemployeesleaverecords
+                  $ref: >-
+                    #/node-output/Kronos Retrieve employees leave
+                    records/response/payload
+                - variable: KronosRetrieveemployeesleaverecordsMetadata
+                  $ref: >-
+                    #/node-output/Kronos Retrieve employees leave
+                    records/response
+              branch:
+                - condition:
+                    '{{$KronosRetrieveemployeesleaverecords[0].caseStatus.qualifier}}': Pending
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C8Z7TK805
+                            - text:
+                                template: >-
+                                  Leave request ID:
+                                  {{$KronosRetrieveemployeesleaverecords[0].id}}
+                                  for employee
+                                  {{$KronosRetrieveemployeesleaverecords[0].employee.id}}:
+                                  {{$KronosRetrieveemployeesleaverecords[0].employee.fullName}}
+                                  needs to be processed.
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: KronosRetrieveemployeesleaverecords
+                              $ref: >-
+                                #/node-output/Kronos Retrieve employees leave
+                                records/response/payload
+                            - variable: KronosRetrieveemployeesleaverecordsMetadata
+                              $ref: >-
+                                #/node-output/Kronos Retrieve employees leave
+                                records/response
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Foreachitem
+                          $ref: '#/block/For each/current-item'
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: KronosRetrieveemployeesleaverecords
+                          $ref: >-
+                            #/node-output/Kronos Retrieve employees leave
+                            records/response/payload
+                        - variable: KronosRetrieveemployeesleaverecordsMetadata
+                          $ref: >-
+                            #/node-output/Kronos Retrieve employees leave
+                            records/response
+                      message: There are no pending leave requests.
+                      status-code: 200
+              output-schema: {}
+  name: Use Slack to notify of unprocessed Kronos leave requests
+models: {}
