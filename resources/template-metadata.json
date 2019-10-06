@@ -637,6 +637,16 @@
       "targetApps": ["kronos", "slack"],
       "tags": ["scheduler", "kronos", "for each", "if", "slack"],
       "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Aggregates account information of users with active consents setup in Yapily and stores it in IBM Cloudant",
+      "description": "This flow aggregates the account information of users with active consents setup in Yapily and stores it in IBM Cloudant",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["yapily", "cloudant"],
+      "tags": ["scheduler", "yapily", "for each", "if", "cloudant"],
+      "offerings": ["app connect professional"]
     }
+                
   ]
 }
