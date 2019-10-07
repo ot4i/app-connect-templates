@@ -27,7 +27,7 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-     trigger-interface-3:
+    trigger-interface-3:
       type: extract-trigger
       triggers:
         RETRIEVEALL:
@@ -36,7 +36,7 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-4'
       connector-type: yapily
-      trigger-interface-4:
+    trigger-interface-4:
       type: extract-trigger
       triggers:
         RETRIEVEALL:
@@ -54,7 +54,7 @@ integration:
                 - batch-record-id:
                     template: '{{$Batchprocess3.uuid}}'
       connector-type: yapily
-   action-interfaces:
+  action-interfaces:
     action-interface-2:
       type: api-action
       business-object: account
