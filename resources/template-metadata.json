@@ -643,8 +643,8 @@
       "description": "This flow aggregates the account information of users with active consents set up in Yapily and stores it in IBM Cloudant",
       "summary": "Scheduler to 2 applications",
       "sourceApp": "streaming-connector-scheduler",
-      "targetApps": ["yapily", "cloudant"],
-      "tags": ["scheduler", "yapily", "for each", "if", "cloudant"],
+      "targetApps": ["yapily", "cloudantdb"],
+      "tags": ["scheduler", "yapily", "for each", "if", "cloudantdb"],
       "offerings": ["app connect professional"]
     }
                 
