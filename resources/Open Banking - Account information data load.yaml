@@ -27,8 +27,7 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      account-name: Account 1
-    trigger-interface-3:
+     trigger-interface-3:
       type: extract-trigger
       triggers:
         RETRIEVEALL:
@@ -37,8 +36,7 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-4'
       connector-type: yapily
-      account-name: Account 1
-    trigger-interface-4:
+      trigger-interface-4:
       type: extract-trigger
       triggers:
         RETRIEVEALL:
@@ -56,13 +54,11 @@ integration:
                 - batch-record-id:
                     template: '{{$Batchprocess3.uuid}}'
       connector-type: yapily
-      account-name: Account 1
-  action-interfaces:
+   action-interfaces:
     action-interface-2:
       type: api-action
       business-object: account
       connector-type: yapily
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-3:
@@ -76,21 +72,18 @@ integration:
       type: api-action
       business-object: document
       connector-type: cloudantdb
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-5:
       type: api-action
       business-object: document
       connector-type: cloudantdb
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-4:
       type: api-action
       business-object: document
       connector-type: cloudantdb
-      account-name: Account 1
       actions:
         UPSERTWITHWHERE: {}
     action-interface-6:
@@ -104,7 +97,6 @@ integration:
       type: api-action
       business-object: consent
       connector-type: yapily
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
   assemblies:
