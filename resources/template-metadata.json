@@ -646,6 +646,15 @@
       "targetApps": ["yapily", "cloudantdb"],
       "tags": ["scheduler", "yapily", "for each", "if", "cloudantdb"],
       "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Create a SugarCRM lead and send email for a new Eventbrite attendee",
+      "description": "This template detects when a new attendee registers for an Eventbrite event, and for the attendee creates a SugarCRM lead and sends an email. The flow illustrates the use of SugarCRM retrieve and create actions, and the use of an If node to take alternative actions depending on the response from the SugarCRM retrieve action.",
+      "summary": "Eventbrite to 2 applications",
+      "sourceApp": "eventbrite",
+      "targetApps": ["sugarcrm", "gmail"],
+      "tags": ["eventbrite", "sugarcrm", "gmail", "if"],
+      "offerings": ["app connect professional"]
     }
                 
   ]
