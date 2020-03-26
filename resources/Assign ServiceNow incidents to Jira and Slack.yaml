@@ -1,0 +1,160 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: servicenow
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    '{{$Trigger.urgency}}': '1'
+                  execute:
+                    - create-action:
+                        name: Jira Create issue
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - issuetype:
+                                mappings:
+                                  - name:
+                                      template: Bug
+                            - key:
+                                template: APCONN
+                            - priority:
+                                mappings:
+                                  - name:
+                                      template: High
+                            - reporter:
+                                mappings:
+                                  - name:
+                                      template: IBM Testa
+                            - summary:
+                                template: '{{$Trigger.short_description}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                    - retrieve-action:
+                        name: Jira Retrieve issues
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            id: '{{$JiraCreateissue.id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JiraCreateissue
+                              $ref: >-
+                                #/block/If/node-output/Jira Create
+                                issue/response/payload
+                          limit: 1
+                        allow-truncation: false
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: false
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C3HECF803
+                            - text:
+                                template: >-
+                                  Check Jira for the new priority
+                                  {{$Trigger.urgency}} issue created with issue
+                                  ID Issue {{$JiraCreateissue.id}} and issue key
+                                  {{$JiraRetrieveissues.key}} --- for ServiceNow
+                                  incident {{$Trigger.number}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JiraCreateissue
+                              $ref: >-
+                                #/block/If/node-output/Jira Create
+                                issue/response/payload
+                            - variable: JiraRetrieveissues
+                              $ref: >-
+                                #/block/If/node-output/Jira Retrieve
+                                issues/response/payload
+                            - variable: JiraRetrieveissuesMetadata
+                              $ref: >-
+                                #/block/If/node-output/Jira Retrieve
+                                issues/response
+              else:
+                execute:
+                  - create-action:
+                      name: Jira Create issue 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - description:
+                              template: '{{$Trigger.description}}'
+                          - issuetype:
+                              mappings:
+                                - name:
+                                    template: Task
+                          - key:
+                              template: APCONN
+                          - priority:
+                              mappings:
+                                - name:
+                                    template: Low
+                          - reporter:
+                              mappings:
+                                - name:
+                                    template: IBM  Testa
+                          - summary:
+                              template: '{{$Trigger.short_description}}'
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+              output-schema: {}
+  name: Assign ServiceNow incidents to Jira and Slack
+models: {}
