@@ -655,7 +655,15 @@
       "targetApps": ["sugarcrm", "gmail"],
       "tags": ["eventbrite", "sugarcrm", "gmail", "if"],
       "offerings": ["app connect professional"]
-    }
-                
+    },
+    {
+      "name": "Assign ServiceNow incidents to Jira and Slack",
+      "description": "This template detects when a new ServiceNow incident is created; if the incident has a High urgency creates an issue in Jira and sends a message to a Slack channel; otherwise, create a task in Jira. The flow illustrates the use of Jira create and retrieve actions, and the use of an If node to take alternative actions depending on data from the ServiceNow new incident trigger event.",
+      "summary": "ServiceNow to 2 applications",
+      "sourceApp": "servicenow",
+      "targetApps": ["jira", "slack"],
+      "tags": ["servicenow", "jira", "slack", "if"],
+      "offerings": ["app connect professional"]
+    }                
   ]
 }
