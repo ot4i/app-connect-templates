@@ -664,6 +664,15 @@
       "targetApps": ["jira", "slack"],
       "tags": ["servicenow", "jira", "slack", "if"],
       "offerings": ["app connect professional"]
-    }                
+    },
+    {
+      "name": "Create Sharepoint team site for new event",
+      "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
+      "summary": "Eventbrite to 2 applications",
+      "sourceApp": "eventbrite",
+      "targetApps": ["mssharepoint", "slack"],
+      "tags": ["eventbrite", "mssharepoint", "slack"],
+      "offerings": ["app connect professional"]
+    }   
   ]
 }
