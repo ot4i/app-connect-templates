@@ -673,6 +673,15 @@
       "targetApps": ["mssharepoint", "slack"],
       "tags": ["eventbrite", "mssharepoint", "slack"],
       "offerings": ["app connect professional"]
-    }   
+    },
+    {
+      "name": "Weekly copy Dropbox files to new COS S3 bucket named with date",
+      "description": "This template copies files from a Dropbox folder to a new bucket in IBM Cloud Object Storage S3 on a weekly schedule.",
+      "summary": "Dropbox to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["dropbox", "ibmcoss3"],
+      "tags": ["scheduler", "dropbox", "ibmcoss3", "foreach", "if"],
+      "offerings": ["app connect professional"]
+    }    
   ]
 }
