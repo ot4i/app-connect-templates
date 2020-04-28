@@ -6,7 +6,7 @@ This template sets up the products which are used with the following templates:
 
 ## Prerequisites
 
-In Google Sheets, create a sheet with the [products to add to Salesforce](https://github.com/ot4i/app-connect-templates/blob/apendrich-welcome-4/resources/markdown/sample/sunflowerFestivalProductsSample.csv). They'll need to include a Product Name, Product Code and Product Family.
+In Google Sheets, create a sheet with the [products to add to Salesforce](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/sample/sunflowerFestivalProductsSample.csv). They'll need to include a Product Name, Product Code and Product Family.
 
 ## Using the template
 
