@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     * Last name
     * Email
 1. Click **Create flow** to start using the template.
-1. Connect to your [Google Sheets account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-google-sheets/).
+1. Connect to your [Google Sheets account](http://ibm.biz/acgsheets).
 1. Click the **Google Sheets** node and select the spreadsheet and worksheet you want to use.
 1. Connect to your Salesforce Pardot account.  
 1. Click the **Salesforce Pardot** node and check the mappings for First name, Last name and Email to make sure they match your spreadsheet.
