@@ -15,9 +15,9 @@ Any other columns after the first five specified here will be ignored by this fl
 
 1. Click **Create flow** to start using the template.
 1. Click **Operations**, then **Edit flow** for the _Create leads_ operation.
-1. Click on the **Google Sheets** node, and if you're not already connected, connect to your [Google Sheets account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-google-sheets/).
+1. Click the **Google Sheets** node, and if you're not already connected, connect to your [Google Sheets account](http://ibm.biz/acgsheets).
 1. Select the Google Sheets spreadsheet and worksheet to use for this flow. Also, if desired, alter the number of rows processed. This default used in this flow is 25.
-1. Click on the **Salesforce node**, and if you're not already connected, connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+1. Click on the **Salesforce node**, and if you're not already connected, connect to your [Salesforce account](http://ibm.biz/ach2salesforce).
 1. Click **Done**.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
