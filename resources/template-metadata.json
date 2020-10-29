@@ -32,7 +32,7 @@
     "summary": "Slack to 2 applications",
     "sourceApp": "slack",
     "targetApps": ["watsonlt", "slack"],
-    "tags": ["slack", "watsonlt", "translate", "translation", "french", "english", "chat", "language"],
+    "tags": ["slack", "Watson Language Translator", "translate", "translation", "french", "english", "chat", "language"],
     "offerings": ["app connect professional"]
   },
   {
