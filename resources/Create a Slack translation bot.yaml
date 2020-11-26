@@ -86,7 +86,7 @@ integration:
                         map:
                           mappings:
                             - model_id:
-                                template: en-fr-conversational
+                                template: en-fr
                             - text:
                                 template: '{{$Trigger.messageBody}}'
                           $map: 'http://ibm.com/appconnect/map/v1'
@@ -126,7 +126,7 @@ integration:
                         map:
                           mappings:
                             - model_id:
-                                template: fr-en-conversational
+                                template: fr-en
                             - text:
                                 template: '{{$Trigger.messageBody}}'
                           $map: 'http://ibm.com/appconnect/map/v1'
