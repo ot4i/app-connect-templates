@@ -21,4 +21,4 @@ The first line in your csv file should look like this:
 1. Click **Done**.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
-Want to see if working? Click **Manage** in the API flow, then follow the instructions on getting started. Once you're in the API portal, use the Try it link and then **Generate** some test data. Replace the value for `file_url` with the URL for the csv file you want to use. Replace the value for `event_name` with the event name you want to match in your file, and click **Call operation**.
+Want to see if working? Click **Manage** in the API flow, then follow the instructions on getting started. Once you're in the API portal, use the Try it link and then **Generate** some test data. Replace the value for `file_url` with the ID for the CSV file you want to use (for example, `1234560543210` for the CSV file `https://app.box.com/file/1234560543210`). Replace the value for `event_name` with the event name you want to match in your file, and click **Call operation**.
