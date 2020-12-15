@@ -3,6 +3,7 @@ integration:
   type: trigger-action
   trigger-interfaces:
     trigger-interface-1:
+      connector-type: slack
       type: event-trigger
       triggers:
         CREATED:
@@ -11,8 +12,7 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
           options:
-            webhookURLSuffix: default
-      connector-type: slack
+            webhookURLSuffix: 74e41714-296a-538f-8620-01e2924a4588
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -55,7 +55,7 @@ integration:
       assembly:
         execute:
           - custom-action:
-              name: Watson Language Translator Identify
+              name: IBM Watson Language Translator Identify
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               action: IDENTIFY
@@ -64,22 +64,24 @@ integration:
                   - text:
                       template: '{{$Trigger.messageBody}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
           - if:
               name: If
               input:
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: WatsonLanguageTranslatorIdentify
+                - variable: IBMWatsonLanguageTranslatorIdentify
                   $ref: >-
-                    #/node-output/Watson Language Translator
+                    #/node-output/IBM Watson Language Translator
                     Identify/response/payload
               branch:
                 - condition:
-                    '{{$WatsonLanguageTranslatorIdentify.languages[0].language}}':
-                      =: en
+                    '{{$IBMWatsonLanguageTranslatorIdentify.languages[0].language}}': en
                   execute:
                     - custom-action:
-                        name: Watson Language Translator Translate
+                        name: IBM Watson Language Translator Translate
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         action: TRANSLATE
@@ -93,33 +95,32 @@ integration:
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: WatsonLanguageTranslatorIdentify
+                            - variable: IBMWatsonLanguageTranslatorIdentify
                               $ref: >-
-                                #/node-output/Watson Language Translator
+                                #/node-output/IBM Watson Language Translator
                                 Identify/response/payload
                   map:
                     $map: 'http://ibm.com/appconnect/map/v1'
                     input:
                       - variable: Trigger
                         $ref: '#/trigger/payload'
-                      - variable: WatsonLanguageTranslatorTranslate
+                      - variable: IBMWatsonLanguageTranslatorTranslate
                         $ref: >-
-                          #/block/If/node-output/Watson Language Translator
+                          #/block/If/node-output/IBM Watson Language Translator
                           Translate/response/payload
-                      - variable: WatsonLanguageTranslatorIdentify
+                      - variable: IBMWatsonLanguageTranslatorIdentify
                         $ref: >-
-                          #/node-output/Watson Language Translator
+                          #/node-output/IBM Watson Language Translator
                           Identify/response/payload
                     mappings:
                       - message:
                           template: >-
-                            {{$WatsonLanguageTranslatorTranslate.translations[0].translation}}
+                            {{$IBMWatsonLanguageTranslatorTranslate.translations[0].translation}}
                 - condition:
-                    '{{$WatsonLanguageTranslatorIdentify.languages[0].language}}':
-                      =: fr
+                    '{{$IBMWatsonLanguageTranslatorIdentify.languages[0].language}}': fr
                   execute:
                     - custom-action:
-                        name: Watson Language Translator Translate 2
+                        name: IBM Watson Language Translator Translate 2
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-3'
                         action: TRANSLATE
@@ -133,37 +134,35 @@ integration:
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: WatsonLanguageTranslatorIdentify
+                            - variable: IBMWatsonLanguageTranslatorIdentify
                               $ref: >-
-                                #/node-output/Watson Language Translator
+                                #/node-output/IBM Watson Language Translator
                                 Identify/response/payload
                   map:
                     $map: 'http://ibm.com/appconnect/map/v1'
                     input:
                       - variable: Trigger
                         $ref: '#/trigger/payload'
-                      - variable: WatsonLanguageTranslatorTranslate2
+                      - variable: IBMWatsonLanguageTranslatorTranslate2
                         $ref: >-
-                          #/block/If/node-output/Watson Language Translator
+                          #/block/If/node-output/IBM Watson Language Translator
                           Translate 2/response/payload
-                      - variable: WatsonLanguageTranslatorIdentify
+                      - variable: IBMWatsonLanguageTranslatorIdentify
                         $ref: >-
-                          #/node-output/Watson Language Translator
+                          #/node-output/IBM Watson Language Translator
                           Identify/response/payload
                     mappings:
                       - message:
                           template: >-
-                            {{$WatsonLanguageTranslatorTranslate2.translations[0].translation}}
+                            {{$IBMWatsonLanguageTranslatorTranslate2.translations[0].translation}}
               else:
                 execute:
                   - create-action:
-                      name: Slack Create message 3
+                      name: Slack Create message
                       target:
-                        $ref: '#/integration/action-interfaces/action-interface-6'
+                        $ref: '#/integration/action-interfaces/action-interface-4'
                       map:
                         mappings:
-                          - channel:
-                              template: C7ES5KKV1
                           - text:
                               template: >-
                                 Unrecognised language for message:
@@ -172,9 +171,9 @@ integration:
                         input:
                           - variable: Trigger
                             $ref: '#/trigger/payload'
-                          - variable: WatsonLanguageTranslatorIdentify
+                          - variable: IBMWatsonLanguageTranslatorIdentify
                             $ref: >-
-                              #/node-output/Watson Language Translator
+                              #/node-output/IBM Watson Language Translator
                               Identify/response/payload
                 completion-action:
                   terminate:
@@ -182,65 +181,58 @@ integration:
                       input:
                         - variable: Trigger
                           $ref: '#/trigger/payload'
-                        - variable: WatsonLanguageTranslatorIdentify
+                        - variable: IBMWatsonLanguageTranslatorIdentify
                           $ref: >-
-                            #/node-output/Watson Language Translator
+                            #/node-output/IBM Watson Language Translator
                             Identify/response/payload
                       message: >-
                         Unrecognised language for message:
                         {{$Trigger.messageBody}}
                       status-code: 200
               output-schema:
-                required:
-                  - message
+                type: object
                 properties:
                   message:
                     type: string
-                    title: message
-                type: object
-          - create-action:
-              name: Slack Create message
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-4'
-              map:
-                mappings:
-                  - channel:
-                      template: C7ES5KKV1
-                  - text:
-                      template: 'Original message: {{$Trigger.messageBody}}'
-                $map: 'http://ibm.com/appconnect/map/v1'
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: WatsonLanguageTranslatorIdentify
-                    $ref: >-
-                      #/node-output/Watson Language Translator
-                      Identify/response/payload
-                  - variable: If
-                    $ref: '#/node-output/If/response/payload'
+                required:
+                  - message
           - create-action:
               name: Slack Create message 2
               target:
                 $ref: '#/integration/action-interfaces/action-interface-5'
               map:
                 mappings:
-                  - channel:
-                      template: C7ES5KKV1
+                  - text:
+                      template: 'Original message: {{$Trigger.messageBody}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMWatsonLanguageTranslatorIdentify
+                    $ref: >-
+                      #/node-output/IBM Watson Language Translator
+                      Identify/response/payload
+                  - variable: If
+                    $ref: '#/node-output/If/response/payload'
+          - create-action:
+              name: Slack Create message 3
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              map:
+                mappings:
                   - text:
                       template: 'Translated message: {{$If.message}}'
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WatsonLanguageTranslatorIdentify
+                  - variable: IBMWatsonLanguageTranslatorIdentify
                     $ref: >-
-                      #/node-output/Watson Language Translator
+                      #/node-output/IBM Watson Language Translator
                       Identify/response/payload
                   - variable: If
                     $ref: '#/node-output/If/response/payload'
-                  - variable: SlackCreatemessage
-                    $ref: '#/node-output/Slack Create message/response/payload'
-        tags:
-          - incomplete
-  name: Create a Slack translation bot
+                  - variable: SlackCreatemessage2
+                    $ref: '#/node-output/Slack Create message 2/response/payload'
+  name: Slack translation bot
 models: {}
