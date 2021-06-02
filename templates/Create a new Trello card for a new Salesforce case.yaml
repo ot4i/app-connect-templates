@@ -1,0 +1,68 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: card
+      connector-type: trello
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add New Card to List
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: 'Case ID = {{$Trigger.Id}}'
+                  - idBoard:
+                      template: 58adba17a45aa348ba368ee6
+                  - idList:
+                      template: 58adba29f82ba459de9f0a3d
+                  - name:
+                      template: '{{$Trigger.Subject}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: Create a new Trello card for a new Salesforce case
+  description: >-
+    This template creates a new card in Trello when a new case is created in
+    Salesforce - make sure you never forget to follow up with that new case
+    again!
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20new%20Trello%20card%20for%20a%20new%20Salesforce%20case_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Salesforce
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).  
+
+    1. Connect to your [Trello
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-trello/).
+
+    1. Select the board and list that you want to add the new card to, and edit
+    the card name and description to meet your business needs.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}

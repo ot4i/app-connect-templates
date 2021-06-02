@@ -1,0 +1,223 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: RawMessage
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: default
+      connector-type: slack
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: ticket
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: ticket
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input: []
+              branch:
+                - condition:
+                    '{{$Trigger.messageBody}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create ticket
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - short_description:
+                                template: >-
+                                  {{$substringAfter($Trigger.messageBody , "
+                                  ")}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                    - retrieve-action:
+                        name: ServiceNow Retrieve tickets
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            sys_id: '{{$ServiceNowCreateticket.sys_id}}'
+                          input:
+                            - variable: ServiceNowCreateticket
+                              $ref: >-
+                                #/block/If/node-output/ServiceNow Create
+                                ticket/response/payload
+                          limit: 1
+                        allow-empty-output: true
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                    - if:
+                        name: If 2
+                        input:
+                          - variable: ServiceNowCreateticket
+                            $ref: >-
+                              #/block/If/node-output/ServiceNow Create
+                              ticket/response/payload
+                          - variable: ServiceNowRetrievetickets
+                            $ref: >-
+                              #/block/If/node-output/ServiceNow Retrieve
+                              tickets/response/payload
+                          - variable: ServiceNowRetrieveticketsMetadata
+                            $ref: >-
+                              #/block/If/node-output/ServiceNow Retrieve
+                              tickets/response
+                        branch:
+                          - condition:
+                              '{{$ServiceNowCreateticket.sys_id}}':
+                                neq: ''
+                            execute:
+                              - create-action:
+                                  name: Gmail Create message 2
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-2
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            {{$substringAfter($Trigger.messageBody ,
+                                            " ")}}
+                                      - Subject:
+                                          template: >-
+                                            ServiceNow Ticket Created :
+                                            {{$ServiceNowRetrievetickets.sys_id}}  |
+                                            Date :
+                                            {{$ServiceNowRetrievetickets.sys_created_on}}
+                                    $map: 'http://ibm.com/appconnect/map/v1'
+                                    input:
+                                      - variable: ServiceNowCreateticket
+                                        $ref: >-
+                                          #/block/If/node-output/ServiceNow Create
+                                          ticket/response/payload
+                                      - variable: ServiceNowRetrievetickets
+                                        $ref: >-
+                                          #/block/If/node-output/ServiceNow
+                                          Retrieve tickets/response/payload
+                                      - variable: ServiceNowRetrieveticketsMetadata
+                                        $ref: >-
+                                          #/block/If/node-output/ServiceNow
+                                          Retrieve tickets/response
+                            map:
+                              $map: 'http://ibm.com/appconnect/map/v1'
+                              input:
+                                - variable: ServiceNowCreateticket
+                                  $ref: >-
+                                    #/block/If/node-output/ServiceNow Create
+                                    ticket/response/payload
+                                - variable: ServiceNowRetrievetickets
+                                  $ref: >-
+                                    #/block/If/node-output/ServiceNow Retrieve
+                                    tickets/response/payload
+                                - variable: ServiceNowRetrieveticketsMetadata
+                                  $ref: >-
+                                    #/block/If/node-output/ServiceNow Retrieve
+                                    tickets/response
+                              mappings: []
+                        else:
+                          execute: []
+                          completion-action:
+                            terminate:
+                              info:
+                                input:
+                                  - variable: ServiceNowCreateticket
+                                    $ref: >-
+                                      #/block/If/node-output/ServiceNow Create
+                                      ticket/response/payload
+                                  - variable: ServiceNowRetrievetickets
+                                    $ref: >-
+                                      #/block/If/node-output/ServiceNow Retrieve
+                                      tickets/response/payload
+                                  - variable: ServiceNowRetrieveticketsMetadata
+                                    $ref: >-
+                                      #/block/If/node-output/ServiceNow Retrieve
+                                      tickets/response
+                                message: >-
+                                  {{$ServiceNowRetrieveticketsMetadata."status-code"}}
+                                status-code: 200
+                        output-schema: {}
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: ServiceNowCreateticket
+                        $ref: >-
+                          #/block/If/node-output/ServiceNow Create
+                          ticket/response/payload
+                      - variable: ServiceNowRetrievetickets
+                        $ref: >-
+                          #/block/If/node-output/ServiceNow Retrieve
+                          tickets/response/payload
+                      - variable: ServiceNowRetrieveticketsMetadata
+                        $ref: >-
+                          #/block/If/node-output/ServiceNow Retrieve
+                          tickets/response
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input: []
+                      message: '{{$Trigger.archiveMessageURL}}'
+                      status-code: 200
+              output-schema:
+                required: []
+                properties: {}
+                type: object
+        tags:
+          - incomplete
+  name: >-
+    Open a ticket on ServiceNow from an identified issue in Slack and send an
+    email using Gmail
+  description: >-
+    Use this template to open a ticket in ServiceNow directly from Slack using a
+    simple slash command. The flow will send you an email using Gmail with the
+    ticket ID number and creation date in the subject, and the description of
+    the issue in the body of the email.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Open%20a%20ticket%20on%20ServiceNow%20from%20an%20identified%20issue%20in%20Slack%20and%20send%20an%20email%20using%20Gmail_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Slack account](http://ibm.biz/acslack).
+
+    1. On the Slack "New message" event, copy the callback URL to the clipboard,
+    and [create a custom slash command](http://ibm.biz/acslack#considerations).
+    Follow a pattern like this in Slack - "/message [your email] [description of
+    the issue]".
+
+    1. Connect to your [ServiceNow account](http://ibm.biz/acservicenow).
+
+    1. Connect to your [Gmail account](http://ibm.biz/acgmail) and choose the
+    email address as per your needs.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}

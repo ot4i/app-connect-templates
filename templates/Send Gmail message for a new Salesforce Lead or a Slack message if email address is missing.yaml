@@ -1,0 +1,130 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    '{{$Trigger.Email}}':
+                      '=': ''
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C4GHPM484
+                            - text:
+                                template: >-
+                                  Missing the email id for lead
+                                  #{{$Trigger.Id}}.   Have someone pull the lead
+                                  to follow-up with a phone call.
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage
+                        $ref: >-
+                          #/block/If/node-output/Slack Create
+                          message/response/payload
+                    mappings: []
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Create message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - Body:
+                              template: >-
+                                {{$Trigger.FirstName}} recently you expressed
+                                interest in our products.   If there is anything
+                                that our team can do to help you at
+                                {{$Trigger.Company}}, please feel free to
+                                contact our team at xxx-xxx-xxxx.
+                          - Subject:
+                              template: Regarding your registration
+                          - To:
+                              template: '{{$Trigger.Email}}'
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  input:
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: GmailCreatemessage
+                      $ref: >-
+                        #/block/If/node-output/Gmail Create
+                        message/response/payload
+                  mappings: []
+              output-schema: {}
+        tags:
+          - incomplete
+  name: >-
+    Send Gmail message for a new Salesforce Lead or a Slack message if email
+    address is missing
+  description: >-
+    Use this template to send your new Salesforce leads an email. If there is no
+    email ID included then send a Slack message to your team that someone needs
+    to call the lead.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Send%20Gmail%20message%20for%20a%20new%20Salesforce%20Lead%20or%20a%20Slack%20message%20if%20email%20address%20is%20missing_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Salesforce account](http://ibm.biz/ach2salesforce).
+
+    1. Connect to your [Slack account](http://ibm.biz/acslack) and choose the
+    channel that you want to post the message to.
+
+    1. Connect to your [Gmail account](http://ibm.biz/acgmail) and update the
+    email subject and body to meet your business needs.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}
