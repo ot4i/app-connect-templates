@@ -1,0 +1,151 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Task
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: Please test the bugs in 2-3 days.
+                  - idBoard:
+                      template: 60772d181ae4fb269ea32086
+                  - idList:
+                      template: 60772d181ae4fb269ea32087
+                  - idOrganization:
+                      template: 607681522be5e67e3d6a97c4
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: TrelloAddcardtolist
+                  $ref: '#/node-output/Trello Add card to list/response/payload'
+              branch:
+                - condition:
+                    '{{$Trigger.PRIORITY}}': '1'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C01UR7B8QF3
+                            - text:
+                                template: High priority bus
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TrelloAddcardtolist
+                              $ref: >-
+                                #/node-output/Trello Add card to
+                                list/response/payload
+                - condition:
+                    '{{$Trigger.PRIORITY}}': '2'
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C01U5R6Q4F8
+                            - text:
+                                template: Medium priority bugs
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TrelloAddcardtolist
+                              $ref: >-
+                                #/node-output/Trello Add card to
+                                list/response/payload
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Create message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - channel:
+                              template: C01U9GCQ285
+                          - text:
+                              template: 'general type bug '
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: TrelloAddcardtolist
+                            $ref: >-
+                              #/node-output/Trello Add card to
+                              list/response/payload
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: TrelloAddcardtolist
+                          $ref: >-
+                            #/node-output/Trello Add card to
+                            list/response/payload
+                      message: 'general bug '
+                      status-code: 200
+              output-schema: {}
+  name: Post slack messages based on bug priority
+models: {}
