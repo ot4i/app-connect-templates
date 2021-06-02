@@ -1,0 +1,241 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: 'YYYY-MM-DDTHH:mm:ss.SSSZZ'
+              timeZone: UTC
+              pollingInterval: 5
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: ticket
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: CaseComment
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: sys_journal_field
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve Account
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  Id: '{{$Trigger.AccountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1
+              allow-empty-output: false
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+          - create-action:
+              name: ServiceNow Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - company:
+                      template: '{{$SalesforceRetrieveAccount.Name}}'
+                  - description:
+                      template: '{{$Trigger.Description}}'
+                  - short_description:
+                      template: '{{$Trigger.Subject}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveAccount
+                    $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
+                  - variable: SalesforceRetrieveAccountMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Account/response'
+          - retrieve-action:
+              name: Salesforce Retrieve case comment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  ParentId: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveAccount
+                    $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
+                  - variable: SalesforceRetrieveAccountMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Account/response'
+                  - variable: ServiceNowCreateticket
+                    $ref: '#/node-output/ServiceNow Create ticket/response/payload'
+                limit: 1000
+              allow-empty-output: true
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ServiceNowCreateticket
+                  $ref: '#/node-output/ServiceNow Create ticket/response/payload'
+                - variable: SalesforceRetrievecasecomment
+                  $ref: >-
+                    #/node-output/Salesforce Retrieve case
+                    comment/response/payload
+                - variable: SalesforceRetrievecasecommentMetadata
+                  $ref: '#/node-output/Salesforce Retrieve case comment/response'
+              branch:
+                - condition:
+                    '{{$SalesforceRetrievecasecommentMetadata."status-code"}}':
+                      neq: '204'
+                  execute:
+                    - for-each:
+                        name: For each
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-2'
+                        source:
+                          expression: '$SalesforceRetrievecasecomment '
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowCreateticket
+                              $ref: >-
+                                #/node-output/ServiceNow Create
+                                ticket/response/payload
+                            - variable: SalesforceRetrievecasecomment
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve case
+                                comment/response/payload
+                            - variable: SalesforceRetrievecasecommentMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve case
+                                comment/response
+                        mode: sequential
+                        continue-on-error: true
+                        display-name: Salesforce Case Comment
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ServiceNowCreateticket
+                        $ref: >-
+                          #/node-output/ServiceNow Create
+                          ticket/response/payload
+                      - variable: SalesforceRetrievecasecomment
+                        $ref: >-
+                          #/node-output/Salesforce Retrieve case
+                          comment/response/payload
+                      - variable: SalesforceRetrievecasecommentMetadata
+                        $ref: >-
+                          #/node-output/Salesforce Retrieve case
+                          comment/response
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: ServiceNowCreateticket
+                          $ref: >-
+                            #/node-output/ServiceNow Create
+                            ticket/response/payload
+                        - variable: SalesforceRetrievecasecomment
+                          $ref: >-
+                            #/node-output/Salesforce Retrieve case
+                            comment/response/payload
+                        - variable: SalesforceRetrievecasecommentMetadata
+                          $ref: >-
+                            #/node-output/Salesforce Retrieve case
+                            comment/response
+                      message: No Case comments to process
+                      status-code: 200
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: ServiceNow Create comment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - CommentOwnerId:
+                      template: '{{$ServiceNowCreateticket.sys_id}}'
+                  - CommentOwnerType:
+                      template: ticket
+                  - value:
+                      template: '{{$Foreachitem.CommentBody}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ServiceNowCreateticket
+                    $ref: '#/node-output/ServiceNow Create ticket/response/payload'
+                  - variable: SalesforceRetrievecasecomment
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve case
+                      comment/response/payload
+                  - variable: SalesforceRetrievecasecommentMetadata
+                    $ref: '#/node-output/Salesforce Retrieve case comment/response'
+  name: Sync new Salesforce cases and comments with ServiceNow
+  description: >-
+    This template looks for new cases added in your Salesforce account and syncs
+    this by creating a new ticket in ServiceNow that includes the comments from
+    the original case.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Sync%20new%20Salesforce%20cases%20and%20comments%20with%20ServiceNow_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Salesforce
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+    This is a polling event trigger - this means App Connect looks for changes
+    in your events as per the timeframe selected in the "Check for new 'Case'
+    every (minutes)" box. You can choose to change this interval but please be
+    aware of your API limits.
+
+    1. Connect to your [ServiceNow
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-servicenow/).
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}

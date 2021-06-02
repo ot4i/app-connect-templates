@@ -1,0 +1,113 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: ClassifyText
+      connector-type: watsonnlclassifier
+      actions:
+        CLASSIFYTEXT: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM Watson Natural Language Classifier Classify text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CLASSIFYTEXT
+              map:
+                mappings:
+                  - classifier_id:
+                      template: 122656x456-nlc-2709
+                  - text:
+                      template: '{{$Trigger.Subject}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - channel:
+                      template: C6DU0RPK4
+                  - text:
+                      template: >-
+                        Case: {{$Trigger.CaseNumber}} received. Type:
+                        {{$uppercase($IBMWatsonNaturalLanguageClassifierClassifytext.top_class)}}.
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMWatsonNaturalLanguageClassifierClassifytext
+                    $ref: >-
+                      #/node-output/IBM Watson Natural Language Classifier
+                      Classify text/response/payload
+  name: Classifying Salesforce cases and posting a message in Slack
+  description: >-
+    Use this template to classify the text from a Salesforce case. Then, after
+    the text has been classified, automatically create a message in Slack
+    identifying the type of case that has been raised and the case number.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Classifying%20Salesforce%20cases%20and%20posting%20a%20message%20in%20Slack_instructions.md)
+    (opens in a new window).
+
+
+    ## Prerequisites
+
+
+    To classify text, you need to train the Watson Natural Language Classifier
+    with sample text and classifications. We have provided some sample data for
+    you to use. To access this data follow the instructions provided in Step 4
+    [here](https://developer.ibm.com/integration/docs/app-connect/tutorials-for-ibm-app-connect/create-event-driven-flow-classify-salesforce-customer-service-queries-post-message-slack/#travel_csv).
+
+
+    ## Using the template
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Click each node to review its configuration. If necessary:
+       - Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+       - Connect to your [Watson Natural Language Classifier account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-natural-language-classifier/).
+       - Connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/).
+    1. Validate all the mappings and ensure that they are correct.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+
+
+    ## Testing the template
+
+    1. Log in to your Salesforce account.
+
+    1. In the **Subject** field type `Lost Baggage`.
+
+    1. Fill in the rest of the form including all the mandatory fields, then
+    save the case.
+
+    1. You will receive a message instantly in Slack notifying you about the new
+    case.
+models: {}

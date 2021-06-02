@@ -1,0 +1,62 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: default
+      connector-type: marketo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: C4GHPM484
+                  - text:
+                      template: 'New lead {{$Trigger.id}} created in Marketo'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: Send me a Slack notification for every new Marketo lead
+  description: >-
+    Use this template to send a Slack notification to your chosen channel
+    whenever a new contact is added in Marketo.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Send%20me%20a%20Slack%20notification%20for%20every%20new%20Marketo%20lead_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Marketo
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-marketo/).
+
+    1. Connect to your [Slack
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/)
+    and choose the channel that you want to post the message to.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}

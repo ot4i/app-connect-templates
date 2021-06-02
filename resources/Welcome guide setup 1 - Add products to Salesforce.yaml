@@ -1,0 +1,547 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: Pricebook2
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-5:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: PricebookEntry
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Pricebook2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: PricebookEntry
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Sheets Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - spreadsheetID: 1qzLub0wU563u_HV-z3s2SJE1gi2IvhSMNeneHMKrAMY
+                    - worksheetID: Sheet1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 100
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - upsert-action:
+              name: Salesforce Update or create price book
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Description:
+                      template: Sunflower Festival prices
+                  - IsActive:
+                      expression: 'true'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+              filter:
+                where:
+                  Name: Sunflower Festival
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+          - retrieve-action:
+              name: Salesforce Retrieve price book
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  IsStandard: 'true'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - set-variable:
+              name: Set variable
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      StandardPriceBookID:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - StandardPriceBookID:
+                            template: '{{$SalesforceRetrievepricebook[0].Id}}'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleSheetsRetrieverows '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+              mode: sequential
+              continue-on-error: false
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateproduct
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response/payload
+                  - variable: SalesforceUpdateorcreateproductMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response
+                  - variable: SalesforceUpdateorcreatepricebookentry
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      price book entry/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookentryMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      price book entry/response
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                mappings: []
+              display-name: Google Sheets worksheetRow
+    assembly-2:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create product
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - Family:
+                      template: ' {{$Foreachitem.values[2]}}'
+                  - IsActive:
+                      expression: 'true'
+                  - ProductCode:
+                      template: ' {{$Foreachitem.values[1]}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+              filter:
+                where:
+                  Name: ' {{$Foreachitem.values[0]}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+          - upsert-action:
+              name: Salesforce Update or create price book entry 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              map:
+                mappings:
+                  - IsActive:
+                      expression: 'true'
+                  - UnitPrice:
+                      expression: '2.0'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateproduct
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response/payload
+                  - variable: SalesforceUpdateorcreateproductMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+              filter:
+                where:
+                  and:
+                    - Pricebook2Id: '{{$Setvariable.variable.StandardPriceBookID}}'
+                    - Product2Id: '{{$SalesforceUpdateorcreateproduct.Id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateproduct
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response/payload
+                  - variable: SalesforceUpdateorcreateproductMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+          - upsert-action:
+              name: Salesforce Update or create price book entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - IsActive:
+                      expression: 'true'
+                  - UnitPrice:
+                      expression: '1.0'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateproduct
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response/payload
+                  - variable: SalesforceUpdateorcreateproductMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response
+                  - variable: SalesforceUpdateorcreatepricebookentry2
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      price book entry 2/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookentry2Metadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      price book entry 2/response
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+              filter:
+                where:
+                  and:
+                    - Product2Id: '{{$SalesforceUpdateorcreateproduct.Id}}'
+                    - Pricebook2Id: '{{$SalesforceUpdateorcreatepricebook.Id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateproduct
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response/payload
+                  - variable: SalesforceUpdateorcreateproductMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      product/response
+                  - variable: SalesforceUpdateorcreatepricebookentry2
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      price book entry 2/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookentry2Metadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      price book entry 2/response
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: SalesforceUpdateorcreatepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response/payload
+                  - variable: SalesforceUpdateorcreatepricebookMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create price
+                      book/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+  name: Welcome guide setup 1 - Add products to Salesforce
+  description: >-
+    Use this flow in conjuction with the templates for 'Welcome guide part 3 -
+    Create a CSV file in Box of the products in Salesforce' and 'Welcome guide
+    part 4 - Flower order API' to set up Salesforce products.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20setup%201%20-%20Add%20products%20to%20Salesforce_instructions.md)
+    (opens in a new window).
+
+
+    This template sets up the products which are used with the following
+    templates:
+
+    * [Welcome guide part 3 - Create a CSV file in Box of the products in
+    Salesforce](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%203%20-%20Create%20a%20CSV%20file%20in%20Box%20of%20the%20products%20in%20Salesforce_instructions.md).
+
+    * [Welcome guide part 4 - Flower order
+    API](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md).
+
+
+    ## Prerequisites
+
+
+    In Google Sheets, create a sheet with the [products to add to
+    Salesforce](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/sample/sunflowerFestivalProductsSample.csv).
+    They'll need to include a Product Name, Product Code and Product Family.
+
+
+    ## Using the template
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Click the Google Sheets "Retrieve rows" action and connect to your
+    [Google Sheets account](http://ibm.biz/acgsheets).
+
+    1. In the Google Sheets "Retrieve rows" action, select the Spreadsheet and
+    Worksheet you want to use.
+
+    1. Click the Salesforce "Update or create price book" action and connect to
+    your [Salesforce account](http://ibm.biz/ach2salesforce).
+
+    1. Check that an account has been set for the other "Salesforce" actions.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+
+    1. Once the flow has run, in the banner open the options menu [&#8942;] then
+    click **Stop flow**, otherwise it will try to create the products again as
+    scheduled.
+
+
+    ## Clean up
+
+
+    If you need to delete the products you've created, you can use the 'Welcome
+    guide setup 3 - Delete flowers and order from Salesforce' template.
+
+
+    ## Related templates
+
+
+    Welcome guide setup 2 - Create Sunflower Festival order in Salesforce.
+
+
+    Welcome guide setup 3 - Delete flowers and order from Salesforce.
+models: {}

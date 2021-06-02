@@ -1,0 +1,227 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: servicenow
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.impact}}':
+                          '=': '1'
+                      - '{{$Trigger.urgency}}':
+                          '=': '1'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create Case
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Origin:
+                                template: Phone
+                            - Priority:
+                                template: High
+                            - Subject:
+                                template: '{{$Trigger.short_description}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                    - create-action:
+                        name: Gmail Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  {{$SalesforceCreateCase.Id}} - immediate
+                                  attention required 
+                            - Subject:
+                                template: 'High Importance : High Priority Case created'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceCreateCase
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Create
+                                Case/response/payload
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - ID:
+                          template: '{{$SalesforceCreateCase.Id}}'
+                - condition:
+                    and:
+                      - '{{$Trigger.impact}}':
+                          '=': '2'
+                      - '{{$Trigger.urgency}}':
+                          '=': '2'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create Case 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Origin:
+                                template: Phone
+                            - Priority:
+                                template: Medium
+                            - Subject:
+                                template: '{{$Trigger.short_description}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - ID:
+                          template: '{{$SalesforceCreateCase2.Id}}'
+              else:
+                execute:
+                  - create-action:
+                      name: Salesforce Create Case 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - Origin:
+                              template: Phone
+                          - Priority:
+                              template: Low
+                          - Subject:
+                              template: '{{$Trigger.short_description}}'
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                map:
+                  $map: 'http://ibm.com/appconnect/map/v1'
+                  input:
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                  mappings:
+                    - ID:
+                        template: '{{$SalesforceCreateCase3.Id}}'
+              output-schema:
+                required: []
+                properties:
+                  ID:
+                    type: string
+                    title: ID
+                type: object
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - channel:
+                      template: C5PM71J90
+                  - text:
+                      template: >-
+                        New Case {{$If.ID}} created with priority
+                        {{$Trigger.impact}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/node-output/If/response/payload'
+        tags:
+          - incomplete
+  name: >-
+    Create a case in Salesforce when a new incident is created in ServiceNow and
+    alert team
+  description: >-
+    This template creates a new case in Salesforce when a new incident is
+    created in ServiceNow. If this is an urgent incident, the flow then sends an
+    email via Gmail and a message on Slack to alert the team when a highly
+    urgent incident comes in to ServiceNow. This helps you to act quickly on
+    your urgent support incidents!
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20case%20in%20Salesforce%20when%20a%20new%20incident%20is%20created%20in%20ServiceNow%20and%20alert%20team_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [ServiceNow account](http://ibm.biz/acservicenow).
+
+    1. Connect to your [Salesforce account](http://ibm.biz/ach2salesforce) and
+    if required change the case origin field from phone to whatever is
+    applicable for your business.
+
+    1. Connect to your [Gmail account](http://ibm.biz/acgmail).
+
+    1. In the Gmail 'Create Message' node, choose the email address to use, and
+    update the email body to send the message that you want.
+
+    1. Click on the other Salesforce nodes to check the case origin field, and
+    change it if you want to use a different method.
+
+    1. Connect to your [Slack account](http://ibm.biz/acslack) and choose the
+    channel that you want to post the message to.   
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}

@@ -1,0 +1,71 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: default
+      connector-type: marketo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: card
+      connector-type: trello
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: New Lead
+                  - idBoard:
+                      template: 599c24e4e0450721439a5de1
+                  - idList:
+                      template: 599c24e4e0450721439a5de2
+                  - name:
+                      template: 'Lead{{$Trigger.id}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: Add a card to a list in Trello when a new lead is added in Marketo
+  description: >-
+    This template creates a new card in Trello when a new lead is created in
+    Marketo - make sure that you never forget to follow up with that lead again!
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Add%20a%20card%20to%20a%20list%20in%20Trello%20when%20a%20new%20lead%20is%20added%20in%20Marketo_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Marketo
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-marketo/).
+
+    1. Connect to your [Trello
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-trello/).
+
+    1. Select the Trello board and list that you want to add the card to.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+
+
+    Want to see the flow working? Create a new lead in Marketo, then go and
+    check Trello to see the new card.
+models: {}

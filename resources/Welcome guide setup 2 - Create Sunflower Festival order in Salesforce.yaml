@@ -1,0 +1,935 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Contract
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Order
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: Pricebook2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-7:
+      type: api-action
+      business-object: PricebookEntry
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-8:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-9:
+      type: api-action
+      business-object: PricebookEntry
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-10:
+      type: api-action
+      business-object: OrderItem
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create account
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                mappings: []
+              filter:
+                where:
+                  Name: Sunflower Festival
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - upsert-action:
+              name: Salesforce Update or create contract
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                mappings: []
+              filter:
+                where:
+                  AccountId: '{{$SalesforceUpdateorcreateaccount.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+          - retrieve-action:
+              name: Salesforce Retrieve price book
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              filter:
+                where:
+                  Name: Sunflower Festival
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - upsert-action:
+              name: Salesforce Update or create order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - AccountId:
+                      template: '{{$SalesforceUpdateorcreateaccount.Id}}'
+                  - EffectiveDate:
+                      template: '{{$Trigger.currentEventTime}}'
+                  - Pricebook2Id:
+                      template: '{{$SalesforceRetrievepricebook[0].Id}}'
+                  - Status:
+                      template: Draft
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+              filter:
+                where:
+                  Name: Sunflower Festival
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+          - retrieve-action:
+              name: Salesforce Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  Family: Seeds
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                limit: 100
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrieveproducts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+              mode: sequential
+              continue-on-error: false
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievepricebookentry
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve price
+                      book entry/response/payload
+                  - variable: SalesforceRetrievepricebookentryMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve price
+                      book entry/response
+                  - variable: SalesforceUpdateorcreateorderproduct
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      order product/response/payload
+                  - variable: SalesforceUpdateorcreateorderproductMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Update or create
+                      order product/response
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                mappings: []
+              display-name: Salesforce Product
+          - retrieve-action:
+              name: Salesforce Retrieve products 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              filter:
+                where:
+                  Family: Bulb
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                limit: 100
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: ' $SalesforceRetrieveproducts2'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: SalesforceRetrieveproducts2
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve products
+                      2/response/payload
+                  - variable: SalesforceRetrieveproducts2Metadata
+                    $ref: '#/node-output/Salesforce Retrieve products 2/response'
+              mode: sequential
+              continue-on-error: false
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievepricebookentry2
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Retrieve price
+                      book entry 2/response/payload
+                  - variable: SalesforceRetrievepricebookentry2Metadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Retrieve price
+                      book entry 2/response
+                  - variable: SalesforceUpdateorcreateorderproduct2
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Update or create
+                      order product 2/response/payload
+                  - variable: SalesforceUpdateorcreateorderproduct2Metadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Update or create
+                      order product 2/response
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: SalesforceRetrieveproducts2
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve products
+                      2/response/payload
+                  - variable: SalesforceRetrieveproducts2Metadata
+                    $ref: '#/node-output/Salesforce Retrieve products 2/response'
+                mappings: []
+              display-name: Salesforce Product
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve price book entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              filter:
+                where:
+                  and:
+                    - Pricebook2Id: '{{$SalesforceRetrievepricebook[0].Id}}'
+                    - Product2Id: '{{$Foreachitem.Id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - upsert-action:
+              name: Salesforce Update or create order product
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - Description:
+                      template: '{{$Foreachitem.Name}}'
+                  - OrderId:
+                      template: '{{$SalesforceUpdateorcreateorder.Id}}'
+                  - PricebookEntryId:
+                      template: '{{$SalesforceRetrievepricebookentry[0].Id}}'
+                  - Quantity:
+                      expression: '1.0'
+                  - UnitPrice:
+                      expression: '1'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievepricebookentry
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve price
+                      book entry/response/payload
+                  - variable: SalesforceRetrievepricebookentryMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve price
+                      book entry/response
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+              filter:
+                where:
+                  Product2Id: '{{$Foreachitem.Id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievepricebookentry
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve price
+                      book entry/response/payload
+                  - variable: SalesforceRetrievepricebookentryMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve price
+                      book entry/response
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+    assembly-3:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve price book entry 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-9'
+              filter:
+                where:
+                  and:
+                    - Pricebook2Id: '{{$SalesforceRetrievepricebook[0].Id}}'
+                    - Product2Id: '{{$Foreach2item.Id}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: SalesforceRetrieveproducts2
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve products
+                      2/response/payload
+                  - variable: SalesforceRetrieveproducts2Metadata
+                    $ref: '#/node-output/Salesforce Retrieve products 2/response'
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - upsert-action:
+              name: Salesforce Update or create order product 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-10'
+              map:
+                mappings:
+                  - Description:
+                      template: '{{$Foreach2item.Name}}'
+                  - OrderId:
+                      template: '{{$SalesforceUpdateorcreateorder.Id}}'
+                  - PricebookEntryId:
+                      template: '{{$SalesforceRetrievepricebookentry2[0].Id}}'
+                  - Quantity:
+                      expression: '1'
+                  - UnitPrice:
+                      expression: '1'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievepricebookentry2
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Retrieve price
+                      book entry 2/response/payload
+                  - variable: SalesforceRetrievepricebookentry2Metadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Retrieve price
+                      book entry 2/response
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: SalesforceRetrieveproducts2
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve products
+                      2/response/payload
+                  - variable: SalesforceRetrieveproducts2Metadata
+                    $ref: '#/node-output/Salesforce Retrieve products 2/response'
+              filter:
+                where:
+                  Product2Id: '{{$Foreach2item.Id}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievepricebookentry2
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Retrieve price
+                      book entry 2/response/payload
+                  - variable: SalesforceRetrievepricebookentry2Metadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Salesforce Retrieve price
+                      book entry 2/response
+                  - variable: SalesforceUpdateorcreateaccount
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      account/response/payload
+                  - variable: SalesforceUpdateorcreateaccountMetadata
+                    $ref: '#/node-output/Salesforce Update or create account/response'
+                  - variable: SalesforceUpdateorcreatecontract
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response/payload
+                  - variable: SalesforceUpdateorcreatecontractMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      contract/response
+                  - variable: SalesforceRetrievepricebook
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve price
+                      book/response/payload
+                  - variable: SalesforceRetrievepricebookMetadata
+                    $ref: '#/node-output/Salesforce Retrieve price book/response'
+                  - variable: SalesforceUpdateorcreateorder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      order/response/payload
+                  - variable: SalesforceUpdateorcreateorderMetadata
+                    $ref: '#/node-output/Salesforce Update or create order/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: SalesforceRetrieveproducts2
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve products
+                      2/response/payload
+                  - variable: SalesforceRetrieveproducts2Metadata
+                    $ref: '#/node-output/Salesforce Retrieve products 2/response'
+  name: Welcome guide setup 2 - Create Sunflower Festival order in Salesforce
+  description: >-
+    Use this template to create the Salesforce order needed for the 'Welcome
+    guide part 4 - Flower order API' template.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20setup%202%20-%20Create%20Sunflower%20Festival%20order%20in%20Salesforce_instructions.md)
+    (opens in a new window).
+
+
+    This template sets up the Salesforce order which is used with the template
+    [Welcome guide part 4 - Flower order
+    API](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md).
+
+
+    ## Prerequisites
+
+
+    To run this flow you'll need to create flower products in Salesforce. To do
+    this you can use the 'Welcome guide setup 1 - Add products to Salesforce'
+    template.
+
+
+    ## Using the template
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Click the Salesforce "Update or create account" action and connect to
+    your [Salesforce
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+
+    1. Check that an account has been set for the other "Salesforce" actions.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+
+    1. Once the flow has run, in the banner open the options menu [&#8942;] then
+    click **Stop flow**, otherwise it will try to create the order again as
+    scheduled.
+
+
+    ## Clean up
+
+
+    If you need to delete the order and products you've created, you can use the
+    'Welcome guide setup 3 - Delete flowers and order from Salesforce' template.
+
+
+    ## Related templates:
+
+
+    Welcome guide setup 1 - Add products to Salesforce.
+
+
+    Welcome guide setup 3 - Delete flowers and order from Salesforce.
+models: {}

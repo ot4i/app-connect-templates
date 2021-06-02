@@ -1,0 +1,280 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 1 * *
+                  runOnceOncheck: false
+                  timeZone: GMT
+                  every: month
+      connector-type: streaming-connector-scheduler
+    trigger-interface-2:
+      type: extract-trigger
+      triggers:
+        RETRIEVEALL:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+      connector-type: salesforce
+    trigger-interface-3:
+      type: batch-completion-trigger
+      triggers:
+        COMPLETE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-3'
+  action-interfaces:
+    action-interface-1:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
+        completion:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-3'
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - batch-retrieve-action:
+              name: Batch process
+              filter: {}
+              pagination-type: TOKEN
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+    assembly-2:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - City:
+                      template: '{{$Batchprocess.City}}'
+                  - Company:
+                      template: '{{$Batchprocess.Company}}'
+                  - Country:
+                      template: '{{$Batchprocess.Country}}'
+                  - Description:
+                      template: Description
+                  - Email:
+                      template: '{{$Batchprocess.Email}}'
+                  - FirstName:
+                      template: '{{$Batchprocess.FirstName}}'
+                  - LastName:
+                      template: '{{$Batchprocess.LastName}}'
+                  - Latitude:
+                      expression: '$Batchprocess.Latitude '
+                  - Longitude:
+                      expression: '$Batchprocess.Longitude '
+                  - Phone:
+                      template: '{{$Batchprocess.Phone}}'
+                  - PostalCode:
+                      template: '{{$Batchprocess.PostalCode}}'
+                  - State:
+                      template: '{{$Batchprocess.State}}'
+                  - Street:
+                      template: '{{$Batchprocess.Street}}'
+                  - Website:
+                      template: Website
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  Id: '{{$Batchprocess.Id}}'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+    assembly-3:
+      assembly:
+        execute:
+          - create-action:
+              name: Gmail Create email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Batch status: {{$BatchprocessOutput.status}}.
+
+                        Number of records processed:
+                        {{$BatchprocessOutput.recordsProcessed.total}} of which
+                        {{$BatchprocessOutput.recordsProcessed.success}} were
+                        successful,
+                        {{$BatchprocessOutput.recordsProcessed.error}} failed
+                        and {{$BatchprocessOutput.recordsProcessed.canceled}}
+                        were canceled.
+
+                        Batch End Time: {{$BatchprocessOutput.end}}
+
+                        Batch id for problem determination :
+                        {{$BatchprocessOutput.batchInstanceId}}
+                  - Subject:
+                      template: >-
+                        Results of batch started at
+                        {{$BatchprocessOutput.start}}
+                  - To:
+                      template: my@email.com
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BatchprocessOutput
+                    $ref: '#/node-output/Batch process/response/payload'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: BatchprocessOutput
+                  $ref: '#/node-output/Batch process/response/payload'
+                - variable: GoogleSheetsCreaterow2
+                  $ref: '#/node-output/Google Sheets Create row 2/response/payload'
+              branch:
+                - condition:
+                    Status: Timed Out
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C2V1VE04T
+                            - text:
+                                template: >-
+                                  Batch
+                                  {{$BatchprocessOutput.batchInstanceId}}timed
+                                  out at {{$BatchprocessOutput.end}}. so far
+                                  {{$BatchprocessOutput.recordsProcessed}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BatchprocessOutput
+                              $ref: '#/node-output/Batch process/response/payload'
+                            - variable: GoogleSheetsCreaterow2
+                              $ref: >-
+                                #/node-output/Google Sheets Create row
+                                2/response/payload
+                - condition:
+                    '{{$BatchprocessOutput.status}}': Retrieve Failed
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C2V1VE04T
+                            - text:
+                                template: >-
+                                  Batch retrieve failed
+                                  {{$BatchprocessOutput.batchInstanceId}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BatchprocessOutput
+                              $ref: '#/node-output/Batch process/response/payload'
+                            - variable: GoogleSheetsCreaterow2
+                              $ref: >-
+                                #/node-output/Google Sheets Create row
+                                2/response/payload
+                  completion-action:
+                    terminate:
+                      error:
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BatchprocessOutput
+                            $ref: '#/node-output/Batch process/response/payload'
+                          - variable: GoogleSheetsCreaterow2
+                            $ref: >-
+                              #/node-output/Google Sheets Create row
+                              2/response/payload
+                        message: >-
+                          Batch {{$BatchprocessOutput.batchInstanceId}} failed
+                          on retrieve
+                        status-code: 400
+              else:
+                execute: []
+              output-schema: {}
+  name: Sync Leads between accounts and record state
+  description: >-
+    This template schedules a monthly synchronisation (batch) between the Leads
+    of two Salesforce accounts. When it completes, a Gmail message is sent with
+    the results of the operation.  You can use this template to perform a check
+    on the status of a batch process.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Sync%20Salesforce%20Leads%20between%20accounts%20and%20check%20and%20record%20state_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your source [Salesforce
+    account](http://ibm.biz/ach2salesforce).
+
+    1. Connect to your target Salesforce account.
+
+    1. Connect to your [Gmail account](http://ibm.biz/acgmail).
+
+    1. Update the **To** field of the **Create mail** Gmail node with the
+    address to send the email to, and update the email **Subject** and **Body**
+    to meet your business needs. 
+
+    1. Connect to your [Slack account](http://ibm.biz/acslack) and select a
+    channel where you want batch level error messages to be sent.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}

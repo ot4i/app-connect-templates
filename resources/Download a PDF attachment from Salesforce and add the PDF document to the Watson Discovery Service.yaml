@@ -1,0 +1,114 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 18 * * *
+                  runOnceOncheck: false
+                  timeZone: GMT
+                  every: day
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Attachment
+      connector-type: salesforce
+      actions:
+        DOWNLOADCONTENT: {}
+    action-interface-2:
+      type: api-action
+      business-object: document
+      connector-type: watsondiscovery
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Salesforce Download attachment content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADCONTENT
+              map:
+                mappings:
+                  - Id:
+                      template: 00P0K000014tYNf
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: IBM Watson Discovery Add document
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - _source:
+                      template: appconect
+                  - _sourceid:
+                      template: appconect
+                  - collection_id:
+                      template: d9190e84-7c97-4bd5-9e23-d313d92a478e
+                  - content_type:
+                      template: base64encoded
+                  - environment_id:
+                      template: bdff44d9-ebd2-4831-bf7b-276ce6941c2b
+                  - file_name:
+                      template: SFWDSDemo.pdf
+                  - payload:
+                      template: '{{$SalesforceDownloadattachmentcontent.content}}'
+                  - version:
+                      template: '2017-09-01'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceDownloadattachmentcontent
+                    $ref: >-
+                      #/node-output/Salesforce Download attachment
+                      content/response/payload
+  name: >-
+    Download a PDF attachment from Salesforce and add the PDF document to the
+    Watson Discovery Service
+  description: >-
+    Use this template to download an attachment from Salesforce and add the same
+    document to the IBM Watson Discovery Service.
+  todo: >
+
+
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Download%20a%20PDF%20Attachment%20from%20Salesforce%20and%20Add%20the%20PDF%20Document%20To%20Watson%20Discovery%20Service_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your [Salesforce
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+
+    1. Update the **Attachment ID**.
+
+    1. Connect to your [Watson Discovery Service
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-watson-discovery/).
+
+    1. Update the mandatory fields and ensure that all the mappings are correct.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+
+
+    Want to see the flow working? The flow is started by a scheduler. Modify the
+    Schedule event to start the flow as per your need. 
+models: {}

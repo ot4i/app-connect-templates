@@ -1,0 +1,487 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: '6'
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+    trigger-interface-3:
+      type: extract-trigger
+      triggers:
+        RETRIEVEALL:
+          input-context:
+            data: transaction
+          assembly:
+            $ref: '#/integration/assemblies/assembly-4'
+      connector-type: yapily
+    trigger-interface-4:
+      type: extract-trigger
+      triggers:
+        RETRIEVEALL:
+          input-context:
+            data: user
+          assembly:
+            $ref: '#/integration/assemblies/assembly-5'
+          options:
+            log-context:
+              $map: 'http://ibm.com/appconnect/map/v1'
+              input:
+                - variable: Batchprocess3
+                  $ref: '#/block/Batch process 3/current-item'
+              mappings:
+                - batch-record-id:
+                    template: '{{$Batchprocess3.uuid}}'
+      connector-type: yapily
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: account
+      connector-type: yapily
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-3'
+    action-interface-9:
+      type: api-action
+      business-object: document
+      connector-type: cloudantdb
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: document
+      connector-type: cloudantdb
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: document
+      connector-type: cloudantdb
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-6:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-4'
+    action-interface-7:
+      type: api-action
+      business-object: consent
+      connector-type: yapily
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - batch-retrieve-action:
+              name: Batch process 3
+              filter:
+                limit: 10000
+              pagination-type: TOKEN
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+          - upsert-action:
+              name: IBM Cloudant Update or create document
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - data:
+                      mappings:
+                        - lastLoad:
+                            template: '{{$Trigger.currentEventTime}}'
+                  - db_name:
+                      template: load_template
+                customSchemas:
+                  properties.`data`:
+                    type: object
+                    properties:
+                      lastLoad:
+                        type: string
+                        format: date-time
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  and:
+                    - _id: '100'
+                    - db_name: load_template
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+    assembly-4:
+      assembly:
+        execute:
+          - create-action:
+              name: IBM Cloudant Create document 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-9'
+              map:
+                mappings:
+                  - data:
+                      mappings:
+                        - accountID:
+                            template: '{{$Foreachitem.id}}'
+                        - institutionID:
+                            template: '{{$Foreach2item.institutionId}}'
+                        - loadTime:
+                            template: '{{$Trigger.currentEventTime}}'
+                        - transaction:
+                            expression: '$Batchprocess2 '
+                        - userUUID:
+                            template: '{{$Batchprocess3.uuid}}'
+                  - db_name:
+                      template: transactions_template
+                customSchemas:
+                  properties.`data`:
+                    type: object
+                    properties:
+                      transaction:
+                        type: object
+                        properties: {}
+                      accountID:
+                        type: string
+                      userUUID:
+                        type: string
+                      loadTime:
+                        type: string
+                        format: date-time
+                      institutionID:
+                        type: string
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Batchprocess2
+                    $ref: '#/block/Batch process 2/current-item'
+                  - variable: Batchprocess3
+                    $ref: '#/block/Batch process 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMCloudantCreatedocument
+                    $ref: >-
+                      #/block/For each/node-output/IBM Cloudant Create
+                      document/response/payload
+                  - variable: YapilyRetrieveaccounts
+                    $ref: >-
+                      #/block/If 2/node-output/Yapily Retrieve
+                      accounts/response/payload
+                  - variable: YapilyRetrieveaccountsMetadata
+                    $ref: '#/block/If 2/node-output/Yapily Retrieve accounts/response'
+                  - variable: YapilyRetrieveconsents
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response/payload
+                  - variable: YapilyRetrieveconsentsMetadata
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response
+    assembly-5:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Yapily Retrieve consents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              filter:
+                where:
+                  userUuid: '{{$Batchprocess3.uuid}}'
+                input:
+                  - variable: Batchprocess3
+                    $ref: '#/block/Batch process 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1000
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-6'
+              source:
+                expression: '$YapilyRetrieveconsents '
+                input:
+                  - variable: Batchprocess3
+                    $ref: '#/block/Batch process 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: YapilyRetrieveconsents
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response/payload
+                  - variable: YapilyRetrieveconsentsMetadata
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response
+              mode: parallel
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Batchprocess3
+                    $ref: '#/block/Batch process 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: YapilyRetrieveconsents
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response/payload
+                  - variable: YapilyRetrieveconsentsMetadata
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response
+                mappings: []
+              display-name: Yapily consent
+    assembly-6:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Batchprocess3
+                  $ref: '#/block/Batch process 3/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: YapilyRetrieveconsents
+                  $ref: >-
+                    #/block/Batch process 3/node-output/Yapily Retrieve
+                    consents/response/payload
+                - variable: YapilyRetrieveconsentsMetadata
+                  $ref: >-
+                    #/block/Batch process 3/node-output/Yapily Retrieve
+                    consents/response
+              branch:
+                - condition:
+                    '{{$Foreach2item.status}}': AUTHORIZED
+                  execute:
+                    - retrieve-action:
+                        name: Yapily Retrieve accounts
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            consentToken: '{{$Foreach2item.consentToken}}'
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Batchprocess3
+                              $ref: '#/block/Batch process 3/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: YapilyRetrieveconsents
+                              $ref: >-
+                                #/block/Batch process 3/node-output/Yapily
+                                Retrieve consents/response/payload
+                            - variable: YapilyRetrieveconsentsMetadata
+                              $ref: >-
+                                #/block/Batch process 3/node-output/Yapily
+                                Retrieve consents/response
+                          limit: 1000
+                        allow-truncation: false
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+                    - for-each:
+                        name: For each
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-2'
+                        source:
+                          expression: '$YapilyRetrieveaccounts '
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Batchprocess3
+                              $ref: '#/block/Batch process 3/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: YapilyRetrieveaccounts
+                              $ref: >-
+                                #/block/If 2/node-output/Yapily Retrieve
+                                accounts/response/payload
+                            - variable: YapilyRetrieveaccountsMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Yapily Retrieve
+                                accounts/response
+                            - variable: YapilyRetrieveconsents
+                              $ref: >-
+                                #/block/Batch process 3/node-output/Yapily
+                                Retrieve consents/response/payload
+                            - variable: YapilyRetrieveconsentsMetadata
+                              $ref: >-
+                                #/block/Batch process 3/node-output/Yapily
+                                Retrieve consents/response
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: IBMCloudantUpdateorcreatedocument
+                              $ref: >-
+                                #/node-output/IBM Cloudant Update or create
+                                document/response/payload
+                            - variable: IBMCloudantUpdateorcreatedocumentMetadata
+                              $ref: >-
+                                #/node-output/IBM Cloudant Update or create
+                                document/response
+                          mappings: []
+                        display-name: Yapily account
+              else:
+                execute: []
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: IBM Cloudant Create document
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - data:
+                      mappings:
+                        - account:
+                            expression: '$Foreachitem '
+                        - institutionID:
+                            template: '{{$Foreach2item.institutionId}}'
+                        - loadTime:
+                            template: '{{$Trigger.currentEventTime}}'
+                        - userUUID:
+                            template: '{{$Batchprocess3.uuid}}'
+                  - db_name:
+                      template: accounts_template
+                customSchemas:
+                  properties.`data`:
+                    type: object
+                    properties:
+                      account:
+                        type: object
+                        properties: {}
+                      userUUID:
+                        type: string
+                      loadTime:
+                        type: string
+                        format: date-time
+                      institutionID:
+                        type: string
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Batchprocess3
+                    $ref: '#/block/Batch process 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: YapilyRetrieveaccounts
+                    $ref: >-
+                      #/block/If 2/node-output/Yapily Retrieve
+                      accounts/response/payload
+                  - variable: YapilyRetrieveaccountsMetadata
+                    $ref: '#/block/If 2/node-output/Yapily Retrieve accounts/response'
+                  - variable: YapilyRetrieveconsents
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response/payload
+                  - variable: YapilyRetrieveconsentsMetadata
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response
+          - batch-retrieve-action:
+              name: Batch process 2
+              filter:
+                where:
+                  and:
+                    - accountID: '{{$Foreachitem.id}}'
+                    - consentToken: '{{$Foreach2item.consentToken}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Batchprocess3
+                    $ref: '#/block/Batch process 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMCloudantCreatedocument
+                    $ref: >-
+                      #/block/For each/node-output/IBM Cloudant Create
+                      document/response/payload
+                  - variable: YapilyRetrieveaccounts
+                    $ref: >-
+                      #/block/If 2/node-output/Yapily Retrieve
+                      accounts/response/payload
+                  - variable: YapilyRetrieveaccountsMetadata
+                    $ref: '#/block/If 2/node-output/Yapily Retrieve accounts/response'
+                  - variable: YapilyRetrieveconsents
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response/payload
+                  - variable: YapilyRetrieveconsentsMetadata
+                    $ref: >-
+                      #/block/Batch process 3/node-output/Yapily Retrieve
+                      consents/response
+              pagination-type: TOKEN
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+  name: Open Banking - Account information data load
+  description: >-
+    This flow aggregates the account information of users with active consents
+    set up in Yapily and stores it in IBM Cloudant
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Open%20Banking%20-%20Account%20information%20data%20load_instructions.md)
+    (opens in a new window).
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Connect to your Yapily account.
+
+    1. For each IBM Cloudant action, connect to your [IBM Cloudant
+    account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-ibm-cloudant/)
+    and select the database for the document to be created or updated.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+models: {}
