@@ -682,6 +682,16 @@
       "targetApps": ["dropbox", "ibmcoss3"],
       "tags": ["scheduler", "dropbox", "ibmcoss3", "foreach", "if"],
       "offerings": ["app connect professional"]
-    }    
+    },  
+     {
+      "name": "Post slack messages based on bug priority",
+      "description": "This template posts slack messages based on bug priority.",
+      "summary": "Insightly to 2 applications",
+      "sourceApp": "insightly",
+      "targetApps": ["trello", "slack"],
+      "tags": ["insightly", "trello", "slack", "foreach", "if"],
+      "offerings": ["app connect professional"]
+    }  
+
   ]
 }
