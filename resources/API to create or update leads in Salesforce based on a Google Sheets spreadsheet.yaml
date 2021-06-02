@@ -1,0 +1,264 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createLeads:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: leads
+          output-context:
+            data: leads
+      options:
+        resources:
+          - business-object: leads
+            model:
+              $ref: '#/models/leads'
+            triggers:
+              create: createLeads
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Sheets Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - spreadsheetID: 1Gt2dNNe4D-zXL8kIjpS8U7J6SiqfmLfrlKqxFm7jrmo
+                    - worksheetID: Sheet1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 25
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: >-
+                  $GoogleSheetsRetrieverows[[1..$count($GoogleSheetsRetrieverows)-1]]
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+              mode: parallel
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                mappings: []
+              display-name: Google Sheets worksheet row
+          - response:
+              name: response-1
+              reply-maps:
+                - title: leads successfully created
+                  status-code: '201'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: GoogleSheetsRetrieverows
+                        $ref: >-
+                          #/node-output/Google Sheets Retrieve
+                          rows/response/payload
+                      - variable: GoogleSheetsRetrieverowsMetadata
+                        $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                      - variable: Setvariable
+                        $ref: '#/node-output/Set variable/response/payload'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings:
+                      - event_name:
+                          template: '{{$Request.event_name}}'
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: GoogleSheetsRetrieverows
+                      $ref: >-
+                        #/node-output/Google Sheets Retrieve
+                        rows/response/payload
+                    - variable: GoogleSheetsRetrieverowsMetadata
+                      $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                    - variable: Setvariable
+                      $ref: '#/node-output/Set variable/response/payload'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+                - variable: GoogleSheetsRetrieverows
+                  $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                - variable: GoogleSheetsRetrieverowsMetadata
+                  $ref: '#/node-output/Google Sheets Retrieve rows/response'
+              branch:
+                - condition:
+                    '{{$Foreachitem.values[4]}}': '{{$Request.event_name}}'
+                  execute:
+                    - upsert-action:
+                        name: Salesforce Update or create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Company:
+                                template: '{{$Foreachitem.values[3]}}'
+                            - FirstName:
+                                template: '{{$Foreachitem.values[0]}}'
+                            - LastName:
+                                template: '{{$Foreachitem.values[1]}}'
+                            - LeadSource:
+                                template: 'From event: "{{$Foreachitem.values[4]}}"'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleSheetsRetrieverows
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response/payload
+                            - variable: GoogleSheetsRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response
+                        filter:
+                          where:
+                            Email: '{{$Foreachitem.values[2]}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleSheetsRetrieverows
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response/payload
+                            - variable: GoogleSheetsRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    API to create or update leads in Salesforce based on a Google Sheets
+    spreadsheet
+  description: >-
+    This template creates an API to create or update leads in Salesforce for a
+    specific event based on data collected in a Google Sheets spreadsheet.
+  todo: >
+    To refer to these instructions while editing the flow, open [the github
+    page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/API%20to%20create%20or%20update%20leads%20in%20Salesforce%20based%20on%20a%20Google%20Sheets%20spreadsheet_instructions.md)
+    (opens in a new window).
+
+
+    This API takes an event name and uses that name to compare against data in a
+    Google Sheets spreadsheet. Any leads found in the spreadsheet for the event
+    name specified in the call will be either added to, or updated in Salesforce
+    depending on whether or not a lead with the same email address already
+    exists in Salesforce. The flow does not change the original spreadsheet.
+
+
+    Before you use this flow, you must have a Google Sheets spreadsheet with the
+    following columns, in this order:
+
+    * **First Name** 
+
+    * **Last Name**
+
+    * **Email Address** (This will be used to work out if this user already
+    exists in Salesforce, or not.)
+
+    * **Company**
+
+    * **Event** (When you call the API, this is the column that will be used to
+    check if the event name matches the one you've specified.)
+
+
+    Any other columns after the first five specified here will be ignored by
+    this flow.
+
+
+    ## Using the template
+
+
+    1. Click **Create flow** to start using the template.
+
+    1. Click **Operations**, then **Edit flow** for the _Create leads_
+    operation.
+
+    1. Click the **Google Sheets** node, and if you're not already connected,
+    connect to your [Google Sheets account](http://ibm.biz/acgsheets).
+
+    1. Select the Google Sheets spreadsheet and worksheet to use for this flow.
+    Also, if desired, alter the number of rows processed. This default used in
+    this flow is 25.
+
+    1. Click on the **Salesforce node**, and if you're not already connected,
+    connect to your [Salesforce account](http://ibm.biz/ach2salesforce).
+
+    1. Click **Done**.
+
+    1. To start the flow, in the banner open the options menu [&#8942;] then
+    click **Start flow**.
+
+
+    Want to see if working? Click **Manage** in the API flow, then follow the
+    instructions on getting started. Once you're in the API portal, use the Try
+    it link and then **Generate** some test data. Replace the value for
+    `event_name` with the event name you want to match in your spreadsheet, and
+    click **Call operation**.
+models:
+  leads:
+    name: leads
+    properties:
+      event_name:
+        required: false
+        id: true
+        type: string
+    plural: leads
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
