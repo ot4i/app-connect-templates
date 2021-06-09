@@ -37,5 +37,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Create an Asana task for every new Insigthly task
+  name: Create an Asana task for every new Insightly task
 models: {}
