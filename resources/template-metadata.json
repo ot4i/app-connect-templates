@@ -315,9 +315,9 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Create an Asana task for every new Insigthly task",
+ "name": "Create an Asana task for every new Insightly task",
  "description": "Use this template to create task in Asana when a new task added in Insightly.",
- "summary": "Insigthly to Asana",
+ "summary": "Insightly to Asana",
  "sourceApp": "insightly",
  "targetApps": ["asana"],
  "tags": ["asana", "insightly", "business", "notification", "task", "crm"],
