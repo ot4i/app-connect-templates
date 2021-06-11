@@ -85,7 +85,7 @@ integration:
                             - Body:
                                 template: >-
                                   {{$SalesforceCreateCase.Id}} - immediate
-                                  attention required
+                                  attention required 
                             - Subject:
                                 template: 'High Importance : High Priority Case created'
                           $map: 'http://ibm.com/appconnect/map/v1'

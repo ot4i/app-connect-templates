@@ -31,7 +31,7 @@ integration:
                 mappings:
                   - desc:
                       template: >-
-                        The campaign will begin on {{$Trigger.StartDate}}.
+                        The campaign will begin on {{$Trigger.StartDate}}. 
                         Ensure that budgetd cost of {{$Trigger.BudgetedCost}} is
                         understood by accounting.
                   - idBoard:

@@ -33,7 +33,7 @@ integration:
                       template: C85J6USLC
                   - text:
                       template: >-
-                        Message received from {{$Trigger.From}} with subject
+                        Message received from {{$Trigger.From}} with subject 
                         {{$Trigger.Subject}} and content {{$Trigger.Body}}
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
