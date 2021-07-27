@@ -682,6 +682,15 @@
       "targetApps": ["dropbox", "ibmcoss3"],
       "tags": ["scheduler", "dropbox", "ibmcoss3", "foreach", "if"],
       "offerings": ["app connect professional"]
-    }    
+    },
+    {
+      "name": "Orders ingestion to IBM Supply Chain Intelligence Suite from Microsoft Dynamics 365",
+      "description": "Use this template to retrieve multiple global identifiers of an order from Microsoft Dynamics 365 CRM system and ingest these global identifiers as name-value pairs to the IBM Supply Chain Intelligence Suite.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["msdynamicfs", "ibmsterlingsci", "slack"],
+      "tags": ["scheduler", "msdynamics365forsales", "ibmsterlingsci", "forEach", "setVariable", "log", "slack"],
+      "offerings": ["app connect professional"]
+    }                
   ]
 }
