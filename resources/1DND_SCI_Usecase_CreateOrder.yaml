@@ -1,0 +1,392 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+      account-name: Account 3
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: SalesOrder
+      connector-type: msdynamicscrmrest
+      account-name: Account 2
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Order
+      connector-type: ibmsterlingsci
+      account-name: Account 2
+      actions:
+        CUSTOMUPSERT: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Dynamics 365 for Sales Retrieve orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 5
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftDynamics365forSalesRetrieveorders '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: Foreach2
+                    $ref: '#/block/For each/node-output/For each 2/response/payload'
+                  - variable: IBMSupplyChainIntelligenceSuitePutorder2
+                    $ref: >-
+                      #/block/For each/node-output/IBM Supply Chain Intelligence
+                      Suite Put order 2/response/payload
+                  - variable: SlackCreatemessage
+                    $ref: >-
+                      #/block/For each/node-output/Slack Create
+                      message/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      Name:
+                        type: string
+                      Value:
+                        type: string
+                      CreatedDate:
+                        type: string
+                mappings:
+                  - output:
+                      mappings:
+                        - CreatedDate:
+                            template: '{{$Foreachitem.createdon}}'
+                        - Name:
+                            template: '{{$Foreachitem.salesorderid}}'
+                        - Value:
+                            template: '{{$Foreachitem.ordernumber}}'
+              display-name: Order
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      OrderID:
+                        type: string
+                      OrderName:
+                        type: string
+                      CreatedDate:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - CreatedDate:
+                            template: CreatedDate:{{$Foreachitem.createdon}}
+                        - OrderID:
+                            template: OrderID:{{$Foreachitem.ordernumber}}
+                        - OrderName:
+                            template: OrderName:{{$Foreachitem.salesorderid}}
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      CRMIdentifiers:
+                        type: array
+                        items:
+                          type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - CRMIdentifiers:
+                            expression: >-
+                              [ $Setvariable2.variable.OrderID  ,
+                              $Setvariable2.variable.OrderName  ,
+                              $Setvariable2.variable.CreatedDate    ]
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$Setvariable.variable.CRMIdentifiers '
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      value:
+                        type: string
+                mappings:
+                  - output:
+                      mappings:
+                        - name:
+                            template: '{{$substringBefore($Foreach2item , ":")}}  '
+                        - value:
+                            template: '{{$substringAfter($Foreach2item , ":")}}'
+              display-name: string_arr
+          - custom-action:
+              name: IBM Supply Chain Intelligence Suite Put order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CUSTOMUPSERT
+              map:
+                mappings:
+                  - upsert__globalIdentifiers:
+                      foreach:
+                        input: '$Foreach2 '
+                        iterator: upsert__globalIdentifiersItem
+                        mappings:
+                          - name:
+                              template: '{{$upsert__globalIdentifiersItem.output.name}}'
+                          - value:
+                              template: '{{$upsert__globalIdentifiersItem.output.value}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: Foreach2
+                    $ref: '#/block/For each/node-output/For each 2/response/payload'
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - channel:
+                      template: C0289F82N80
+                  - text:
+                      template: >-
+                        SCI_Order_UC:
+                        {{$IBMSupplyChainIntelligenceSuitePutorder2}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: Foreach2
+                    $ref: '#/block/For each/node-output/For each 2/response/payload'
+                  - variable: IBMSupplyChainIntelligenceSuitePutorder
+                    $ref: >-
+                      #/block/For each/node-output/IBM Supply Chain Intelligence
+                      Suite Put order/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+    assembly-3:
+      assembly:
+        execute:
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftDynamics365forSalesRetrieveorders
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response/payload
+                  - variable: MicrosoftDynamics365forSalesRetrieveordersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Sales Retrieve
+                      orders/response
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: '{{$Setvariable}}'
+  name: 1DND_SCI_Usecase_CreateOrder
+models: {}
