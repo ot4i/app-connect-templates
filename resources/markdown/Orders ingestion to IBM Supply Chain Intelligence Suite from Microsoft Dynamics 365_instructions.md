@@ -7,7 +7,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Slack**
 3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
-Want to see the flow working? The flow is started by a scheduler. Modify the Schedule flow event to start the flow as per your need.
+Want to see the flow working? The flow is started by a scheduler. Modify the Schedule flow event to start the flow when you need.
 
 This scenario helps a user to retrieve multiple global identifiers of an order from a Microsoft Dynamics 365 CRM system and ingest these global identifiers as name-value pairs to the IBM Supply Chain Intelligence Suite.
 
