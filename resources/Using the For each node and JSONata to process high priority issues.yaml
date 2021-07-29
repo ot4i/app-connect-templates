@@ -15,14 +15,14 @@ integration:
             subscription:
               scheduleConfiguration:
                 interval:
-                  unit: minute
+                  unit: hour
                   value: 1
                   runOnceOncheck: true
   action-interfaces:
     action-interface-1:
       type: api-action
-      business-object: incidents
-      connector-type: atlassianjira
+      business-object: IssueCollection
+      connector-type: jira
       actions:
         RETRIEVEALL: {}
   assemblies:
@@ -30,11 +30,11 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Atlassian JIRA Service Desk Retrieve issues
+              name: Jira Retrieve all issues
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
-                limit: 1000
+                limit: 10
               allow-truncation: true
               pagination-type: TOKEN
               allow-empty-output: false
@@ -44,19 +44,19 @@ integration:
                 $ref: '#/integration/assemblies/assembly-2'
               source:
                 expression: >-
-                  $filter($AtlassianJIRAServiceDeskRetrieveissues,function($v,
-                  $i, $a){$contains($v.fields.priority.name, "High")})
+                  $filter($JiraRetrieveallissues,function($v, $i,
+                  $a){$contains($v.fields.priority.name, "High")})
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: AtlassianJIRAServiceDeskRetrieveissues
-                    $ref: >-
-                      #/node-output/Atlassian JIRA Service Desk Retrieve
-                      issues/response/payload
-                  - variable: AtlassianJIRAServiceDeskRetrieveissuesMetadata
-                    $ref: >-
-                      #/node-output/Atlassian JIRA Service Desk Retrieve
-                      issues/response
+                  - variable: JiraRetrieveallissues
+                    $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                  - variable: JiraRetrieveallissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve all issues/response'
+                  - variable: JiraRetrieveissues
+                    $ref: '#/node-output/Jira Retrieve issues/response/payload'
+                  - variable: JiraRetrieveissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve issues/response'
               mode: sequential
               continue-on-error: true
               map:
@@ -66,16 +66,16 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: AtlassianJIRAServiceDeskRetrieveissues
-                    $ref: >-
-                      #/node-output/Atlassian JIRA Service Desk Retrieve
-                      issues/response/payload
-                  - variable: AtlassianJIRAServiceDeskRetrieveissuesMetadata
-                    $ref: >-
-                      #/node-output/Atlassian JIRA Service Desk Retrieve
-                      issues/response
+                  - variable: JiraRetrieveallissues
+                    $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                  - variable: JiraRetrieveallissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve all issues/response'
+                  - variable: JiraRetrieveissues
+                    $ref: '#/node-output/Jira Retrieve issues/response/payload'
+                  - variable: JiraRetrieveissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve issues/response'
                 mappings: []
-              display-name: Atlassian JIRA Service Desk Issue (Priority='High' or 'Highest')
+              display-name: Atlassian JIRA Service Desk Issue - Priority is High or Highest
     assembly-2:
       assembly:
         execute:
@@ -88,14 +88,10 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: AtlassianJIRAServiceDeskRetrieveissues
-                    $ref: >-
-                      #/node-output/Atlassian JIRA Service Desk Retrieve
-                      issues/response/payload
-                  - variable: AtlassianJIRAServiceDeskRetrieveissuesMetadata
-                    $ref: >-
-                      #/node-output/Atlassian JIRA Service Desk Retrieve
-                      issues/response
+                  - variable: JiraRetrieveallissues
+                    $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                  - variable: JiraRetrieveallissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve all issues/response'
                 mappings:
                   - logLevel:
                       template: Info

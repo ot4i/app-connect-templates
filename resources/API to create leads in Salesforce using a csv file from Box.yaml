@@ -26,48 +26,47 @@ integration:
       connector-type: salesforce
       actions:
         UPSERTWITHWHERE: {}
-    action-interface-1:
-      type: api-action
-      business-object: File
-      connector-type: box
-      actions:
-        RETRIEVEALL: {}
     action-interface-3:
       type: api-action
       business-object: Lead
       connector-type: salesforce
       actions:
         UPSERTWITHWHERE: {}
+    action-interface-4:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        DOWNLOADFILE: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
-          - retrieve-action:
-              name: Box Retrieve file
+          - custom-action:
+              name: Box Retrieve file content
               target:
-                $ref: '#/integration/action-interfaces/action-interface-1'
-              filter:
-                where:
-                  id: '{{$split($Request.file_url, "/")[-1]}}'
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - fileType:
+                      template: Text
+                  - id:
+                      template: '{{$split($Request.file_url, "/")[-1]}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Request
                     $ref: '#/trigger/payload'
-                limit: 1
-              allow-truncation: false
-              pagination-type: SKIP_LIMIT
-              allow-empty-output: false
           - parse:
               name: CSV Parser Parse
               parse-format: csv
               source:
-                template: ' {{$BoxRetrievefile.content}}'
+                template: '{{$BoxRetrievefilecontent.content}}'
                 input:
                   - variable: Request
                     $ref: '#/trigger/payload'
-                  - variable: BoxRetrievefile
-                    $ref: '#/node-output/Box Retrieve file/response/payload'
-                  - variable: BoxRetrievefileMetadata
-                    $ref: '#/node-output/Box Retrieve file/response'
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
               sample-data: 'First Name,Last Name,Email,Company,Event'
               output-schema:
                 type: array
@@ -174,10 +173,8 @@ integration:
                   $ref: '#/block/For each/current-item'
                 - variable: Request
                   $ref: '#/trigger/payload'
-                - variable: BoxRetrievefile
-                  $ref: '#/node-output/Box Retrieve file/response/payload'
-                - variable: BoxRetrievefileMetadata
-                  $ref: '#/node-output/Box Retrieve file/response'
+                - variable: BoxRetrievefilecontent
+                  $ref: '#/node-output/Box Retrieve file content/response/payload'
                 - variable: CSVParserParse
                   $ref: '#/node-output/CSV Parser Parse/response/payload'
               branch:
@@ -211,26 +208,22 @@ integration:
                                     mappings:
                                       - Company:
                                           template: '{{$Foreachitem.Company}}'
-                                      - Email:
-                                          template: '{{$Foreachitem.Email}}'
                                       - FirstName:
                                           template: '{{$Foreachitem."First Name"}}'
                                       - LastName:
                                           template: '{{$Foreachitem."Last Name"}}'
                                       - LeadSource:
-                                          template: 'From event: "{{$Foreachitem.Event}}"'
+                                          template: 'From event: {{$Foreachitem.Event}}'
                                     $map: 'http://ibm.com/appconnect/map/v1'
                                     input:
                                       - variable: Foreachitem
                                         $ref: '#/block/For each/current-item'
                                       - variable: Request
                                         $ref: '#/trigger/payload'
-                                      - variable: BoxRetrievefile
+                                      - variable: BoxRetrievefilecontent
                                         $ref: >-
-                                          #/node-output/Box Retrieve
-                                          file/response/payload
-                                      - variable: BoxRetrievefileMetadata
-                                        $ref: '#/node-output/Box Retrieve file/response'
+                                          #/node-output/Box Retrieve file
+                                          content/response/payload
                                       - variable: CSVParserParse
                                         $ref: >-
                                           #/node-output/CSV Parser
@@ -243,12 +236,10 @@ integration:
                                         $ref: '#/block/For each/current-item'
                                       - variable: Request
                                         $ref: '#/trigger/payload'
-                                      - variable: BoxRetrievefile
+                                      - variable: BoxRetrievefilecontent
                                         $ref: >-
-                                          #/node-output/Box Retrieve
-                                          file/response/payload
-                                      - variable: BoxRetrievefileMetadata
-                                        $ref: '#/node-output/Box Retrieve file/response'
+                                          #/node-output/Box Retrieve file
+                                          content/response/payload
                                       - variable: CSVParserParse
                                         $ref: >-
                                           #/node-output/CSV Parser
@@ -266,8 +257,6 @@ integration:
                         mappings:
                           - Company:
                               template: '{{$Foreachitem.Company}}'
-                          - Email:
-                              template: '{{$Foreachitem.Email}}'
                           - FirstName:
                               template: '{{$Foreachitem."First Name"}}'
                           - LastName:
@@ -280,10 +269,10 @@ integration:
                             $ref: '#/block/For each/current-item'
                           - variable: Request
                             $ref: '#/trigger/payload'
-                          - variable: BoxRetrievefile
-                            $ref: '#/node-output/Box Retrieve file/response/payload'
-                          - variable: BoxRetrievefileMetadata
-                            $ref: '#/node-output/Box Retrieve file/response'
+                          - variable: BoxRetrievefilecontent
+                            $ref: >-
+                              #/node-output/Box Retrieve file
+                              content/response/payload
                           - variable: CSVParserParse
                             $ref: '#/node-output/CSV Parser Parse/response/payload'
                       filter:
@@ -294,10 +283,10 @@ integration:
                             $ref: '#/block/For each/current-item'
                           - variable: Request
                             $ref: '#/trigger/payload'
-                          - variable: BoxRetrievefile
-                            $ref: '#/node-output/Box Retrieve file/response/payload'
-                          - variable: BoxRetrievefileMetadata
-                            $ref: '#/node-output/Box Retrieve file/response'
+                          - variable: BoxRetrievefilecontent
+                            $ref: >-
+                              #/node-output/Box Retrieve file
+                              content/response/payload
                           - variable: CSVParserParse
                             $ref: '#/node-output/CSV Parser Parse/response/payload'
               output-schema: {}

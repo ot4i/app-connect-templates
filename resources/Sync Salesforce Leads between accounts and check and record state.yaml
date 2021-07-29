@@ -140,35 +140,35 @@ integration:
                 mappings:
                   - Body:
                       template: >-
-                        Batch status: {{$Batchprocess.status}}.
+                        Batch status: {{$BatchprocessOutput.status}}.
 
                         Number of records processed:
-                        {{$Batchprocess.recordsProcessed.total}} of which
-                        {{$Batchprocess.recordsProcessed.success}} were
-                        successful, {{$Batchprocess.recordsProcessed.error}}
-                        failed and {{$Batchprocess.recordsProcessed.canceled}}
+                        {{$BatchprocessOutput.recordsProcessed.total}} of which
+                        {{$BatchprocessOutput.recordsProcessed.success}} were
+                        successful, {{$BatchprocessOutput.recordsProcessed.error}}
+                        failed and {{$BatchprocessOutput.recordsProcessed.canceled}}
                         were canceled.
 
-                        Batch End Time: {{$Batchprocess.end}} 
+                        Batch End Time: {{$BatchprocessOutput.end}}
 
                         Batch id for problem determination :
-                        {{$Batchprocess.batchInstanceId}}
+                        {{$BatchprocessOutput.batchInstanceId}}
                   - Subject:
-                      template: 'Results of batch started at {{$Batchprocess.start}}'
+                      template: 'Results of batch started at {{$BatchprocessOutput.start}}'
                   - To:
                       template: my@email.com
                 $map: 'http://ibm.com/appconnect/map/v1'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: Batchprocess
+                  - variable: BatchprocessOutput
                     $ref: '#/node-output/Batch process/response/payload'
           - if:
               name: If
               input:
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: Batchprocess
+                - variable: BatchprocessOutput
                   $ref: '#/node-output/Batch process/response/payload'
                 - variable: GoogleSheetsCreaterow2
                   $ref: '#/node-output/Google Sheets Create row 2/response/payload'
@@ -186,21 +186,21 @@ integration:
                                 template: C2V1VE04T
                             - text:
                                 template: >-
-                                  Batch {{$Batchprocess.batchInstanceId}}timed
-                                  out at {{$Batchprocess.end}}. so far
-                                  {{$Batchprocess.recordsProcessed}}
+                                  Batch {{$BatchprocessOutput.batchInstanceId}}timed
+                                  out at {{$BatchprocessOutput.end}}. so far
+                                  {{$BatchprocessOutput.recordsProcessed}}
                           $map: 'http://ibm.com/appconnect/map/v1'
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: Batchprocess
+                            - variable: BatchprocessOutput
                               $ref: '#/node-output/Batch process/response/payload'
                             - variable: GoogleSheetsCreaterow2
                               $ref: >-
                                 #/node-output/Google Sheets Create row
                                 2/response/payload
                 - condition:
-                    '{{$Batchprocess.status}}': Retrieve Failed
+                    '{{$BatchprocessOutput.status}}': Retrieve Failed
                   execute:
                     - create-action:
                         name: Slack Create message 2
@@ -213,12 +213,12 @@ integration:
                             - text:
                                 template: >-
                                   Batch retrieve failed
-                                  {{$Batchprocess.batchInstanceId}}
+                                  {{$BatchprocessOutput.batchInstanceId}}
                           $map: 'http://ibm.com/appconnect/map/v1'
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: Batchprocess
+                            - variable: BatchprocessOutput
                               $ref: '#/node-output/Batch process/response/payload'
                             - variable: GoogleSheetsCreaterow2
                               $ref: >-
@@ -230,14 +230,14 @@ integration:
                         input:
                           - variable: Trigger
                             $ref: '#/trigger/payload'
-                          - variable: Batchprocess
+                          - variable: BatchprocessOutput
                             $ref: '#/node-output/Batch process/response/payload'
                           - variable: GoogleSheetsCreaterow2
                             $ref: >-
                               #/node-output/Google Sheets Create row
                               2/response/payload
                         message: >-
-                          Batch {{$Batchprocess.batchInstanceId}} failed on
+                          Batch {{$BatchprocessOutput.batchInstanceId}} failed on
                           retrieve
                         status-code: 400
               else:

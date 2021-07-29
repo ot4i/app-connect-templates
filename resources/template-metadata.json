@@ -32,7 +32,7 @@
     "summary": "Slack to 2 applications",
     "sourceApp": "slack",
     "targetApps": ["watsonlt", "slack"],
-    "tags": ["slack", "watsonlt", "translate", "translation", "french", "english", "chat", "language"],
+    "tags": ["slack", "Watson Language Translator", "translate", "translation", "french", "english", "chat", "language"],
     "offerings": ["app connect professional"]
   },
   {
@@ -628,6 +628,69 @@
       "targetApps": ["salesforce"],
       "tags": ["salesforce", "scheduler"],
       "offerings": ["app connect professional"]
-    }             
+    },
+    {
+      "name": "Add a Mailchimp subscriber from a Slack slash command",
+      "description": "Use this template to add a new member as a subscriber of a Mailchimp list from a Slack slash command.",
+      "summary": "Slack to Mailchimp",
+      "sourceApp": "slack",
+      "targetApps": ["mailchimp"],
+      "tags": ["slack", "mailchimp"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Use Slack to notify of unprocessed Kronos leave requests",
+      "description": "This template contains a flow to notify you when leave requests in Kronos require attention. A scheduler runs the flow every Monday morning to retrieve leave records from Kronos then notify you on Slack if any requests have a status of 'pending'.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["kronos", "slack"],
+      "tags": ["scheduler", "kronos", "for each", "if", "slack"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Open Banking - Account information data load",
+      "description": "This flow aggregates the account information of users with active consents set up in Yapily and stores it in IBM Cloudant",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["yapily", "cloudantdb"],
+      "tags": ["scheduler", "yapily", "for each", "if", "cloudantdb"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Create a SugarCRM lead and send email for a new Eventbrite attendee",
+      "description": "This template detects when a new attendee registers for an Eventbrite event, and for the attendee creates a SugarCRM lead and sends an email. The flow illustrates the use of SugarCRM retrieve and create actions, and the use of an If node to take alternative actions depending on the response from the SugarCRM retrieve action.",
+      "summary": "Eventbrite to 2 applications",
+      "sourceApp": "eventbrite",
+      "targetApps": ["sugarcrm", "gmail"],
+      "tags": ["eventbrite", "sugarcrm", "gmail", "if"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Assign ServiceNow incidents to Jira and Slack",
+      "description": "This template detects when a new ServiceNow incident is created; if the incident has a High urgency creates an issue in Jira and sends a message to a Slack channel; otherwise, create a task in Jira. The flow illustrates the use of Jira create and retrieve actions, and the use of an If node to take alternative actions depending on data from the ServiceNow new incident trigger event.",
+      "summary": "ServiceNow to 2 applications",
+      "sourceApp": "servicenow",
+      "targetApps": ["jira", "slack"],
+      "tags": ["servicenow", "jira", "slack", "if"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Create Sharepoint team site for new event",
+      "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
+      "summary": "Eventbrite to 2 applications",
+      "sourceApp": "eventbrite",
+      "targetApps": ["mssharepoint", "slack"],
+      "tags": ["eventbrite", "mssharepoint", "slack"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Weekly copy Dropbox files to new COS S3 bucket named with date",
+      "description": "This template copies files from a Dropbox folder to a new bucket in IBM Cloud Object Storage S3 on a weekly schedule.",
+      "summary": "Dropbox to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": ["dropbox", "ibmcoss3"],
+      "tags": ["scheduler", "dropbox", "ibmcoss3", "foreach", "if"],
+      "offerings": ["app connect professional"]
+    }    
   ]
 }

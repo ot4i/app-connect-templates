@@ -6,14 +6,14 @@ This template sets up the products which are used with the following templates:
 
 ## Prerequisites
 
-In Google Sheets, create a sheet with the [products to add to Salesforce](https://github.com/ot4i/app-connect-templates/blob/apendrich-welcome-4/resources/markdown/sample/sunflowerFestivalProductsSample.csv). They'll need to include a Product Name, Product Code and Product Family.
+In Google Sheets, create a sheet with the [products to add to Salesforce](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/sample/sunflowerFestivalProductsSample.csv). They'll need to include a Product Name, Product Code and Product Family.
 
 ## Using the template
 
 1. Click **Create flow** to start using the template.
-1. Click the Google Sheets "Retrieve rows" action and connect to your [Google Sheets account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-google-sheets/).
+1. Click the Google Sheets "Retrieve rows" action and connect to your [Google Sheets account](http://ibm.biz/acgsheets).
 1. In the Google Sheets "Retrieve rows" action, select the Spreadsheet and Worksheet you want to use.
-1. Click the Salesforce "Update or create price book" action and connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+1. Click the Salesforce "Update or create price book" action and connect to your [Salesforce account](http://ibm.biz/ach2salesforce).
 1. Check that an account has been set for the other "Salesforce" actions.
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 1. Once the flow has run, in the banner open the options menu [&#8942;] then click **Stop flow**, otherwise it will try to create the products again as scheduled.

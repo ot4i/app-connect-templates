@@ -142,11 +142,11 @@ integration:
               input:
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: Batchprocess
+                - variable: BatchprocessOutput
                   $ref: '#/node-output/Batch process/response/payload'
               branch:
                 - condition:
-                    '{{$Batchprocess.status}}': Complete
+                    '{{$BatchprocessOutput.status}}': Complete
                   execute:
                     - create-action:
                         name: Gmail Create email
@@ -157,8 +157,8 @@ integration:
                             - Body:
                                 template: >-
                                   Batch retreive process
-                                  {{$Batchprocess.batchInstanceId}} retrieved
-                                  {{$Batchprocess.recordsProcessed.success}}
+                                  {{$BatchprocessOutput.batchInstanceId}} retrieved
+                                  {{$BatchprocessOutput.recordsProcessed.success}}
                                   records successfully
                             - Subject:
                                 template: Leads created
@@ -168,10 +168,10 @@ integration:
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: Batchprocess
+                            - variable: BatchprocessOutput
                               $ref: '#/node-output/Batch process/response/payload'
                 - condition:
-                    '{{$Batchprocess.status}}': Retrieve failed
+                    '{{$BatchprocessOutput.status}}': Retrieve failed
                   execute:
                     - create-action:
                         name: Gmail Create email 2
@@ -182,9 +182,9 @@ integration:
                             - Body:
                                 template: >-
                                   Batch retrieve process
-                                  {{$Batchprocess.batchInstanceId}} failed to
+                                  {{$BatchprocessOutput.batchInstanceId}} failed to
                                   retrieve
-                                  {{$Batchprocess.recordsProcessed.error}}
+                                  {{$BatchprocessOutput.recordsProcessed.error}}
                                   records
                             - Subject:
                                 template: Retrieval of leads failed
@@ -194,10 +194,10 @@ integration:
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: Batchprocess
+                            - variable: BatchprocessOutput
                               $ref: '#/node-output/Batch process/response/payload'
                 - condition:
-                    '{{$Batchprocess.status}}': Stopped
+                    '{{$BatchprocessOutput.status}}': Stopped
                   execute:
                     - create-action:
                         name: Gmail Create email 3
@@ -208,7 +208,7 @@ integration:
                             - Body:
                                 template: >-
                                   Batch retrieve process
-                                  {{$Batchprocess.batchInstanceId}} was stopped
+                                  {{$BatchprocessOutput.batchInstanceId}} was stopped
                             - Subject:
                                 template: Retrieval of leads stopped
                             - To:
@@ -217,10 +217,10 @@ integration:
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: Batchprocess
+                            - variable: BatchprocessOutput
                               $ref: '#/node-output/Batch process/response/payload'
                 - condition:
-                    '{{$Batchprocess.status}}': Timed out
+                    '{{$BatchprocessOutput.status}}': Timed out
                   execute:
                     - create-action:
                         name: Slack Create message
@@ -233,12 +233,12 @@ integration:
                             - text:
                                 template: >-
                                   Batch retrieve process
-                                  {{$Batchprocess.batchInstanceId}} timed out
+                                  {{$BatchprocessOutput.batchInstanceId}} timed out
                           $map: 'http://ibm.com/appconnect/map/v1'
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: Batchprocess
+                            - variable: BatchprocessOutput
                               $ref: '#/node-output/Batch process/response/payload'
               else:
                 execute: []
@@ -248,7 +248,7 @@ integration:
                       input:
                         - variable: Trigger
                           $ref: '#/trigger/payload'
-                        - variable: Batchprocess
+                        - variable: BatchprocessOutput
                           $ref: '#/node-output/Batch process/response/payload'
                       message: Should not happen
                       status-code: 400
