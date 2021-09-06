@@ -540,8 +540,7 @@
     "offerings": ["app connect professional"]
   },
     {
-      "name": "Synchronize data between SAP and Sales
-      force whenever the Salesforce contact is being updated",
+      "name": "Synchronize data between SAP and Salesforce whenever the Salesforce contact is being updated",
       "description": "Use this template to sync data between SAP and Salesforce when a Salesforce contact is being updated. The flow will send a trigger from Salesforce to SAP whenever the details of a customer contact are being updated and check if the same customer exists in SAP using the unique customer ID. If the customer exists it will update their details and create a notification that the customer was found. If the customer does not exist in SAP it will create a notification that there was no such customer.",
       "summary": "Salesforce to SAP",
       "sourceApp": "salesforce",
