@@ -691,6 +691,24 @@
       "targetApps": ["msdynamicscrmrest", "ibmsterlingsci", "slack"],
       "tags": ["scheduler", "msdynamics365forsales", "ibmsterlingsci", "forEach", "setVariable", "log", "slack"],
       "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Create a new work item whenever a new incident is logged in ServiceNow",
+      "description": "Use this template to create a new work item in IBM Engineering Workflow Management whenever a new incident is logged in ServiceNow and a notification is sent to the relevant squad through Microsoft Teams.",
+      "summary": "ServiceNow to 2 applications",
+      "sourceApp": "servicenow",
+      "targetApps": ["ibmewm", "msteams"],
+      "tags": ["servicenow", "ibmewm", "msteams"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Update ServiceNow incident and send a Microsoft Teams notification whenever a work item in IBM EWM is updated",
+      "description": "Use this template to update the ServiceNow incident whenever a work item in IBM Engineering Workflow Management is updated. A Microsoft Teams notification is sent to the relevant squad.",
+      "summary": "IBM Engineering Workflow Management to 2 applications",
+      "sourceApp": "ibmewm",
+      "targetApps": ["msteams", "servicenow"],
+      "tags": ["ibmewm", "msteams", "servicenow"],
+      "offerings": ["app connect professional"]
     }                
   ]
 }
