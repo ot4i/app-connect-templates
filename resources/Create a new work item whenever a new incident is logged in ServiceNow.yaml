@@ -1,0 +1,80 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: servicenow
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: workitem
+      connector-type: ibmewm
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: IBM Engineering Workflow Management Create work item
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - description:
+                      template: '{{$Trigger.short_description}}'
+                  - filedAgainst:
+                      template: Category 2
+                  - priority:
+                      template: '{{$Trigger.urgency}}'
+                  - projectId:
+                      template: _-nf44OlkEeuKaLsP5GITMw
+                  - title:
+                      template: '{{$Trigger.sys_id}} '
+                  - workItemType:
+                      template: defect
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft Teams Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              this the new work item created:
+                              {{$IBMEngineeringWorkflowManagementCreateworkitem}}
+                              -- {{$Trigger.number}}
+                  - channelId:
+                      template: 19:61e1e163a6924abc8a6ddf3444dd7f2f@thread.tacv2
+                  - teamId:
+                      template: 057cbbda-ed17-47ba-b6c1-1e265b2c70f8
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMEngineeringWorkflowManagementCreateworkitem
+                    $ref: >-
+                      #/node-output/IBM Engineering Workflow Management Create
+                      work item/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: _ServiceN-EWM-1
+models: {}
