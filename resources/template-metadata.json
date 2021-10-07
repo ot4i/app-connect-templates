@@ -711,7 +711,7 @@
       "offerings": ["app connect professional"]
     },
     {
-    "name": "Send a Slack message when urgent ServiceNow incidents come in",
+    "name": "Send a Slack message for urgent ServiceNow incidents",
     "description": "This template sends a message via Slack when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents.",
     "summary": "ServiceNow to Slack",
     "sourceApp": "servicenow",
