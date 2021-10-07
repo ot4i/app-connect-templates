@@ -716,8 +716,8 @@
     "summary": "ServiceNow to Slack",
     "sourceApp": "servicenow",
     "targetApps": ["servicenow", "slack"],
-    "tags": ["ServiceNow", "Slack", "incident"],
+    "tags": ["servicenow", "slack", "incident"],
     "offerings": ["app connect professional"]
-  },
+  }
   ]
 }
