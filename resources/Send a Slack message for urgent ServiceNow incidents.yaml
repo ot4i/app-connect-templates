@@ -58,5 +58,5 @@ integration:
                     - variable: Trigger
                       $ref: '#/trigger/payload'
               output-schema: {}
-  name: Send a Slack message when urgent ServiceNow incidents come in
+  name: Send a Slack message for urgent ServiceNow incidents
 models: {}
