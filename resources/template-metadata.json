@@ -715,7 +715,7 @@
     "description": "This template sends a message via Slack when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents.",
     "summary": "ServiceNow to Slack",
     "sourceApp": "servicenow",
-    "targetApps": ["servicenow", "slack"],
+    "targetApps": ["slack"],
     "tags": ["servicenow", "slack", "incident"],
     "offerings": ["app connect professional"]
   }
