@@ -718,14 +718,15 @@
     "targetApps": ["slack"],
     "tags": ["servicenow", "slack", "incident"],
     "offerings": ["app connect professional"]
-  },{
-"name": "Retrieve file content from Microsoft OneDrive then add to IBM Watson Discovery",
- "description": "Use this template to retrieve file content from Microsoft OneDrive and add the same document to the IBM Watson Discovery Service.",
- "summary": "Scheduler to 2 applications",
- "sourceApp": "streaming-connector-scheduler",
- "targetApps": ["msonedrive", "watsondiscovery"],
- "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
-"offerings": ["app connect professional"]
-}
+    },
+    {
+    "name": "Retrieve file content from Microsoft OneDrive then add to IBM Watson Discovery",
+    "description": "Use this template to retrieve file content from Microsoft OneDrive and add the same document to the IBM Watson Discovery Service.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["msonedrive", "watsondiscovery"],
+    "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
+    "offerings": ["app connect professional"]
+    }
   ]
 }
