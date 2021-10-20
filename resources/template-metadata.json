@@ -718,6 +718,51 @@
     "targetApps": ["slack"],
     "tags": ["servicenow", "slack", "incident"],
     "offerings": ["app connect professional"]
-  }
+    }     
+    {
+    "name": "Sync new attendee from Eventbrite to lead in MS Dynamics",
+    "description": "This template creates a new lead in MS Dynamics whenever a new attendee is created in Eventbrite.",
+    "summary": "Eventbrite to Microsoft Dynamics",
+    "sourceApp": "eventbrite",
+    "targetApps": ["msdynamicscrmrest"],
+    "tags": ["eventbrite", "msdynamicscrmrest"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record MS Dynamics campaign members to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a campaign is added in MS Dynamics.",
+    "summary": "Microsoft Dynamics to Google Sheet",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["msdynamicscrmrest", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Slack notifications for Closed Won opportunities in MS Dynamics",
+    "description": "This template retrieves the details of opportunities that are updated with 'Closed Won' status.",
+    "summary": "Microsoft Dynamics to Slack",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["slack"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record Jira issues to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a new issue is created in Jira.",
+    "summary": "Jira to Google Sheets",
+    "sourceApp": "jira",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["jira", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create Box folders for Jira issues",
+    "description": "This template creates a Box folder with the Jira issue key whenever a new issue is created in Jira.",
+    "summary": "Jira to Box",
+    "sourceApp": "jira",
+    "targetApps": ["box"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    }           
   ]
 }
