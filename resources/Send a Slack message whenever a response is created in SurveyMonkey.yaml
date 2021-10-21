@@ -1,0 +1,52 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Responses
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            survey_id: '292669030'
+            collector_id: '410335577'
+            parentFilter:
+              survey_id: '292669030'
+              collector_id: '410335577'
+      connector-type: surveymonkey
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: DC5AUKR7D
+                  - text:
+                      template: >-
+                        New Survey Response with Survey
+                        ID:{{$Trigger.survey_id}}is created
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: New response received for a survey will post slack notification
+models: {}
