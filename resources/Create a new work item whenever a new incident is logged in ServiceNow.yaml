@@ -77,4 +77,7 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a new IBM EWM work item when a new incident is logged in ServiceNow
+  description: >-
+    This template detects when a new incident is logged in ServiceNow, then creates a new work item in IBM Engineering Workflow Management 
+    and sends a notification to the relevant squad through Microsoft Teams.
 models: {}
