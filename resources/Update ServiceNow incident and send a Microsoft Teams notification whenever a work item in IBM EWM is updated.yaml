@@ -101,5 +101,5 @@ integration:
               allow-empty-output: true
         tags:
           - incomplete
-  name: _ServiceN-EWM-2
+  name: Update ServiceNow incident and send a Microsoft Teams message when a work item in IBM EWM is updated
 models: {}
