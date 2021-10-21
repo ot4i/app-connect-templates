@@ -76,5 +76,5 @@ integration:
                       work item/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a new work item when a new incident is logged in ServiceNow
+  name: Create a new IBM EWM work item when a new incident is logged in ServiceNow
 models: {}
