@@ -763,6 +763,60 @@
     "targetApps": ["box"],
     "tags": ["msdynamicscrmrest", "slack"],
     "offerings": ["app connect professional"]
-    }           
+    },
+    {
+    "name": "Slack notifications for Closed Won opportunities in SugarCRM",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status.",
+    "summary": "SugarCRM to Slack",
+    "sourceApp": "sugarcrm",
+    "targetApps": ["slack"],
+    "tags": ["sugarcrm", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite with SugarCRM lead",
+    "description": "This template creates a new lead in SugarCRM when a new attendee is created in Eventbrite.",
+    "summary": "Eventbrite to SugarCRM",
+    "sourceApp": "eventbrite",
+    "targetApps": ["sugarcrm"],
+    "tags": ["eventbrite", "sugarcrm"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a case is created or updated in Microsoft Dynamics",
+    "description": "This template allows you to receive Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365.",
+    "summary": "Microsoft Dynamics 365 to Microsoft Teams",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["msteams"],
+    "tags": ["msdynamicscrmrest", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
+    "description": "This template allows you to receive Microsoft Teams message with the event details when a new event is created in Eventbrite.",
+    "summary": "Eventbrite to Microsoft Teams",
+    "sourceApp": "eventbrite",
+    "targetApps": ["slack"],
+    "tags": ["eventbrite", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a new Insightly task is created",
+    "description": "This template allows you to receive Microsoft Teams message with the task details when a new Insightly task is created.",
+    "summary": "Insightly to Microsoft Teams",
+    "sourceApp": "insightly",
+    "targetApps": ["msteams"],
+    "tags": ["insightly", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message whenever a response is created in SurveyMonkey",
+    "description": "This template allows you to receive a Slack message whenever a response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Slack",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["slack"],
+    "tags": ["surveymonkey", "slack"],
+    "offerings": ["app connect professional"]
+    }
   ]
 }
