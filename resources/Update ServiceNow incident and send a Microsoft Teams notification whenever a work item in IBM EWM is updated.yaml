@@ -102,4 +102,7 @@ integration:
         tags:
           - incomplete
   name: Update ServiceNow incident and send a Microsoft Teams message when a work item in IBM EWM is updated
+  description: >-
+    This template detects when a work item is updated in IBM Engineering Workflow Management, then updates a ServiceNow incident and sends
+    a Microsoft Teams notification to the relevant squad.
 models: {}
