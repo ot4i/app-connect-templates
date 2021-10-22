@@ -720,8 +720,8 @@
     "offerings": ["app connect professional"]
     }     
     {
-    "name": "Sync new attendee from Eventbrite to lead in MS Dynamics",
-    "description": "This template creates a new lead in MS Dynamics whenever a new attendee is created in Eventbrite.",
+    "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
+    "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
     "summary": "Eventbrite to Microsoft Dynamics",
     "sourceApp": "eventbrite",
     "targetApps": ["msdynamicscrmrest"],
@@ -729,8 +729,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Record MS Dynamics campaign members to Google Sheets",
-    "description": "This template creates a new row in Google Sheets whenever a campaign is added in MS Dynamics.",
+    "name": "Record Microsoft Dynamics 365 campaign members to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics to Google Sheet",
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["googlespreadsheet"],
@@ -738,8 +738,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Slack notifications for Closed Won opportunities in MS Dynamics",
-    "description": "This template retrieves the details of opportunities that are updated with 'Closed Won' status.",
+    "name": "Slack notifications for Closed Won opportunities in Microsoft Dynamics 365",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics to Slack",
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["slack"],
@@ -766,7 +766,7 @@
     },
     {
     "name": "Slack notifications for Closed Won opportunities in SugarCRM",
-    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status.",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in SugarCRM.",
     "summary": "SugarCRM to Slack",
     "sourceApp": "sugarcrm",
     "targetApps": ["slack"],
@@ -783,8 +783,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Send a Microsoft Teams message when a case is created or updated in Microsoft Dynamics",
-    "description": "This template allows you to receive Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365.",
+    "name": "Send a Microsoft Teams message when a case is created or updated in Microsoft Dynamics 365",
+    "description": "This template allows you to receive Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics 365 to Microsoft Teams",
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["msteams"],
