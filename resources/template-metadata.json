@@ -722,7 +722,7 @@
     {
     "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
     "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
-    "summary": "Eventbrite to Microsoft Dynamics",
+    "summary": "Eventbrite to Microsoft Dynamics 365",
     "sourceApp": "eventbrite",
     "targetApps": ["msdynamicscrmrest"],
     "tags": ["eventbrite", "msdynamicscrmrest"],
@@ -731,7 +731,7 @@
     {
     "name": "Record Microsoft Dynamics 365 campaign members to Google Sheets",
     "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
-    "summary": "Microsoft Dynamics to Google Sheet",
+    "summary": "Microsoft Dynamics 365 to Google Sheet",
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["googlespreadsheet"],
     "tags": ["msdynamicscrmrest", "googlespreadsheet"],
@@ -740,7 +740,7 @@
     {
     "name": "Slack notifications for Closed Won opportunities in Microsoft Dynamics 365",
     "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in Microsoft Dynamics 365 for Sales.",
-    "summary": "Microsoft Dynamics to Slack",
+    "summary": "Microsoft Dynamics 365 to Slack",
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["slack"],
     "tags": ["msdynamicscrmrest", "slack"],
