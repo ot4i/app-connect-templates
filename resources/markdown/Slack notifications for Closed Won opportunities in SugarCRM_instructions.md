@@ -6,4 +6,4 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Slack**
 3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
-The flow is started when an opportunity is updated to 'Closed Won' in SugarCRM.
+The flow is started when an opportunity is updated to 'Closed Won' status in SugarCRM.
