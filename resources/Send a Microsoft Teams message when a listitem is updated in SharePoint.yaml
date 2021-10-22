@@ -1,0 +1,66 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED_POLLER:
+          input-context:
+            data: ListItem
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            SitePath: /
+            ListId: 7e11aaae-7418-45b9-aad5-809ef5143716
+            parentFilter:
+              SitePath: /
+              ListId: 7e11aaae-7418-45b9-aad5-809ef5143716
+            subscription:
+              createdField: Created
+              updatedField: Modified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: mssharepoint
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Teams Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              Complete details of updated listitem -
+                              {{$Trigger}}
+                  - channelId:
+                      template: 19:ddf3c4dd217249c98e8d543b8a791e4b@thread.tacv2
+                  - subject:
+                      template: SharePoint updated listitem name - {{$Trigger.Title}}
+                  - teamId:
+                      template: 80c4627a-16cc-417e-82f8-a1342a3fa647
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    When listitem is updated in SharePoint send notification to a particular
+    channel in MSTeams
+models: {}
