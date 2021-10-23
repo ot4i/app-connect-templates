@@ -17,7 +17,6 @@ integration:
       type: api-action
       business-object: leads
       connector-type: marketo
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-3:
