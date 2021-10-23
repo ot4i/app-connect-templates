@@ -1,0 +1,96 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: sugarcrm
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Marketo Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  email: '{{$Trigger.email.email_address}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MarketoRetrieveleads
+                  $ref: '#/node-output/Marketo Retrieve leads/response/payload'
+                - variable: MarketoRetrieveleadsMetadata
+                  $ref: '#/node-output/Marketo Retrieve leads/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MarketoRetrieveleads}}': '[]'
+                  execute:
+                    - create-action:
+                        name: Marketo Create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - company:
+                                template: Persistent
+                            - email:
+                                template: '{{$Trigger.email.email_address}}'
+                            - firstName:
+                                template: '{{$Trigger.first_name}}'
+                            - lastName:
+                                template: '{{$Trigger.last_name}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoRetrieveleads
+                              $ref: >-
+                                #/node-output/Marketo Retrieve
+                                leads/response/payload
+                            - variable: MarketoRetrieveleadsMetadata
+                              $ref: '#/node-output/Marketo Retrieve leads/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Sync leads from SugarCRM to Marketo
+models: {}
