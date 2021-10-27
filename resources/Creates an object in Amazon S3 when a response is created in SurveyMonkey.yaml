@@ -1,0 +1,56 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: surveymonkey
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Responses
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            survey_id: '294407158'
+            collector_id: '409509472'
+            parentFilter:
+              survey_id: '294407158'
+              collector_id: '409509472'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - ContentType:
+                      template: text/plain
+                  - Key:
+                      template: Name - {{$Trigger.id}}
+                  - bucketName:
+                      template: appcon0zsyrg
+                  - content:
+                      template: '{{$Trigger}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    For a new surveymonkey response create an object in Amazon S3 with survey
+    details
+models: {}
