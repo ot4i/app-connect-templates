@@ -709,6 +709,78 @@
     "targetApps": ["msonedrive", "watsondiscovery"],
     "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
     "offerings": ["app connect professional"]
-    }
+    },    	
+    {
+    "name": "Creates an object in Amazon S3 when a response is created in SurveyMonkey",
+    "description": "This template creates an object in Amazon S3 with the survey details when a new response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Amazon A3 ",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["amazons3"],
+    "tags": ["surveymonkey", "amazons3"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates an object in Google Cloud Storage when a response is created in SurveyMonkey",
+    "description": "This template creates an object in Google Cloud Storage with the survey details when a new response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Google Cloud Storage",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["googlecloudstorage"],
+    "tags": ["surveymonkey", "googlecloudstorage"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message when a high or highest priority issue is created in Jira",
+    "description": "This template creates a new Slack message with the issue details when a 'High' or 'Highest' priority issue is created in Jira.",
+    "summary": "Jira to Slack",
+    "sourceApp": "jira",
+    "targetApps": ["jira", "slack"],
+    "tags": ["jira", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates an incident in ServiceNow when an issue is created in Jira",
+    "description": "This template creates a new incident in ServiceNow with the issue details when an issue is created in Jira.",
+    "summary": "Jira to ServiceNow",
+    "sourceApp": "jira",
+    "targetApps": ["jira", "servicenow"],
+    "tags": ["jira", "servicenow"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a case in Salesforce when an issue is created in Jira",
+    "description": "This template creates new case in Salesforce with the issue details when an issue is created in Jira.",
+    "summary": "Jira to Salesforce",
+    "sourceApp": "jira",
+    "targetApps": ["jira", "salesforce"],
+    "tags": ["jira", "salesforce"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message when an incident is created in ServiceNow",
+    "description": "This template creates a new Slack message when a new incident is created in ServiceNow.",
+    "summary": "ServiceNow to Slack",
+    "sourceApp": "servicenow",
+    "targetApps": ["slack"],
+    "tags": ["servicenow", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message when an incident is updated in ServiceNow",
+    "description": "This template creates a new Slack message when an incident is updated in ServiceNow.",
+    "summary": "ServiceNow to Slack",
+    "sourceApp": "servicenow",
+    "targetApps": ["slack"],
+    "tags": ["servicenow", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new or updated lead from SugarCRM to Marketo",
+    "description": "This template finds a matching lead in Marketo based on the email address when a new lead is created or updated in SugarCRM. If a matching lead is not found, the lead is created in Marketo and a Slack notification is sent. If a matching lead is found, the lead is updated in Marketo and a Slack notification is sent.",
+    "summary": "SugarCRM to 2 applications",
+    "sourceApp": "sugarcrm",
+    "targetApps": ["marketo", "slack"],
+    "tags": ["sugarcrm", "marketo", "slack"],
+    "offerings": ["app connect professional"]
+    }            
   ]
 }
