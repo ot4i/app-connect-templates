@@ -1,0 +1,187 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 16
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      account-name: Account 1
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Opportunity
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        CREATEEMAIL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - update-action:
+              name: Salesforce Update opportunity
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Probability:
+                      expression: '50'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Id: 0062v00001NgvwXAA
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceUpdateopportunity
+                  $ref: '#/node-output/Salesforce Update opportunity/response/payload'
+                - variable: SalesforceUpdateopportunityMetadata
+                  $ref: '#/node-output/Salesforce Update opportunity/response'
+              branch:
+                - condition:
+                    '{{$SalesforceUpdateopportunityMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Email Create email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: CREATEEMAIL
+                        map:
+                          mappings:
+                            - emailBody:
+                                template: >-
+                                  There is error of invalid ID while updating
+                                  opportunity in Salesforce.
+                            - priority:
+                                template: normal
+                            - subjectFilter:
+                                template: >-
+                                  Error while updating opportunitiy in
+                                  Salesforce
+                            - toFilter:
+                                template: ffbld01@ibmappcon.onmicrosoft.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SalesforceUpdateopportunity
+                              $ref: >-
+                                #/node-output/Salesforce Update
+                                opportunity/response/payload
+                            - variable: SalesforceUpdateopportunityMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Update
+                                opportunity/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: CGNCQU7H9
+                            - text:
+                                template: >-
+                                  Inside
+                                  If-----{{$SalesforceUpdateopportunityMetadata."status-code"}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: EmailCreateemail
+                              $ref: >-
+                                #/block/If/node-output/Email Create
+                                email/response/payload
+                            - variable: SalesforceUpdateopportunity
+                              $ref: >-
+                                #/node-output/Salesforce Update
+                                opportunity/response/payload
+                            - variable: SalesforceUpdateopportunityMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Update
+                                opportunity/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Create message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - channel:
+                              template: CGNCQU7H9
+                          - text:
+                              template: >-
+                                Inside
+                                Else-----{{$SalesforceUpdateopportunityMetadata."status-code"}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceUpdateopportunity
+                            $ref: >-
+                              #/node-output/Salesforce Update
+                              opportunity/response/payload
+                          - variable: SalesforceUpdateopportunityMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Update
+                              opportunity/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Checking for an invalid ID when updating a Salesforce opportunity
+models: {}

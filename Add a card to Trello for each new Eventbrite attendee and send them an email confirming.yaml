@@ -1,0 +1,83 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '563967386399'
+            parentFilter:
+              organizationID: '563967386399'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        CREATEEMAIL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: >-
+                        {{$Trigger.profile.name}} from
+                        {{$Trigger.profile.company}} has confirmed attendance to
+                        the event! Contact them at their email:
+                        {{$Trigger.profile.email}}
+                  - idBoard:
+                      template: 6178028f58aef57dfcb01f06
+                  - idList:
+                      template: 617802c3366ceb1468ea5ba8
+                  - name:
+                      template: '{{$Trigger.profile.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - custom-action:
+              name: Email Create email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CREATEEMAIL
+              map:
+                mappings:
+                  - emailBody:
+                      template: >-
+                        Thank's for signing up to our event! You can find more
+                        information on the event here: <company site> 
+                  - priority:
+                      template: normal
+                  - subjectFilter:
+                      template: You've signed up, {{$Trigger.profile.first_name}}!
+                  - toFilter:
+                      template: '{{$Trigger.profile.email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: TrelloAddcardtolist
+                    $ref: '#/node-output/Trello Add card to list/response/payload'
+  name: >-
+    Add a card to Trello for each new Eventbrite attendee and send them an email
+    confirming sign up
+models: {}

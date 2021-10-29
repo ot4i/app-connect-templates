@@ -1,0 +1,88 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+models: {}
+integration:
+  name: >-
+    When someone signs up to an event through Eventbrite create a file on
+    Dropbox and send them an email
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-scheduler:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly_scheduler'
+          options:
+            organizationID: '563967386399'
+            parentFilter:
+              organizationID: '563967386399'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        CREATEEMAIL: {}
+  assemblies:
+    assembly_scheduler:
+      assembly:
+        execute:
+          - create-action:
+              name: Dropbox Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fileContent:
+                      template: >-
+                        Name: {{$Trigger.profile.name}} ID: {{$Trigger.id}}
+                        Company: {{$Trigger.profile.company}} Email Address:
+                        {{$Trigger.profile.email}} Phone:
+                        {{$Trigger.profile.cell_phone}} Date:
+                        {{$Trigger.created}}
+                  - fileType:
+                      template: Text
+                  - name:
+                      template: >-
+                        attendee report {{$Trigger.profile.name}}
+                        {{$floor($random()*1000)}}
+                  - path:
+                      template: /
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - custom-action:
+              name: Email Create email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CREATEEMAIL
+              map:
+                mappings:
+                  - emailBody:
+                      template: >-
+                        Your attendance has been confirmed. Thank you for
+                        signing up!
+                  - priority:
+                      template: normal
+                  - subjectFilter:
+                      template: >-
+                        Thank you for signing up,
+                        {{$Trigger.profile.first_name}}!
+                  - toFilter:
+                      template: '{{$Trigger.profile.email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DropboxCreatefile
+                    $ref: '#/node-output/Dropbox Create file/response/payload'

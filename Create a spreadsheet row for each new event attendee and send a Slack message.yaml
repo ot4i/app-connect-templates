@@ -1,0 +1,122 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '553173844815'
+            parentFilter:
+              organizationID: '553173844815'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: test1
+                        - '10':
+                            template: test10
+                        - '11':
+                            template: test11
+                        - '12':
+                            template: test12
+                        - '13':
+                            template: test13
+                        - '14':
+                            template: test14
+                        - '15':
+                            template: test15
+                        - '16':
+                            template: test16
+                        - '17':
+                            template: test17
+                        - '18':
+                            template: test18
+                        - '19':
+                            template: test19
+                        - '2':
+                            template: test2
+                        - '20':
+                            template: test20
+                        - '21':
+                            template: test21
+                        - '22':
+                            template: test22
+                        - '23':
+                            template: test23
+                        - '24':
+                            template: test24
+                        - '25':
+                            template: test25
+                        - '26':
+                            template: test26
+                        - '3':
+                            template: test3
+                        - '4':
+                            template: test4
+                        - '5':
+                            template: test5
+                        - '6':
+                            template: test6
+                        - '7':
+                            template: test7
+                        - '8':
+                            template: test8
+                        - '9':
+                            template: test9
+                  - spreadsheetID:
+                      template: 1sllSC7MQC_OwFlDPaG6uZ9ynU9pKHGteej-YjtflkEE
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - channel:
+                      template: CGNCQU7H9
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    Create a spreadsheet row for each new event attendee and send a Slack
+    message
+models: {}

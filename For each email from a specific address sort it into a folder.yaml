@@ -1,0 +1,174 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        MOVEMESSAGE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        MOVEMESSAGE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Email Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - flagFilter: UNSEEN
+                    - folder: Orders
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 100
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EmailRetrieveemails '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemails
+                    $ref: '#/node-output/Email Retrieve emails/response/payload'
+                  - variable: EmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Email Retrieve emails/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemails
+                    $ref: '#/node-output/Email Retrieve emails/response/payload'
+                  - variable: EmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Email Retrieve emails/response'
+                mappings: []
+              display-name: Email
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: EmailRetrieveemails
+                  $ref: '#/node-output/Email Retrieve emails/response/payload'
+                - variable: EmailRetrieveemailsMetadata
+                  $ref: '#/node-output/Email Retrieve emails/response'
+              branch:
+                - condition:
+                    '{{$Foreachitem.from}}': appcontest21@gmail.com
+                  execute:
+                    - custom-action:
+                        name: Email Move email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: MOVEMESSAGE
+                        map:
+                          mappings:
+                            - destinationFolder:
+                                template: Dispatch
+                            - sourceFolder:
+                                template: Orders
+                            - uid:
+                                expression: '$Foreachitem.uid '
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: EmailRetrieveemails
+                              $ref: >-
+                                #/node-output/Email Retrieve
+                                emails/response/payload
+                            - variable: EmailRetrieveemailsMetadata
+                              $ref: '#/node-output/Email Retrieve emails/response'
+                - condition:
+                    '{{$Foreachitem.from}}': appcon1001@gmail.com
+                  execute:
+                    - custom-action:
+                        name: Email Move email 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: MOVEMESSAGE
+                        map:
+                          mappings:
+                            - destinationFolder:
+                                template: Packaging
+                            - sourceFolder:
+                                template: Orders
+                            - uid:
+                                expression: '$Foreachitem.uid '
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: EmailRetrieveemails
+                              $ref: >-
+                                #/node-output/Email Retrieve
+                                emails/response/payload
+                            - variable: EmailRetrieveemailsMetadata
+                              $ref: '#/node-output/Email Retrieve emails/response'
+              else:
+                execute: []
+              output-schema: {}
+  name: For each email from a specific address sort it into a folder
+models: {}

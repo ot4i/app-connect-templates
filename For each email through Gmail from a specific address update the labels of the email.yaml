@@ -1,0 +1,187 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        UPDATEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Gmail Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EmailRetrieveemails '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemails
+                    $ref: '#/node-output/Email Retrieve emails/response/payload'
+                  - variable: EmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Email Retrieve emails/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemails
+                    $ref: '#/node-output/Email Retrieve emails/response/payload'
+                  - variable: EmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Email Retrieve emails/response'
+                mappings: []
+              display-name: Email
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailRetrieveemails
+                  $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                - variable: GmailRetrieveemailsMetadata
+                  $ref: '#/node-output/Gmail Retrieve emails/response'
+              branch:
+                - condition:
+                    '{{$Foreachitem.from}}': appcontest21@gmail.com
+                  execute:
+                    - update-action:
+                        name: Gmail Update email labels
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - addLabels:
+                                foreach:
+                                  input: '$Foreachitem '
+                                  iterator: addLabelsItem
+                                  mappings:
+                                    - label:
+                                        template: Dispatch
+                            - removeLabels:
+                                foreach:
+                                  input: '$Foreachitem '
+                                  iterator: removeLabelsItem
+                                  mappings:
+                                    - label:
+                                        template: Orders
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailRetrieveemails
+                              $ref: >-
+                                #/node-output/Gmail Retrieve
+                                emails/response/payload
+                            - variable: GmailRetrieveemailsMetadata
+                              $ref: '#/node-output/Gmail Retrieve emails/response'
+                        filter:
+                          limit: 10
+                        allow-empty-output: false
+                - condition:
+                    '{{$Foreachitem.from}}': appcon1001@gmail.com
+                  execute:
+                    - update-action:
+                        name: Gmail Update email labels 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - addLabels:
+                                foreach:
+                                  input: '$Foreachitem '
+                                  iterator: addLabelsItem
+                                  mappings:
+                                    - label:
+                                        template: Packaging
+                            - removeLabels:
+                                foreach:
+                                  input: '$Foreachitem '
+                                  iterator: removeLabelsItem
+                                  mappings:
+                                    - label:
+                                        template: Orders
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailRetrieveemails
+                              $ref: >-
+                                #/node-output/Gmail Retrieve
+                                emails/response/payload
+                            - variable: GmailRetrieveemailsMetadata
+                              $ref: '#/node-output/Gmail Retrieve emails/response'
+                        filter:
+                          limit: 10
+                        allow-empty-output: false
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    For each email through Gmail from a specific address update the labels of
+    the email
+models: {}

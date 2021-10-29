@@ -1,0 +1,204 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        DOWNLOADEMAIL: {}
+    action-interface-3:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        MOVEMESSAGE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Email Retrieve emails metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - flagFilter: UNSEEN
+                    - folder: usecase
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EmailRetrieveemailsmetadata '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailDownloademailcontent
+                    $ref: >-
+                      #/block/For each/node-output/Email Download email
+                      content/response/payload
+                  - variable: AmazonS3Createobject
+                    $ref: >-
+                      #/block/For each/node-output/Amazon S3 Create
+                      object/response/payload
+                  - variable: EmailMoveemail
+                    $ref: >-
+                      #/block/For each/node-output/Email Move
+                      email/response/payload
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+                mappings: []
+              display-name: Email mail
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Email Download email content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADEMAIL
+              map:
+                mappings:
+                  - folder:
+                      template: usecase
+                  - uid:
+                      expression: '$Foreachitem.uid '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - ContentType:
+                      template: Application/json
+                  - Key:
+                      template: >-
+                        {{$Foreachitem.subject}}+{{$Foreachitem.date}}+{{$random()}}
+                  - bucketName:
+                      template: 000azuretest
+                  - content:
+                      template: '{{$Foreachitem}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Email Move email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: MOVEMESSAGE
+              map:
+                mappings:
+                  - destinationFolder:
+                      template: downloaded-mails
+                  - sourceFolder:
+                      template: usecase
+                  - uid:
+                      expression: '$Foreachitem.uid '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailDownloademailcontent
+                    $ref: >-
+                      #/block/For each/node-output/Email Download email
+                      content/response/payload
+                  - variable: AmazonS3Createobject
+                    $ref: >-
+                      #/block/For each/node-output/Amazon S3 Create
+                      object/response/payload
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+  name: For each email received create an AWS object
+models: {}

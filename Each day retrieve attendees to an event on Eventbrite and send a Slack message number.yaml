@@ -1,0 +1,129 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Attendee
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve attendees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  event_id: Test Event
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1000
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: EventbriteRetrieveattendees
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response/payload'
+                - variable: EventbriteRetrieveattendeesMetadata
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+              branch:
+                - condition:
+                    '{{$count($EventbriteRetrieveattendees )}}':
+                      lte: '1000'
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C02AA4TCDKM
+                            - text:
+                                template: >-
+                                  {{$count($EventbriteRetrieveattendees)}}
+                                  people have confirmed attendance to the event
+                                  {{$EventbriteRetrieveattendees.event_id}}!
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: EventbriteRetrieveattendees
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response/payload
+                            - variable: EventbriteRetrieveattendeesMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Create message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - channel:
+                              template: C02AA4TCDKM
+                          - text:
+                              template: >-
+                                Over 1000 people have confirmed attendance to
+                                the event
+                                {{$EventbriteRetrieveattendees.event_id}}!
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: EventbriteRetrieveattendees
+                            $ref: >-
+                              #/node-output/Eventbrite Retrieve
+                              attendees/response/payload
+                          - variable: EventbriteRetrieveattendeesMetadata
+                            $ref: >-
+                              #/node-output/Eventbrite Retrieve
+                              attendees/response
+              output-schema: {}
+  name: >-
+    Each day retrieve attendees to an event on Eventbrite and send a Slack
+    message with the amount
+models: {}

@@ -1,0 +1,169 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Gmail Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GmailRetrieveemails '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailRetrieveemails
+                    $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                  - variable: GmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Gmail Retrieve emails/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailDownloademailcontent
+                    $ref: >-
+                      #/block/For each/node-output/Email Download email
+                      content/response/payload
+                  - variable: AmazonS3Createobject
+                    $ref: >-
+                      #/block/For each/node-output/Amazon S3 Create
+                      object/response/payload
+                  - variable: EmailMoveemail
+                    $ref: >-
+                      #/block/For each/node-output/Email Move
+                      email/response/payload
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+                mappings: []
+              display-name: Gmail mail
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - ContentType:
+                      template: Application/json
+                  - Key:
+                      template: >-
+                        {{$Foreachitem.subject}}+{{$Foreachitem.date}}+{{$random()}}
+                  - bucketName:
+                      template: 00testbucket
+                  - content:
+                      template: '{{$Foreachitem}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailRetrieveemails
+                    $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                  - variable: GmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Gmail Retrieve emails/response'
+          - update-action:
+              name: Gmail Update email labels
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - addLabels:
+                      foreach:
+                        input: '$GmailRetrieveemails '
+                        iterator: addLabelsItem
+                        mappings:
+                          - label:
+                              template: downloaded emails
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailRetrieveemails
+                    $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                  - variable: GmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Gmail Retrieve emails/response'
+              filter:
+                where:
+                  id: '{{$Foreachitem.id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailRetrieveemails
+                    $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                  - variable: GmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Gmail Retrieve emails/response'
+              allow-empty-output: false
+  name: For each email received through Gmail create an AWS object
+models: {}
