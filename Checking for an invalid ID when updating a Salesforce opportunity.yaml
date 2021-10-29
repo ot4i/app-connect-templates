@@ -27,7 +27,6 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      account-name: Account 1
   action-interfaces:
     action-interface-2:
       type: api-action
