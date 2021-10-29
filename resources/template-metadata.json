@@ -709,6 +709,87 @@
     "targetApps": ["msonedrive", "watsondiscovery"],
     "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "When someone signs up to an event through Eventbrite create a file on Dropbox",
+    "description": "Use this template flow to create a new text file in Dropbox for each new event attendee containing their contact information, as well as sending the attendee confirmation that they've signed up via email.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["dropbox", "email"],
+    "tags": ["eventbrite", "dropbox", "email", "document", "event", "attendee"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "For each email from a specific address sort it into a folder",
+    "description": "Use this template flow to sort your emails from two specified addresses into folders. The flow will move 10 emails each hour.",
+    "summary": "Scheduler to 1 application",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["email"],
+    "tags": ["scheduler", "email", "hourly"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "For each email received create an AWS object",
+    "description": "Use this template flow to store each of your emails using AWS. The flow will retrieve 10 flows each hour and store them each as an AWS object.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["email", "amazonS3"],
+    "tags": ["scheduler", "email", "amazonS3"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "Add a card to Trello for each new Eventbrite attendee and send them an email confirming",
+    "description": "Use this template flow to track new Eventbrite attendees in a Trello board, as well as sending each new attendee an email to confirm their attendance.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["trello", "email"],
+    "tags": ["eventbrite", "trello", "email", "attendee"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "Each day retrieve attendees to an event on Eventbrite and send a Slack message number",
+    "description": "Use this template flow to keep updated with the number of attendees your Eventbrite event has through a daily message on Slack.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["eventbrite", "slack"],
+    "tags": ["scheduler", "eventbrite", "slack", "if", "attendee"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "For each email received through Gmail create an AWS object",
+    "description": "Use this template flow to store each of your emails using AWS. The flow will retrieve 10 flows from Gmail each hour and store them each as an AWS object.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["gmail", "amazonS3"],
+    "tags": ["scheduler", "gmail", "amazonS3"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "For each email through Gmail from a specific address update the labels of the email",
+    "description": "Use this template flow to sort your emails from two specified addresses into certain labels. The flow will retrieve 10 emails from Gmail each hour.",
+    "summary": "Scheduler to 1 application",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["gmail"],
+    "tags": ["scheduler", "gmail", "email"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "Send an email through Gmail and Slack message for each new Eventbrite attendee",
+    "description": "Each time a new attendee signs up for your event on Eventbrite, this flow sends an email from your gmail address stating that someone has just signed up including their name & city in the body of the email. The flow then sends a message on Slack alerting the channel of a new sign up with the same information.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["gmail", "slack"],
+    "tags": ["eventbrite", "gmail", "slack", "attendee"],
+    "offerings": ["app connect professional"]
+    }, 
+    {
+    "name": "Create a spreadsheet row for each new event attendee and send a Slack message",
+    "description": "Each time a new attendee signs up for your event on Eventbrite, this flow creates a new row on a Google Sheets spreadsheet with their information in the columns. The flow then sends a message on Slack alerting the channel of a new sign up.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["googlesheet", "slack"],
+    "tags": ["eventbrite", "googlesheets", "slack", "spreadsheet", "event", "attendee"],
+    "offerings": ["app connect professional"]
+    }, 
   ]
 }
