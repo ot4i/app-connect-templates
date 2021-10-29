@@ -709,6 +709,24 @@
     "targetApps": ["msonedrive", "watsondiscovery"],
     "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Create a task in Asana when a new contact is created in Insightly",
+    "description": "This template creates a task in Asana with the contact details when a new contact is created in Insightly. A slack message is created to notify the Insightly contact is created in Asana.",
+    "summary": "Insightly to 2 applications ",
+    "sourceApp": "insightly",
+    "targetApps": ["asana", "slack"],
+    "tags": ["insightly", "asana", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Retrieve Microsoft Dynamics 365 leads and create a Microsoft Excel .csv file in Dropbox at regular intervals",
+    "description": "This template retrieves 10 leads maximum at a time from Microsoft Dynamics 365 for Sales and creates a Microsoft Excel .csv file with the lead details in Dropbox. The flow is triggered once a day at 00:00 UTC.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["msdynamicscrmrest", "dropbox"],
+    "tags": ["scheduler", "msdynamicscrmrest", "dropbox"],
+    "offerings": ["app connect professional"]
+    }               
   ]
 }
