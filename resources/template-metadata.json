@@ -790,6 +790,6 @@
     "targetApps": ["googlesheet", "slack"],
     "tags": ["eventbrite", "googlesheets", "slack", "spreadsheet", "event", "attendee"],
     "offerings": ["app connect professional"]
-    }, 
+    }
   ]
 }
