@@ -729,7 +729,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Record Microsoft Dynamics 365 campaign members to Google Sheets",
+    "name": "Record Microsoft Dynamics 365 campaign to Google Sheets",
     "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics 365 to Google Sheet",
     "sourceApp": "msdynamicscrmrest",
