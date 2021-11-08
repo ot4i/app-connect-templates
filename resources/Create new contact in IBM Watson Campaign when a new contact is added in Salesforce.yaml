@@ -24,7 +24,7 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: IBM Watson Campaign Automation Create contact
+              name: Create contact
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
@@ -40,6 +40,6 @@ integration:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
   name: >-
-    Create new contact in IBM Watson Campaign when a new contact is added in
+    Create new contact in Acoustic Campaign when a new contact is added in
     Salesforce
 models: {}
