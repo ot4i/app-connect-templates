@@ -40,5 +40,6 @@ integration:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
   name: >-
-    Create new contact in Acoustic Campaign when a new contact is added in Salesforce
+    Create new contact in Acoustic Campaign when a new contact is added in
+    Salesforce
 models: {}

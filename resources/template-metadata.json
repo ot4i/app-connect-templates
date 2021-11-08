@@ -378,8 +378,8 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Create new contact in Acoustic Campaign when a new contact is added in Salesforce",
- "description": "Use this template to create a new contact in Acoustic Campaign when a new contact is created in the Salesforce.",
+ "name": "Create new contact in IBM Watson Campaign when a new contact is added in Salesforce",
+ "description": "Use this template to create a new contact in IBM Watson Campaign when a new contact is created in the Salesforce.",
  "summary": "Salesforce to IBM Watson Campaign",
  "sourceApp": "salesforce",
  "targetApps": ["silverpop"],
