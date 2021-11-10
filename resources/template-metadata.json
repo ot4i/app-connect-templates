@@ -810,15 +810,6 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Creates an Asana task when a new Microsoft Teams message is created",
-    "description": "This template creates a task in Asana when a new message is created in Microsoft Teams.",
-    "summary": "Microsoft Teams to Asana",
-    "sourceApp": "msteams",
-    "targetApps": ["asana"],
-    "tags": ["msteams", "asana"],
-    "offerings": ["app connect professional"]
-    },
-    {
     "name": "Retrieve emails and move to another folder within Microsoft Exchange",
     "description": "This template is an API driven flow that runs on a Request and Response node. When the API is called, it retrieves emails from Microsoft Exchange. The email is then moved from the source folder to the targeted folder within Microsoft Exchange.",
     "summary": "Microsoft Exchange to Microsoft Exchange",
