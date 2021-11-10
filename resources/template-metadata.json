@@ -167,7 +167,7 @@
  "summary": "Eventbrite to 3 applications",
  "sourceApp": "eventbrite",
  "targetApps": ["eventbrite", "salesforce", "slack"],
- "tags": ["eventbrite", "slack", "salesforce", "contacts", "marketing", "leads", "events", "matching", "city", "notification"],
+ "tags": ["eventbrite", "slack", "salesforce", "contact", "marketing", "lead", "event", "matching", "city", "notification"],
  "offerings": ["app connect professional"]
 },
   {
@@ -185,7 +185,7 @@
     "summary": "Slack to 3 applications",
     "sourceApp": "slack",
     "targetApps": ["googlesheet", "marketo", "slack"],
-    "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "lead", "leadcapturing"],
+    "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "contact", "lead", "leadcapturing"],
     "offerings": ["app connect professional"]
   },
   {
@@ -378,9 +378,9 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Create new contact in IBM Watson Campaign when a new contact is added in Salesforce",
- "description": "Use this template to create a new contact in IBM Watson Campaign when a new contact is created in the Salesforce.",
- "summary": "Salesforce to IBM Watson Campaign",
+ "name": "Create a new contact in Acoustic Campaign when a new contact is added in Salesforce",
+ "description": "Use this template to create a new contact in Acoustic Campaign when a new contact is created in the Salesforce.",
+ "summary": "Salesforce to Acoustic Campaign",
  "sourceApp": "salesforce",
  "targetApps": ["silverpop"],
  "tags": ["salesforce", "silverpop", "marketing", "email", "contact"],
@@ -425,7 +425,7 @@
     "summary": "1 flow using 1 application",
     "sourceApp": "api",
     "targetApps": ["salesforce"],
-    "tags": ["api", "salesforce"],
+    "tags": ["api", "salesforce", "contact"],
     "offerings": ["app connect professional"]
   },{
     "name": "API to create leads in Salesforce using a csv file from Box",
@@ -433,7 +433,7 @@
     "summary": "1 flow using 3 applications",
     "sourceApp": "api",
     "targetApps": ["salesforce"],
-    "tags": ["api", "box", "if", "salesforce"],
+    "tags": ["api", "box", "if", "salesforce", "lead"],
     "offerings": ["app connect professional"]
   },{
  "name": "Download a PDF attachment from Salesforce and add the PDF document to the Watson Discovery Service",
@@ -466,7 +466,7 @@
     "summary": "Salesforce to 3 applications",
     "sourceApp": "salesforce",
     "targetApps": ["ibmdb2", "watsonnlclassifier", "salesforce"],
-    "tags": ["Salesforce", "IBM Watson Natural Language Classifier", "crm", "cognitive", "IBM Db2", "batch process"],
+    "tags": ["Salesforce", "IBM Watson Natural Language Classifier", "crm", "cognitive", "IBM Db2", "batch process", "lead"],
     "offerings": ["app connect professional"]
 },
    {
@@ -475,7 +475,7 @@
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["ibmdb2", "salesforce"],
-    "tags": ["Salesforce", "crm", "IBM Db2", "batch process"],
+    "tags": ["Salesforce", "crm", "IBM Db2", "batch process", "lead"],
     "offerings": ["app connect professional"]
 }, {
     "name": "At regular intervals extract Salesforce lead details and upload Box file with CSV output",
@@ -483,7 +483,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["salesforce", "box"],
-    "tags": ["CSV", "Comma-Separated Values", "Salesforce", "Box"],
+    "tags": ["CSV", "Comma-Separated Values", "Salesforce", "Box", "lead"],
     "offerings": ["app connect professional"]
   },
    {
@@ -500,7 +500,7 @@
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
     "targetApps": ["http", "gmail"],
-    "tags": ["http node", "gmail", "JSON parse", "forEach", "retrieve with pagination", "pagination", "api flow"],
+    "tags": ["http node", "gmail", "JSON parse", "foreach", "retrieve with pagination", "pagination", "api flow"],
     "offerings": ["app connect professional"]
   },
    {
@@ -653,7 +653,7 @@
       "summary": "Eventbrite to 2 applications",
       "sourceApp": "eventbrite",
       "targetApps": ["sugarcrm", "gmail"],
-      "tags": ["eventbrite", "sugarcrm", "gmail", "if"],
+      "tags": ["eventbrite", "sugarcrm", "gmail", "if", "event", "lead", "email"],
       "offerings": ["app connect professional"]
     },
     {
@@ -671,7 +671,7 @@
       "summary": "Eventbrite to 2 applications",
       "sourceApp": "eventbrite",
       "targetApps": ["mssharepoint", "slack"],
-      "tags": ["eventbrite", "mssharepoint", "slack"],
+      "tags": ["eventbrite", "mssharepoint", "slack", "site", "list", "message"],
       "offerings": ["app connect professional"]
     },
     {
@@ -689,7 +689,7 @@
       "summary": "Scheduler to 2 applications",
       "sourceApp": "streaming-connector-scheduler",
       "targetApps": ["msdynamicscrmrest", "ibmsterlingsci", "slack"],
-      "tags": ["scheduler", "msdynamics365forsales", "ibmsterlingsci", "forEach", "setVariable", "log", "slack"],
+      "tags": ["scheduler", "msdynamics365forsales", "ibmsterlingsci", "foreach", "setVariable", "log", "slack"],
       "offerings": ["app connect professional"]
     },
     {
@@ -699,6 +699,105 @@
     "sourceApp": "servicenow",
     "targetApps": ["slack"],
     "tags": ["servicenow", "slack", "incident"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
+    "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
+    "summary": "Eventbrite to Microsoft Dynamics 365",
+    "sourceApp": "eventbrite",
+    "targetApps": ["msdynamicscrmrest"],
+    "tags": ["eventbrite", "msdynamicscrmrest"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record Microsoft Dynamics 365 campaign to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Google Sheet",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["msdynamicscrmrest", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Slack notifications for Closed Won opportunities in Microsoft Dynamics 365",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Slack",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["slack"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record Jira issues to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a new issue is created in Jira.",
+    "summary": "Jira to Google Sheets",
+    "sourceApp": "jira",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["jira", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create Box folders for Jira issues",
+    "description": "This template creates a Box folder with the Jira issue key whenever a new issue is created in Jira.",
+    "summary": "Jira to Box",
+    "sourceApp": "jira",
+    "targetApps": ["box"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Slack notifications for Closed Won opportunities in SugarCRM",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in SugarCRM.",
+    "summary": "SugarCRM to Slack",
+    "sourceApp": "sugarcrm",
+    "targetApps": ["slack"],
+    "tags": ["sugarcrm", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite with SugarCRM lead",
+    "description": "This template creates a new lead in SugarCRM when a new attendee is created in Eventbrite.",
+    "summary": "Eventbrite to SugarCRM",
+    "sourceApp": "eventbrite",
+    "targetApps": ["sugarcrm"],
+    "tags": ["eventbrite", "sugarcrm"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a case is created or updated in Microsoft Dynamics 365",
+    "description": "This template allows you to receive Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Microsoft Teams",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["msteams"],
+    "tags": ["msdynamicscrmrest", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
+    "description": "This template allows you to receive Microsoft Teams message with the event details when a new event is created in Eventbrite.",
+    "summary": "Eventbrite to Microsoft Teams",
+    "sourceApp": "eventbrite",
+    "targetApps": ["slack"],
+    "tags": ["eventbrite", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a new Insightly task is created",
+    "description": "This template allows you to receive Microsoft Teams message with the task details when a new Insightly task is created.",
+    "summary": "Insightly to Microsoft Teams",
+    "sourceApp": "insightly",
+    "targetApps": ["msteams"],
+    "tags": ["insightly", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message whenever a response is created in SurveyMonkey",
+    "description": "This template allows you to receive a Slack message whenever a response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Slack",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["slack"],
+    "tags": ["surveymonkey", "slack"],
     "offerings": ["app connect professional"]
     },
     {
@@ -826,6 +925,15 @@
     "targetApps": ["googlespreadsheet"],
     "tags": ["sugarcrm", "googlespreadsheet"],
     "offerings": ["app connect professional"]
-    }            
+    },
+    {
+    "name": "Create a user in Microsoft AD for each contact in Salesforce",
+    "description": "Use this template to retrieve contacts from Salesforce, then for each create a user in Microsoft Active Directory, and then update the Saleforce contact.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["msad", "salesforce"],
+    "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
+    "offerings": ["app connect professional"]
+    }
   ]
 }

@@ -1,0 +1,97 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: WOR
+            parentFilter:
+              key: WOR
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+      connector-type: jira
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.id}}'
+                        - '10':
+                            template: '{{$Trigger.fields.lastViewed}}'
+                        - '11':
+                            template: '{{$Trigger.fields.watches}}'
+                        - '12':
+                            template: '{{$Trigger.fields.creator}}'
+                        - '13':
+                            template: '{{$Trigger.fields.created}}'
+                        - '14':
+                            template: '{{$Trigger.fields.aggregateprogress}}'
+                        - '15':
+                            template: '{{$Trigger.fields.timeestimate}}'
+                        - '16':
+                            template: '{{$Trigger.fields.aggregatetimeoriginalestimate}}'
+                        - '17':
+                            template: '{{$Trigger.fields.progress}}'
+                        - '18':
+                            template: '{{$Trigger.fields.votes}}'
+                        - '19':
+                            template: '{{$Trigger.fields.updated}}'
+                        - '2':
+                            template: '{{$Trigger.self}}'
+                        - '20':
+                            template: '{{$Trigger.fields.status}}'
+                        - '3':
+                            template: '{{$Trigger.key}}'
+                        - '4':
+                            template: '{{$Trigger.fields}}'
+                        - '5':
+                            template: '{{$Trigger.fields.worklog}}'
+                        - '6':
+                            template: '{{$Trigger.fields.subtasks}}'
+                        - '7':
+                            template: '{{$Trigger.fields.aggregatetimespent}}'
+                        - '8':
+                            template: '{{$Trigger.fields.resolutiondate}}'
+                        - '9':
+                            template: '{{$Trigger.fields.workratio}}'
+                  - spreadsheetID:
+                      template: 1uq4YQseJ4jMyTHWsoVlJdrosXXOO9uq-igizix46qTg
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Record Jira issues to Google Sheets
+models: {}
