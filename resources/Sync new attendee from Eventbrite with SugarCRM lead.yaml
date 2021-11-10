@@ -1,0 +1,78 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '344797520005'
+            parentFilter:
+              organizationID: '344797520005'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: sugarcrm
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: SugarCRM Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - alt_address_city:
+                      template: '{{$Trigger.profile.addresses.work.city}}'
+                  - alt_address_country:
+                      template: '{{$Trigger.profile.addresses.work.country}}'
+                  - alt_address_postalcode:
+                      template: '{{$Trigger.profile.addresses.work.postal_code}}'
+                  - alt_address_state:
+                      template: '{{$Trigger.profile.addresses.work.region}}'
+                  - alt_address_street:
+                      template: '{{$Trigger.profile.addresses.work.address_1}}'
+                  - assistant_phone:
+                      template: '{{$Trigger.profile.cell_phone}}'
+                  - birthdate:
+                      template: '{{$Trigger.profile.birth_date}}'
+                  - contact_email:
+                      template: '{{$Trigger.profile.email}}'
+                  - first_name:
+                      template: '{{$Trigger.profile.first_name}}'
+                  - last_name:
+                      template: '{{$Trigger.profile.last_name}}'
+                  - primary_address_city:
+                      template: '{{$Trigger.profile.addresses.home.city}}'
+                  - primary_address_country:
+                      template: '{{$Trigger.profile.addresses.home.country}}'
+                  - primary_address_postalcode:
+                      template: '{{$Trigger.profile.addresses.home.postal_code}}'
+                  - primary_address_state:
+                      template: '{{$Trigger.profile.addresses.home.region}}'
+                  - primary_address_street:
+                      template: '{{$Trigger.profile.addresses.home.address_1}}'
+                  - title:
+                      template: '{{$Trigger.profile.job_title}}'
+                  - website:
+                      template: '{{$Trigger.profile.website}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Sync new attendee from Eventbrite to lead in SugarCRM
+models: {}
