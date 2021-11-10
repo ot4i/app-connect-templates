@@ -1,0 +1,57 @@
+$integration: "http://ibm.com/appconnect/integration/v2/integrationFile"
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: "#/integration/assemblies/assembly-1"
+          options: {}
+      connector-type: jira
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        UPDATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: "#/trigger/payload"
+              branch:
+                - condition:
+                    and:
+                      - "{{$Trigger.fields.status.name}}":
+                          =: "Closed"
+                  execute:
+                    - create-action:
+                        name: Salesforce Close Case
+                        target:
+                          $ref: "#/integration/action-interfaces/action-interface-1"
+                  map:
+                    $map: "http://ibm.com/appconnect/map/v1"
+                    input:
+                      - variable: Trigger
+                        $ref: "#/trigger/payload"
+                    mappings:
+                      - Subject:
+                          template: "{{$SalesforceUpdateCase.Subject}}"
+              output-schema:
+                required: []
+                properties:
+                  Subject:
+                    type: string
+                    title: Subject
+                type: object
+  name: Update a Salesforce Case from a JIRA issue
+models: {}
