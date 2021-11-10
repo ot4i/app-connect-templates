@@ -702,6 +702,105 @@
     "offerings": ["app connect professional"]
     },
     {
+    "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
+    "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
+    "summary": "Eventbrite to Microsoft Dynamics 365",
+    "sourceApp": "eventbrite",
+    "targetApps": ["msdynamicscrmrest"],
+    "tags": ["eventbrite", "msdynamicscrmrest"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record Microsoft Dynamics 365 campaign to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Google Sheet",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["msdynamicscrmrest", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Slack notifications for Closed Won opportunities in Microsoft Dynamics 365",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Slack",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["slack"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record Jira issues to Google Sheets",
+    "description": "This template creates a new row in Google Sheets whenever a new issue is created in Jira.",
+    "summary": "Jira to Google Sheets",
+    "sourceApp": "jira",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["jira", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create Box folders for Jira issues",
+    "description": "This template creates a Box folder with the Jira issue key whenever a new issue is created in Jira.",
+    "summary": "Jira to Box",
+    "sourceApp": "jira",
+    "targetApps": ["box"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Slack notifications for Closed Won opportunities in SugarCRM",
+    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in SugarCRM.",
+    "summary": "SugarCRM to Slack",
+    "sourceApp": "sugarcrm",
+    "targetApps": ["slack"],
+    "tags": ["sugarcrm", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite with SugarCRM lead",
+    "description": "This template creates a new lead in SugarCRM when a new attendee is created in Eventbrite.",
+    "summary": "Eventbrite to SugarCRM",
+    "sourceApp": "eventbrite",
+    "targetApps": ["sugarcrm"],
+    "tags": ["eventbrite", "sugarcrm"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a case is created or updated in Microsoft Dynamics 365",
+    "description": "This template allows you to receive Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Microsoft Teams",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["msteams"],
+    "tags": ["msdynamicscrmrest", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
+    "description": "This template allows you to receive Microsoft Teams message with the event details when a new event is created in Eventbrite.",
+    "summary": "Eventbrite to Microsoft Teams",
+    "sourceApp": "eventbrite",
+    "targetApps": ["slack"],
+    "tags": ["eventbrite", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message when a new Insightly task is created",
+    "description": "This template allows you to receive Microsoft Teams message with the task details when a new Insightly task is created.",
+    "summary": "Insightly to Microsoft Teams",
+    "sourceApp": "insightly",
+    "targetApps": ["msteams"],
+    "tags": ["insightly", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message whenever a response is created in SurveyMonkey",
+    "description": "This template allows you to receive a Slack message whenever a response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Slack",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["slack"],
+    "tags": ["surveymonkey", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
     "name": "Retrieve file content from Microsoft OneDrive then add to IBM Watson Discovery",
     "description": "Use this template to retrieve file content from Microsoft OneDrive and add the same document to the IBM Watson Discovery Service.",
     "summary": "Scheduler to 2 applications",
