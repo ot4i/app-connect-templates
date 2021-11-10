@@ -718,6 +718,15 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Closed JIRA issues close Salesforce Cases",
+      "description": "Trigger executes when a Jira issue is updated to status 'Closed' Retrieve Salesforce cases with matching 'Subject' Updates Salesforce case to status 'Closed' if status is not 'Closed'",
+      "summary": "JIRA to Salesforce",
+      "sourceApp": "jira",
+      "targetApps": ["salesforce"],
+      "tags": ["jira", "salesforce", "scheduler"],
+      "offerings": ["app connect professional"]
     }
   ]
 }
