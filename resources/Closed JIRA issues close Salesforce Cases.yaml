@@ -18,7 +18,7 @@ integration:
       business-object: Case
       connector-type: salesforce
       actions:
-        UPDATE: {}
+        UPDATEALL: {}
   assemblies:
     assembly-1:
       assembly:
@@ -46,12 +46,22 @@ integration:
                     mappings:
                       - Subject:
                           template: "{{$SalesforceUpdateCase.Subject}}"
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: "#/trigger/payload"
+                      message: Status is not "Closed"
+                      status-code: 200
               output-schema:
                 required: []
                 properties:
                   Subject:
                     type: string
-                    title: Subject
+                    title: Status
                 type: object
   name: Update a Salesforce Case from a JIRA issue
 models: {}

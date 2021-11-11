@@ -727,6 +727,15 @@
       "targetApps": ["salesforce"],
       "tags": ["jira", "salesforce", "scheduler"],
       "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Sync leads from Salesforce to Marketo",
+      "description": "For a new lead in Salesforce, Retrieve a matching lead in Marketo by email address. If no matching lead is found in Marketo, Create a new lead in Marketo.",
+      "summary": "Salesforce to Marketo",
+      "sourceApp": "salesforce",
+      "targetApps": ["marketo"],
+      "tags": ["marketo", "salesforce", "scheduler"],
+      "offerings": ["app connect professional"]
     }
   ]
 }

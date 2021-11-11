@@ -1,0 +1,56 @@
+$integration: "http://ibm.com/appconnect/integration/v2/integrationFile"
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: "#/integration/assemblies/assembly-1"
+          options:
+            webhookURLSuffix: default
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Marketo Update or create Lead
+              target:
+                $ref: "#/integration/action-interfaces/action-interface-1"
+              map:
+                mappings:
+                  - Company:
+                      template: "{{$Trigger.company}}"
+                  - Email:
+                      template: "{{$Trigger.email}}"
+                  - FirstName:
+                      template: "{{$Trigger.firstName}}"
+                  - LastName:
+                      template: "{{$Trigger.lastName}}"
+                  - Phone:
+                      template: "{{$Trigger.phone}}"
+                $map: "http://ibm.com/appconnect/map/v1"
+                input:
+                  - variable: Trigger
+                    $ref: "#/trigger/payload"
+              filter:
+                where:
+                  and:
+                    - Company: "{{$Trigger.company}}"
+                    - Email: "{{$Trigger.email}}"
+                input:
+                  - variable: Trigger
+                    $ref: "#/trigger/payload"
+  name: Sync Salesforce new leads to Marketo Leads
+models: {}
