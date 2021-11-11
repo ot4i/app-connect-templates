@@ -817,6 +817,15 @@
     "targetApps": ["msexchange"],
     "tags": ["msexchange", "msexchange"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates an Asana task when a new Microsoft Teams message is created",
+    "description": "This template creates a task in Asana if Microsoft Teams message contains the word 'task'.",
+    "summary": "Microsoft Teams to Asana",
+    "sourceApp": "msteams",
+    "targetApps": ["asana"],
+    "tags": ["msteams", "asana"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
