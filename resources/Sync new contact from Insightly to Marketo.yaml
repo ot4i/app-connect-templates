@@ -1,0 +1,180 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Marketo Update or create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - address:
+                      template: '{{$Trigger.ADDRESS_MAIL_STREET}}'
+                  - city:
+                      template: '{{$Trigger.ADDRESS_MAIL_CITY}}'
+                  - country:
+                      template: '{{$Trigger.ADDRESS_MAIL_COUNTRY}}'
+                  - dateOfBirth:
+                      template: '{{$Trigger.DATE_OF_BIRTH}}'
+                  - fax:
+                      expression: '$Trigger.PHONE_FAX '
+                  - firstName:
+                      template: '{{$Trigger.FIRST_NAME}}'
+                  - lastName:
+                      template: '{{$Trigger.LAST_NAME}}'
+                  - mobilePhone:
+                      expression: '$Trigger.PHONE_MOBILE '
+                  - phone:
+                      expression: '$Trigger.PHONE '
+                  - postalCode:
+                      template: '{{$Trigger.ADDRESS_MAIL_POSTCODE}}'
+                  - salutation:
+                      template: '{{$Trigger.SALUTATION}}'
+                  - state:
+                      template: '{{$Trigger.ADDRESS_MAIL_STATE}}'
+                  - title:
+                      template: '{{$Trigger.TITLE}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  email: '{{$Trigger.EMAIL_ADDRESS}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MarketoUpdateorcreatelead
+                  $ref: '#/node-output/Marketo Update or create lead/response/payload'
+                - variable: MarketoUpdateorcreateleadMetadata
+                  $ref: '#/node-output/Marketo Update or create lead/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MarketoUpdateorcreateleadMetadata."status-code"}}': '200'
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: CGAKSJKBL
+                            - text:
+                                template: >-
+                                  Marketo lead updated for
+                                  {{$MarketoUpdateorcreatelead.firstName}}
+                                  {{$MarketoUpdateorcreatelead.lastName}} in
+                                  Insightly 
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoUpdateorcreatelead
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response/payload
+                            - variable: MarketoUpdateorcreateleadMetadata
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$MarketoUpdateorcreateleadMetadata."status-code"}}': '201'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: CGAKSJKBL
+                            - text:
+                                template: >-
+                                  Marketo lead created for
+                                  {{$MarketoUpdateorcreatelead.firstName}}
+                                  {{$MarketoUpdateorcreatelead.lastName}} in
+                                  Insightly
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoUpdateorcreatelead
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response/payload
+                            - variable: MarketoUpdateorcreateleadMetadata
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: MarketoUpdateorcreatelead
+                          $ref: >-
+                            #/node-output/Marketo Update or create
+                            lead/response/payload
+                        - variable: MarketoUpdateorcreateleadMetadata
+                          $ref: '#/node-output/Marketo Update or create lead/response'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: No Marketo  lead were created or updated
+                      status-code: 200
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Sync new  contact from Insightly to Marketo lead
+models: {}

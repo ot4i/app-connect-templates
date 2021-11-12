@@ -1,0 +1,58 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msdynamicscrmrest
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: '{{$Trigger.description}}'
+                  - idBoard:
+                      template: 615e9e03f493fa2c13228657
+                  - idList:
+                      template: 615e9e5f68084f7b4a32db7d
+                  - idOrganization:
+                      template: 614328d05b8b6657b3908fdf
+                  - name:
+                      template: '{{$Trigger.title}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Create a new Trello card for a MS Dynamics case
+models: {}

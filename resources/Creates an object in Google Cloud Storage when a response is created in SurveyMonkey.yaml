@@ -1,0 +1,72 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Responses
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            survey_id: '294407158'
+            collector_id: '409509472'
+            parentFilter:
+              survey_id: '294407158'
+              collector_id: '409509472'
+      connector-type: surveymonkey
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Object
+      connector-type: googlecloudstorage
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Google Cloud Storage Update or create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - ACL:
+                      template: public-read
+                  - Body:
+                      template: '{{$Trigger}}'
+                  - ContentType:
+                      template: text/plain
+                  - EnableBodySigning:
+                      expression: 'true'
+                  - ServerSideEncryption:
+                      template: AES256
+                  - StorageClass:
+                      template: STANDARD
+                  - bucketName:
+                      template: 00001test
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - Key: '{{$Trigger.survey_id}}'
+                    - bucketName: 00001test
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    For a new surveymonkey response create an object in Google Cloud storage
+    with survey details
+models: {}
