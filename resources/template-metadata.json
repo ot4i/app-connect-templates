@@ -1071,6 +1071,15 @@
     "offerings": ["app connect professional"]
     },
     {
+    "name": "Send a Slack notification for resolved case in Microsoft Dynamics 365",
+    "description": "This template creates a Slack message to notify user when a case is marked as resolved in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Slack",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["slack"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },  
+    {
     "name": "Creates an Asana task when a new Microsoft Teams message is created",
     "description": "This template creates a task in Asana if Microsoft Teams message contains the word 'task'.",
     "summary": "Microsoft Teams to Asana",
