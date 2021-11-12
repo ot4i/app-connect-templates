@@ -7,11 +7,16 @@ integration:
       triggers:
         CREATED:
           input-context:
-            data: ticket
+            data: Responses
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
-          options: {}
-      connector-type: servicenow
+          options:
+            survey_id: '292669030'
+            collector_id: '410335577'
+            parentFilter:
+              survey_id: '292669030'
+              collector_id: '410335577'
+      connector-type: surveymonkey
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -32,21 +37,24 @@ integration:
                   - body:
                       mappings:
                         - content:
-                            template: '{{$Trigger.description}}'
+                            template: >-
+                              Survey Monkey Response details are logged :-
+                              {{$Trigger}}
                   - channelId:
-                      template: 19:4c778591986d4c64a49a9d872e4870e8@thread.tacv2
+                      template: 19:d04c2e464fb0493cb864566e868d1649@thread.tacv2
                   - subject:
                       template: >-
-                        New ServiceNow ticket- {{$Trigger.number}}-
-                        {{$Trigger.short_description}} is created by
-                        {{$Trigger.sys_created_by}}
+                        Response is created survey monkey with  Response ID :
+                        {{$Trigger.id}}
                   - teamId:
-                      template: a074b49c-281a-4c1a-9a6c-e847f6a1ee9a
+                      template: 3a41ad11-334b-4c10-a48f-ac185cf18043
                 $map: http://ibm.com/appconnect/map/v1
                 input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
         tags:
           - incomplete
-  name: New ticket in Servicenow will send a notification via MSTeams
+  name: New response received for a survey will post a message in MS Teams
 models: {}

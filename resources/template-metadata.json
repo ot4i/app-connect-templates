@@ -808,6 +808,42 @@
     "targetApps": ["msonedrive", "watsondiscovery"],
     "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
     "offerings": ["app connect professional"]
+    },     	
+    {
+    "name": "Creates a list item attachment in SharePoint and uploads it to Box when a new attachment is created in ServiceNow",
+    "description": "This template uploads an attachment file with its details to a specified Box folder from Microsoft SharePoint when new attachment is created in ServiceNow.",
+    "summary": "ServiceNow to 2 applications ",
+    "sourceApp": "servicenow",
+    "targetApps": ["mssharepoint", "box"],
+    "tags": ["servicenow", "mssharepoint", "box"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Microsoft Teams message whenever a response is created in SurveyMonkey",
+    "description": "This template allows you to receive a Microsoft Teams message whenever a response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Microsoft Teams",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["msteams"],
+    "tags": ["surveymonkey", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a file in Dropbox when a response is created in SurveyMonkey",
+    "description": "This template creates a new file in Dropbox with the survey details whenever a response is created in SurveyMonkey.",
+    "summary": "SurveyMonkey to Dropbox",
+    "sourceApp": "surveymonkey",
+    "targetApps": ["dropbox"],
+    "tags": ["surveymonkey", "dropbox"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record ServiceNow ticket details to Google Sheets",
+    "description": "Use this template to create a new row in Google Sheets when a ticket is created in ServiceNow.",
+    "summary": "ServiceNow to Google Sheets",
+    "sourceApp": "servicenow",
+    "targetApps": ["googlespreadsheet"],
+    "tags": ["servicenow", "googlespreadsheet"],
+    "offerings": ["app connect professional"]
     },    	
     {
     "name": "Create new Trello card when a new case is created in Microsoft Dynamics 365",
@@ -937,11 +973,20 @@
     },
     {
     "name": "Send a Microsoft Teams message when a ticket is created in ServiceNow",
-    "description": "This template creates a new Microsoft Teams message with the ticket details when a new ticket is created in ServiceNow.",
+    "description": "This template creates a Microsoft Teams message with the ServiceNow ticket details when a ticket is created in ServiceNow.",
     "summary": "ServiceNow to Microsoft Teams",
     "sourceApp": "servicenow",
     "targetApps": ["msteams"],
     "tags": ["servicenow", "msteams"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a Dropbox file when a new attachment is created in ServiceNow",
+    "description": "This template uploads the attachment file details to Dropbox when a new attachment is created in ServiceNow",
+    "summary": "ServiceNow to Dropbox",
+    "sourceApp": "servicenow",
+    "targetApps": ["dropbox"],
+    "tags": ["servicenow", "dropbox"],
     "offerings": ["app connect professional"]
     },
     {

@@ -1,0 +1,165 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: servicenow
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: sys_attachment
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: ListItemAttachment
+      connector-type: mssharepoint
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: ListItemAttachment
+      connector-type: mssharepoint
+      actions:
+        DOWNLOADLISTITEMATTACHMENT: {}
+    action-interface-3:
+      type: api-action
+      business-object: ListItemAttachment
+      connector-type: mssharepoint
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft SharePoint Create list item attachment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - FileName:
+                      template: '{{$millis()}}{{$Trigger.file_name}}'
+                  - ListId:
+                      template: 7e11aaae-7418-45b9-aad5-809ef5143716
+                  - ListItemId:
+                      template: '4'
+                  - SitePath:
+                      template: /
+                  - content:
+                      template: '{{$Trigger.FileContent}}'
+                  - fileType:
+                      template: Text
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Microsoft SharePoint Retrieve list item attachments
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  and:
+                    - ServerRelativeUrl: >-
+                        {{$MicrosoftSharePointCreatelistitemattachment.ServerRelativeUrl}}
+                    - ListId: 7e11aaae-7418-45b9-aad5-809ef5143716
+                    - SitePath: /
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftSharePointCreatelistitemattachment
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Create list item
+                      attachment/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - custom-action:
+              name: Microsoft SharePoint Download list item attachment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADLISTITEMATTACHMENT
+              map:
+                mappings:
+                  - ServerRelativeUrl:
+                      template: >-
+                        {{$MicrosoftSharePointRetrievelistitemattachments.ServerRelativeUrl}}
+                  - SiteCollectionURL:
+                      template: >-
+                        {{$MicrosoftSharePointRetrievelistitemattachments.SiteCollectionURL}}
+                  - fileType:
+                      template: Text
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftSharePointCreatelistitemattachment
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Create list item
+                      attachment/response/payload
+                  - variable: MicrosoftSharePointRetrievelistitemattachments
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Retrieve list item
+                      attachments/response/payload
+                  - variable: MicrosoftSharePointRetrievelistitemattachmentsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Retrieve list item
+                      attachments/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Box Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - content:
+                      template: >-
+                        {{$MicrosoftSharePointDownloadlistitemattachment.content}}
+                  - fileType:
+                      template: Text
+                  - name:
+                      template: '{{$millis()}} {{$Trigger.file_name}}'
+                  - parent_id:
+                      template: '100505460527'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftSharePointCreatelistitemattachment
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Create list item
+                      attachment/response/payload
+                  - variable: MicrosoftSharePointRetrievelistitemattachments
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Retrieve list item
+                      attachments/response/payload
+                  - variable: MicrosoftSharePointRetrievelistitemattachmentsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Retrieve list item
+                      attachments/response
+                  - variable: MicrosoftSharePointDownloadlistitemattachment
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Download list item
+                      attachment/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    New attachment in ServiceNow will create listitem attachment in SharePoint
+    and upload it to box
+models: {}
