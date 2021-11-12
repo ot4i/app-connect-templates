@@ -1,0 +1,69 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: insightly
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: msdynamicscrmrest
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Dynamics 365 for Sales Create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - address1_city:
+                      template: '{{$Trigger.ADDRESS_MAIL_CITY}}'
+                  - address1_country:
+                      template: '{{$Trigger.ADDRESS_MAIL_COUNTRY}}'
+                  - address1_line1:
+                      template: '{{$Trigger.ADDRESS_MAIL_STREET}}'
+                  - address1_postalcode:
+                      template: '{{$Trigger.ADDRESS_MAIL_POSTCODE}}'
+                  - address1_stateorprovince:
+                      template: '{{$Trigger.ADDRESS_MAIL_STATE}}'
+                  - assistantname:
+                      template: '{{$Trigger.ASSISTANT_NAME}}'
+                  - emailaddress1:
+                      template: '{{$Trigger.EMAIL_ADDRESS}}'
+                  - fax:
+                      template: '{{$Trigger.PHONE_FAX}}'
+                  - firstname:
+                      template: '{{$Trigger.FIRST_NAME}}'
+                  - lastname:
+                      template: '{{$Trigger.LAST_NAME}}'
+                  - mobilephone:
+                      template: '{{$Trigger.PHONE_MOBILE}}'
+                  - telephone1:
+                      template: '{{$Trigger.PHONE}}'
+                  - telephone2:
+                      template: '{{$Trigger.PHONE_HOME}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackCreatemessage
+                    $ref: '#/node-output/Slack Create message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Sync insightly contacts with msdynamics contact
+models: {}

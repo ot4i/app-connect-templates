@@ -808,7 +808,97 @@
     "targetApps": ["msonedrive", "watsondiscovery"],
     "tags": ["msonedrive", "watsondiscovery", "scheduler", "document", "upload", "encoding"],
     "offerings": ["app connect professional"]
-    },    	
+    }, 	
+    {
+    "name": "Creates an object in Amazon S3 when a new lead is created in Microsoft Dynamics 365",
+    "description": "This template creates the lead details in Amazon S3 when a new lead is created in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Amazon S3",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["amazons3"],
+    "tags": ["msdynamicscrmrest", "amazons3"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates an object in Amazon S3 when an attachment of type incident is created in ServiceNow",
+    "description": "This template creates the attachment details in Amazon S3  when an attachment of type incident is created in ServiceNow.",
+    "summary": "ServiceNow to Amazon S3  ",
+    "sourceApp": "servicenow",
+    "targetApps": ["amazons3"],
+    "tags": ["servicenow", "amazons3"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a Dropbox folder and shares the link via Slack when a new spreadsheet is created in Google Sheets",
+    "description": "This template creates a Dropbox folder when a new spread sheet is created in Google Sheets. A Dropbox share link is created for the folder and shared through a Slack message.",
+    "summary": "Goolge Sheets to 2 applications ",
+    "sourceApp": "googlespreadsheet",
+    "targetApps": ["dropbox", "dropbox", "slack"],
+    "tags": ["dropbox", "googlespreadsheet", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a file in Dropbox when a new email is received in Gmail",
+    "description": "This template creates a file with the email details in Dropbox when a new email is received in Gmail.",
+    "summary": "Gmail to Dropbox",
+    "sourceApp": "gmail",
+    "targetApps": ["dropbox"],
+    "tags": ["gmail", "dropbox"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite to lead in Insightly",
+    "description": "This template creates a new lead in Insightly when a new attendee is created in Eventbrite.",
+    "summary": " Eventbrite to Insightly",
+    "sourceApp": "eventbrite",
+    "targetApps": ["insightly"],
+    "tags": ["eventbrite", "insightly"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new contact from Insightly to Marketo",
+    "description": "This template finds a matching lead in Marketo based on the email address when a new contact is created Insightly. If a matching lead is not found, the lead is created in Marketo and a Slack notification is sent. If a matching lead is found, the lead is updated in Marketo and a Slack notification is sent.",
+    "summary": "Insightly to 2 applications",
+    "sourceApp": "insightly",
+    "targetApps": ["marketo", "slack"],
+    "tags": ["insightly", "marketo", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a Trello card for a new Insightly lead",
+    "description": "This template adds the card to the list in Trello when a lead is created in Insightly.",
+    "summary": "Insightly to Trello",
+    "sourceApp": "insightly",
+    "targetApps": ["trello"],
+    "tags": ["insightly", "trello"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync Insightly new leads with Salesforce leads",
+    "description": "This template creates new leads in Salesforce when a new lead is created in Insightly.",
+    "summary": "Insightly to Salesforce",
+    "sourceApp": "insightly",
+    "targetApps": ["salesforce"],
+    "tags": ["insightly", "salesforce"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync Insightly contacts with Microsoft Dynamics 365 contacts",
+    "description": "This template creates a contact in Microsoft Dynamics 365 for Sales when a new contact is created in Insightly.",
+    "summary": "Insightly to Microsoft Dynamics 365",
+    "sourceApp": "insightly",
+    "targetApps": ["msdynamicscrmrest"],
+    "tags": ["insightly", "msdynamicscrmrest"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a file in Box when a new incident is created in ServiceNow",
+    "description": "This template creates a new file in Box with the incident details when a new incident is created in ServiceNow.",
+    "summary": "ServiceNow to Box",
+    "sourceApp": "servicenow",
+    "targetApps": ["box"],
+    "tags": ["servicenow", "box"],
+    "offerings": ["app connect professional"]
+    },
     {
     "name": "Creates an object in Amazon S3 when a response is created in SurveyMonkey",
     "description": "This template creates an object in Amazon S3 with the survey details when a new response is created in SurveyMonkey.",
@@ -969,6 +1059,33 @@
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["slack"],
     "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Retrieve emails and move to another folder within Microsoft Exchange",
+    "description": "This template is an API driven flow that runs on a Request and Response node. When the API is called, it retrieves emails from Microsoft Exchange. The email is then moved from the source folder to the targeted folder within Microsoft Exchange.",
+    "summary": "Microsoft Exchange to Microsoft Exchange",
+    "sourceApp": "msexchange",
+    "targetApps": ["msexchange"],
+    "tags": ["msexchange", "msexchange"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack notification for resolved case in Microsoft Dynamics 365",
+    "description": "This template creates a Slack message to notify user when a case is marked as resolved in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to Slack",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["slack"],
+    "tags": ["msdynamicscrmrest", "slack"],
+    "offerings": ["app connect professional"]
+    },  
+    {
+    "name": "Creates an Asana task when a new Microsoft Teams message is created",
+    "description": "This template creates a task in Asana if Microsoft Teams message contains the word 'task'.",
+    "summary": "Microsoft Teams to Asana",
+    "sourceApp": "msteams",
+    "targetApps": ["asana"],
+    "tags": ["msteams", "asana"],
     "offerings": ["app connect professional"]
     },
     {
