@@ -1,0 +1,65 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: ListItem
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            SitePath: /
+            ListId: 7e11aaae-7418-45b9-aad5-809ef5143716
+            parentFilter:
+              SitePath: /
+              ListId: 7e11aaae-7418-45b9-aad5-809ef5143716
+            subscription:
+              createdField: Created
+              updatedField: Modified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+      connector-type: mssharepoint
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: >-
+                        New listitem id - {{$Trigger.ID}} --with
+                        {{$Trigger.Title}}
+                  - idBoard:
+                      template: 615e9e03f493fa2c13228657
+                  - idList:
+                      template: 615e9e5f68084f7b4a32db7d
+                  - idOrganization:
+                      template: 614328d05b8b6657b3908fdf
+                  - name:
+                      template: '{{$Trigger.Title}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Create a new Trello card for new SharePoint listitem
+models: {}

@@ -1,0 +1,50 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msteams
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Message
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            teamId: 3a41ad11-334b-4c10-a48f-ac185cf18043
+            channelId: 19:d04c2e464fb0493cb864566e868d1649@thread.tacv2
+            parentFilter:
+              teamId: 3a41ad11-334b-4c10-a48f-ac185cf18043
+              channelId: 19:d04c2e464fb0493cb864566e868d1649@thread.tacv2
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: CGAKSJKBL
+                  - text:
+                      template: message is updated-->{{$Trigger}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Slack notification for updated message in MS Teams
+models: {}
