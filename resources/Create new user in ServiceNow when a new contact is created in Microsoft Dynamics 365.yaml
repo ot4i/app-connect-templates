@@ -1,0 +1,163 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: msdynamicscrmrest
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: imp_user
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: imp_user
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ServiceNow Retrieve user
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  email: '{{$Trigger.emailaddress1}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ServiceNowRetrieveuser
+                  $ref: '#/node-output/ServiceNow Retrieve user/response/payload'
+                - variable: ServiceNowRetrieveuserMetadata
+                  $ref: '#/node-output/ServiceNow Retrieve user/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ServiceNowRetrieveuserMetadata."status-code"}}': '204'
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create user
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - department:
+                                template: '{{$Trigger.department}}'
+                            - email:
+                                template: '{{$Trigger.emailaddress1}}'
+                            - first_name:
+                                template: ' {{$Trigger.firstname}}'
+                            - last_name:
+                                template: '{{$Trigger.lastname}}'
+                            - phone:
+                                template: '{{$Trigger.mobilephone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowRetrieveuser
+                              $ref: >-
+                                #/node-output/ServiceNow Retrieve
+                                user/response/payload
+                            - variable: ServiceNowRetrieveuserMetadata
+                              $ref: '#/node-output/ServiceNow Retrieve user/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - channel:
+                                template: CGAKSJKBL
+                            - text:
+                                template: User is created-->{{$ServiceNowCreateuser}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowCreateuser
+                              $ref: >-
+                                #/block/If/node-output/ServiceNow Create
+                                user/response/payload
+                            - variable: ServiceNowRetrieveuser
+                              $ref: >-
+                                #/node-output/ServiceNow Retrieve
+                                user/response/payload
+                            - variable: ServiceNowRetrieveuserMetadata
+                              $ref: '#/node-output/ServiceNow Retrieve user/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Create message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - channel:
+                              template: CGAKSJKBL
+                          - text:
+                              template: No User created
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: ServiceNowRetrieveuser
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve
+                              user/response/payload
+                          - variable: ServiceNowRetrieveuserMetadata
+                            $ref: '#/node-output/ServiceNow Retrieve user/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Create a new user in servicenow for MS Dynamics case
+models: {}
