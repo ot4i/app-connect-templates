@@ -1,0 +1,83 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: servicenow
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.number}}'
+                        - '10':
+                            template: '{{$Trigger.description}}'
+                        - '11':
+                            template: '{{$Trigger.sys_id}}'
+                        - '12':
+                            template: '{{$Trigger.impact}}'
+                        - '13':
+                            template: '{{$Trigger.sys_created_on}}'
+                        - '14':
+                            template: ' {{$Trigger.sys_created_by}}'
+                        - '15':
+                            template: '{{$Trigger.expected_start}}'
+                        - '16':
+                            template: '{{$Trigger.sla_due}}'
+                        - '17':
+                            template: '{{$Trigger.urgency}}'
+                        - '18':
+                            template: '{{$Trigger.company}}'
+                        - '2':
+                            template: '{{$Trigger.assignment_group}}'
+                        - '3':
+                            template: '{{$Trigger.assigned_to}}'
+                        - '4':
+                            template: '{{$Trigger.parent}}'
+                        - '5':
+                            template: '{{$Trigger.priority}}'
+                        - '6':
+                            template: '{{$Trigger.state}}'
+                        - '7':
+                            template: ' {{$Trigger.due_date}}'
+                        - '8':
+                            template: '{{$Trigger.short_description}}'
+                        - '9':
+                            template: '{{$Trigger.escalation}}'
+                  - spreadsheetID:
+                      template: 1MTITb0hAGdLB2ekIUzXfI2kpAfwbXlSUEKz9qVD-Xhw
+                  - worksheetID:
+                      template: DS-Test-01
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Record ServiceNow ticket details to Google Sheet
+models: {}

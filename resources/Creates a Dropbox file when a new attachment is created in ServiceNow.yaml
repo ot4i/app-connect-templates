@@ -1,0 +1,82 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: sys_attachment
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: servicenow
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: sys_attachment
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ServiceNow Retrieve attachments
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - file_name: '{{$Trigger.file_name}}'
+                    - AttachmentOwnerId: 47138238a9fe1981016e3762d1fd26d4
+                    - AttachmentOwnerType: incident
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - create-action:
+              name: Dropbox Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fileContent:
+                      template: '{{$Trigger.FileContent}}'
+                  - fileType:
+                      template: '{{$Trigger.contentType}}'
+                  - name:
+                      template: ' {{$Trigger.file_name}}'
+                  - path:
+                      template: /home
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ServiceNowRetrieveattachments
+                    $ref: >-
+                      #/node-output/ServiceNow Retrieve
+                      attachments/response/payload
+                  - variable: ServiceNowRetrieveattachmentsMetadata
+                    $ref: '#/node-output/ServiceNow Retrieve attachments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    Create a DropBox file for a newly created attachment for incident in Service
+    now
+models: {}
