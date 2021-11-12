@@ -1,0 +1,204 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: msdynamicscrmrest
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Marketo Update or create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - address:
+                      template: '{{$Trigger.address1_name}}'
+                  - billingCity:
+                      template: '{{$Trigger.address2_city}}'
+                  - billingCountry:
+                      template: '{{$Trigger.address2_country}}'
+                  - billingPostalCode:
+                      template: '{{$Trigger.address2_postalcode}}'
+                  - billingState:
+                      template: '{{$Trigger.address2_stateorprovince}}'
+                  - billingStreet:
+                      template: '{{$Trigger.address2_composite}}'
+                  - city:
+                      template: '{{$Trigger.address1_city}}'
+                  - company:
+                      template: '{{$Trigger.parentcustomerid_account_account}}'
+                  - country:
+                      template: '{{$Trigger.address1_country}}'
+                  - dateOfBirth:
+                      template: '{{$Trigger.birthdate}}'
+                  - department:
+                      template: '{{$Trigger.department}}'
+                  - fax:
+                      expression: '$Trigger.fax '
+                  - firstName:
+                      template: '{{$Trigger.firstname}}'
+                  - lastName:
+                      template: '{{$Trigger.lastname}}'
+                  - leadRole:
+                      template: '{{$Trigger.accountrolecode}}'
+                  - leadSource:
+                      template: '{{$Trigger.leadsourcecode}}'
+                  - leadStatus:
+                      template: '{{$Trigger.statecode}}'
+                  - middleName:
+                      template: '{{$Trigger.middlename}}'
+                  - mobilePhone:
+                      expression: '$Trigger.mobilephone '
+                  - phone:
+                      expression: '$Trigger.telephone2 '
+                  - postalCode:
+                      template: '{{$Trigger.address1_postalcode}}'
+                  - salutation:
+                      template: '{{$Trigger.salutation}}'
+                  - state:
+                      template: '{{$Trigger.address1_stateorprovince}}'
+                  - title:
+                      template: '{{$Trigger.jobtitle}}'
+                  - website:
+                      template: '{{$Trigger.websiteurl}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  email: '{{$Trigger.emailaddress1}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MarketoUpdateorcreatelead
+                  $ref: '#/node-output/Marketo Update or create lead/response/payload'
+                - variable: MarketoUpdateorcreateleadMetadata
+                  $ref: '#/node-output/Marketo Update or create lead/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MarketoUpdateorcreateleadMetadata."status-code"}}': '200'
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: CGAKSJKBL
+                            - text:
+                                template: >-
+                                  Marketo lead updated for {{$Trigger.fullname}}
+                                  in ms dynamics  
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoUpdateorcreatelead
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response/payload
+                            - variable: MarketoUpdateorcreateleadMetadata
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$MarketoUpdateorcreateleadMetadata."status-code"}}': '201'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: CGAKSJKBL
+                            - text:
+                                template: >-
+                                  Marketo lead created for {{$Trigger.fullname}}
+                                  in ms dynamics 
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoUpdateorcreatelead
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response/payload
+                            - variable: MarketoUpdateorcreateleadMetadata
+                              $ref: >-
+                                #/node-output/Marketo Update or create
+                                lead/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: MarketoUpdateorcreatelead
+                          $ref: >-
+                            #/node-output/Marketo Update or create
+                            lead/response/payload
+                        - variable: MarketoUpdateorcreateleadMetadata
+                          $ref: '#/node-output/Marketo Update or create lead/response'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: No Marketo  lead were created or updated
+                      status-code: 200
+              output-schema: {}
+  name: Sync new or updated contact from MS Dynamics to Marketo
+models: {}

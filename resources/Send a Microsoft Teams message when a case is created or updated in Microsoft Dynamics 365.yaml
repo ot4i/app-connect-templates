@@ -1,0 +1,61 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: msdynamicscrmrest
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Teams Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: case details are as follows :- {{$Trigger}}
+                  - channelId:
+                      template: 19:d04c2e464fb0493cb864566e868d1649@thread.tacv2
+                  - subject:
+                      template: >-
+                        MS Dynamics  case with  case number :-
+                        {{$Trigger.ticketnumber}} 
+                  - teamId:
+                      template: 3a41ad11-334b-4c10-a48f-ac185cf18043
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    When Case is created or updated in MSDynamics send notification to a
+    particular channel in msteams
+models: {}
