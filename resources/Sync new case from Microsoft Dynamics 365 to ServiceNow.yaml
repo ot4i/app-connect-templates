@@ -1,0 +1,108 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msdynamicscrmrest
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ServiceNow Retrieve incidents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  short_description: '{{$Trigger.title}} '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ServiceNowRetrieveincidents
+                  $ref: '#/node-output/ServiceNow Retrieve incidents/response/payload'
+                - variable: ServiceNowRetrieveincidentsMetadata
+                  $ref: '#/node-output/ServiceNow Retrieve incidents/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ServiceNowRetrieveincidentsMetadata."status-code"}}': '204'
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create incident
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - description:
+                                template: '{{$Trigger.description}}'
+                            - due_date:
+                                template: '{{$Trigger.slaid_sla}}'
+                            - parent_incident:
+                                template: '{{$Trigger.parentcaseid}}'
+                            - resolved_by:
+                                template: ' {{$Trigger.resolveby}}'
+                            - short_description:
+                                template: '{{$Trigger.title}}'
+                            - sys_created_by:
+                                template: '{{$Trigger.createdby}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowRetrieveincidents
+                              $ref: >-
+                                #/node-output/ServiceNow Retrieve
+                                incidents/response/payload
+                            - variable: ServiceNowRetrieveincidentsMetadata
+                              $ref: >-
+                                #/node-output/ServiceNow Retrieve
+                                incidents/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Sync new case from MS Dynamics to ServiceNow
+models: {}
