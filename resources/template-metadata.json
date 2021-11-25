@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+	{
+    "name": "Post a Slack notification when a new task is created in Asana",
+    "description": "Use this template to post a message in slack when a new asana task is created.",
+    "summary": "Asana to Slack",
+    "sourceApp": "asana",
+    "targetApps": ["slack"],
+    "tags": ["asana", "slack", "new-task"],
+    "offerings": ["app connect professional"]
+    },
+	{
+    "name": "Post a Slack notification when a task is completed in Asana",
+    "description": "Use this template to post a message in slack when a task is completed.",
+    "summary": "Asana to Slack",
+    "sourceApp": "asana",
+    "targetApps": ["slack"],
+    "tags": ["asana", "slack", "completed-task"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
