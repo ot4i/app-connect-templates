@@ -1251,7 +1251,7 @@
     "offerings": ["app connect professional"]
     },
 	{
-    "name": "Post a Slack notification when a new task is created in Asana",
+    "name": "Post a Slack message when a new task is created in Asana",
     "description": "Use this template to post a message in slack when a new asana task is created.",
     "summary": "Asana to Slack",
     "sourceApp": "asana",
@@ -1260,8 +1260,8 @@
     "offerings": ["app connect professional"]
     },
 	{
-    "name": "Post a Slack notification when a task is completed in Asana",
-    "description": "Use this template to post a message in slack when a task is completed.",
+    "name": "Post a Slack message when a new completed task is created in Asana",
+    "description": "Use this template to post a message in slack when a new and completed task is created in Asana.",
     "summary": "Asana to Slack",
     "sourceApp": "asana",
     "targetApps": ["slack"],
