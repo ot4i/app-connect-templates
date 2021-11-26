@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](pastetheurlforthisreadmehere) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Post%20a%20Slack%20message%20when%20a%20new%20completed%20task%20is%20created%20in%20Asana_instructions.md) (opens in a new window).
 
 This flow will monitor your Asana account for any new added and completed tasks. When a new and completed task is added to your Asana workspace, this will trigger the flow to post a message to your Slack channel that a new and completed Asana task has been added, notifying you of the task name and the completion date. 
 
