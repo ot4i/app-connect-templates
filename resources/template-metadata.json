@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Append a new row to Google Sheets when a new task is created on Asana",
+    "description": "Learn how easy it is to use App Connect to connect Asana to Google Sheets so that every time someone creates a new task on Asana a new row is appended automatically to a sheet in Google Sheet.",
+    "summary": "Asana to Google Sheet",
+    "sourceApp": "asana",
+    "targetApps": ["googlesheets"],
+    "tags": ["asana", "new task", "googlesheets", "row"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Add new Lead to SalesForce when a new attendee is added to Eventbrite",
+    "description": "Learn how easy it is to use App Connect to connect Eventbrite to Sales Force so that every time a new attendee is added to Eventbrite a new lead is added automatically to Sales Force if the e mail is missing a new email is sent to the event owner using Gmail.",
+    "summary": "Eventbrite to 2 applications using an if node",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce", "gmail"],
+    "tags": ["eventbrite", "salesforce", "gmail", "new", "attendee", "email", "lead", "if", "conditions"],
+    "offerings": ["app connect professional"]
+  }
   ]
 }
