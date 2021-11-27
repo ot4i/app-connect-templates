@@ -1,0 +1,119 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.profile.email}}':
+                      '=': ''
+                  execute:
+                    - create-action:
+                        name: Gmail Create email 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: E-mail for {{$Trigger.profile.name}} not found
+                            - Subject:
+                                template: Attendee e-mail not found
+                            - To:
+                                template: someone@email.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                  completion-action:
+                    terminate:
+                      info:
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        message: E-mail not found
+                        status-code: 200
+              else:
+                execute:
+                  - create-action:
+                      name: Salesforce Create lead
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - City:
+                              template: '{{$Trigger.profile.addresses.home.city}}'
+                          - Company:
+                              template: '{{$Trigger.profile.company}}'
+                          - Country:
+                              template: '{{$Trigger.profile.addresses.home.country}}'
+                          - Email:
+                              template: '{{$Trigger.profile.email}}'
+                          - FirstName:
+                              template: '{{$Trigger.profile.first_name}}'
+                          - LastName:
+                              template: '{{$Trigger.profile.last_name}}'
+                          - LeadSource:
+                              template: Other
+                          - Phone:
+                              template: '{{$Trigger.profile.cell_phone}}'
+                          - PostalCode:
+                              template: '{{$Trigger.profile.addresses.home.postal_code}}'
+                          - State:
+                              template: '{{$Trigger.profile.addresses.home.region}}'
+                          - Street:
+                              template: '{{$Trigger.profile.addresses.home.address_1}}'
+                          - Website:
+                              template: '{{$Trigger.profile.website}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: Success
+                      status-code: 200
+              output-schema: {}
+  name: Eventbrite to Marketo Leds
+models: {}
