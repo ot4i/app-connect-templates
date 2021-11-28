@@ -1249,6 +1249,33 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Add new row in Google Sheets for new Task in Asana",
+    "description": "Use this template to add a new Google Sheet row for every new Task created in Asana.",
+    "summary": "Google Sheets to Asana",
+    "sourceApp": "Google Sheets",
+    "targetApps": ["Asana"],
+    "tags": ["GoogleSheets", "Asana"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message for newly created completed task in Asana",
+    "description": "Use this template to Send a Slack message when a completed task is created in Asana.",
+    "summary": "Asana to Slack",
+    "sourceApp": "Asana",
+    "targetApps": ["Slack"],
+    "tags": ["Slack", "Asana"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a Slack message for newly created task in Asana",
+    "description": "Use this template to Send a Slack message when a task is created in Asana.",
+    "summary": "Asana to Slack",
+    "sourceApp": "Asana",
+    "targetApps": ["Slack"],
+    "tags": ["Slack", "Asana"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
