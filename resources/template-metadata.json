@@ -1249,6 +1249,15 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Sync new/updated issue from Jira to Salesforce",
+    "description": "A new issue is created in Jira. Retrieve a matching case in Salesforce by Jira summary.If no matching case is found in Salesforce, Create a new case in Salesforce.",
+    "summary": "jira to salesforce",
+    "sourceApp": "jira",
+    "targetApps": ["salesforce"],
+    "tags": ["jira", "salesforce", "case", "retrieve", "issue"],
+    "offerings": ["app connect professional"]
+  }            
   ]
 }
