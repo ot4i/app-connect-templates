@@ -1,0 +1,52 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: jira
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: C2
+            parentFilter:
+              key: C2
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tasks
+      connector-type: asana
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Asana Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: new-task-project23
+                  - project:
+                      template: '1201376800191138'
+                  - workspace-id:
+                      template: '969633112286638'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: cmpe-272-flow-1
+models: {}
