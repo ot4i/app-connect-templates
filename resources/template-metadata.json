@@ -1258,6 +1258,15 @@
     "targetApps": ["salesforce"],
     "tags": ["jira", "salesforce", "case", "retrieve", "issue"],
     "offerings": ["app connect professional"]
-  }            
+    },
+    {
+    "name": "Record Salesforce campaign members to Google Sheets",
+    "description": "For a campaign member is created in Salesforce. Create campaign member in Google Sheets as a new row.",
+    "summary": "salesforce to Google Sheets",
+    "sourceApp": "salesforce",
+    "targetApps": ["Google Sheets"],
+    "tags": ["salesforce", "Google Sheets", "sheets", "google", "campaign", "campaign member"],
+    "offerings": ["app connect professional"]
+  }
   ]
 }
