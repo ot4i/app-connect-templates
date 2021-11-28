@@ -16,7 +16,7 @@
     "targetApps": ["salesforce","servicenow"],
     "tags": ["servicenow", "salesforce", "case", "support", "ticket"],
     "offerings": ["app connect professional"]
-  },
+  },               
   {
     "name": "Open a ticket on ServiceNow from an identified issue in Slack and send an email using Gmail",
     "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow will send you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Create an issue in Asana when an issue is created in JIRA",
+    "summary": "JIRA to ASANA",
+    "description": "This template looks for new issues created in JIRA and creates a new issue in ASANA.",
+    "sourceApp": "JIRA",
+    "targetApps": ["ASANA"],
+    "tags": ["JIRA", "ASANA"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Send an SMS when a task is created in ASANA",
+    "summary": "ASANA to Twillo",
+    "description": "This template looks for new tasks in created in ASANA and sends an SMS for every task created.",
+    "sourceApp": "ASANA",
+    "targetApps": ["TWILLO"],
+    "tags": ["TWILLO", "ASANA"],
+    "offerings": ["app connect professional"]
+  }
   ]
 }
