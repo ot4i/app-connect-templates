@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {	
+      "name": "New row in Google Sheet creates a Lead in Zoho CRM",
+      "description": "Use this template to create a Lead in Zoho CRM when a new row is added in Google Sheets",
+      "summary": "Google Sheets to Zoho CRM Lead",
+      "sourceApp": "googlesheet",
+      "targetApps": ["zoho"],
+      "tags": ["googlesheets", "zoho", "lead", "row"],
+      "offerings": ["app connect professional"]
+	  }, 
+    {	
+      "name": "Salesforce campaign syncs with campaign in Zoho CRM",
+      "description": "This template creates a new campaign in Zoho when a new campaign is created in Salesforce",
+      "summary": "Salesforce campaign to Zoho campaign",
+      "sourceApp": "salesforce",
+      "targetApps": ["zoho"],
+      "tags": ["salesforce", "zoho", "campaign", "crm"],
+      "offerings": ["app connect professional"]
+	  }
   ]
 }
