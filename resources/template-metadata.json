@@ -1249,6 +1249,16 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new case from Salesforce to FreshDesk",
+    "description": "For new case in Salesforce, create a new ticket in FreshDesk. Use salesforce case id as external ID in FreshDesk.",
+    "summary": "Salesforce to FreshDesk",
+    "sourceApp": "salesforce",
+    "targetApps": ["freshdesk"],
+    "tags": ["freshdesk", "salesforce", "ticket"],
+    "offerings": ["app connect professional"]
     }
+                
   ]
 }
