@@ -1249,6 +1249,15 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Record new lead activity from Marketo to Google Sheets",
+    "description": "Use this template to automatically update a Google Sheets document with data from new leads from Marketo.",
+    "summary": "Automatically update a Google Spreadsheet with Marketo new leads.",
+    "sourceApp": "marketo",
+    "targetApps": ["googlesheet"],
+    "tags": ["marketo", "googlesheet", "leads"],
+    "offerings": ["app connect professional"]
     }
   ]
 }

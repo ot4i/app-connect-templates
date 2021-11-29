@@ -1,0 +1,58 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: marketo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.id}}'
+                        - '2':
+                            template: '{{$Trigger.firstName}}'
+                        - '3':
+                            template: '{{$Trigger.lastName}}'
+                        - '4':
+                            template: '{{$Trigger.phone}}'
+                        - '5':
+                            template: '{{$Trigger.email}}'
+                        - '6':
+                            template: '{{$Trigger.company}}'
+                  - spreadsheetID:
+                      template: 16SEe6TDI92A1JN6Khki0ga4h271Jo6wnmyUANC1OoA8
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Record new lead activity from Marketo to Google Sheets
+models: {}
