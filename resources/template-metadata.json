@@ -826,7 +826,7 @@
     "targetApps": ["msdynamicscrmrest", "dropbox"],
     "tags": ["scheduler", "msdynamicscrmrest", "dropbox"],
     "offerings": ["app connect professional"]
-    }, 	
+    },
     {
     "name": "Creates an object in Amazon S3 when a new lead is created in Microsoft Dynamics 365",
     "description": "This template creates the lead details in Amazon S3 when a new lead is created in Microsoft Dynamics 365 for Sales.",
@@ -988,7 +988,7 @@
     "targetApps": ["marketo", "slack"],
     "tags": ["sugarcrm", "marketo", "slack"],
     "offerings": ["app connect professional"]
-    },     	
+    },
     {
     "name": "Creates a list item attachment in SharePoint and uploads it to Box when a new attachment is created in ServiceNow",
     "description": "This template uploads an attachment file with its details to a specified Box folder from Microsoft SharePoint when new attachment is created in ServiceNow.",
@@ -1024,7 +1024,7 @@
     "targetApps": ["googlespreadsheet"],
     "tags": ["servicenow", "googlespreadsheet"],
     "offerings": ["app connect professional"]
-    },    	
+    },
     {
     "name": "Create new Trello card when a new case is created in Microsoft Dynamics 365",
     "description": "Use this template to create a new Trello card when a new case is created in Microsoft Dynamics 365 for Sales.",
@@ -1042,7 +1042,7 @@
     "targetApps": ["servicenow"],
     "tags": ["msdynamicscrmrest", "servicenow"],
     "offerings": ["app connect professional"]
-    },		
+    },
     {
     "name": "Send a Microsoft Teams message when a new product is created in Microsoft Dynamics 365",
     "description": "This template creates a new Microsoft Teams message when a new product is created in Microsoft Dynamics 365 for Sales.",
@@ -1096,7 +1096,7 @@
     "targetApps": ["slack"],
     "tags": ["msdynamicscrmrest", "slack"],
     "offerings": ["app connect professional"]
-    },  
+    },
     {
     "name": "Creates an Asana task when a new Microsoft Teams message is created",
     "description": "This template creates a task in Asana if Microsoft Teams message contains the word 'task'.",
@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+      "name": "New row in Google Sheet creates a Lead in Zoho CRM",
+      "description": "Use this template to create a Lead in Zoho CRM when a new row is added in Google Sheets",
+      "summary": "Google Sheets to Zoho CRM Lead",
+      "sourceApp": "googlesheet",
+      "targetApps": ["zoho"],
+      "tags": ["googlesheets", "zoho", "lead", "row"],
+      "offerings": ["app connect professional"]
+	  },
+    {
+      "name": "Salesforce campaign syncs with campaign in Zoho CRM",
+      "description": "This template creates a new campaign in Zoho when a new campaign is created in Salesforce",
+      "summary": "Salesforce campaign to Zoho campaign",
+      "sourceApp": "salesforce",
+      "targetApps": ["zoho"],
+      "tags": ["salesforce", "zoho", "campaign", "crm"],
+      "offerings": ["app connect professional"]
+	  }
   ]
 }
