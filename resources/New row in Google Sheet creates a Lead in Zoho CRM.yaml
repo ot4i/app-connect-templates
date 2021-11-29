@@ -1,0 +1,104 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlesheet
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1SAlaEGPdsDnQIEdNJyXsyEMFvAk0Z32PCHt771TitzM
+            worksheetID: Sheet1_test
+            parentFilter:
+              spreadsheetID: 1SAlaEGPdsDnQIEdNJyXsyEMFvAk0Z32PCHt771TitzM
+              worksheetID: Sheet1_test
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: zohocrm
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Zoho CRM Create leads insert records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Annual_Revenue:
+                      expression: '$Trigger.fields."3" '
+                  - City:
+                      template: '{{$Trigger.fields."4"}}'
+                  - Company:
+                      template: '{{$Trigger.fields."5"}}'
+                  - Country:
+                      template: '{{$Trigger.fields."6"}}'
+                  - Description:
+                      template: '{{$Trigger.fields."7"}}'
+                  - Designation:
+                      template: '{{$Trigger.fields."8"}}'
+                  - Email:
+                      template: '{{$Trigger.fields."9"}}'
+                  - Email_Opt_Out:
+                      expression: '$Trigger.fields."10" '
+                  - Fax:
+                      template: '{{$Trigger.fields."11"}}'
+                  - First_Name:
+                      template: '{{$Trigger.fields."1"}}'
+                  - Industry:
+                      template: '{{$Trigger.fields."12"}}'
+                  - InfluitiveStatus:
+                      template: '{{$Trigger.fields."13"}}'
+                  - Last_Name:
+                      template: '{{$Trigger.fields."2"}}'
+                  - Lead_Source:
+                      template: '{{$Trigger.fields."14"}}'
+                  - Lead_Status:
+                      template: '{{$Trigger.fields."15"}}'
+                  - Mobile:
+                      template: '{{$Trigger.fields."16"}}'
+                  - No_of_Employees:
+                      expression: '$Trigger.fields."17" '
+                  - Owner:
+                      mappings:
+                        - id:
+                            template: '{{$Trigger.fields."18"}}'
+                        - name:
+                            template: '{{$Trigger.fields."19"}}'
+                  - Phone:
+                      template: '{{$Trigger.fields."20"}}'
+                  - Rating:
+                      template: '{{$Trigger.fields."21"}}'
+                  - ReferralId:
+                      template: '{{$Trigger.fields."22"}}'
+                  - Salutation:
+                      template: '{{$Trigger.fields."23"}}'
+                  - Secondary_Email:
+                      template: '{{$Trigger.fields."24"}}'
+                  - Skype_ID:
+                      template: '{{$Trigger.fields."25"}}'
+                  - State:
+                      template: '{{$Trigger.fields."26"}}'
+                  - Street:
+                      template: '{{$Trigger.fields."27"}}'
+                  - Twitter:
+                      template: '{{$Trigger.fields."28"}}'
+                  - Website:
+                      template: '{{$Trigger.fields."29"}}'
+                  - Zip_Code:
+                      template: '{{$Trigger.fields."30"}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: New row in Google Sheet creates a Lead in Zoho CRM
+models: {}
