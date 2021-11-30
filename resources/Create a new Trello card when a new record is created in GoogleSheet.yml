@@ -17,13 +17,11 @@ integration:
               spreadsheetID: 1g6KnZraL6Ygi6-Af0uO1s6VZowW9Td2yn_Pz_5PWn7E
               worksheetID: Sheet1
       connector-type: googlesheet
-      account-name: Account 3
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Card
       connector-type: trello
-      account-name: Account 2
       actions:
         CREATE: {}
   assemblies:
@@ -52,5 +50,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Trello GoogleSheet Task2
+  name: Create a new Trello card when a new row is added in Google Sheets
 models: {}

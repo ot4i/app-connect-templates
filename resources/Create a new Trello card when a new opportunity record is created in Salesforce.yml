@@ -12,13 +12,11 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: salesforce
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Card
       connector-type: trello
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
@@ -49,5 +47,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Trello-Salesforce_Task1
+  name: Create a new Trello card when a new opportunity record is created in Salesforce
 models: {}
