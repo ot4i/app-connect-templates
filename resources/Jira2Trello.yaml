@@ -1,0 +1,54 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: jira
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: TEST
+            parentFilter:
+              key: TEST
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Action
+      connector-type: trello
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Trello Retrieve actions
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - idBoard: 6192af3190873d49c3343591
+                    - idList: 6192af3190873d49c3343592
+                    - idOrganization: 6192a3eaab5f364439fe16eb
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              allow-empty-output: false
+  name: Jira2Trello
+models: {}
