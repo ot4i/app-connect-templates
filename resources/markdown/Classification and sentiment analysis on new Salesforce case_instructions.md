@@ -8,4 +8,4 @@ To refer to these instructions while editing the flow, open [the github page](ht
 6. In the **Slack** node, choose the channel that you want to post the message to.
 7. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
-To test the flow, create a new Case in your Salesforce account (make sure you select an Account and in the Subject field enter the text that you want analyzed; for example, `Excellent service` or `Bad service`)
+To test the flow, create a new Case in your Salesforce account (make sure that you select an Account and in the Subject field, enter the text that you want to be analyzed; for example, `Excellent service` or `Bad service`).
