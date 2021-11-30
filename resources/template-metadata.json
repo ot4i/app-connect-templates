@@ -1256,7 +1256,7 @@
     "summary": "Salesforce Case to Trello Ticket",
     "sourceApp": "salesforce",
     "targetApps": ["trello"],
-    "tags": ["salesforce", "trello],
+    "tags": ["salesforce", "trello"],
     "offerings": ["app connect professional"]
     },
     {
@@ -1265,7 +1265,7 @@
     "summary": "Jira Issue to Trello Ticket",
     "sourceApp": "jira",
     "targetApps": ["trello"],
-    "tags": ["jira", "trello],
+    "tags": ["jira", "trello"],
     "offerings": ["app connect professional"]
     }
   ]
