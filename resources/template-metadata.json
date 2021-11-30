@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create Trello Ticket from Salesforce Case created",
+    "description": "Add a Trello Ticket when a Case record is created on Salesforce. The case description, subject, type should be copied over the Trello ticket.",
+    "summary": "Salesforce Case to Trello Ticket",
+    "sourceApp": "salesforce",
+    "targetApps": ["trello"],
+    "tags": ["salesforce", "trello],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "New issue in JIRA will create a new Trello card",
+    "description": "When there is a new issue from JIRA, create a Trello card If not exist.",
+    "summary": "Jira Issue to Trello Ticket",
+    "sourceApp": "jira",
+    "targetApps": ["trello"],
+    "tags": ["jira", "trello],
+    "offerings": ["app connect professional"]
     }
   ]
 }
