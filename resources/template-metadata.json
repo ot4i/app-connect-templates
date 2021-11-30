@@ -1249,6 +1249,15 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite to account in Salesforce",
+    "description": "This template creates account in Salesforce when a new attendee from Eventbrite is created.",
+    "summary": "Eventbrite to Salesforce",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce"],
+    "tags": ["eventbrite", "salesforce"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
