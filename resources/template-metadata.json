@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new attendee from Eventbrite to lead in Zoho CRM",
+    "description": "This template creates a new lead in Zoho CRM for new attendees in Eventbrite.",
+    "summary": "Eventbrite to Zoho CRM",
+    "sourceApp": "eventbrite",
+    "targetApps": ["zohocrm"],
+    "tags": ["eventbrite", "zohocrm", "attendee", "lead"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "New lead in Marketo will create contact in Zoho CRM",
+    "description": "This template creates a new contact in Zoho CRM when there is a new lead in Marketo.",
+    "summary": "Marketo to Zoho CRM",
+    "sourceApp": "marketo",
+    "targetApps": ["zohocrm"],
+    "tags": ["marketo", "zohocrm", "contact", "lead"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
