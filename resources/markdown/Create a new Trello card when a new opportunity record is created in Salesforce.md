@@ -9,6 +9,8 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 4. To start the flow, click **Start flow**.
 
-5. In Salesforce, create a new opportunity record.   
+## Testing the Flow
 
-6. A new card would be created in the Trello app with corresponding metadata.
+1. In Salesforce, create a new opportunity record.   
+
+2. A new card would be created in the Trello app with corresponding metadata.

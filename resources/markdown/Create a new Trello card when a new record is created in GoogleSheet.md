@@ -8,6 +8,8 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 4. To start the flow, click **Start flow**.
 
-5. Start adding rows to the configured Google Sheets worksheet to see new cards being created in the connected Trello account.
+## Testing the Flow
 
-6. A new card would be created in the Trello app with corresponding metadata.
+1. Start adding rows to the configured Google Sheets worksheet to see new cards being created in the connected Trello account.
+
+2. A new card would be created in the Trello app with corresponding metadata.
