@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Create a new card in Trello when a new opportunity record is created in Salesforce",
+      "description": "Learn how easy it is to use App Connect to connect Salesforce to Trello so that every time a new opportunity is created in Salesforce, details of that opportunity are added automatically to a card list in the Trello account.",
+      "summary": "Salesforce to Trello",
+      "sourceApp": "salesforce",
+      "targetApps": ["trello"],
+      "tags": ["salesforce", "trello", "opportunity", "card", "list", "sales", "event-driven flow"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Create a new card in Trello when a new row is added in Google Sheets",
+      "description": "Learn how easy it is to use App Connect to connect Google Sheets to Trello so that every time a new row is added in Google Sheets, a new card is created in the Trello account with metadata of the new row from Google Sheets.",
+      "summary": "Google Sheets to Trello",
+      "sourceApp": "googlesheets",
+      "targetApps": ["trello"],
+      "tags": ["trello", "googlesheets", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
+      "offerings": ["app connect professional"]
     }
   ]
 }
