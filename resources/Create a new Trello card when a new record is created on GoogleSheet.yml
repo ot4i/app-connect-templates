@@ -1,0 +1,56 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1g6KnZraL6Ygi6-Af0uO1s6VZowW9Td2yn_Pz_5PWn7E
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1g6KnZraL6Ygi6-Af0uO1s6VZowW9Td2yn_Pz_5PWn7E
+              worksheetID: Sheet1
+      connector-type: googlesheet
+      account-name: Account 3
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      account-name: Account 2
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: '{{$Trigger}}'
+                  - idBoard:
+                      template: 61a44a633402157a709e8607
+                  - idList:
+                      template: 61a44a8fb303823e7849ee20
+                  - idOrganization:
+                      template: 61a40d9ca6103209ec19bb93
+                  - name:
+                      template: '{{$flowDetails.flowName}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Trello GoogleSheet Task2
+models: {}
