@@ -1,10 +1,10 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20new%20Trello%20card%20for%20a%20new%20Salesforce%20campaign_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to create an event-driven flow to start using the template on IBM App connect.
+1. Click **Create flow** to create an event-driven flow to start using the template on IBM App Connect.
 
-2. Connect to your [Google sheet account](http://ibm.biz/acgsheets) on the App connect by configuring the Google drive API, sheets API with appropriate credentials of the google account with required access permission.
+2. Connect to your [Google sheet account](http://ibm.biz/acgsheets) on the App Connect by configuring the Google drive API, sheets API with appropriate credentials of the google account with required access permission.
 
-3. Connect to your [Trello account](https://ibm.biz/actrello) to the IBM App connect and configure the board and list in which the cards are to be added when a new opportunity record is created on salesforce.
+3. Connect to your [Trello account](https://ibm.biz/actrello) to the IBM App Connect and configure the board and list in which the cards are to be added when a new opportunity record is created on salesforce.
 
 4. To start the flow, click **Start flow**.
 
