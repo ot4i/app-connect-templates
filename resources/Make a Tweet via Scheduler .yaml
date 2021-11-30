@@ -1,0 +1,120 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: statuses
+      connector-type: twitter
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: notification-card
+      actions: {}
+      options:
+        card:
+          layout:
+            direction: vertical
+            style: layoutA
+            items:
+              - direction: horizontal
+                style: header
+                items:
+                  - style: icon
+                    widget_id: icon
+                  - direction: vertical
+                    items:
+                      - style: title
+                        widget_id: nameLabel
+                      - style: subtitle
+                        widget_id: timestamp
+              - direction: vertical
+                style: content
+                items:
+                  - widget_id: descriptionLabel
+              - style: buttons
+                widget_id: btnGrp1
+          widgets:
+            - id: icon
+              widget: icon
+            - id: timestamp
+              widget: timestamp
+            - id: btnGrp1
+              widget: buttonGroup
+              widget_ids: []
+            - id: nameLabel
+              widget: text
+              binding: description
+              value: New notification
+            - id: descriptionLabel
+              widget: text
+              value: 'Tweeted '
+        input:
+          - variable: Trigger
+            $ref: '#/trigger/payload'
+          - variable: TwitterCreatetweet
+            $ref: '#/node-output/Twitter Create tweet/response/payload'
+          - variable: flowDetails
+            $ref: '#/flowDetails'
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Twitter Create tweet
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - status:
+                      template: Sample Tweet using IBM Connect
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - notification:
+              name: Notification
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: TwitterCreatetweet
+                    $ref: '#/node-output/Twitter Create tweet/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+  name: Tweet_Flow
+models: {}
