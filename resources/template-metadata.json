@@ -1249,6 +1249,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Make a Tweet via Scheduler",
+    "description": "This template tweets every 1 min on every new day via twitter. Also notification is sent when we tweet .",
+    "summary": "Scheduler to Twitter to Notification”,
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["twitter"],
+    "tags": ["streaming-connector-scheduler", "twitter"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Slack Notification via Scheduler",
+    "description": "This template posts a new slack message on a specified channel based on the scheduler.",
+    "summary": "Scheduler to Slack",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["slack"],
+    "tags": ["streaming-connector-scheduler", "slack"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
