@@ -1243,7 +1243,7 @@
     "offerings":["app connect professional"]
     },
     {
-    "name":"New Issue in Jira will Create new Task in Asana",
+    "name":"Creates a task in Asana when an issue is created in Jira",
     "summary":"Jira to Asana",
     "sourceApp":"jira",
     "targetApps":"asana",
