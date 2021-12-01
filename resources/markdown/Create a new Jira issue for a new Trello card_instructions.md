@@ -12,4 +12,4 @@ The flow is started when a new issue is created in Jira.
 ## Testing the Flow
 
 1. In Jira, create a new issue
-2. A new card will be created in Trello with the Jira issue name and description
+2. A new card will be created in Trello with the Jira issue id as the name
