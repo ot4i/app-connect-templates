@@ -48,5 +48,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: cmpe-272-flow-1
+  name: Create an issue in Asana when an issue is created in Jira
 models: {}
