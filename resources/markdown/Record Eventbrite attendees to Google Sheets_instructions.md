@@ -5,6 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 3. Connect to your [Eventbrite account](https://ibm.biz/aceventbrite) and then select the Organization that you want to use.
 4. Click the Google Sheets / **Create row** node.
 5. Connect to your [Google Sheet account](https://ibm.biz/acgsheets) and then select the Google Sheets spreadsheet and worksheet that you want to use. 
+6. Ensure that there are apropriate mappings for the worksheet.  For example, to create a mapping in a field for the person's name, you can click in the field, start typing `name`, and then select the **Attendee / Profile / Name** field.
 7. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
 To test your flow:
