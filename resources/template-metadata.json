@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send slack notification for salesforce Closed Won opportunities",
+    "description": "Use this template to send a slack notification when a saleforce opportunity is in Closed Won stage.",
+    "summary": "Salesforce to Slack",
+    "sourceApp": "salesforce",
+    "targetApps": ["slack"],
+    "tags": ["Salesforce", "opportunity", "Slack", "Closed Won opportunities"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Upload salesforce opportunity attachments to dropbox",
+    "description": "Use this template to create an opportunity with multiple attachments. Search for a folder in dropbox account which matches with the created opportunity ID. If found, upload the attachments to the dropbox folder.",
+    "summary": "Salesforce to Dropbox",
+    "sourceApp": "salesforce",
+    "targetApps": ["dropbox"],
+    "tags": ["Salesforce", "opportunity", "dropbox", "attachments","folder","upload"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
