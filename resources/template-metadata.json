@@ -1252,8 +1252,8 @@
     },
     {
     "name": "Create a new Jira issue for a new Trello card",
-    "description": "When there is a new issue from Jira, create a Trello card.",
-    "summary": "Jira Issue to Trello Ticket",
+    "description": "When a new issue is created in Jira, a new Trello card is created with metadata from the Jira issue.",
+    "summary": "Jira Issue to Trello Card",
     "sourceApp": "jira",
     "targetApps": ["trello"],
     "tags": ["jira", "trello"],
