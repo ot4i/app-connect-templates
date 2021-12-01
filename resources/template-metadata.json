@@ -2,9 +2,9 @@
   "templates": [{
     "name": "Classification and sentiment analysis on new Salesforce case",
     "description": "Use this template to enrich your new Salesforce cases with cognitive information like the classification of the case and what the tone of the case is. This helps you prioritize dealing with new cases and ensures they get the attention they require.",
-    "summary": "Salesforce to 4 applications",
+    "summary": "Salesforce to 3 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["watsonnlclassifier", "watsontoneanalyzer", "salesforce", "slack"],
+    "targetApps": ["watsontoneanalyzer", "salesforce", "slack"],
     "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "crm", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   },
@@ -460,16 +460,7 @@
     "tags": ["scheduler", "atlassianjira", "service desk", "tickets", "issues", "priority", "incidents", "JSONata", "for each", "log", "logging", "high", "highest"],
     "offerings": ["app connect professional"]
   },
-   {
-    "name": "Populate a Salesforce campaign with leads captured in IBM Db2 and cognitively rate each lead",
-    "description": "This template detects when a new campaign is created in Salesforce, identifies leads from the associated trade show whose details were stored in an IBM Db2 database, and then populates Salesforce with these leads. The template also uses cognitive analysis to rate the Salesforce leads as Hot, Warm, or Cold.",
-    "summary": "Salesforce to 3 applications",
-    "sourceApp": "salesforce",
-    "targetApps": ["ibmdb2", "watsonnlclassifier", "salesforce"],
-    "tags": ["Salesforce", "IBM Watson Natural Language Classifier", "crm", "cognitive", "IBM Db2", "batch process", "lead"],
-    "offerings": ["app connect professional"]
-},
-   {
+  {
     "name": "Populate a Salesforce campaign with leads captured in IBM Db2",
     "description": "This template detects when a new campaign is created in Salesforce, identifies leads from the associated trade show whose details were stored in an IBM Db2 database, and then populates Salesforce with these leads.",
     "summary": "Salesforce to 2 applications",
@@ -477,7 +468,8 @@
     "targetApps": ["ibmdb2", "salesforce"],
     "tags": ["Salesforce", "crm", "IBM Db2", "batch process", "lead"],
     "offerings": ["app connect professional"]
-}, {
+  },
+ {
     "name": "At regular intervals extract Salesforce lead details and upload Box file with CSV output",
     "description": "This template gathers 10 leads from Salesforce, uses their names and email addresses to build a CSV file, then outputs the file to Box. The flow triggers once per day at 00:00 UTC.",
     "summary": "Scheduler to 2 applications",
@@ -519,15 +511,6 @@
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["salesforce", "slack", "gmail"],
     "tags": ["scheduler", "salesforce", "slack", "gmail", "batch", "process", "sync", "email", "retrieve", "add", "create", "update", "upsert", "leads", ""],
-    "offerings": ["app connect professional"]
-  },
-   {
-    "name": "Classifying Salesforce cases and posting a message in Slack",
-    "description": "Use this template to classify the text from a Salesforce case. Then, after the text has been classified, automatically create a message in Slack identifying the type of case that has been raised and the case number.",
-    "summary": "Salesforce to 2 applications",
-    "sourceApp": "salesforce",
-    "targetApps": ["watsonnlclassifier", "slack"],
-    "tags": ["watson", "salesforce", "slack", "classifier", "natural", "language", "case", "classification", "train"],
     "offerings": ["app connect professional"]
   },
    {
@@ -826,7 +809,7 @@
     "targetApps": ["msdynamicscrmrest", "dropbox"],
     "tags": ["scheduler", "msdynamicscrmrest", "dropbox"],
     "offerings": ["app connect professional"]
-    }, 	
+    },
     {
     "name": "Creates an object in Amazon S3 when a new lead is created in Microsoft Dynamics 365",
     "description": "This template creates the lead details in Amazon S3 when a new lead is created in Microsoft Dynamics 365 for Sales.",
@@ -988,7 +971,7 @@
     "targetApps": ["marketo", "slack"],
     "tags": ["sugarcrm", "marketo", "slack"],
     "offerings": ["app connect professional"]
-    },     	
+    },
     {
     "name": "Creates a list item attachment in SharePoint and uploads it to Box when a new attachment is created in ServiceNow",
     "description": "This template uploads an attachment file with its details to a specified Box folder from Microsoft SharePoint when new attachment is created in ServiceNow.",
@@ -1024,7 +1007,7 @@
     "targetApps": ["googlespreadsheet"],
     "tags": ["servicenow", "googlespreadsheet"],
     "offerings": ["app connect professional"]
-    },    	
+    },
     {
     "name": "Create new Trello card when a new case is created in Microsoft Dynamics 365",
     "description": "Use this template to create a new Trello card when a new case is created in Microsoft Dynamics 365 for Sales.",
@@ -1042,7 +1025,7 @@
     "targetApps": ["servicenow"],
     "tags": ["msdynamicscrmrest", "servicenow"],
     "offerings": ["app connect professional"]
-    },		
+    },
     {
     "name": "Send a Microsoft Teams message when a new product is created in Microsoft Dynamics 365",
     "description": "This template creates a new Microsoft Teams message when a new product is created in Microsoft Dynamics 365 for Sales.",
@@ -1096,7 +1079,7 @@
     "targetApps": ["slack"],
     "tags": ["msdynamicscrmrest", "slack"],
     "offerings": ["app connect professional"]
-    },  
+    },
     {
     "name": "Creates an Asana task when a new Microsoft Teams message is created",
     "description": "This template creates a task in Asana if Microsoft Teams message contains the word 'task'.",
@@ -1267,6 +1250,51 @@
       "targetApps": ["trello"],
       "tags": ["trello", "googlesheets", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
       "offerings": ["app connect professional"]
-    }
+    },
+    {
+      "name": "Create a new lead in Zoho CRM when a row is added in Google Sheets",
+      "description": "Use this template to create a lead in Zoho CRM when a new row is added in Google Sheets",
+      "summary": "Google Sheets to Zoho CRM Lead",
+      "sourceApp": "googlesheet",
+      "targetApps": ["zohocrm"],
+      "tags": ["googlesheets", "zohocrm", "lead", "row"],
+      "offerings": ["app connect professional"]
+	  },
+    {
+      "name": "Create a new campaign in Zoho CRM when a campaign is created in Salesforce",
+      "description": "This template creates a new campaign in Zoho CRM when a new campaign is created in Salesforce",
+      "summary": "Salesforce campaign to Zoho campaign",
+      "sourceApp": "salesforce",
+      "targetApps": ["zohocrm"],
+      "tags": ["salesforce", "zohocrm", "campaign", "crm"],
+      "offerings": ["app connect professional"]
+	  },
+    {
+    "name": "Sync new case from Salesforce to Freshdesk",
+    "description": "For a new case in Salesforce, create a new ticket in Freshdesk. Use the Salesforce case ID as the external ID of the ticket in Freshdesk.",
+    "summary": "Salesforce to FreshDesk",
+    "sourceApp": "salesforce",
+    "targetApps": ["freshdesk"],
+    "tags": ["freshdesk", "salesforce", "ticket"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send an SMS message when a new task is created in Asana",
+    "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
+    "summary": "asana to twilio",
+    "sourceApp": "asana",
+    "targetApps": ["twilio"],
+    "tags": ["asana","twilio"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a task in Asana when an issue is created in Jira",
+    "description": "Whenever a new Issue is created in Jira, a new task is created in Asana",
+    "summary": "Jira to Asana",
+    "sourceApp": "jira",
+    "targetApps": ["asana"],
+    "tags": ["jira","asana"],
+    "offerings": ["app connect professional"]
+    }           
   ]
 }
