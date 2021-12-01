@@ -41,5 +41,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: create a new task in Asana on creating a new salesforce campaign
+  name: Create a new task in Asana when a new Salesforce campaign is created
 models: {}
