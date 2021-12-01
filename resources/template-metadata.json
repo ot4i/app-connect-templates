@@ -1232,6 +1232,36 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Filter and record accounts from salesforce based on number of employees",
+    "description": " Retrieve accounts from salesforce with more than 500 employees and create accounts for those in Google Sheets as a new row. ",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["googlesheet", "googledrive"],
+    "tags": ["scheduler", "salesforce", "googlesheets", "employees"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Add attendee to Salesforce",
+    "description": "This template creates a Salesforce lead when someone registers for an event in Eventbrite",
+    "summary": "Eventbrite to Salesforce",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce"],
+    "tags": ["eventbrite", "salesforce", "events", "lead"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync new/updated contact from Salesforce to Zoho CRM",
+    "description": "This template creates a Zoho lead when someone creates new contact in Salesforce",
+    "summary": "Salesforce to Zoho",
+    "sourceApp": "salesforce",
+    "targetApps": ["zohocrm"],
+    "tags": ["salesforce","zohocrm","lead","contacts"],
+    "offerings": ["app connect professional"]
     }
+                
   ]
 }
+
+
