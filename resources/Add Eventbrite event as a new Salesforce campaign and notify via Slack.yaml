@@ -123,5 +123,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: FundGalaxy Event Creation
+  name: Add Eventbrite event as a new Salesforce campaign and notify via Slack
 models: {}
