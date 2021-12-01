@@ -1239,7 +1239,7 @@
     "summary": "Automating task creation between applications",
     "sourceApp": "Google Sheets",
     "targetApps": ["asana"],
-    "tags": ["marketing", "events", "project management","process automation"."asana"],
+    "tags": ["marketing", "events", "project management","process automation","asana"],
     "offerings": ["app connect professional"]
   },
     {
