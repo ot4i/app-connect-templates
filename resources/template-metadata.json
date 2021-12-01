@@ -1252,7 +1252,7 @@
     },
     {
     "name": "Record Eventbrite attendees to Google Sheets",
-    "description": "Use this template to record attendee registers of Eventbrite events in a new row in Google Sheets",
+    "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets",
     "summary": "Eventbrite to Google Sheet",
     "sourceApp": "eventbrite",
     "targetApps": ["googlesheet"],
