@@ -8,3 +8,8 @@ To refer to these instructions while editing the flow, open [the github page](Cr
 4.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
 The flow is started when a new issue is created in Jira.
+
+## Testing the Flow
+
+1. In Jira, create a new issue
+2. A new card will be created in Trello with the Jira issue name and description
