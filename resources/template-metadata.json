@@ -1234,6 +1234,15 @@
     "offerings": ["app connect professional"]
     },
     {
+    "name": "Sync new case from Salesforce to Freshdesk",
+    "description": "For a new case in Salesforce, create a new ticket in Freshdesk. Use the Salesforce case ID as the external ID of the ticket in Freshdesk.",
+    "summary": "Salesforce to FreshDesk",
+    "sourceApp": "salesforce",
+    "targetApps": ["freshdesk"],
+    "tags": ["freshdesk", "salesforce", "ticket"],
+    "offerings": ["app connect professional"]
+    },
+    {
     "name": "Send an SMS message when a new task is created in Asana",
     "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
     "summary": "asana to twilio",
