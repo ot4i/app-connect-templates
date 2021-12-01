@@ -68,5 +68,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name:Record Eventbrite attendees to Google Sheets
+  name: Record Eventbrite attendees to Google Sheets
 models: {}
