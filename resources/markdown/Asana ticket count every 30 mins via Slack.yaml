@@ -1,0 +1,13 @@
+##Asana ticket count every 30 mins via Slack
+
+To refer to these instructions while editing the flow, open the github page (opens in a new window).
+
+1. Before you start this flow, complete the following steps:
+
+  a) Create an Asana account and create an event using this account.
+  b) Create a Slack account.
+
+2. In App Connect, Click Create flow to start using the template.
+3. Connect to your Asana account.
+4. Connect to your Slack account.
+5. To start the flow, in the banner open the options menu [⋮] then click Start flow.
