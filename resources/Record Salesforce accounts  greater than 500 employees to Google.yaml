@@ -1,0 +1,123 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      account-name: Account 2
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      account-name: Account 2
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve accounts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 50
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveaccounts
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response/payload'
+                - variable: SalesforceRetrieveaccountsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$SalesforceRetrieveaccounts.NumberOfEmployees}}':
+                      gt: '500'
+                  execute: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: SalesforceRetrieveaccounts
+                          $ref: >-
+                            #/node-output/Salesforce Retrieve
+                            accounts/response/payload
+                        - variable: SalesforceRetrieveaccountsMetadata
+                          $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: >-
+                        {{$SalesforceRetrieveaccounts.NumberOfEmployees}} are
+                        less than or equal to 500.
+                      status-code: 200
+              output-schema: {}
+          - create-action:
+              name: Google Sheets Create row 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$SalesforceRetrieveaccounts.Id}}'
+                        - '2':
+                            template: '{{$SalesforceRetrieveaccounts.Name}}'
+                  - spreadsheetID:
+                      template: 1-Y_OyLZ9J8poDkHQ3TtU611CcABOBAW2ea97rk2kJy8
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+  name: Salesforce-GoogleSheets Scheduler
+models: {}
