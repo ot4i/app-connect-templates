@@ -1,0 +1,273 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: FolderItem
+      connector-type: box
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Collaboration
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Collaboration
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Box Retrieve folder items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$BoxRetrievefolderitems.name '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefolderitems
+                    $ref: '#/node-output/Box Retrieve folder items/response/payload'
+                  - variable: BoxRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Box Retrieve folder items/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: parallel
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      for-each-output:
+                        type: boolean
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: BoxRetrievefolderitems
+                    $ref: '#/node-output/Box Retrieve folder items/response/payload'
+                  - variable: BoxRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Box Retrieve folder items/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - for-each-output:
+                            expression: '$If."if-output" '
+              display-name: Box Name
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: '{{$Foreach.output."for-each-output"}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefolderitems
+                    $ref: '#/node-output/Box Retrieve folder items/response/payload'
+                  - variable: BoxRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Box Retrieve folder items/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: BoxRetrievefolderitems
+                  $ref: '#/node-output/Box Retrieve folder items/response/payload'
+                - variable: BoxRetrievefolderitemsMetadata
+                  $ref: '#/node-output/Box Retrieve folder items/response'
+                - variable: Foreach
+                  $ref: '#/node-output/For each/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreach.output."for-each-output"}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: Box Create collaboration 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - accessible_byId:
+                                template: '{{$Trigger.Email}}'
+                            - accessible_byType:
+                                template: user
+                            - itemId:
+                                template: '{{$Trigger.Email}}'
+                            - itemType:
+                                template: folder
+                            - role:
+                                template: editor
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BoxRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Box Retrieve folder
+                                items/response/payload
+                            - variable: BoxRetrievefolderitemsMetadata
+                              $ref: '#/node-output/Box Retrieve folder items/response'
+                            - variable: Foreach
+                              $ref: '#/node-output/For each/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Box Create folder 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - name:
+                              template: '{{$Trigger.FirstName}}'
+                          - parent_id:
+                              template: '0'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxRetrievefolderitems
+                            $ref: >-
+                              #/node-output/Box Retrieve folder
+                              items/response/payload
+                          - variable: BoxRetrievefolderitemsMetadata
+                            $ref: '#/node-output/Box Retrieve folder items/response'
+                          - variable: Foreach
+                            $ref: '#/node-output/For each/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Box Create collaboration
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - accessible_byId:
+                              template: '{{$Trigger.Email}}'
+                          - accessible_byType:
+                              template: user
+                          - itemId:
+                              template: '{{$BoxCreatefolder2.id}}'
+                          - itemType:
+                              template: folder
+                          - role:
+                              template: editor
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxCreatefolder2
+                            $ref: >-
+                              #/block/If 2/node-output/Box Create folder
+                              2/response/payload
+                          - variable: BoxRetrievefolderitems
+                            $ref: >-
+                              #/node-output/Box Retrieve folder
+                              items/response/payload
+                          - variable: BoxRetrievefolderitemsMetadata
+                            $ref: '#/node-output/Box Retrieve folder items/response'
+                          - variable: Foreach
+                            $ref: '#/node-output/For each/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: BoxRetrievefolderitems
+                  $ref: '#/node-output/Box Retrieve folder items/response/payload'
+                - variable: BoxRetrievefolderitemsMetadata
+                  $ref: '#/node-output/Box Retrieve folder items/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.FirstName}}': '{{$Foreachitem}}'
+                  execute: []
+                  map:
+                    mappings:
+                      - if-output:
+                          expression: 'true'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: BoxRetrievefolderitems
+                        $ref: >-
+                          #/node-output/Box Retrieve folder
+                          items/response/payload
+                      - variable: BoxRetrievefolderitemsMetadata
+                        $ref: '#/node-output/Box Retrieve folder items/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema:
+                type: object
+                properties:
+                  if-output:
+                    type: boolean
+                required: []
+  name: Salesforce-box-integration-2
+models: {}
