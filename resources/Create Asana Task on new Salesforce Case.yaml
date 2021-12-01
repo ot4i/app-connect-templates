@@ -1,0 +1,42 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tasks
+      connector-type: asana
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Asana Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$flowDetails.transactionId}}'
+                  - project:
+                      template: '1201377568723315'
+                  - workspace-id:
+                      template: '969633112286638'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create Asana Task on new Salesforce Case
+models: {}
