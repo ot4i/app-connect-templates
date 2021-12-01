@@ -3,7 +3,6 @@ integration:
   type: trigger-action
   trigger-interfaces:
     trigger-interface-1:
-      connector-type: gmail
       type: event-trigger
       triggers:
         CREATED:
@@ -12,15 +11,9 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
+      connector-type: gmail
       account-name: Account 1
   action-interfaces:
-    action-interface-1:
-      type: api-action
-      business-object: Files
-      connector-type: googledrive
-      account-name: Account 1
-      actions:
-        CREATE: {}
     action-interface-2:
       type: api-action
       business-object: mail
@@ -28,6 +21,13 @@ integration:
       account-name: Account 1
       actions:
         RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      account-name: Account 1
+      actions:
+        CREATE: {}
   assemblies:
     assembly-1:
       assembly:
@@ -37,13 +37,6 @@ integration:
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
-                where:
-                  id: '{{$Trigger.id}}'
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: flowDetails
-                    $ref: '#/flowDetails'
                 limit: 1
               allow-truncation: true
               pagination-type: TOKEN
@@ -55,23 +48,11 @@ integration:
               map:
                 mappings:
                   - content:
-                      template: '{{$GmailRetrieveemails.payload.body}}'
-                  - createdTime:
-                      template: '{{$Trigger.Date}}'
-                  - description:
-                      template: '{{$GmailRetrieveemails.snippet}}'
-                  - encoding:
-                      template: UTF-8
+                      template: '{{$GmailRetrieveemails.payload.body.data}}'
                   - isText:
-                      expression: '$exists($Trigger) '
-                  - mimeType:
-                      template: '{{$GmailRetrieveemails.payload.mimeType}}'
-                  - modifiedTime:
-                      template: '{{$GmailRetrieveemails.internalDate}}'
+                      expression: '$exists($GmailRetrieveemails.payload.body ) '
                   - name:
-                      template: '{{$GmailRetrieveemails.id}}'
-                  - parent:
-                      template: IBMEmails
+                      template: '{{$GmailRetrieveemails.payload.filename}}'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
