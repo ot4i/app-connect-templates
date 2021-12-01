@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "New document in Salesforce is added to Google Drive",
+    "description": "Use this template to ensure when new document is created in Salesforce,file is copied in Google Drive.",
+    "summary": "Salesforce to Google Drive",
+    "sourceApp": "salesforce",
+    "targetApps": ["googledrive"],
+    "tags": ["salesforce", "googledrive"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Invite Salesforce contacts to be collaborators into Google Drive folder",
+    "description": "Use this template to retrieve new contacts from Salesforce, then for each new contact,Create a shared folder in Google Drive for the Salesforce account associatedto the contact, if one does not already exist.Invite the Salesforce contact to the company's Google Drive folder.",
+    "summary": "Salesforce to Google Drive",
+    "sourceApp": "salesforce",
+    "targetApps": ["googledrive"."googledrive"],
+    "tags": ["salesforce", "googledrive"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
