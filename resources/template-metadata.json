@@ -9,6 +9,24 @@
     "offerings": ["app connect professional"]
   },
   {
+    "name": "Create a new contact in Salesforce for a new Eventbrite order",
+    "description": "When a new order for an event is created in Eventbrite, this flow tries to retrieve a matching contact in Salesforce by email address. If a matching contact is not found in Salesforce, the flow creates a new contact in Salesforce",
+    "summary": "Eventbrite to Salesforce",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce"],
+    "tags": ["eventbrite", "salesforce"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Add Eventbrite event as a new Salesforce campaign and notify via Slack",
+    "description": "When a new event is created in Eventbrite, this flow tries to retrieve a matching campaign in Salesforce. If a matching campaign is not found in Salesforce, the flow creates a new campaign in Salesforce and adds a message to a Slack channel",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce", "slack"],
+    "tags": ["eventbrite", "salesforce", "slack"],
+    "offerings": ["app connect professional"]
+  },
+  {
     "name": "Sync new Salesforce cases and comments with ServiceNow",
     "description": "This template looks for new cases added in your Salesforce account and syncs this by creating a new ticket in ServiceNow that includes the comments from the original case.",
     "summary": "Salesforce to 2 applications",
