@@ -1,3 +1,5 @@
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Creates%20a%20task%20in%20Asana%20when%20an%20issue%20is%20created%20in%20Jira_instructions.md) (opens in a new window).
+
 1. Click **Create flow** to start using the template.
 2. Connect to your [Jira](https://ibm.biz/ach2jira) account.
 3. Under Jira  / **New issue**, select a project
