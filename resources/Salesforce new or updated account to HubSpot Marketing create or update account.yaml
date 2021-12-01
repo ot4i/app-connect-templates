@@ -184,5 +184,5 @@ integration:
                             $ref: '#/flowDetails'
                       allow-empty-output: false
               output-schema: {}
-  name: Salesforce new/updated account to HubSpot Marketing create/update account
+  name: Salesforce new or updated account to HubSpot Marketing create or update account
 models: {}

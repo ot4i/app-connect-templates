@@ -1244,7 +1244,7 @@
     },
     {
     "name": "Salesforce new/updated account to HubSpot Marketing create/update account",
-    "description": "Use this template to automatically add or update HubSpot Marketing accounts whene Salesforce accounts are created or updated.",
+    "description": "Use this template to automatically add or update HubSpot Marketing accounts when Salesforce accounts are created or updated.",
     "summary": "Automatically update/create HubSpot Marketing accounts with data from Salesforce new/updated accounts.",
     "sourceApp": "salesforce",
     "targetApps": ["hubspotmarketing"],
