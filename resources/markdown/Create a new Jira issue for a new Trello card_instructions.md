@@ -7,7 +7,7 @@ To refer to these instructions while editing the flow, open [the github page](Cr
 5.	Connect to [**Trello**](https://ibm.biz/actrello) and then select a preferred team, board, and list from your Trello account
 6.	To start the flow, in the banner open the options menu [⋮] and click **Start flow**.
 
-The flow is started when a new issue is created in Jira.
+The flow is triggered when a new issue is created in Jira.
 
 ## Testing the Flow
 
