@@ -35,7 +35,7 @@ integration:
               map:
                 mappings:
                   - Body:
-                      template: A new Task has been created in Asana: {{$Trigger.name}}
+                      template: 'A new Task has been created in Asana: {{$Trigger.name}}'
                   - From:
                       template: '+16516153122'
                   - To:
