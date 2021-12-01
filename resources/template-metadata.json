@@ -1259,7 +1259,17 @@
     "targetApps": ["zohocrm"],
     "tags": ["salesforce","zohocrm","lead","contacts"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "create a campaign member",
+    "description": "This template creates a contact in the HubSpot CRM, If email is present for campaign member.",
+    "summary": "Salesforce to Hubspot CRM",
+    "sourceApp": "salesforce",
+    "targetApps": ["hubspotcrm"],
+    "tags": ["salesforce","email","Hubspot CRM"],
+    "offerings": ["app connect professional"]
     }
+
                 
   ]
 }
