@@ -716,8 +716,8 @@
     "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics 365 to Google Sheet",
     "sourceApp": "msdynamicscrmrest",
-    "targetApps": ["googlespreadsheet"],
-    "tags": ["msdynamicscrmrest", "googlespreadsheet"],
+    "targetApps": ["googlesheet"],
+    "tags": ["msdynamicscrmrest", "googlesheet"],
     "offerings": ["app connect professional"]
     },
     {
@@ -734,8 +734,8 @@
     "description": "This template creates a new row in Google Sheets whenever a new issue is created in Jira.",
     "summary": "Jira to Google Sheets",
     "sourceApp": "jira",
-    "targetApps": ["googlespreadsheet"],
-    "tags": ["jira", "googlespreadsheet"],
+    "targetApps": ["googlesheet"],
+    "tags": ["jira", "googlesheet"],
     "offerings": ["app connect professional"]
     },
     {
@@ -767,7 +767,7 @@
     },
     {
     "name": "Send a Microsoft Teams message when a case is created or updated in Microsoft Dynamics 365",
-    "description": "This template allows you to receive Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365 for Sales.",
+    "description": "This template allows you to receive a Microsoft Teams message with the case details when a case is created or updated in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics 365 to Microsoft Teams",
     "sourceApp": "msdynamicscrmrest",
     "targetApps": ["msteams"],
@@ -776,11 +776,11 @@
     },
     {
     "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
-    "description": "This template allows you to receive Microsoft Teams message with the event details when a new event is created in Eventbrite.",
+    "description": "This template allows you to receive a Microsoft Teams message with the event details when a new event is created in Eventbrite.",
     "summary": "Eventbrite to Microsoft Teams",
     "sourceApp": "eventbrite",
-    "targetApps": ["slack"],
-    "tags": ["eventbrite", "slack"],
+    "targetApps": ["msteams"],
+    "tags": ["eventbrite", "msteams"],
     "offerings": ["app connect professional"]
     },
     {
@@ -850,9 +850,9 @@
     "name": "Creates a Dropbox folder and shares the link via Slack when a new spreadsheet is created in Google Sheets",
     "description": "This template creates a Dropbox folder when a new spread sheet is created in Google Sheets. A Dropbox share link is created for the folder and shared through a Slack message.",
     "summary": "Goolge Sheets to 2 applications ",
-    "sourceApp": "googlespreadsheet",
+    "sourceApp": "googlesheet",
     "targetApps": ["dropbox", "dropbox", "slack"],
-    "tags": ["dropbox", "googlespreadsheet", "slack"],
+    "tags": ["dropbox", "googlesheet", "slack"],
     "offerings": ["app connect professional"]
     },
     {
@@ -1022,8 +1022,8 @@
     "description": "Use this template to create a new row in Google Sheets when a ticket is created in ServiceNow.",
     "summary": "ServiceNow to Google Sheets",
     "sourceApp": "servicenow",
-    "targetApps": ["googlespreadsheet"],
-    "tags": ["servicenow", "googlespreadsheet"],
+    "targetApps": ["googlesheet"],
+    "tags": ["servicenow", "googlesheet"],
     "offerings": ["app connect professional"]
     },
     {
@@ -1166,8 +1166,8 @@
     "description": "Use this template to create a new row in Google Sheets when a campaign is created in SugarCRM.",
     "summary": "SugarCRM to Google Sheets",
     "sourceApp": "sugarcrm",
-    "targetApps": ["googlespreadsheet"],
-    "tags": ["sugarcrm", "googlespreadsheet"],
+    "targetApps": ["googlesheet"],
+    "tags": ["sugarcrm", "googlesheet"],
     "offerings": ["app connect professional"]
     },
     {
