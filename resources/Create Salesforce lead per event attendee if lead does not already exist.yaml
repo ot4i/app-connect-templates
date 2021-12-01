@@ -1,0 +1,139 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '692308964423'
+            parentFilter:
+              organizationID: '692308964423'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce 
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce 
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveleads
+                  $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                - variable: SalesforceRetrieveleadsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve leads/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.profile.name}}': '{{$SalesforceRetrieveleads[0].Name}}'
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve leads 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          where:
+                            Name: '{{$SalesforceRetrieveleads[0].Name}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveleads
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                leads/response/payload
+                            - variable: SalesforceRetrieveleadsMetadata
+                              $ref: '#/node-output/Salesforce Retrieve leads/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+              else:
+                execute:
+                  - create-action:
+                      name: Salesforce Create lead
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - Company:
+                              template: '{{$Trigger.profile.company}}'
+                          - FirstName:
+                              template: '{{$Trigger.profile.first_name}}'
+                          - LastName:
+                              template: '{{$Trigger.profile.last_name}}'
+                          - Salutation:
+                              template: '{{$Trigger.profile.prefix}}'
+                          - Title:
+                              template: '{{$Trigger.profile.job_title}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrieveaccounts2
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve accounts
+                              2/response/payload
+                          - variable: SalesforceRetrieveaccounts2Metadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve accounts
+                              2/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: SalesforceRetrieveleads
+                          $ref: >-
+                            #/node-output/Salesforce Retrieve
+                            leads/response/payload
+                        - variable: SalesforceRetrieveleadsMetadata
+                          $ref: '#/node-output/Salesforce Retrieve leads/response'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: No matching lead found, new lead was created instead
+                      status-code: 200
+              output-schema:
+                type: object
+                properties: {}
+  name: create-salesforce-lead-per-event-attendee-if-lead-does-not-already-exist
+models: {}
