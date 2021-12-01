@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "New leads in Salesforce will post Slack notifications",
+    "description": "This template contains a flow that posts a messsage in Slack with lead details when a new lead is created in Salesforce.",
+    "summary": "Salesforce to Slack",
+    "sourceApp": "salesforce",
+    "targetApps": ["slack"],
+    "tags": ["salesforce", "slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "New event registration in Eventbrite will create lead in Salesforce if fullname is present",
+    "description": "This template contains a flow that for a new event attendee registered in Eventbrite, retreive a matching lead in Salesforce by full name.If no matching lead is found in Salesforce, create a new lead.",
+    "summary": "Eventbrite to Salesforce",
+    "sourceApp": "Eventbrite",
+    "targetApps": ["salesforce"],
+    "tags": ["salesforce", "eventbrite", "if"],
+    "offerings": ["app connect professional"]
+    },
   ]
 }
