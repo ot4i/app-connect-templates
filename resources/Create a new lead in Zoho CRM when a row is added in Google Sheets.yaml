@@ -100,5 +100,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: New row in Google Sheet creates a Lead in Zoho CRM
+  name: Create a new lead in Zoho CRM when a row is added in Google Sheets
 models: {}
