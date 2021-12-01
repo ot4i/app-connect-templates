@@ -41,5 +41,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send message on slack when a new salesforce contact is created
+  name: Send a message on Slack when a new Salesforce contact is created
 models: {}
