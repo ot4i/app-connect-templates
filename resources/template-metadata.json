@@ -1234,6 +1234,15 @@
     "offerings": ["app connect professional"]
     },
     {
+    "name": "Create a new Jira issue for a new Trello card",
+    "description": "When a new issue is created in Jira, a new Trello card is created with metadata from the Jira issue.",
+    "summary": "Jira Issue to Trello Card",
+    "sourceApp": "jira",
+    "targetApps": ["trello"],
+    "tags": ["jira", "trello"],
+    "offerings": ["app connect professional"]
+    },
+    {
       "name": "Create a new Trello card when a new opportunity record is created in Salesforce",
       "description": "Learn how easy it is to use App Connect to connect Salesforce to Trello so that every time a new opportunity is created in Salesforce, details of that opportunity are added automatically to a card list in the Trello account.",
       "summary": "Salesforce to Trello",
