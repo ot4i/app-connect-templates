@@ -37,10 +37,17 @@ integration:
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
+                where:
+                  id: '{{$Trigger.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
                 limit: 1
-              allow-truncation: false
+              allow-truncation: true
               pagination-type: TOKEN
-              allow-empty-output: false
+              allow-empty-output: true
           - create-action:
               name: Google Drive Create file
               target:
