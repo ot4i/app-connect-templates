@@ -48,5 +48,5 @@ integration:
                 input:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: jiraAsana
+  name: Creates a task in Asana when an issue is created in Jira
 models: {}
