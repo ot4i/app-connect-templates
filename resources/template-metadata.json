@@ -1232,6 +1232,15 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Sync new/updated issue from Jira to Freshdesk",
+    "description": "An issue is created or updated in Jira. Search for a matching ticket in Freshdesk by summary. If no matching ticket is found in Freshdesk, creates a new ticket in Freshdesk. If a matching ticket is found in Freshdesk, updates that ticket in Freshdesk. ",
+    "summary": "Jira to Freshdesk",
+    "sourceApp": "Jira",
+    "targetApps": ["Freshdesk"],
+    "tags": ["Jira", "Freshdesk"],
+    "offerings": ["app connect professional"]
+    }            
   ]
 }
