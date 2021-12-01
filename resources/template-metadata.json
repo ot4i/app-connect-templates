@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Create Asana Task on new Google Sheet entry",
+    "description": "Use this template to create new Asana tasks automatically on adding a new row in Google Sheets",
+    "summary": "Automating task creation between applications",
+    "sourceApp": "Google Sheets",
+    "targetApps": ["asana"],
+    "tags": ["marketing", "events", "project management","process automation"."asana"],
+    "offerings": ["app connect professional"]
+  },
+    {
+    "name": "Create Asana Task on new Salesforce Case",
+    "description": "Use this template to create new Asana tasks automatically on adding a new row in Salesforce",
+    "summary": "Automating task creation between applications",
+    "sourceApp": "Salesforce",
+    "targetApps": ["asana"],
+    "tags": ["marketing", "events", "project management","process automation","salesforce","asana"],
+    "offerings": ["app connect professional"]
+  }
   ]
 }
