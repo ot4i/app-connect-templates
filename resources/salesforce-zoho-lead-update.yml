@@ -1,0 +1,202 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: zohocrm
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: leads
+      connector-type: zohocrm
+      account-name: Account 3
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: leads
+      connector-type: zohocrm
+      account-name: Account 3
+      actions:
+        DELETEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: leads
+      connector-type: zohocrm
+      account-name: Account 3
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho CRM Retrieve all leads get records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 50
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoCRMRetrieveallleadsgetrecords
+                  $ref: >-
+                    #/node-output/Zoho CRM Retrieve all leads get
+                    records/response/payload
+                - variable: ZohoCRMRetrieveallleadsgetrecordsMetadata
+                  $ref: >-
+                    #/node-output/Zoho CRM Retrieve all leads get
+                    records/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$contains($string($ZohoCRMRetrieveallleadsgetrecords.Email), $Trigger.Email )}}':
+                      '=': 'true'
+                  execute:
+                    - logging:
+                        name: Log
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoCRMRetrieveallleadsgetrecords
+                              $ref: >-
+                                #/node-output/Zoho CRM Retrieve all leads get
+                                records/response/payload
+                            - variable: ZohoCRMRetrieveallleadsgetrecordsMetadata
+                              $ref: >-
+                                #/node-output/Zoho CRM Retrieve all leads get
+                                records/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - logLevel:
+                                template: Info
+                            - logMessage:
+                                template: >-
+                                  Email : {{$Trigger.Email}}  exists in Zoho.
+                                  Deleting zoho record
+                    - delete-action:
+                        name: Zoho CRM Delete lead by ID
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            id: '{{$Trigger.Id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoCRMRetrieveallleadsgetrecords
+                              $ref: >-
+                                #/node-output/Zoho CRM Retrieve all leads get
+                                records/response/payload
+                            - variable: ZohoCRMRetrieveallleadsgetrecordsMetadata
+                              $ref: >-
+                                #/node-output/Zoho CRM Retrieve all leads get
+                                records/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Zoho CRM Create leads insert records 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - City:
+                                template: '{{$Trigger.City}}'
+                            - Company:
+                                template: '{{$Trigger.Company}}'
+                            - Country:
+                                template: '{{$Trigger.Country}}'
+                            - Email:
+                                template: '{{$Trigger.Email}}'
+                            - First_Name:
+                                template: '{{$Trigger.FirstName}}'
+                            - Last_Name:
+                                template: '{{$Trigger.LastName}}'
+                            - Lead_Status:
+                                template: '{{$Trigger.Status}}'
+                            - Mobile:
+                                template: '{{$Trigger.MobilePhone}}'
+                            - Owner:
+                                mappings:
+                                  - id:
+                                      template: '{{$Trigger.Id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoCRMDeleteleadbyID
+                              $ref: >-
+                                #/block/If/node-output/Zoho CRM Delete lead by
+                                ID/response/payload
+                            - variable: ZohoCRMDeleteleadbyIDMetadata
+                              $ref: >-
+                                #/block/If/node-output/Zoho CRM Delete lead by
+                                ID/response
+                            - variable: ZohoCRMRetrieveallleadsgetrecords
+                              $ref: >-
+                                #/node-output/Zoho CRM Retrieve all leads get
+                                records/response/payload
+                            - variable: ZohoCRMRetrieveallleadsgetrecordsMetadata
+                              $ref: >-
+                                #/node-output/Zoho CRM Retrieve all leads get
+                                records/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Zoho CRM Create leads insert records
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - Country:
+                              template: '{{$Trigger.Country}}'
+                          - Email:
+                              template: '{{$Trigger.Email}}'
+                          - First_Name:
+                              template: '{{$Trigger.FirstName}}'
+                          - Last_Name:
+                              template: '{{$Trigger.LastName}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: ZohoCRMRetrieveallleadsgetrecords
+                            $ref: >-
+                              #/node-output/Zoho CRM Retrieve all leads get
+                              records/response/payload
+                          - variable: ZohoCRMRetrieveallleadsgetrecordsMetadata
+                            $ref: >-
+                              #/node-output/Zoho CRM Retrieve all leads get
+                              records/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: salesforce-zoho-lead
+models: {}

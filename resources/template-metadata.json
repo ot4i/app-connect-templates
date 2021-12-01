@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Sync leads from Salesforce to Zoho CRM",
+    "description": "For a new lead in Salesforce, Retrieve a matching lead in Zoho CRM by email address. If no matching lead is found in Zoho CRM, Create a new lead in Zoho CRM",
+    "summary": "Salesforce to Zoho CRM",
+    "sourceApp": "salesforce",
+    "targetApps": ["zohocrm"],
+    "tags": ["salesforce","lead", "zohoCRM"],
+    "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Sync new/updated contact from Salesforce to Zoho CRM",
+      "description": "A contact is created or updated in Salesforce. Retreive a matching lead in Zoho CRM by email address. If no matching lead is found in Zoho CRM, Create a new lead. If a matching lead is found in Zoho CRM, Update that lead.",
+      "summary": "Salesforce to Zoho CRM",
+      "sourceApp": "salesforce",
+      "targetApps": ["zohocrm"],
+      "tags": ["salesforce","lead", "zohoCRM"],
+      "offerings": ["app connect professional"]
+      }
   ]
 }
