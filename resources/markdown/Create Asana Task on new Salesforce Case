@@ -1,0 +1,10 @@
+Click Create flow to start using the template.
+
+Connect to the following accounts by using your credentials:
+
+Salesforce
+Asana
+
+To start the flow, in the banner, open the options menu [⋮] and click Start flow.
+
+The flow is started when a new case is created in Salesforce. This automatically creates a new task in Asana.
