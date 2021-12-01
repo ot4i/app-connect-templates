@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page]() (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/CMPE272_Team15/resources/markdown/API%20to%20update%20the%20campaign%20member%20info%20from%20Salesforce%20campaign%20to%20Hubspot%20CRM_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2.	Connect your salesforce account (https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-salesforce), we connect salesforce “New or updated campaign member” (Trigger connector)
