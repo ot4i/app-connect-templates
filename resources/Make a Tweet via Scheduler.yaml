@@ -116,5 +116,5 @@ integration:
                     $ref: '#/flowDetails'
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
-  name: Tweet_Flow
+  name: Make a Tweet via Scheduler
 models: {}
