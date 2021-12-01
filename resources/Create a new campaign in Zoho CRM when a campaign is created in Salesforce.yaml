@@ -60,5 +60,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Salesforce campaign syncs with campaign in Zoho CRM
+  name: Create a new campaign in Zoho CRM when a campaign is created in Salesforce
 models: {}
