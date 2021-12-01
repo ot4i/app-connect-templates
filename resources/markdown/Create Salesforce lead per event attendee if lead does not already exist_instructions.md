@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Send%20a%20Slack%20message%20for%20every%20updated%20message%20in%20Microsoft%20Teams_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/cmpe-272-Team21/resources/markdown/Create%20Salesforce%20lead%20per%20event%20attendee%20if%20lead%20does%20not%20already%20exist_instructions.md) (opens in a new window).
 
 1.	Click **Create flow** to start using the template.
 2.	Connect to the following accounts by using your credentials:
