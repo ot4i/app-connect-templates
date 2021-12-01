@@ -1,0 +1,10 @@
+Click Create flow to start using the template.
+
+Connect to the following accounts by using your credentials:
+
+Google Sheets
+Asana
+
+To start the flow, in the banner, open the options menu [⋮] and click Start flow.
+
+The flow is started when a new row is created in Google Sheets. This automatically creates a new task in Asana.
