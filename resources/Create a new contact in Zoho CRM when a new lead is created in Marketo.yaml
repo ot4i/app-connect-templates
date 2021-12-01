@@ -38,5 +38,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: New lead in Marketo will create contact in Zoho CRM
+  name: Create a new contact in Zoho CRM when a new lead is created in Marketo
 models: {}
