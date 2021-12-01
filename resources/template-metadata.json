@@ -1238,7 +1238,7 @@
     "summary":"asana to twilio",
     "sourceApp":"asana",
     "targetApps":"twilio",
-    "description":"Whenever a new Task is created in Asana correspondingly an SMS is sent to the User",
+    "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
     "tags":["asana","twilio"],
     "offerings":["app connect professional"]
     },
@@ -1247,7 +1247,7 @@
     "summary":"Jira to Asana",
     "sourceApp":"jira",
     "targetApps":"asana",
-    "description":"Whenever a new Issue is created in Jira correspondingly a new task is created in Asana",
+    "description":"Whenever a new Issue is created in Jira, a new task is created in Asana",
     "tags":["jira","asana"],
     "offerings":["app connect professional"]
     }           
