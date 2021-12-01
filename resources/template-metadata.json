@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync all Campaign Members to Hubspot Contact when a Campaign is completed in Salesforce",
+    "description": "This template finds the new/updated campaign members in a Salesforce campaign and creates/updates the contact in Hubspot CRM only if the email is present in the Campaign member details",
+    "summary": "Salesforce to Hubspotcrm",
+    "sourceApp": "salesforce",
+    "targetApps": ["hubspotcrm"],
+    "tags": ["salesforce", "hubspotcrm"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send SMS message via Twilio for New issue in JIRA",
+    "description": "This template sends a new message whenever new issue is created in JIRA.",
+    "summary": "Jira to Twilio",
+    "sourceApp": "jira",
+    "targetApps": ["twilio"],
+    "tags": ["jira", "twilio"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
