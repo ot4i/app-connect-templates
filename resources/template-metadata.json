@@ -1243,8 +1243,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Send SMS message via Twilio for New issue in JIRA",
-    "description": "This template sends a new message whenever new issue is created in JIRA.",
+    "name": "Send SMS message via Twilio for New issue in Jira",
+    "description": "This template sends a new message whenever new issue is created in Jira",
     "summary": "Jira to Twilio",
     "sourceApp": "jira",
     "targetApps": ["twilio"],
