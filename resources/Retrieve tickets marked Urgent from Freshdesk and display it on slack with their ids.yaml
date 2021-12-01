@@ -1,0 +1,197 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 5
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incidents
+      connector-type: freshdesk
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Freshdesk Retrieve tickets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings:
+                  - logLevel:
+                      template: Debug
+                  - logMessage:
+                      template: '{{$FreshdeskRetrievetickets}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FreshdeskRetrievetickets
+                    $ref: '#/node-output/Freshdesk Retrieve tickets/response/payload'
+                  - variable: FreshdeskRetrieveticketsMetadata
+                    $ref: '#/node-output/Freshdesk Retrieve tickets/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$FreshdeskRetrievetickets '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FreshdeskRetrievetickets
+                    $ref: '#/node-output/Freshdesk Retrieve tickets/response/payload'
+                  - variable: FreshdeskRetrieveticketsMetadata
+                    $ref: '#/node-output/Freshdesk Retrieve tickets/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Freshdesk Priority
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Setvariable
+                  $ref: '#/block/For each/node-output/Set variable/response/payload'
+                - variable: FreshdeskRetrievetickets
+                  $ref: '#/node-output/Freshdesk Retrieve tickets/response/payload'
+                - variable: FreshdeskRetrieveticketsMetadata
+                  $ref: '#/node-output/Freshdesk Retrieve tickets/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.priority}}': '4'
+                  execute:
+                    - logging:
+                        name: Log 2
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings:
+                            - logLevel:
+                                template: Debug
+                            - logMessage:
+                                template: Inside if
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: FreshdeskRetrievetickets
+                              $ref: >-
+                                #/node-output/Freshdesk Retrieve
+                                tickets/response/payload
+                            - variable: FreshdeskRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Freshdesk Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C02PC5H1KK3
+                            - text:
+                                template: >-
+                                  Urgent priority ticket alert with id:
+                                  {{$Foreachitem.id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: FreshdeskRetrievetickets
+                              $ref: >-
+                                #/node-output/Freshdesk Retrieve
+                                tickets/response/payload
+                            - variable: FreshdeskRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Freshdesk Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - logging:
+                      name: Log 3
+                      map:
+                        $map: http://ibm.com/appconnect/map/v1
+                        mappings:
+                          - logLevel:
+                              template: Debug
+                          - logMessage:
+                              template: Inside else
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: FreshdeskRetrievetickets
+                            $ref: >-
+                              #/node-output/Freshdesk Retrieve
+                              tickets/response/payload
+                          - variable: FreshdeskRetrieveticketsMetadata
+                            $ref: '#/node-output/Freshdesk Retrieve tickets/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: >-
+    Retrieve tickets marked Urgent from Freshdesk and display it on slack with
+    their ids.
+models: {}
