@@ -1247,7 +1247,7 @@
     "description": "Use this template to retrieve new contacts from Salesforce, then for each new contact,Create a shared folder in Google Drive for the Salesforce account associatedto the contact, if one does not already exist.Invite the Salesforce contact to the company's Google Drive folder.",
     "summary": "Salesforce to Google Drive",
     "sourceApp": "salesforce",
-    "targetApps": ["googledrive"."googledrive"],
+    "targetApps": ["googledrive","googledrive"],
     "tags": ["salesforce", "googledrive"],
     "offerings": ["app connect professional"]
     }
