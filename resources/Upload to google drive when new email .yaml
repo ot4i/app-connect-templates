@@ -1,0 +1,79 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: gmail
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Gmail Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: Google Drive Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - content:
+                      template: '{{$GmailRetrieveemails.payload.body}}'
+                  - createdTime:
+                      template: '{{$Trigger.Date}}'
+                  - description:
+                      template: '{{$GmailRetrieveemails.snippet}}'
+                  - encoding:
+                      template: UTF-8
+                  - isText:
+                      expression: '$exists($Trigger) '
+                  - mimeType:
+                      template: '{{$GmailRetrieveemails.payload.mimeType}}'
+                  - modifiedTime:
+                      template: '{{$GmailRetrieveemails.internalDate}}'
+                  - name:
+                      template: '{{$GmailRetrieveemails.id}}'
+                  - parent:
+                      template: IBMEmails
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailRetrieveemails
+                    $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                  - variable: GmailRetrieveemailsMetadata
+                    $ref: '#/node-output/Gmail Retrieve emails/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: gmailToDrive
+models: {}

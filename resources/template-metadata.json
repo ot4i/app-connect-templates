@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+      "name": "When there is a new gmail, upload it to Google Drive",
+      "description": "Use this template to upload to Google Drive whenever there is a new email in gmail",
+      "summary": "Gmail to Google Drive",
+      "sourceApp": "gmail",
+      "targetApps": ["googledrive"],
+      "tags": ["gmail", "googledrive"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Upload Sales force account files to Google drive",
+      "description": "Use this template to retrieve matching folder with account name if exists in Box, else create a new folder in box with Acoount name, upload account attachments to Google drive",
+      "summary": "Salesforce to Google Drive",
+      "sourceApp": "Salesforce",
+      "targetApps": ["box","googledrive"],
+      "tags": ["salesforce","box", "googledrive"],
+      "offerings": ["app connect professional"]
     }
   ]
 }
