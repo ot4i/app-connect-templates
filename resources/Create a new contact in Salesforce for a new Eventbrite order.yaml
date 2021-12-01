@@ -93,5 +93,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: FundGalaxy New Order
+  name: Create a new contact in Salesforce for a new Eventbrite order
 models: {}
