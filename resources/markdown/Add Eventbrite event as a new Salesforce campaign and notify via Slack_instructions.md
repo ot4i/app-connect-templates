@@ -1,9 +1,10 @@
-##Add Eventbrite event as a new Salesforce campaign and notify via Slack
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Add%20Eventbrite%20event%20as%20a%20new%20Salesforce%20campaign%20and%20notify%20via%20Slack_instructions.md) (opens in a new window).
 
-To refer to these instructions while editing the flow, open the github page (opens in a new window).
-
-1. Clicking Create flow takes you to the App connect flow editor.
-2. Connect to your Eventbrite account.
-3. Click the Salesforce node and connect to your Salesforce account.
-4. Click the Slack nodes and connect to your Slack account.
-5. To start the flow, in the banner open the options menu [⋮] then click Start flow.
+1. Clicking **Create flow** to start using the template.
+2. Click the Eventbrite / **New order** node.
+3. Connect to your [Eventbrite](https://ibm.biz/aceventbrite) account and then select the Organization that you want to use.
+4. Click the [Salesforce](https://ibm.biz/ach2salesforce) / **Create campaign** node.
+5. Connect to your Salesforce account.
+6. Click the [Slack](https://ibm.biz/acslack) / **Create message** node.
+7. Connect to your Slack account and then select the channel to which you want to post your message.
+8. To start the flow, in the banner open the options menu [⋮] then click **Start flow**.
