@@ -1234,7 +1234,7 @@
     "offerings": ["app connect professional"]
     },
     {
-      "name": "Create a new Lead in Zoho CRM when a row is added in Google Sheets",
+      "name": "Create a new lead in Zoho CRM when a row is added in Google Sheets",
       "description": "Use this template to create a lead in Zoho CRM when a new row is added in Google Sheets",
       "summary": "Google Sheets to Zoho CRM Lead",
       "sourceApp": "googlesheet",
@@ -1243,7 +1243,7 @@
       "offerings": ["app connect professional"]
 	  },
     {
-      "name": "Sync new Salesforce campaign with campaign in Zoho CRM",
+      "name": "Create a new campaign in Zoho CRM when a campaign is created in Salesforce",
       "description": "This template creates a new campaign in Zoho CRM when a new campaign is created in Salesforce",
       "summary": "Salesforce campaign to Zoho campaign",
       "sourceApp": "salesforce",
