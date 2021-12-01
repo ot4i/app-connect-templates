@@ -8,3 +8,5 @@ To refer to these instructions while editing the flow, open [the github page](ht
 6. Click the [Slack](https://ibm.biz/acslack) / **Create message** node.
 7. Connect to your Slack account and then select the channel to which you want to post your message.
 8. To start the flow, in the banner open the options menu [⋮] then click **Start flow**.
+
+To test the flow, create a new order in the Eventbrite account.  In response, the flow creates a new campaign in Salesforce and adds a message to the Slack channel.
