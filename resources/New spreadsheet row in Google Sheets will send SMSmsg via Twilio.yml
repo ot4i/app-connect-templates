@@ -1,0 +1,54 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1mipsSH3C784h4zuecCYCXs11kNDAPMwE8ybcIAVsyV8
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1mipsSH3C784h4zuecCYCXs11kNDAPMwE8ybcIAVsyV8
+              worksheetID: Sheet1
+      connector-type: googlesheet
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: messages
+      connector-type: twilio
+      actions:
+        CREATE: {}
+      account-name: Account 1
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Twilio Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        New event {{$Trigger.fields."1"}} planned in
+                        {{$Trigger.fields."2"}}
+                  - From:
+                      template: '+12396666526'
+                  - To:
+                      template: '+16692104681'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send me a Twilio SMS when a new row is added in Google Sheets
+models: {}
