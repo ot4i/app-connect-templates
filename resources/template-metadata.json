@@ -1260,7 +1260,7 @@
       "offerings": ["app connect professional"]
     },
     {
-      "name": "Create a new Trello card when a new record is created in Google Sheets",
+      "name": "Create a new Trello card when a new row is created in Google Sheets",
       "description": "Learn how easy it is to use App Connect to connect Google Sheets to Trello so that every time a new row is added in Google Sheets, a new card is created in the Trello account with metadata of the new row from Google Sheets.",
       "summary": "Google Sheets to Trello",
       "sourceApp": "googlesheet",
