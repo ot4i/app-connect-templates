@@ -729,12 +729,12 @@
       "offerings": ["app connect professional"]
     },
     {
-      "name": "Sync leads from Salesforce to Marketo",
-      "description": "For a new lead in Salesforce, Retrieve a matching lead in Marketo by email address. If no matching lead is found in Marketo, Create a new lead in Marketo.",
-      "summary": "Salesforce to Marketo",
+      "name": "Sync leads from Salesforce to Eventbrite",
+      "description": "For a new lead in Salesforce, Retrieve a matching organizer in Eventbrite by email address. If no matching organizer is found in Eventbrite, Create a new organizer in Eventbrite.",
+      "summary": "Salesforce to Eventbrite",
       "sourceApp": "salesforce",
-      "targetApps": ["marketo"],
-      "tags": ["marketo", "salesforce", "scheduler"],
+      "targetApps": ["eventbrite"],
+      "tags": ["eventbrite", "salesforce", "scheduler"],
       "offerings": ["app connect professional"]
     }
   ]

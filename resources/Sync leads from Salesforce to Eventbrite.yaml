@@ -16,16 +16,16 @@ integration:
   action-interfaces:
     action-interface-1:
       type: api-action
-      business-object: leads
-      connector-type: marketo
+      business-object: organizer
+      connector-type: eventbrite
       actions:
         UPSERTWITHWHERE: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
-          - upsert-action:
-              name: Marketo Update or create Lead
+          - create-action:
+              name: eventbrite create organizer
               target:
                 $ref: "#/integration/action-interfaces/action-interface-1"
               map:
@@ -52,5 +52,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: "#/trigger/payload"
-  name: Sync Salesforce new leads to Marketo Leads
+  name: Sync Salesforce new leads to eventbrite organizer
 models: {}
