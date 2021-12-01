@@ -1234,7 +1234,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "New leads in Salesforce will post Slack notifications",
+    "name": "New lead notify Slack",
     "description": "This template contains a flow that posts a messsage in Slack with lead details when a new lead is created in Salesforce.",
     "summary": "Salesforce to Slack",
     "sourceApp": "salesforce",
@@ -1243,7 +1243,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "New event registration in Eventbrite will create lead in Salesforce if fullname is present",
+    "name": "Create Salesforce lead per event attendee if lead does not already exist  ",
     "description": "This template contains a flow that for a new event attendee registered in Eventbrite, retreive a matching lead in Salesforce by full name.If no matching lead is found in Salesforce, create a new lead.",
     "summary": "Eventbrite to Salesforce",
     "sourceApp": "Eventbrite",
