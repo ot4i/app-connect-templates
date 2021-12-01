@@ -1,0 +1,87 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: DEV
+            parentFilter:
+              key: DEV
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: jira
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incidents
+      connector-type: freshdesk
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Jira Retrieve issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  id: '{{$Trigger.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - create-action:
+              name: Freshdesk Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - description:
+                      template: '{{$JiraRetrieveissues.fields.description}}'
+                  - email:
+                      template: '{{$Trigger.fields.creator.emailAddress}}'
+                  - priority:
+                      expression: '1'
+                  - status:
+                      expression: '2'
+                  - subject:
+                      template: '{{$JiraRetrieveissues.fields.summary}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveissues
+                    $ref: '#/node-output/Jira Retrieve issues/response/payload'
+                  - variable: JiraRetrieveissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve issues/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Jira to freshdesk
+models: {}
