@@ -1,0 +1,60 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Document
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 5
+              isCreatedQueryable: true
+      account-name: Account 4
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Drive Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - content:
+                      template: '{{$Trigger.Body}}'
+                  - createdTime:
+                      template: '{{$Trigger.CreatedDate}}'
+                  - description:
+                      template: '{{$Trigger.Description}}'
+                  - mimeType:
+                      template: '{{$Trigger.ContentType}}'
+                  - name:
+                      template: '{{$Trigger.Name}}'
+                  - starred:
+                      expression: 'false'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: New document in Salesforce is added to Google Drive
+models: {}

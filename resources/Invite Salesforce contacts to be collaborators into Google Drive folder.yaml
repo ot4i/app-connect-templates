@@ -1,0 +1,96 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      account-name: Account 4
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: googledrive
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Permission
+      connector-type: googledrive
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Drive Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                customSchemas:
+                  properties.`appProperties`:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      role:
+                        type: string
+                      emailAddress:
+                        type: string
+                mappings:
+                  - appProperties:
+                      mappings:
+                        - emailAddress:
+                            template: '{{$Trigger.Email}}'
+                        - role:
+                            template: writer
+                        - type:
+                            template: user
+                  - createdTime:
+                      template: '{{$Trigger.CreatedDate}}'
+                  - description:
+                      template: >-
+                        Invite Salesforce contacts to be collaborators into
+                        Google Drive folder
+                  - name:
+                      template: '{{$Trigger.Name}}_shared_file'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Google Drive Create permission
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - emailAddress:
+                      template: '{{$Trigger.Email}}'
+                  - emailMessage:
+                      template: Join Google drive shared {{$GoogleDriveCreatefolder.id}}
+                  - fileId:
+                      template: '{{$GoogleDriveCreatefolder.id}}'
+                  - role:
+                      template: writer
+                  - sendNotificationEmail:
+                      expression: 'true'
+                  - type:
+                      template: group
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleDriveCreatefolder
+                    $ref: '#/node-output/Google Drive Create folder/response/payload'
+  name: Invite Salesforce contacts to be collaborators into Google Drive folder
+models: {}
