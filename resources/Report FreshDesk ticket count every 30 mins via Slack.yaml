@@ -1,0 +1,120 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 30
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incidents
+      connector-type: freshdesk
+      account-name: Account 2
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Freshdesk Retrieve tickets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FreshdeskRetrievetickets
+                    $ref: '#/node-output/Freshdesk Retrieve tickets/response/payload'
+                  - variable: FreshdeskRetrieveticketsMetadata
+                    $ref: '#/node-output/Freshdesk Retrieve tickets/response'
+                customSchemas: {}
+                mappings:
+                  - variable:
+                      expression: '$count($FreshdeskRetrievetickets ) '
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: FreshdeskRetrievetickets
+                  $ref: '#/node-output/Freshdesk Retrieve tickets/response/payload'
+                - variable: FreshdeskRetrieveticketsMetadata
+                  $ref: '#/node-output/Freshdesk Retrieve tickets/response'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+              branch:
+                - condition:
+                    '{{$Setvariable.variable}}':
+                      gt: '2'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C02M90EBA9Z
+                            - text:
+                                template: You have more than 2 tickets
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: FreshdeskRetrievetickets
+                              $ref: >-
+                                #/node-output/Freshdesk Retrieve
+                                tickets/response/payload
+                            - variable: FreshdeskRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Freshdesk Retrieve
+                                tickets/response
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: FreshDeskCounter
+models: {}

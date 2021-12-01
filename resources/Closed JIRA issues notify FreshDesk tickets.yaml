@@ -1,0 +1,50 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: RW
+            parentFilter:
+              key: RW
+            subscription:
+              createdField: resolutionDateFilter
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 5
+      connector-type: jira
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incidents
+      connector-type: freshdesk
+      account-name: Account 1
+      actions:
+        DELETEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - delete-action:
+              name: Freshdesk Delete ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  id: '{{$Trigger.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Closed JIRA issues notify FreshDesk tickets
+models: {}

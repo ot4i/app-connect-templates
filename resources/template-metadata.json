@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Report FreshDesk ticket count every 30 mins via Slack",
+    "description": "Use this template to notify a slack channel if number of tickets is exceeds certain limits",
+    "summary": "Freshdesk to Slack notification",
+    "sourceApp": "Freshdesk",
+    "targetApps": ["Slack"],
+    "tags": ["Freshdesk", "scheduler", "Slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Closed JIRA issues notify FreshDesk tickets",
+    "description": "Use this template to updates the close the issue in FreshDesk when same JIRA issue is closed",
+    "summary": "Jira to Freshdesk",
+    "sourceApp": "Jira",
+    "targetApps": ["Freshdesk"],
+    "tags": ["Freshdesk", "scheduler", "Jira"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
