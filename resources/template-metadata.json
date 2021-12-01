@@ -1251,17 +1251,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Create Trello Ticket from Salesforce Case created",
-    "description": "Add a Trello Ticket when a Case record is created on Salesforce. The case description, subject, type should be copied over the Trello ticket.",
-    "summary": "Salesforce Case to Trello Ticket",
-    "sourceApp": "salesforce",
-    "targetApps": ["trello"],
-    "tags": ["salesforce", "trello"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "New issue in JIRA will create a new Trello card",
-    "description": "When there is a new issue from JIRA, create a Trello card If not exist.",
+    "name": "Create a new Jira issue for a new Trello card",
+    "description": "When there is a new issue from Jira, create a Trello card.",
     "summary": "Jira Issue to Trello Ticket",
     "sourceApp": "jira",
     "targetApps": ["trello"],
