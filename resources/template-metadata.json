@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Save Gmail attachment to Box",
+      "description": "When there is a new email in Gmail, download email attachment from Gmail and upload to Box.",
+      "summary": "Salesforce to 3 applications",
+      "sourceApp": "gmail",
+      "targetApps": ["box"],
+      "tags": ["gmail", "box", "attachment", "upload"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Upload Salesforce account files to Box",
+      "description": "A new account with attachments is created in Salesforce. Retrive a matching folder in Box by account name and creates a new folder if it doesn't already exists. Upload the account attachments to Box.",
+      "summary": "Salesforce to 3 applications",
+      "sourceApp": "salesforce",
+      "targetApps": ["box"],
+      "tags": ["salesforce", "box", "account", "attachment", "upload"],
+      "offerings": ["app connect professional"]
     }
   ]
 }
