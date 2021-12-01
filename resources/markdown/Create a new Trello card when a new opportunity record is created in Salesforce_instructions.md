@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20new%20Trello%20card%20when%20a%20new%20opportunity%20record%20is%20created%20in%20Salesforce.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20new%20Trello%20card%20when%20a%20new%20opportunity%20record%20is%20created%20in%20Salesforce_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to create an event-driven flow from the template.
 2. Click Salesforce / **New opportunity**
