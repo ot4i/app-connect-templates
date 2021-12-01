@@ -1251,8 +1251,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Sync new attendee from Eventbrite to lead in Zoho CRM",
-    "description": "This template creates a new lead in Zoho CRM for new attendees in Eventbrite.",
+    "name": "Create a new lead in Zoho CRM for a new Eventbrite attendee",
+    "description": "This template creates a new lead in Zoho CRM when a new attendee is added in Eventbrite.",
     "summary": "Eventbrite to Zoho CRM",
     "sourceApp": "eventbrite",
     "targetApps": ["zohocrm"],
@@ -1260,8 +1260,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "New lead in Marketo will create contact in Zoho CRM",
-    "description": "This template creates a new contact in Zoho CRM when there is a new lead in Marketo.",
+    "name": "Create a new contact in Zoho CRM when a new lead is created in Marketo",
+    "description": "This template creates a new contact in Zoho CRM when a new lead is created in Marketo.",
     "summary": "Marketo to Zoho CRM",
     "sourceApp": "marketo",
     "targetApps": ["zohocrm"],
