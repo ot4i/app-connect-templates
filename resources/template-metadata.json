@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Send an SMS message when a new task is created in Asana",
+    "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
+    "summary": "asana to twilio",
+    "sourceApp": "asana",
+    "targetApps": ["twilio"],
+    "tags": ["asana","twilio"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Creates a task in Asana when an issue is created in Jira",
+    "description": "Whenever a new Issue is created in Jira, a new task is created in Asana",
+    "summary": "Jira to Asana",
+    "sourceApp": "jira",
+    "targetApps": ["asana"],
+    "tags": ["jira","asana"],
+    "offerings": ["app connect professional"]
+    }           
   ]
 }
