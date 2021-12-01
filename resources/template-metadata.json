@@ -1234,22 +1234,22 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name":"Send a SMS message when a task is assigned in Asana ",
-    "summary":"asana to twilio",
-    "sourceApp":"asana",
-    "targetApps":"twilio",
+    "name": "Send an SMS message when a task is assigned in Asana ",
     "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
-    "tags":["asana","twilio"],
-    "offerings":["app connect professional"]
+    "summary": "asana to twilio",
+    "sourceApp": "asana",
+    "targetApps": ["twilio"],
+    "tags": ["asana","twilio"],
+    "offerings": ["app connect professional"]
     },
     {
-    "name":"Creates a task in Asana when an issue is created in Jira",
-    "summary":"Jira to Asana",
-    "sourceApp":"jira",
-    "targetApps":"asana",
-    "description":"Whenever a new Issue is created in Jira, a new task is created in Asana",
-    "tags":["jira","asana"],
-    "offerings":["app connect professional"]
+    "name": "Creates a task in Asana when an issue is created in Jira",
+    "description": "Whenever a new Issue is created in Jira, a new task is created in Asana",
+    "summary": "Jira to Asana",
+    "sourceApp": "jira",
+    "targetApps": ["asana"],
+    "tags": ["jira","asana"],
+    "offerings": ["app connect professional"]
     }           
   ]
 }
