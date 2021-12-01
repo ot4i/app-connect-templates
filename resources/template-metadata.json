@@ -1252,6 +1252,24 @@
     "offerings": ["app connect professional"]
     },
     {
+    "name": "Create a new task in Asana when a new Salesforce campaign is created",
+    "description": "Use this template to create a new task in Asana for a new Salesforce campaign, setting the Asana task name to the name of the Salesforce campaign.",
+    "summary": "Salesforce to Asana",
+    "sourceApp": "Salesforce",
+    "targetApps": ["Asana"],
+    "tags": ["Salesforce", "Asana"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Send a message on Slack when a new Salesforce contact is created",
+    "description": "Use this template to send a Slack message when a new contact created in Salesforce, with the message containing data from the Salesforce contact.",
+    "summary": "Salesforce to Slack",
+    "sourceApp": "Salesforce",
+    "targetApps": ["Slack"],
+    "tags": ["Salesforce", "Slack"],
+    "offerings": ["app connect professional"]
+    },
+    {
     "name": "Create a new lead in Zoho CRM for a new Eventbrite attendee",
     "description": "This template creates a new lead in Zoho CRM when a new attendee is added in Eventbrite.",
     "summary": "Eventbrite to Zoho CRM",
