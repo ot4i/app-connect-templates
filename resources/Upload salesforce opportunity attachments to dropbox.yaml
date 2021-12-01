@@ -1,0 +1,281 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: File
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: folders
+      connector-type: dropbox
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: File
+      connector-type: salesforce
+      actions:
+        DOWNLOADFILECONTENT: {}
+    action-interface-5:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: File
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - AccessType:
+                      template: Public
+                  - Name:
+                      template: '{{$Trigger.Name}}'
+                  - Type:
+                      template: Document
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  DeveloperName: F_{{$Trigger.Id}}
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Salesforce Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - content:
+                      template: random string
+                  - contentType:
+                      template: Text
+                  - title:
+                      template: '{{$Trigger.Id}}_file_{{$ceil($random())}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreatefolder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      folder/response/payload
+                  - variable: SalesforceUpdateorcreatefolderMetadata
+                    $ref: '#/node-output/Salesforce Update or create folder/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Dropbox Retrieve folders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  folderPath: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreatefolder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      folder/response/payload
+                  - variable: SalesforceUpdateorcreatefolderMetadata
+                    $ref: '#/node-output/Salesforce Update or create folder/response'
+                  - variable: SalesforceCreatefile
+                    $ref: '#/node-output/Salesforce Create file/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceUpdateorcreatefolder
+                  $ref: >-
+                    #/node-output/Salesforce Update or create
+                    folder/response/payload
+                - variable: SalesforceUpdateorcreatefolderMetadata
+                  $ref: '#/node-output/Salesforce Update or create folder/response'
+                - variable: SalesforceCreatefile
+                  $ref: '#/node-output/Salesforce Create file/response/payload'
+                - variable: DropboxRetrievefolders
+                  $ref: '#/node-output/Dropbox Retrieve folders/response/payload'
+                - variable: DropboxRetrievefoldersMetadata
+                  $ref: '#/node-output/Dropbox Retrieve folders/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$DropboxRetrievefoldersMetadata."status-code"}}': '200'
+                  execute: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    error:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: SalesforceUpdateorcreatefolder
+                          $ref: >-
+                            #/node-output/Salesforce Update or create
+                            folder/response/payload
+                        - variable: SalesforceUpdateorcreatefolderMetadata
+                          $ref: >-
+                            #/node-output/Salesforce Update or create
+                            folder/response
+                        - variable: SalesforceCreatefile
+                          $ref: >-
+                            #/node-output/Salesforce Create
+                            file/response/payload
+                        - variable: DropboxRetrievefolders
+                          $ref: >-
+                            #/node-output/Dropbox Retrieve
+                            folders/response/payload
+                        - variable: DropboxRetrievefoldersMetadata
+                          $ref: '#/node-output/Dropbox Retrieve folders/response'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: The folder is not present in dropbox
+                      status-code: 400
+              output-schema: {}
+          - retrieve-action:
+              name: Salesforce Retrieve files metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              filter:
+                where:
+                  id: '{{$SalesforceCreatefile.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreatefolder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      folder/response/payload
+                  - variable: SalesforceUpdateorcreatefolderMetadata
+                    $ref: '#/node-output/Salesforce Update or create folder/response'
+                  - variable: SalesforceCreatefile
+                    $ref: '#/node-output/Salesforce Create file/response/payload'
+                  - variable: DropboxRetrievefolders
+                    $ref: '#/node-output/Dropbox Retrieve folders/response/payload'
+                  - variable: DropboxRetrievefoldersMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - custom-action:
+              name: Salesforce Download file content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: DOWNLOADFILECONTENT
+              map:
+                mappings:
+                  - id:
+                      template: '{{$SalesforceCreatefile.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreatefolder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      folder/response/payload
+                  - variable: SalesforceUpdateorcreatefolderMetadata
+                    $ref: '#/node-output/Salesforce Update or create folder/response'
+                  - variable: SalesforceCreatefile
+                    $ref: '#/node-output/Salesforce Create file/response/payload'
+                  - variable: DropboxRetrievefolders
+                    $ref: '#/node-output/Dropbox Retrieve folders/response/payload'
+                  - variable: DropboxRetrievefoldersMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Dropbox Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - fileContent:
+                      template: '{{$SalesforceDownloadfilecontent.content}}'
+                  - fileType:
+                      template: '{{$SalesforceRetrievefilesmetadata.fileType}}'
+                  - name:
+                      template: '{{$SalesforceRetrievefilesmetadata.name}}'
+                  - path:
+                      template: '{{$Trigger.Id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceUpdateorcreatefolder
+                    $ref: >-
+                      #/node-output/Salesforce Update or create
+                      folder/response/payload
+                  - variable: SalesforceUpdateorcreatefolderMetadata
+                    $ref: '#/node-output/Salesforce Update or create folder/response'
+                  - variable: SalesforceCreatefile
+                    $ref: '#/node-output/Salesforce Create file/response/payload'
+                  - variable: DropboxRetrievefolders
+                    $ref: '#/node-output/Dropbox Retrieve folders/response/payload'
+                  - variable: DropboxRetrievefoldersMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folders/response'
+                  - variable: SalesforceRetrievefilesmetadata
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve files
+                      metadata/response/payload
+                  - variable: SalesforceRetrievefilesmetadataMetadata
+                    $ref: '#/node-output/Salesforce Retrieve files metadata/response'
+                  - variable: SalesforceDownloadfilecontent
+                    $ref: >-
+                      #/node-output/Salesforce Download file
+                      content/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Upload salesforce opportunity attachments to dropbox
+models: {}
