@@ -22,33 +22,37 @@ integration:
               timeZone: UTC
               pollingInterval: 1
   action-interfaces:
-    action-interface-1:
+    action-interface-2:
       type: api-action
-      business-object: Action
+      business-object: Card
       connector-type: trello
       actions:
-        RETRIEVEALL: {}
+        CREATE: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
-          - retrieve-action:
-              name: Trello Retrieve actions
+          - create-action:
+              name: Trello Add card to list
               target:
-                $ref: '#/integration/action-interfaces/action-interface-1'
-              filter:
-                where:
-                  and:
-                    - idBoard: 6192af3190873d49c3343591
-                    - idList: 6192af3190873d49c3343592
-                    - idOrganization: 6192a3eaab5f364439fe16eb
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - desc:
+                      template: '{{$Trigger}}'
+                  - idBoard:
+                      template: 619330c908e4f132c0cc6906
+                  - idList:
+                      template: 619f27f28448e38b07bd5119
+                  - idOrganization:
+                      template: 60875bfb4608d527d47e67de
+                  - name:
+                      template: '{{$Trigger.id}}'
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-                limit: 10
-              allow-truncation: false
-              allow-empty-output: false
-  name: Jira2Trello
+  name: Create a new Jira issue for a new Trello card
 models: {}
