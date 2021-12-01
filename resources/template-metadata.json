@@ -1251,18 +1251,18 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Create an issue in Asana when an issue is created in JIRA",
-    "summary": "JIRA to ASANA",
-    "description": "This template looks for new issues created in JIRA and creates a new issue in ASANA.",
+    "name": "Create an issue in Asana when an issue is created in Jira",
+    "summary": "Jira to Asana",
+    "description": "This template looks for new issues created in Jira and creates a new issue in Asana.",
     "sourceApp": "JIRA",
     "targetApps": ["ASANA"],
     "tags": ["JIRA", "ASANA"],
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Send an SMS when a task is created in ASANA",
-    "summary": "ASANA to Twillo",
-    "description": "This template looks for new tasks in created in ASANA and sends an SMS for every task created.",
+    "name": "Send an SMS when a task is created in Asana",
+    "summary": "Asana to Twillo",
+    "description": "This template looks for new tasks in created in Asana and sends an SMS for every task created.",
     "sourceApp": "ASANA",
     "targetApps": ["TWILLO"],
     "tags": ["TWILLO", "ASANA"],
