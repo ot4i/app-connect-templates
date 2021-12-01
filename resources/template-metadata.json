@@ -1238,8 +1238,8 @@
       "description": "Use this template to create a lead in Zoho CRM when a new row is added in Google Sheets",
       "summary": "Google Sheets to Zoho CRM Lead",
       "sourceApp": "googlesheet",
-      "targetApps": ["zoho"],
-      "tags": ["googlesheets", "zoho", "lead", "row"],
+      "targetApps": ["zohocrm"],
+      "tags": ["googlesheets", "zohocrm", "lead", "row"],
       "offerings": ["app connect professional"]
 	  },
     {
@@ -1247,8 +1247,8 @@
       "description": "This template creates a new campaign in Zoho CRM when a new campaign is created in Salesforce",
       "summary": "Salesforce campaign to Zoho campaign",
       "sourceApp": "salesforce",
-      "targetApps": ["zoho"],
-      "tags": ["salesforce", "zoho", "campaign", "crm"],
+      "targetApps": ["zohocrm"],
+      "tags": ["salesforce", "zohocrm", "campaign", "crm"],
       "offerings": ["app connect professional"]
 	  },
     {
