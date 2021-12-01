@@ -1,0 +1,88 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: CampaignMember
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: LastName
+              updatedField: Email
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: contacts
+      connector-type: hubspotcrm
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Email}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: HubSpot CRM Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - properties:
+                                mappings:
+                                  - email:
+                                      template: '{{$Trigger.Email}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  completion-action:
+                    terminate:
+                      info:
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        message: '"Email found, updated the contact in hubspot'
+                        status-code: 200
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: '"Email not found, so not updating hubspot"'
+                      status-code: 200
+              output-schema: {}
+        tags:
+          - incomplete
+  name: >-
+    API to update the campaign member info from Salesforce campaign to Hubspot
+    CRM
+models: {}
