@@ -42,5 +42,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Sync new attendee from Eventbrite to lead in Zoho CRM
+  name: Create a new lead in Zoho CRM for a new Eventbrite attendee
 models: {}
