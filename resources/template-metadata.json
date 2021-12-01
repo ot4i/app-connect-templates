@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name":"Asana ticket count every 30 mins via Slack ",
+    "summary":"Asana to Slack",
+    "sourceApp":"Asana",
+    "targetApps":"Slack",
+    "description":"Sync Slack with Asana every 30 mins",
+    "tags":["Asana","Slack"],
+    "offerings":["app connect professional"]
+    },
+    {
+    "name":"Retrieve tickets marked Urgent from Freshdesk and display it on slack with their ids.",
+    "summary":"Freshdesk to Slack",
+    "sourceApp":"Freshdesk",
+    "targetApps":"Slack",
+    "description":"Urgent tickets are retrieved from Freshdesk and sent to Slack",
+    "tags":["Freshdesk","Slack"],
+    "offerings":["app connect professional"]
+    }  
   ]
 }
