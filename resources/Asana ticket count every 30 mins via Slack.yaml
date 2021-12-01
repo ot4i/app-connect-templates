@@ -1,0 +1,197 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 30
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tasks
+      connector-type: asana
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Asana Retrieve tasks
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - project: '1201444397541755'
+                    - workspace-id: '1201444397422113'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AsanaRetrievetasks
+                    $ref: '#/node-output/Asana Retrieve tasks/response/payload'
+                  - variable: AsanaRetrievetasksMetadata
+                    $ref: '#/node-output/Asana Retrieve tasks/response'
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      expression: '$count($AsanaRetrievetasks) '
+          - logging:
+              name: Log 4
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings:
+                  - logLevel:
+                      template: Debug
+                  - logMessage:
+                      template: '{{$Setvariable}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AsanaRetrievetasks
+                    $ref: '#/node-output/Asana Retrieve tasks/response/payload'
+                  - variable: AsanaRetrievetasksMetadata
+                    $ref: '#/node-output/Asana Retrieve tasks/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: AsanaRetrievetasks
+                  $ref: '#/node-output/Asana Retrieve tasks/response/payload'
+                - variable: AsanaRetrievetasksMetadata
+                  $ref: '#/node-output/Asana Retrieve tasks/response'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Setvariable.variable}}':
+                      gt: '5'
+                  execute:
+                    - logging:
+                        name: Log 2
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings:
+                            - logLevel:
+                                template: Debug
+                            - logMessage:
+                                template: Inside IF
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AsanaRetrievetasks
+                              $ref: >-
+                                #/node-output/Asana Retrieve
+                                tasks/response/payload
+                            - variable: AsanaRetrievetasksMetadata
+                              $ref: '#/node-output/Asana Retrieve tasks/response'
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: Foreach
+                              $ref: '#/node-output/For each/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C02PC5H1KK3
+                            - text:
+                                template: Ticket count exceeded limit
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AsanaRetrievetasks
+                              $ref: >-
+                                #/node-output/Asana Retrieve
+                                tasks/response/payload
+                            - variable: AsanaRetrievetasksMetadata
+                              $ref: '#/node-output/Asana Retrieve tasks/response'
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - logging:
+                      name: Log 3
+                      map:
+                        $map: http://ibm.com/appconnect/map/v1
+                        mappings:
+                          - logLevel:
+                              template: Debug
+                          - logMessage:
+                              template: Inside else
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: AsanaRetrievetasks
+                            $ref: >-
+                              #/node-output/Asana Retrieve
+                              tasks/response/payload
+                          - variable: AsanaRetrievetasksMetadata
+                            $ref: '#/node-output/Asana Retrieve tasks/response'
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: Foreach
+                            $ref: '#/node-output/For each/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Asana ticket count every 30 mins via Slack
+models: {}
