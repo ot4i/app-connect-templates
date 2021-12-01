@@ -184,7 +184,5 @@ integration:
                             $ref: '#/flowDetails'
                       allow-empty-output: false
               output-schema: {}
-  name: >-
-    Sync New and Updated Accounts in Salesforce With Contacts in HubSpot
-    Marketing
+  name: Salesforce new/updated account to HubSpot Marketing create/update account
 models: {}
