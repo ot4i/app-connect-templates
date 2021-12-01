@@ -1232,6 +1232,24 @@
     "targetApps": ["msad", "salesforce"],
     "tags": ["msad", "salesforce", "scheduler", "contact", "foreach", "user"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create a folder in Box for every new contact in Salesforce and invite the contact for collaboration",
+    "description": "This temaplte creates a new folder in Box for every new contact added in Salesforce. The new contact will be inviited for collaboration for the folder in Box",
+    "summary": "For every new contact in Salesforce, a new folder in Box",
+    "sourceApp": "salesforce",
+    "targetApps": ["box"],
+    "tags": ["box", "salesforce"],
+    "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create file with contents in Box for every new document in Salesforce",
+    "description": "This template creates a new file in Box for every new document in Salesforce. The contents of file in Box is same as the one created in Salesforce",
+    "summary": "Document from salesforce to box",
+    "sourceApp": "salesforce",
+    "targetApps": ["box"],
+    "tags": ["box", "salesforce"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
