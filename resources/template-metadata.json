@@ -1251,8 +1251,8 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Sync new case from Salesforce to FreshDesk",
-    "description": "For new case in Salesforce, create a new ticket in FreshDesk. Use salesforce case id as external ID in FreshDesk.",
+    "name": "Sync new case from Salesforce to Freshdesk",
+    "description": "For a new case in Salesforce, create a new ticket in Freshdesk. Use the Salesforce case ID as the external ID of the ticket in Freshdesk.",
     "summary": "Salesforce to FreshDesk",
     "sourceApp": "salesforce",
     "targetApps": ["freshdesk"],
