@@ -46,5 +46,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Scheduler Notification in Slack
+  name: Scheduler Notification via Slack
 models: {}
