@@ -44,5 +44,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: cmpe-272-flow 2
+  name: Send an SMS when a task is created in Asana
 models: {}
