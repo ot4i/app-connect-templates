@@ -21,20 +21,17 @@ integration:
               timeZone: UTC
               pollingInterval: 1
       connector-type: jira
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: incidents
       connector-type: freshdesk
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-2:
       type: api-action
       business-object: Issue
       connector-type: jira
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
   assemblies:
