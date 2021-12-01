@@ -1234,7 +1234,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Send an SMS message when a task is assigned in Asana",
+    "name": "Send an SMS message when a new task is created in Asana",
     "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
     "summary": "asana to twilio",
     "sourceApp": "asana",
