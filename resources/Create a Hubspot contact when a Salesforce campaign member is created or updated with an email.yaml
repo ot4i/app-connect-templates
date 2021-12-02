@@ -97,5 +97,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: create a campaign member
+  name: Create a Hubspot contact when a Salesforce campaign member is created or updated with an email
 models: {}
