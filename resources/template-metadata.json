@@ -1250,6 +1250,6 @@
     "targetApps": ["dropbox"],
     "tags": ["Salesforce", "opportunity", "dropbox", "attachments","folder","upload"],
     "offerings": ["app connect professional"]
-    }
+    },
   ]
 }
