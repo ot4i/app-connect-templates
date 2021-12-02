@@ -119,5 +119,5 @@ integration:
                       accounts/response/payload
                   - variable: SalesforceRetrieveaccountsMetadata
                     $ref: '#/node-output/Salesforce Retrieve accounts/response'
-  name: Salesforce-GoogleSheets Scheduler
+  name: Add Salesforce accounts that have more than 500 employees to a Google Sheets worksheet
 models: {}
