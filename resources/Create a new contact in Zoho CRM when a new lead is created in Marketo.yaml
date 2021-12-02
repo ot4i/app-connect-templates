@@ -1,0 +1,42 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: marketo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: contacts
+      connector-type: zohocrm
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Zoho CRM Create contacts insert records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Email:
+                      template: '{{$Trigger.profile.email}}'
+                  - First_Name:
+                      template: '{{$Trigger.profile.first_name}}'
+                  - Last_Name:
+                      template: '{{$Trigger.profile.last_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+  name: Create a new contact in Zoho CRM when a new lead is created in Marketo
+models: {}
