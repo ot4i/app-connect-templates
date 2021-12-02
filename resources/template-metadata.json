@@ -1269,6 +1269,7 @@
       "tags": ["eventbrite", "salesforce", "scheduler"],
       "offerings": ["app connect professional"]
     },
+    {
     "name": "Create a new task in Asana when a new Salesforce campaign is created",
     "description": "Use this template to create a new task in Asana for a new Salesforce campaign, setting the Asana task name to the name of the Salesforce campaign.",
     "summary": "Salesforce to Asana",
