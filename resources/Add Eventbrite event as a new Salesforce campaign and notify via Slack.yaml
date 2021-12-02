@@ -1,0 +1,127 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Event
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '695532935343'
+            parentFilter:
+              organizationID: '695532935343'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Campaign
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Campaign
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve campaigns
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Name: '{{$Trigger.name}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrievecampaigns
+                  $ref: '#/node-output/Salesforce Retrieve campaigns/response/payload'
+                - variable: SalesforceRetrievecampaignsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve campaigns/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$isNull($SalesforceRetrievecampaigns.Name)}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create campaign
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Name:
+                                template: '{{$Trigger.name}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecampaigns
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                campaigns/response/payload
+                            - variable: SalesforceRetrievecampaignsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                campaigns/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C02M8SLPDJ7
+                            - text:
+                                template: You have created a new event!
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceCreatecampaign
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Create
+                                campaign/response/payload
+                            - variable: SalesforceRetrievecampaigns
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                campaigns/response/payload
+                            - variable: SalesforceRetrievecampaignsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                campaigns/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Add Eventbrite event as a new Salesforce campaign and notify via Slack
+models: {}
