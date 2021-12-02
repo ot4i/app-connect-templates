@@ -1,0 +1,55 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: gmail
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Dropbox Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - autorename:
+                      expression: 'true'
+                  - fileContent:
+                      template: >-
+                        subject - {{$Trigger.Subject}} ---- body of the content
+                        - {{$Trigger.Body}} ---message id - {{$Trigger.id}}
+                  - fileType:
+                      template: Text
+                  - name:
+                      template: '{{$Trigger.Subject}}'
+                  - path:
+                      template: /home
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    Whenever there is new email in gmail create file in dropbox with mail
+    details 
+models: {}

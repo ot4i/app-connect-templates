@@ -1,0 +1,97 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Order
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '695532935343'
+            parentFilter:
+              organizationID: '695532935343'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Email: '{{$Trigger.email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrievecontacts
+                  $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                - variable: SalesforceRetrievecontactsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$isNull($SalesforceRetrievecontacts.Email)}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Email:
+                                template: '{{$Trigger.email}}'
+                            - FirstName:
+                                template: '{{$Trigger.first_name}}'
+                            - LastName:
+                                template: '{{$Trigger.last_name}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecontacts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                contacts/response/payload
+                            - variable: SalesforceRetrievecontactsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                contacts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a new contact in Salesforce for a new Eventbrite order
+models: {}

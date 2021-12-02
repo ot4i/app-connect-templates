@@ -1,0 +1,97 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlesheet
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: spreadsheet
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: folders
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: sharing
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Dropbox Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - path:
+                      template: /home/{{$Trigger.title}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Dropbox Create shared link
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - path:
+                      template: /home/{{$Trigger.title}}
+                  - settings_requested_visibility:
+                      template: public
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DropboxCreatefolder
+                    $ref: '#/node-output/Dropbox Create folder/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - channel:
+                      template: CJR8WDG2X
+                  - text:
+                      template: >-
+                        Create folder - {{$DropboxCreatefolder}} -------Created
+                        shared link  - {{$DropboxCreatesharedlink}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DropboxCreatefolder
+                    $ref: '#/node-output/Dropbox Create folder/response/payload'
+                  - variable: DropboxCreatesharedlink
+                    $ref: '#/node-output/Dropbox Create shared link/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: >-
+    New spreadsheet in Google sheet will create folder in dropbox and share
+    folder link in slack message
+models: {}
