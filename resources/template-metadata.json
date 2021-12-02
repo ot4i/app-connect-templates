@@ -1234,7 +1234,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Record new lead activity from Marketo to Google Sheets",
+    "name": "Add a row in Google Sheets when a new lead is created in Marketo",
     "description": "Use this template to automatically update a Google Sheets document with data from new leads from Marketo.",
     "summary": "Automatically update a Google Spreadsheet with Marketo new leads.",
     "sourceApp": "marketo",
@@ -1243,7 +1243,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Salesforce new or updated account to HubSpot Marketing create or update account",
+    "name": "Create or update a HubSpot Marketing account when a Saleforce account is created or updated",
     "description": "Use this template to automatically add or update HubSpot Marketing accounts when Salesforce accounts are created or updated.",
     "summary": "Automatically update/create HubSpot Marketing accounts with data from Salesforce new/updated accounts.",
     "sourceApp": "salesforce",

@@ -54,5 +54,5 @@ integration:
                     $ref: '#/flowDetails'
         tags:
           - incomplete
-  name: Record new lead activity from Marketo to Google Sheets
+  name: Add a row in Google Sheets when a new lead is created in Marketo
 models: {}

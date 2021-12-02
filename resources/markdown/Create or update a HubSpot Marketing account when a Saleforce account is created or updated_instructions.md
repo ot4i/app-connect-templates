@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Salesforce%20new%20or%20updated%20account%20to%20HubSpot%20Marketing%20create%20or%20update%20account_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20or%20update%20a%20HubSpot%20Marketing%20account%20when%20a%20Saleforce%20account%20is%20created%20or%20updated_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to your [Salesforce Account](https://www.ibm.com/docs/en/app-connect/cloud?topic=gmail-connecting-google-application-using-website-oauth-20-authorization-method).
