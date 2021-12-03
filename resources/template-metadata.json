@@ -847,7 +847,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Creates a Dropbox folder and shares the link via Slack when a new spreadsheet is created in Google Sheets",
+    "name": "Creates a Dropbox folder and shares the link via Slack for new Google Sheets",
     "description": "This template creates a Dropbox folder when a new spread sheet is created in Google Sheets. A Dropbox share link is created for the folder and shared through a Slack message.",
     "summary": "Goolge Sheets to 2 applications ",
     "sourceApp": "googlesheet",
@@ -991,7 +991,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Creates a list item attachment in SharePoint and uploads it to Box when a new attachment is created in ServiceNow",
+    "name": "Create a list item attachment in SharePoint & upload it to Box for new attachments in ServiceNow",
     "description": "This template uploads an attachment file with its details to a specified Box folder from Microsoft SharePoint when new attachment is created in ServiceNow.",
     "summary": "ServiceNow to 2 applications ",
     "sourceApp": "servicenow",
