@@ -820,7 +820,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Retrieve Microsoft Dynamics 365 leads and create a Microsoft Excel .csv file in Dropbox at regular intervals",
+    "name": "Retrieve MS Dynamics 365 leads and create an MS Excel CSV file in Dropbox at regular intervals",
     "description": "This template retrieves 10 leads maximum at a time from Microsoft Dynamics 365 for Sales and creates a Microsoft Excel .csv file with the lead details in Dropbox. The flow is triggered once a day at 00:00 UTC.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
@@ -1367,6 +1367,6 @@
     "targetApps": ["asana"],
     "tags": ["jira","asana"],
     "offerings": ["app connect professional"]
-    }           
+    }
   ]
 }
