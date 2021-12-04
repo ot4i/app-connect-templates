@@ -18,27 +18,23 @@ integration:
               timeZone: UTC
               pollingInterval: 5
       connector-type: salesforce
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: contacts
       connector-type: hubspotmarketing
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: contacts
       connector-type: hubspotmarketing
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-3:
       type: api-action
       business-object: contacts
       connector-type: hubspotmarketing
-      account-name: Account 1
       actions:
         UPDATEALL: {}
   assemblies:
