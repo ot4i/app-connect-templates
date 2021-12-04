@@ -40,7 +40,7 @@ integration:
       type: api-action
       business-object: worksheetRow
       connector-type: googlesheet
-      account-name: Account 2
+      account-name: Account 3
       actions:
         CREATE: {}
   assemblies:
@@ -56,9 +56,50 @@ integration:
               allow-truncation: true
               pagination-type: TOKEN
               allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrieveaccounts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: false
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              display-name: Salesforce Account
+    assembly-2:
+      assembly:
+        execute:
           - if:
-              name: If
+              name: If 2
               input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
                 - variable: Trigger
                   $ref: '#/trigger/payload'
                 - variable: SalesforceRetrieveaccounts
@@ -69,55 +110,47 @@ integration:
                   $ref: '#/flowDetails'
               branch:
                 - condition:
-                    '{{$SalesforceRetrieveaccounts.NumberOfEmployees}}':
+                    '{{$Foreachitem.NumberOfEmployees}}':
                       gt: '500'
-                  execute: []
+                  execute:
+                    - create-action:
+                        name: Google Sheets Create row 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - fields:
+                                mappings:
+                                  - '1':
+                                      template: '{{$Foreachitem.Id}}'
+                                  - '2':
+                                      template: '{{$Foreachitem.Name}}'
+                                  - '3':
+                                      template: '{{$Foreachitem.NumberOfEmployees}}'
+                            - spreadsheetID:
+                                template: 1-Y_OyLZ9J8poDkHQ3TtU611CcABOBAW2ea97rk2kJy8
+                            - worksheetID:
+                                template: Sheet1
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
               else:
                 execute: []
-                completion-action:
-                  terminate:
-                    info:
-                      input:
-                        - variable: Trigger
-                          $ref: '#/trigger/payload'
-                        - variable: SalesforceRetrieveaccounts
-                          $ref: >-
-                            #/node-output/Salesforce Retrieve
-                            accounts/response/payload
-                        - variable: SalesforceRetrieveaccountsMetadata
-                          $ref: '#/node-output/Salesforce Retrieve accounts/response'
-                        - variable: flowDetails
-                          $ref: '#/flowDetails'
-                      message: >-
-                        {{$SalesforceRetrieveaccounts.NumberOfEmployees}} are
-                        less than or equal to 500.
-                      status-code: 200
               output-schema: {}
-          - create-action:
-              name: Google Sheets Create row 2
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
-              map:
-                mappings:
-                  - fields:
-                      mappings:
-                        - '1':
-                            template: '{{$SalesforceRetrieveaccounts.Id}}'
-                        - '2':
-                            template: '{{$SalesforceRetrieveaccounts.Name}}'
-                  - spreadsheetID:
-                      template: 1-Y_OyLZ9J8poDkHQ3TtU611CcABOBAW2ea97rk2kJy8
-                  - worksheetID:
-                      template: Sheet1
-                $map: http://ibm.com/appconnect/map/v1
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: SalesforceRetrieveaccounts
-                    $ref: >-
-                      #/node-output/Salesforce Retrieve
-                      accounts/response/payload
-                  - variable: SalesforceRetrieveaccountsMetadata
-                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
-  name: Add Salesforce accounts that have more than 500 employees to a Google Sheets worksheet
+  name: >-
+    Add Salesforce accounts that have more than 500 employees to a Google Sheets
+    worksheet
 models: {}
