@@ -21,17 +21,17 @@ const templateMetadata = require('../resources/' + templateMetadataFilename)
 
 describe('Template files', function () {
   it('must all exist for the list in template-metadata', function () {
-    for (let template of templateMetadata.templates) {
-      let fileName = `./resources/${template.name}.yaml`
+    for (const template of templateMetadata.templates) {
+      const fileName = `./resources/${template.name}.yaml`
       expect(fs.existsSync(fileName), `Missing file ${fileName}`).equals(true)
     }
   })
 
   it('must not contain account-name in action or trigger interfaces', function () {
     let noAccountNameFound = true
-    for (let template of templateMetadata.templates) {
-      let fileName = `./resources/${template.name}.yaml`
-      var doc = jsyaml.safeLoad(fs.readFileSync(fileName, 'utf8'))
+    for (const template of templateMetadata.templates) {
+      const fileName = `./resources/${template.name}.yaml`
+      const doc = jsyaml.safeLoad(fs.readFileSync(fileName, 'utf8'))
       const triggerInterfaceAccounts = jsonata('*."trigger-interfaces".*."account-name"').evaluate(doc)
       const actionInterfaceAccounts = jsonata('*."action-interfaces".*."account-name"').evaluate(doc)
       if (triggerInterfaceAccounts !== undefined || actionInterfaceAccounts !== undefined) {
@@ -39,11 +39,11 @@ describe('Template files', function () {
         noAccountNameFound = false
       }
     }
-    expect(noAccountNameFound, `Found 'account-name' in some of the templates, check the logs above!`).equal(true)
+    expect(noAccountNameFound, 'Found \'account-name\' in some of the templates, check the logs above!').equal(true)
   })
 
   it('must all have an entry in template-metadata', function () {
-    let flowNames = jsonata('templates.name').evaluate(templateMetadata)
+    const flowNames = jsonata('templates.name').evaluate(templateMetadata)
     const listOfFiles = fs.readdirSync('./resources')
 
     // Remove the templates-metadata.json file from the list we're checking against
@@ -61,7 +61,7 @@ describe('Template files', function () {
     // Iterate through each flow doc name and remove the file extension so can directly compare with the metadata file
     // entries, list any missing ones and fail the test if any are missing
     let missingFlowDocInMetadata = false
-    for (var i = 0; i < listOfFiles.length; i++) {
+    for (let i = 0; i < listOfFiles.length; i++) {
       listOfFiles[i] = listOfFiles[i].substr(0, listOfFiles[i].lastIndexOf('.'))
 
       if (flowNames.indexOf(listOfFiles[i]) === -1) {
@@ -73,8 +73,8 @@ describe('Template files', function () {
   })
 
   it('must have a corresponding markdown file', function () {
-    for (let template of templateMetadata.templates) {
-      let fileName = `./resources/markdown/${template.name}_instructions.md`
+    for (const template of templateMetadata.templates) {
+      const fileName = `./resources/markdown/${template.name}_instructions.md`
       expect(fs.existsSync(fileName), `Missing file ${fileName}`).equals(true)
     }
   })

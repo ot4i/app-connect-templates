@@ -124,6 +124,5 @@ integration:
         tags:
           - incomplete
   name: >-
-    At regular intervals extract MS Dynamics lead details and upload Dropbox
-    file with CSV output
+    Retrieve MS Dynamics 365 leads and create an MS Excel CSV file in Dropbox at regular intervals
 models: {}

@@ -15,13 +15,11 @@ integration:
             organizationID: '696807928253'
             parentFilter:
               organizationID: '696807928253'
-      account-name:
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: worksheetRow
       connector-type: googlesheet
-      account-name:
       actions:
         CREATE: {}
   assemblies:
