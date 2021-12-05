@@ -1373,8 +1373,8 @@
     "description": "When there is a new spreadsheet row added in Google Sheets account then we a send SMSmessage via Twilio to specific mobile number",
     "summary": "Googlesheet new row to SMS",
     "sourceApp": "GoogleSheet",
-    "targetApps": "twilio",
-    "tags": ["GoogleSheet", "twilio", "support", "SMS" "newrow" "account" "google" "googleaccount" "case", "new case"],
+    "targetApps": ["twilio"],
+    "tags": ["GoogleSheet", "twilio", "support", "SMS", "newrow", "account", "google", "googleaccount", "case", "new case"],
     "offerings": ["app connect professional"]
     }   
               
