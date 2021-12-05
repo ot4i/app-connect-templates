@@ -1369,7 +1369,7 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "New spreadsheet row in Google Sheets will send SMS message via Twilio,
+    "name": "New spreadsheet row in Google Sheets will send SMS message via Twilio",
     "description": "When there is a new spreadsheet row added in Google Sheets account then we a send SMSmessage via Twilio to specific mobile number",
     "summary": "Googlesheet new row to SMS",
     "sourceApp": "GoogleSheet",
