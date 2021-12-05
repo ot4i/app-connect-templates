@@ -1,4 +1,4 @@
-$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -15,8 +15,8 @@ integration:
   action-interfaces:
     action-interface-1:
       type: api-action
-      business-object: Contact
-      connector-type: silverpop
+      business-object: message
+      connector-type: slack
       actions:
         CREATE: {}
   assemblies:
@@ -24,22 +24,22 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: Create contact
+              name: Slack Create message
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
                 mappings:
-                  - KEY_COLUMNS:
-                      mappings:
-                        - Email:
-                            template: '{{$Trigger.Email}}'
-                  - LIST_ID:
-                      template: '28963'
-                $map: 'http://ibm.com/appconnect/map/v1'
+                  - channel:
+                      template: C02PF28CB89
+                  - text:
+                      template: >-
+                        A new contact for {{$Trigger.FirstName}}
+                        {{$Trigger.LastName}} is created in Salesforce
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: >-
-    Create new contact in Acoustic Campaign when a new contact is added in
-    Salesforce
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a message on Slack when a new Salesforce contact is created
 models: {}

@@ -13,7 +13,7 @@
           "name": {
             "description": "The name of the template",
             "type": "string",
-            "maxLength": 98
+            "maxLength": 120
           },
           "description": {
             "description": "A description of the flow created with the template",
