@@ -1403,7 +1403,16 @@
     "targetApps": ["asana"],
     "tags": ["jira","asana"],
     "offerings": ["app connect professional"]
-    }           
+    },
+    {
+    "name": "Add Salesforce accounts that have more than 500 employees to a Google Sheets worksheet",
+    "description": " Retrieve accounts from salesforce with more than 500 employees and create accounts for those in Google Sheets as a new row. ",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["googlesheet", "googledrive"],
+    "tags": ["scheduler", "salesforce", "googlesheets", "employees"],
+    "offerings": ["app connect professional"]
+},
   ]
 }
 
