@@ -50,5 +50,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send me a Twilio SMS when a new row is added in Google Sheets
+  name: New spreadsheet row in Google Sheets will send SMS message via Twilio
 models: {}
