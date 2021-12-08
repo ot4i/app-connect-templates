@@ -1360,6 +1360,15 @@
     "offerings": ["app connect professional"]
     },
     {
+    "name": "Post slack messages based on bug priority",
+    "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
+    "summary": "Insightly to 2 applications",
+    "sourceApp": "insightly",
+    "targetApps": ["trello, slack"],
+    "tags": ["asana","twilio"],
+    "offerings": ["app connect professional"]
+    },
+    {
     "name": "Creates a task in Asana when an issue is created in Jira",
     "description": "Whenever a new Issue is created in Jira, a new task is created in Asana",
     "summary": "Jira to Asana",
