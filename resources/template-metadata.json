@@ -1252,9 +1252,9 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Sync new/updated issue from Jira to Salesforce",
-    "description": "A new issue is created in Jira. Retrieve a matching case in Salesforce by Jira summary.If no matching case is found in Salesforce, Create a new case in Salesforce.",
-    "summary": "jira to salesforce",
+    "name": "Update Sync updated issues from Jira to Salesforce",
+    "description": "When a new issue is created in Jira, this flow will check to see if there is a matching case in Salesforce. Cases are matched by summary. If no matching case is found in Salesforce then it will create a new case in Salesforce.",
+    "summary": "Jira to Salesforce",
     "sourceApp": "jira",
     "targetApps": ["salesforce"],
     "tags": ["jira", "salesforce", "case", "retrieve", "issue"],
@@ -1262,10 +1262,10 @@
     },
     {
     "name": "Record Salesforce campaign members to Google Sheets",
-    "description": "For a campaign member is created in Salesforce. Create campaign member in Google Sheets as a new row.",
-    "summary": "salesforce to Google Sheets",
+    "description": "For every campaign member that is created in Salesforce this flow will create a campaign member in Google Sheets on a new row.",
+    "summary": "Salesforce to Google Sheets",
     "sourceApp": "salesforce",
-    "targetApps": ["Google Sheets"],
+    "targetApps": ["googlesheet"],
     "tags": ["salesforce", "Google Sheets", "sheets", "google", "campaign", "campaign member"],
     "offerings": ["app connect professional"]
   },
