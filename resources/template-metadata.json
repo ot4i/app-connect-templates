@@ -1367,6 +1367,15 @@
     "targetApps": ["asana"],
     "tags": ["jira","asana"],
     "offerings": ["app connect professional"]
-    }
+    },
+    {
+    "name": "Record Salesforce campaign members to Google Sheets",
+    "description": "For every campaign member that is created in Salesforce this flow will create a campaign member in Google Sheets on a new row.",
+    "summary": "Salesforce to Google Sheets",
+    "sourceApp": "salesforce",
+    "targetApps": ["googlesheet"],
+    "tags": ["salesforce", "Google Sheets", "sheets", "google", "campaign", "campaign member"],
+    "offerings": ["app connect professional"]
+    }                
   ]
 }
