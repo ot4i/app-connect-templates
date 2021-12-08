@@ -1367,6 +1367,15 @@
     "targetApps": ["asana"],
     "tags": ["jira","asana"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Sync updated issues from Jira to Salesforce",
+    "description": "When a new issue is created in Jira, this flow will check to see if there is a matching case in Salesforce. Cases are matched by summary. If no matching case is found in Salesforce then it will create a new case in Salesforce.",
+    "summary": "Jira to Salesforce",
+    "sourceApp": "jira",
+    "targetApps": ["salesforce"],
+    "tags": ["jira", "salesforce", "case", "retrieve", "issue"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
