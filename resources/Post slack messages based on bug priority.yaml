@@ -12,34 +12,29 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: insightly
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Card
       connector-type: trello
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-3:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-4:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-2:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
