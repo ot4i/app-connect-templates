@@ -1,4 +1,4 @@
-$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -13,24 +13,12 @@ integration:
           options: {}
       connector-type: salesforce
   action-interfaces:
-    action-interface-1:
-      type: api-action
-      business-object: ClassifyText
-      connector-type: watsonnlclassifier
-      actions:
-        CLASSIFYTEXT: {}
     action-interface-2:
       type: api-action
       business-object: Tone
       connector-type: watsontoneanalyzer
       actions:
         GETTONEANALYSIS: {}
-    action-interface-3:
-      type: api-action
-      business-object: Case
-      connector-type: salesforce
-      actions:
-        UPSERTWITHWHERE: {}
     action-interface-4:
       type: api-action
       business-object: Account
@@ -43,25 +31,16 @@ integration:
       connector-type: slack
       actions:
         CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
-          - custom-action:
-              name: Watson Natural Language Classifier Classify text
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-1'
-              action: CLASSIFYTEXT
-              map:
-                mappings:
-                  - classifier_id:
-                      assign: e638e2x208-nlc-105197
-                  - text:
-                      template: '{{$Trigger.Subject}}'
-                $map: 'http://ibm.com/appconnect/map/v1'
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
           - custom-action:
               name: Watson Tone Analyzer Get tone analysis
               target:
@@ -77,56 +56,45 @@ integration:
                       template: '{{$Trigger.Subject}}'
                   - version:
                       template: '2017-05-08'
-                $map: 'http://ibm.com/appconnect/map/v1'
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WatsonNaturalLanguageClassifierClassifytext
-                    $ref: >-
-                      #/node-output/Watson Natural Language Classifier Classify
-                      text/response/payload
-          - upsert-action:
-              name: Salesforce Update or create Case
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - update-action:
+              name: Salesforce Update case
               target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
+                $ref: '#/integration/action-interfaces/action-interface-1'
               map:
                 mappings:
-                  - Origin:
-                      template: '{{$Trigger.Origin}}'
-                  - WatsonToneAnalysis__c:
+                  - Subject:
                       template: >-
-                        {{$WatsonToneAnalyzerGettoneanalysis.document_tone.tone_categories[category_id="emotion_tone"].tones^(>score)[0].tone_name}}
-                  - Watson_Classification__c:
-                      template: >-
-                        {{$WatsonNaturalLanguageClassifierClassifytext.top_class}}
-                  - Watson_Tone_Analysis_Performed__c:
-                      expression: 'true'
-                $map: 'http://ibm.com/appconnect/map/v1'
+                        {{$Trigger.Subject}} // Tone analysis:
+                        {{$WatsonToneAnalyzerGettoneanalysis.dominant_tones.document_tone.emotion_tone.tone_name}}
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WatsonNaturalLanguageClassifierClassifytext
-                    $ref: >-
-                      #/node-output/Watson Natural Language Classifier Classify
-                      text/response/payload
                   - variable: WatsonToneAnalyzerGettoneanalysis
                     $ref: >-
                       #/node-output/Watson Tone Analyzer Get tone
                       analysis/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
               filter:
                 where:
                   Id: '{{$Trigger.Id}}'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WatsonNaturalLanguageClassifierClassifytext
-                    $ref: >-
-                      #/node-output/Watson Natural Language Classifier Classify
-                      text/response/payload
                   - variable: WatsonToneAnalyzerGettoneanalysis
                     $ref: >-
                       #/node-output/Watson Tone Analyzer Get tone
                       analysis/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: false
           - retrieve-action:
               name: Salesforce Retrieve Account
               target:
@@ -137,24 +105,20 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WatsonNaturalLanguageClassifierClassifytext
-                    $ref: >-
-                      #/node-output/Watson Natural Language Classifier Classify
-                      text/response/payload
                   - variable: WatsonToneAnalyzerGettoneanalysis
                     $ref: >-
                       #/node-output/Watson Tone Analyzer Get tone
                       analysis/response/payload
-                  - variable: SalesforceUpdateorcreateCase
-                    $ref: >-
-                      #/node-output/Salesforce Update or create
-                      Case/response/payload
-                  - variable: SalesforceUpdateorcreateCaseMetadata
-                    $ref: '#/node-output/Salesforce Update or create Case/response'
+                  - variable: SalesforceUpdatecase
+                    $ref: '#/node-output/Salesforce Update case/response/payload'
+                  - variable: SalesforceUpdatecaseMetadata
+                    $ref: '#/node-output/Salesforce Update case/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
                 limit: 1
-              allow-empty-output: false
               allow-truncation: false
-              pagination-type: SKIP_LIMIT
+              pagination-type: TOKEN
+              allow-empty-output: false
           - create-action:
               name: Slack Create message
               target:
@@ -162,34 +126,30 @@ integration:
               map:
                 mappings:
                   - channel:
-                      assign: C4GHPM484
+                      template: C3HECF803
                   - text:
                       template: >-
                         {{$Trigger.Id}}"{{$Trigger.Subject}}" created by
                         {{$SalesforceRetrieveAccount[0].Name}} with tone
-                        {{$WatsonToneAnalyzerGettoneanalysis.document_tone.tone_categories[category_id="emotion_tone"].tones^(>score)[0].tone_name}}
-                $map: 'http://ibm.com/appconnect/map/v1'
+                        {{$WatsonToneAnalyzerGettoneanalysis.dominant_tones.document_tone.emotion_tone.tone_name}}
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WatsonNaturalLanguageClassifierClassifytext
-                    $ref: >-
-                      #/node-output/Watson Natural Language Classifier Classify
-                      text/response/payload
                   - variable: WatsonToneAnalyzerGettoneanalysis
                     $ref: >-
                       #/node-output/Watson Tone Analyzer Get tone
                       analysis/response/payload
-                  - variable: SalesforceUpdateorcreateCase
-                    $ref: >-
-                      #/node-output/Salesforce Update or create
-                      Case/response/payload
-                  - variable: SalesforceUpdateorcreateCaseMetadata
-                    $ref: '#/node-output/Salesforce Update or create Case/response'
+                  - variable: SalesforceUpdatecase
+                    $ref: '#/node-output/Salesforce Update case/response/payload'
+                  - variable: SalesforceUpdatecaseMetadata
+                    $ref: '#/node-output/Salesforce Update case/response'
                   - variable: SalesforceRetrieveAccount
                     $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
                   - variable: SalesforceRetrieveAccountMetadata
                     $ref: '#/node-output/Salesforce Retrieve Account/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
   name: Classification and sentiment analysis on new Salesforce case
   description: >-
     Use this template to enrich your new Salesforce cases with cognitive
