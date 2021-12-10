@@ -5,7 +5,7 @@
     "summary": "Salesforce to 3 applications",
     "sourceApp": "salesforce",
     "targetApps": ["watsontoneanalyzer", "salesforce", "slack"],
-    "tags": ["Salesforce", "Watson Natural Language Classifier", "Watson Tone Analyzer", "crm", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
+    "tags": ["Salesforce", "Watson Tone Analyzer", "crm", "cognitive", "Slack", "support", "tone analysis", "case", "new case"],
     "offerings": ["app connect professional"]
   },
   {
