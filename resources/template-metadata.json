@@ -143,15 +143,6 @@
     "tags": ["ServiceNow", "Watson Language Translator", "support", "cognitive", "Slack", "incident", "messaging", "language detection"],
     "offerings": ["app connect professional"]
 },
-{
-    "name": "Create NetSuite ERP and Stripe products from Asana tasks to launch a Salesforce Pardot campaign",
-    "description": "When a new task is created in Asana, a new product is created in NetSuite ERP & Stripe, then a campaign for the new product is launched as a Salesforce Pardot Campaign.",
-    "summary": "Asana to 3 applications",
-    "sourceApp": "asana",
-    "targetApps": ["netsuiteerp", "stripe", "salesforcepardot"],
-    "tags": ["asana", "netsuiteerp", "salesforcepardot", "stripe", "marketing", "campaign", "product", "crm"],
-    "offerings": ["app connect professional"]
-},
   {
     "name": "For large Salesforce opportunities send an email and create an Asana task",
     "description": "This template creates and sends an email via Gmail, and creates an Asana task, when a new high value opportunity is created in Salesforce.",
@@ -348,15 +339,6 @@
  "sourceApp": "slack",
  "targetApps": ["slack"],
  "tags": ["slack", "channels", "message", "copy", "callback", "callback url"],
- "offerings": ["app connect professional"]
-},
-{
- "name": "Create a Pardot prospect when a row is appended in Google Sheets",
- "description": "Use this template to create new prospect in Salesforce Pardot when a new row is appended in Google Sheets.",
- "summary": "Google Sheets to Pardot",
- "sourceApp": "googlesheet",
- "targetApps": ["salesforcepardot"],
- "tags": ["googlesheets", "salesforcepardot"],
  "offerings": ["app connect professional"]
 },
 {
@@ -1270,24 +1252,6 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Create a new lead in Zoho CRM for a new Eventbrite attendee",
-    "description": "This template creates a new lead in Zoho CRM when a new attendee is added in Eventbrite.",
-    "summary": "Eventbrite to Zoho CRM",
-    "sourceApp": "eventbrite",
-    "targetApps": ["zohocrm"],
-    "tags": ["eventbrite", "zohocrm", "attendee", "lead"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Create a new contact in Zoho CRM when a new lead is created in Marketo",
-    "description": "This template creates a new contact in Zoho CRM when a new lead is created in Marketo.",
-    "summary": "Marketo to Zoho CRM",
-    "sourceApp": "marketo",
-    "targetApps": ["zohocrm"],
-    "tags": ["marketo", "zohocrm", "contact", "lead"],
-    "offerings": ["app connect professional"]
-    },
-    {
     "name": "Record Eventbrite attendees to Google Sheets",
     "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets",
     "summary": "Eventbrite to Google Sheets",
@@ -1323,24 +1287,6 @@
       "tags": ["trello", "googlesheets", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
       "offerings": ["app connect professional"]
     },
-    {
-      "name": "Create a new lead in Zoho CRM when a row is added in Google Sheets",
-      "description": "Use this template to create a lead in Zoho CRM when a new row is added in Google Sheets",
-      "summary": "Google Sheets to Zoho CRM Lead",
-      "sourceApp": "googlesheet",
-      "targetApps": ["zohocrm"],
-      "tags": ["googlesheets", "zohocrm", "lead", "row"],
-      "offerings": ["app connect professional"]
-	  },
-    {
-      "name": "Create a new campaign in Zoho CRM when a campaign is created in Salesforce",
-      "description": "This template creates a new campaign in Zoho CRM when a new campaign is created in Salesforce",
-      "summary": "Salesforce campaign to Zoho campaign",
-      "sourceApp": "salesforce",
-      "targetApps": ["zohocrm"],
-      "tags": ["salesforce", "zohocrm", "campaign", "crm"],
-      "offerings": ["app connect professional"]
-	  },
     {
     "name": "Send an SMS message when a new task is created in Asana",
     "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
