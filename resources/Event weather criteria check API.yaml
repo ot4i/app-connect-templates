@@ -151,16 +151,16 @@ integration:
                 event","html":"Longshot POC Arrow launch
                 event"},"description":{"text":"Event to launch the Longshot POC
                 Arrow","html":"Event to launch the Longshot POC
-                Arrow"},"url":"https://www.eventbrite.com/e/longshot-poc-arrow-launch-event-tickets-272545750677","start":{"timezone":"Europe/London","local":"2022-03-30T06:00:00","utc":"2022-03-30T05:00:00Z"},"end":{"timezone":"Europe/London","local":"2022-03-30T07:00:00","utc":"2022-03-30T06:00:00Z"},"organization_id":"196921718943","created":"2022-02-18T07:09:29Z","changed":"2022-02-18T12:55:23Z","published":"2022-02-18T07:20:42Z","capacity":50,"capacity_is_custom":false,"status":"live","currency":"USD","listed":false,"shareable":false,"invite_only":false,"password":"out/2/launch","online_event":false,"show_remaining":false,"tx_time_limit":1200,"hide_start_date":false,"hide_end_date":false,"locale":"en_US","is_locked":false,"privacy_setting":"unlocked","is_series":false,"is_series_parent":false,"inventory_type":"limited","is_reserved_seating":false,"show_pick_a_seat":false,"show_seatmap_thumbnail":false,"show_colors_in_seatmap_thumbnail":false,"source":"coyote","is_free":true,"version":null,"summary":"Event
+                Arrow"},"url":"https://www.eventbrite.com/e/longshot-poc-arrow-launch-event-tickets-123456750677","start":{"timezone":"Europe/London","local":"2022-03-30T06:00:00","utc":"2022-03-30T05:00:00Z"},"end":{"timezone":"Europe/London","local":"2022-03-30T07:00:00","utc":"2022-03-30T06:00:00Z"},"organization_id":"196921718943","created":"2022-02-18T07:09:29Z","changed":"2022-02-18T12:55:23Z","published":"2022-02-18T07:20:42Z","capacity":50,"capacity_is_custom":false,"status":"live","currency":"USD","listed":false,"shareable":false,"invite_only":false,"password":"out/2/launch","online_event":false,"show_remaining":false,"tx_time_limit":1200,"hide_start_date":false,"hide_end_date":false,"locale":"en_US","is_locked":false,"privacy_setting":"unlocked","is_series":false,"is_series_parent":false,"inventory_type":"limited","is_reserved_seating":false,"show_pick_a_seat":false,"show_seatmap_thumbnail":false,"show_colors_in_seatmap_thumbnail":false,"source":"coyote","is_free":true,"version":null,"summary":"Event
                 to launch the Longshot POC
-                Arrow","facebook_event_id":null,"logo_id":"232410279","organizer_id":"25585703943","venue_id":"84379729","category_id":"102","subcategory_id":"2004","format_id":"100","id":"272545750677","resource_uri":"https://www.eventbriteapi.com/v3/events/272545750677/","is_externally_ticketed":false,"logo":{"crop_mask":{"top_left":{"x":0,"y":212},"width":3712,"height":1856},"original":{"url":"https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F232410279%2F196921718943%2F1%2Foriginal.20220216-144641?auto=format%2Ccompress&q=75&sharp=10&s=1fecff315558a2c192fa63f938ee37f9","width":3712,"height":2475},"id":"232410279","url":"https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F232410279%2F196921718943%2F1%2Foriginal.20220216-144641?h=200&w=450&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C212%2C3712%2C1856&s=56d37eb1a6f396f3b11de737db42dd63","aspect_ratio":"2","edge_color":"#acadac","edge_color_set":true},"venue":{"address":{"address_1":"Hursley
+                Arrow","facebook_event_id":null,"logo_id":"123410279","organizer_id":"12345703943","venue_id":"12349729","category_id":"102","subcategory_id":"2004","format_id":"100","id":"123456750677","resource_uri":"https://www.eventbriteapi.com/v3/events/123456750677/","is_externally_ticketed":false,"logo":{"crop_mask":{"top_left":{"x":0,"y":212},"width":3712,"height":1856},"original":{"url":"https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F232410279%2F196921718943%2F1%2Foriginal.20220216-144641?auto=format%2Ccompress&q=75&sharp=10&s=1fecff315558a2c192fa63f938ee37f9","width":3712,"height":2475},"id":"232410279","url":"https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F232410279%2F196921718943%2F1%2Foriginal.20220216-144641?h=200&w=450&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C212%2C3712%2C1856&s=56d37eb1a6f396f3b11de737db42dd63","aspect_ratio":"2","edge_color":"#acadac","edge_color_set":true},"venue":{"address":{"address_1":"Hursley
                 Park
                 Road","address_2":"","city":"Hursley","region":"England","postal_code":"SO21
                 2JN","country":"GB","latitude":"51.0266568","longitude":"-1.3989264","localized_address_display":"Hursley
                 Park Road, Hursley, SO21
                 2JN","localized_area_display":"Hursley","localized_multi_line_address_display":["Hursley
                 Park Road","Hursley","SO21
-                2JN"]},"resource_uri":"https://www.eventbriteapi.com/v3/venues/84379729/","id":"84379729","age_restriction":null,"capacity":null,"name":"Hursley
+                2JN"]},"resource_uri":"https://www.eventbriteapi.com/v3/venues/12349729/","id":"12349729","age_restriction":null,"capacity":null,"name":"Hursley
                 House","latitude":"51.0266568","longitude":"-1.3989264"}}
               output-schema:
                 $schema: http://json-schema.org/draft-04/schema#
@@ -460,38 +460,6 @@ integration:
                               $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.max
                               :
                               $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_EVENING.max
-          - logging:
-              name: Log
-              map:
-                $map: http://ibm.com/appconnect/map/v1
-                mappings:
-                  - logLevel:
-                      template: Info
-                  - logMessage:
-                      template: >-
-                        Evening gust: {{$Setvariable.variable."pm-gust-max"}}
-                        m/s
-                input:
-                  - variable: api
-                    $ref: '#/trigger/api/parameters'
-                  - variable: EventbriteRetrieveevents
-                    $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
-                  - variable: EventbriteRetrieveeventsMetadata
-                    $ref: '#/node-output/Eventbrite Retrieve events/response'
-                  - variable: HTTPInvokemethod
-                    $ref: '#/node-output/HTTP Invoke method/response/payload'
-                  - variable: HTTPInvokemethodMetadata
-                    $ref: '#/node-output/HTTP Invoke method/response'
-                  - variable: JSONParserParse
-                    $ref: '#/node-output/JSON Parser Parse/response/payload'
-                  - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
-                    $ref: >-
-                      #/node-output/IBM Weather Company Data Limited Edition Get
-                      forecast/response/payload
-                  - variable: Setvariable
-                    $ref: '#/node-output/Set variable/response/payload'
-                  - variable: flowDetails
-                    $ref: '#/flowDetails'
           - if:
               name: If
               input:
@@ -900,8 +868,6 @@ integration:
                         $ref: >-
                           #/node-output/IBM Weather Company Data Limited Edition
                           Get forecast/response/payload
-                      - variable: JSONParserParse2
-                        $ref: '#/node-output/JSON Parser Parse 2/response/payload'
                       - variable: Setvariable
                         $ref: '#/node-output/Set variable/response/payload'
                       - variable: flowDetails
@@ -923,9 +889,8 @@ integration:
                             -273.15, 2)}} Celsius - Wind speed average:
                             {{$round($Setvariable.variable."am-windspeed-avg" ,
                             2)}} m/s // Weather forecast for the evening - Gust
-                            maximum:
-                            {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_EVENING.max}}
-                            m/s - Precipitation maximum:
+                            maximum: {{$Setvariable.variable."pm-gust-max"}} m/s
+                            - Precipitation maximum:
                             {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}
                             mm - Temperature minimum:
                             {{$round($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Temperature.LOCAL_EVENING.max
@@ -1114,9 +1079,8 @@ integration:
                           -273.15, 2)}} Celsius - Wind speed average:
                           {{$round($Setvariable.variable."am-windspeed-avg" ,
                           2)}} m/s // Weather forecast for the evening - Gust
-                          maximum:
-                          {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_EVENING.max}}
-                          m/s - Precipitation maximum:
+                          maximum: {{$Setvariable.variable."pm-gust-max"}} m/s -
+                          Precipitation maximum:
                           {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}
                           mm - Temperature minimum:
                           {{$round($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Temperature.LOCAL_EVENING.max
