@@ -1304,6 +1304,15 @@
     "targetApps": ["asana"],
     "tags": ["jira","asana"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Event weather criteria check API",
+    "description": "An API to get the weather forecast for an Eventbrite event and take different actions based on weather criteria.",
+    "summary": "1 flow using 4 applications",
+    "sourceApp": "api",
+    "targetApps": ["eventbrite", "http", "ibmtwc"],
+    "tags": ["api", "eventbrite", "http", "ibmtwc", "weather"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
