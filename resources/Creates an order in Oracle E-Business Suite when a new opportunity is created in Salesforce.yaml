@@ -1,0 +1,120 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: OE_INBOUND_INT_Service___PROCESS_ORDER
+      connector-type: oracleebs
+       actions:
+        CREATE_ORDER: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Oracle E-Business Suite Create order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CREATE_ORDER
+              map:
+                mappings:
+                  - P_HEADER_REC:
+                      mappings:
+                        - ATTRIBUTE1:
+                            template: '{{$Trigger.Name}} --oppotunity name'
+                        - ATTRIBUTE2:
+                            template: '{{$Trigger.OrderNumber__c}} --- order number'
+                        - ATTRIBUTE3:
+                            template: '{{$Trigger.Amount}}-- amount '
+                        - BOOKED_FLAG:
+                            template: 'Y'
+                        - FOB_POINT_CODE:
+                            template: SHIP POINT
+                        - FREIGHT_CARRIER_CODE:
+                            template: Due
+                        - INVOICE_TO_ORG_ID:
+                            template: '1040'
+                        - ORDER_TYPE_ID:
+                            template: '1001'
+                        - SALESREP_ID:
+                            template: '-3'
+                        - SOLD_TO_ORG_ID:
+                            template: '1040'
+                  - P_LINE_TBL:
+                      mappings:
+                        - P_LINE_TBL_ITEM:
+                            foreach:
+                              input: '[0]'
+                              iterator: P_LINE_TBL_ITEMItem
+                              mappings:
+                                - BOOKED_FLAG:
+                                    template: 'Y'
+                                - INVENTORY_ITEM_ID:
+                                    template: '1002'
+                                - ORDERED_ITEM:
+                                    template: AS54111
+                                - ORDERED_QUANTITY:
+                                    template: '1'
+                  - SOAHeader:
+                      mappings:
+                        - NLSLanguage:
+                            template: AMERICAN
+                        - OrgId:
+                            template: '121'
+                        - RespApplication:
+                            template: AR
+                        - Responsibility:
+                            template: ISL_RECEIVABLES_MANAGER
+                        - SecurityGroup:
+                            template: STANDARD
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - channel:
+                      template: CJR8WDG2X
+                  - text:
+                      template: >-
+                        {{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ATTRIBUTE1}},------{{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ATTRIBUTE2}},-----{{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ATTRIBUTE3}},---EBS
+                        OrderNumber
+                        {{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ORDER_NUMBER}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleEBusinessSuiteCreateorder
+                    $ref: >-
+                      #/node-output/Oracle E-Business Suite Create
+                      order/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Creates an order in Oracle E-Business Suite when a new opportunity is created in Salesforce
+  description: >-
+	Use this template to create a new order whenever a new opportunity is created in Salesforce and a Slack notification is sent to the dedicated channel.
+models: {}
