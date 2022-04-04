@@ -1313,6 +1313,15 @@
     "targetApps": ["eventbrite", "http", "ibmtwc"],
     "tags": ["api", "eventbrite", "http", "ibmtwc", "weather"],
     "offerings": ["app connect professional"]
+    },
+    {
+    "name": "Create data extension values in Salesforce Marketing Cloud for contacts created in Salesforce event",
+    "description": "Use this template to create contact’s data extension values table with the contact’s details whenever a contact is created in a Salesforce New contact event.",
+    "summary": "Salesforce to Salesforce Marketing Cloud",
+    "sourceApp": "salesforce",
+    "targetApps": ["salesforcemc", "salesforcemc", "slack"],
+    "tags": ["salesforcemc", "salesforce", "slack"],
+    "offerings": ["app connect professional"]
     }
   ]
 }
