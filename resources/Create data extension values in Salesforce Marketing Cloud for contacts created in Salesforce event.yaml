@@ -1,0 +1,118 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: DataExtensionValue
+      connector-type: salesforcemc
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: DataExtensionValue
+      connector-type: salesforcemc
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.MailingCountry}}': USA
+                  execute:
+                    - create-action:
+                        name: Salesforce Marketing Cloud Create data extension value
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - CustomerKey:
+                                template: cust5603
+                            - EmailAddress:
+                                template: '{{$Trigger.Email}}'
+                            - FirstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - LastName:
+                                template: '{{$Trigger.LastName}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.MailingCountry}}': India
+                  execute:
+                    - create-action:
+                        name: >-
+                          Salesforce Marketing Cloud Create data extension value
+                          2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - CustomerKey:
+                                template: key8833
+                            - EmailAddress:
+                                template: '{{$Trigger.Email}}'
+                            - FirstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - LastName:
+                                template: '{{$Trigger.LastName}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Create message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - channel:
+                              template: CGAKSJKBL
+                          - text:
+                              template: >-
+                                table with {{$Trigger.MailingCountry}} does not
+                                exist
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Create data extension values in Salesforce Marketing Cloud for contacts created in Salesforce event
+models: {}
