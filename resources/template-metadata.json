@@ -1316,7 +1316,7 @@
     },
     {
     "name": "Create data extension values in Salesforce Marketing Cloud for contacts created in Salesforce event",
-    "description": "Use this template to create contact’s data extension values table with the contact’s details whenever a contact is created in a Salesforce New contact event.",
+    "description": "Use this template to create a contact’s data extension values table with the contact’s details whenever a contact is created in a Salesforce New contact event.",
     "summary": "Salesforce to Salesforce Marketing Cloud",
     "sourceApp": "salesforce",
     "targetApps": ["salesforcemc", "salesforcemc", "slack"],
