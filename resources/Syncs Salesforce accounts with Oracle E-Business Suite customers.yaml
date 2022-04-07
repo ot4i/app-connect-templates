@@ -196,5 +196,5 @@ integration:
           - incomplete
   name: Syncs Salesforce accounts with Oracle E-Business Suite customers
   description: >-
-	Use this template to create a customer in Oracle E-Business Suite whenever an account is created in Salesforce. 
+    Use this template to create a customer in Oracle E-Business Suite whenever an account is created in Salesforce. 
 models: {}
