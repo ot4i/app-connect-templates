@@ -116,5 +116,6 @@ integration:
           - incomplete
   name: Creates data extension values in Salesforce Marketing Cloud for contacts created in Salesforce event
   description: >-
-	Use this template to create contact’s data extension values table with the contact’s details whenever a contact is created in a Salesforce New contact event. 
+    Use this template to create contact’s data extension values table with the contact’s details 
+    whenever a contact is created in a Salesforce New contact event. 
 models: {}
