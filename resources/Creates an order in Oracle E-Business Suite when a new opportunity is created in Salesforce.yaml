@@ -116,5 +116,6 @@ integration:
                     $ref: '#/flowDetails'
   name: Creates an order in Oracle E-Business Suite when a new opportunity is created in Salesforce
   description: >-
-	Use this template to create a new order whenever a new opportunity is created in Salesforce and a Slack notification is sent to the dedicated channel.
+    Use this template to create a new order whenever a new opportunity is created in Salesforce and 
+    a Slack notification is sent to the dedicated channel.
 models: {}
