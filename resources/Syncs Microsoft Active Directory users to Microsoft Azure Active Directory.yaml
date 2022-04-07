@@ -189,5 +189,6 @@ integration:
                     $ref: '#/flowDetails'
   name: Syncs Microsoft Active Directory users to Microsoft Azure Active Directory
   description: >-
-    Use this template to create or update the user in Microsoft Azure Active Directory whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync.
+    Use this template to create or update the user in Microsoft Azure Active Directory 
+    whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync.
 models: {}
