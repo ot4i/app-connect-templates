@@ -240,5 +240,5 @@ integration:
               output-schema: {}
   name: Creates a single invoice when an order is closed
   description: >-
-	Use this template to create a single invoice when an order status is updated to closed. An email is sent from Gmail with the invoice details.
+    Use this template to create a single invoice when an order status is updated to closed. An email is sent from Gmail with the invoice details.
 models: {}
