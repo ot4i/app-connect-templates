@@ -1,0 +1,194 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: User
+      connector-type: msad
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: Users
+      connector-type: azuread
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Active Directory Retrieve users
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  ou: OU=AdityaUC,DC=ibm,DC=msad,DC=com
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftActiveDirectoryRetrieveusers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Microsoft Active Directory User
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      UserName:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - UserName:
+                            template: >-
+                              {{$substringBefore($Foreachitem.userPrincipalName,
+                              "@")}}
+          - upsert-action:
+              name: Microsoft Azure Active Directory Update or create user
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - accountEnabled:
+                      expression: 'true'
+                  - givenName:
+                      template: '{{$Foreachitem.givenName}}'
+                  - mailNickname:
+                      template: '{{$Setvariable.variable.UserName}}_{{$millis()}}'
+                  - passwordProfile:
+                      mappings:
+                        - forceChangePasswordNextSignIn:
+                            expression: 'true'
+                        - forceChangePasswordNextSignInWithMfa:
+                            expression: 'true'
+                        - password:
+                            template: Password_{{$random()}}
+                  - surname:
+                      template: '{{$Foreachitem.sn}}'
+                  - userPrincipalName:
+                      template: >-
+                        {{$Setvariable.variable.UserName}}@ibmappcon.onmicrosoft.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  displayName: '{{$Setvariable.variable.UserName}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      users/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Syncs Microsoft Active Directory users to Microsoft Azure Active Directory
+  description: >-
+    Use this template to create or update the user in Microsoft Azure Active Directory 
+    whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync.
+models: {}
