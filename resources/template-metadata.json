@@ -342,42 +342,6 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Use a Slack slash command to send a Twilio SMS message",
- "description": "Use this template to send a Twilio SMS  directly from Slack using a slash command.",
- "summary": "Slack to Twilio",
- "sourceApp": "slack",
- "targetApps": ["twilio"],
- "tags": ["slack", "twilio"],
- "offerings": ["app connect professional"]
-},
-{
- "name": "Send me a Twilio SMS for every new Salesforce contact",
- "description": "Use this template to send an SMS from Twilio when a new contact is added in Salesforce.",
- "summary": "Salesforce to Twilio",
- "sourceApp": "salesforce",
- "targetApps": ["twilio"],
- "tags": ["salesforce", "twilio", "sms", "contact", "opportunity", "business"],
- "offerings": ["app connect professional"]
-},
-{
- "name": "Send me a Twilio SMS when a new row is added in Google Sheets",
- "description": "Use this template to send an SMS from Twilio when a new row is added in Google Sheets.",
- "summary": "Google Sheets to Twilio",
- "sourceApp": "googlesheet",
- "targetApps": ["twilio"],
- "tags": ["googlesheets", "twilio", "sms", "row", "business"],
- "offerings": ["app connect professional"]
-},
-{
- "name": "Send me a Twilio SMS when a new message arrives in Gmail",
- "description": "Use this template to send an SMS from Twilio when a new email arrives in your Gmail account.",
- "summary": "Gmail to Twilio",
- "sourceApp": "gmail",
- "targetApps": ["twilio"],
- "tags": ["gmail", "twilio", "sms", "email", "business"],
- "offerings": ["app connect professional"]
-},
-{
  "name": "Create a new contact in Acoustic Campaign when a new contact is added in Salesforce",
  "description": "Use this template to create a new contact in Acoustic Campaign when a new contact is created in the Salesforce.",
  "summary": "Salesforce to Acoustic Campaign",
@@ -493,15 +457,6 @@
     "sourceApp": "api",
     "targetApps": ["http", "gmail"],
     "tags": ["http node", "gmail", "JSON parse", "foreach", "retrieve with pagination", "pagination", "api flow"],
-    "offerings": ["app connect professional"]
-  },
-   {
-    "name": "Load NetSuite ERP products into Salesforce",
-    "description": "Use this template to load products from NetSuite ERP into Salesforce at a regular occurring scheduled interval.",
-    "summary": "Scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["netsuiteerp", "salesforce"],
-    "tags": ["scheduler", "salesforce", "netsuiteerp", "scheduler", "JSON parser", "products", "sync", "load", "retrieve", "add", "create"],
     "offerings": ["app connect professional"]
   },
    {
@@ -1286,15 +1241,6 @@
       "targetApps": ["trello"],
       "tags": ["trello", "googlesheets", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
       "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Send an SMS message when a new task is created in Asana",
-    "description":"Whenever a new Task is created in Asana, an SMS is sent to the user",
-    "summary": "asana to twilio",
-    "sourceApp": "asana",
-    "targetApps": ["twilio"],
-    "tags": ["asana","twilio"],
-    "offerings": ["app connect professional"]
     },
     {
     "name": "Creates a task in Asana when an issue is created in Jira",
