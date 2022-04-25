@@ -152,15 +152,6 @@
     "tags": ["Salesforce", "gmail", "asana", "sales", "opportunity", "email", "crm"],
     "offerings": ["app connect professional"]
   },
-{
- "name": "Arrange welcome drinks for an Eventbrite event",
- "description": "Use this template to organize welcome drinks for an Eventbrite event. Each attendee automatically receives a text message, via Twilio, which they can show on arrival to collect their complimentary drink. Your drinks order in Salesforce is automatically updated each time a new attendee registers. The organizer of the event is kept updated via Slack about the number of attendees registered, and is instructed to check and place the drinks order once your event is fully subscribed!",
- "summary": "Eventbrite to 4 applications",
- "sourceApp": "eventbrite",
- "targetApps": ["salesforce", "twilio", "eventbrite", "slack"],
- "tags": ["eventbrite", "slack", "salesforce", "twilio", "marketing", "hospitality", "events", "notification"],
- "offerings": ["app connect professional"]
-},
  {
     "name": "Email tone detector",
     "description": "This template analyses the tone of your emails and alerts you when you receive emails with the same tone from the same sender. You specify the number of emails and the time period you want to monitor.",
