@@ -9,7 +9,6 @@ To use this flow, you'll need to set up an event in Eventbrite. The event needs 
 * Last name
 * Company
 * Email address
-* Mobile phone number
 * How they are going to get to the event
 
 To gather the information about how attendees are going to get to your event, you'll need to [create a custom question for attendees](https://www.eventbrite.com/support/articles/en_US/How_To/how-to-create-custom-questions-for-attendees) in Eventbrite. Create the following question:
@@ -26,11 +25,10 @@ Set the question as a required field for your event.
 ## Using the template
 
 1. Click **Create flow** to start using the template.
-1. Click the Eventbrite event and connect to your [Eventbrite account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-eventbrite/).
-1. Click the Slack "Create message" action and connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/).
+1. Click the Eventbrite event and then connect to your [Eventbrite account](https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-eventbrite).
+1. Click the Slack "Create message" action and then connect to your [Slack account](https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-slack).
 1. In the Slack "Create message" action, choose the channel that you want to post the message to.
-1. Click the Twilio "Create messages" action and connect to your Twilio account.
-1. In the Twilio action, update the "From" field to be your Twilio phone number.
+1. Click the Gmail "Send email" action and then connect to your [Google account](https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-gmail).
 1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
 
 ## Related templates
