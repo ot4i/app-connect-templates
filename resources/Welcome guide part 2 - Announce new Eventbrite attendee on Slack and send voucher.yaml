@@ -1,4 +1,4 @@
-$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -11,7 +11,10 @@ integration:
             data: Attendee
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
-          options: {}
+          options:
+            organizationID: '5311719572'
+            parentFilter:
+              organizationID: '5311719572'
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -21,8 +24,8 @@ integration:
         CREATE: {}
     action-interface-2:
       type: api-action
-      business-object: messages
-      connector-type: twilio
+      business-object: mail
+      connector-type: gmail
       actions:
         CREATE: {}
   assemblies:
@@ -36,16 +39,18 @@ integration:
               map:
                 mappings:
                   - channel:
-                      template: CKW5TC0J2
+                      template: C03E73MGV9N
                   - text:
                       template: >-
                         We have a new attendee {{$Trigger.profile.first_name}}
                         {{$Trigger.profile.last_name}} - they work for
                         {{$Trigger.profile.company}}!
-                $map: 'http://ibm.com/appconnect/map/v1'
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
           - if:
               name: If
               input:
@@ -53,24 +58,31 @@ integration:
                   $ref: '#/trigger/payload'
                 - variable: SlackCreatemessage
                   $ref: '#/node-output/Slack Create message/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
               branch:
                 - condition:
                     '{{$contains($string($Trigger.answers), "Walking")}}':
-                      =: 'true'
+                      '=': 'true'
                   execute:
                     - create-action:
-                        name: Twilio Create messages
+                        name: Gmail Send email
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         map:
                           mappings:
                             - Body:
-                                template: "Great that you're walking, {{$Trigger.profile.first_name}} - have a drink on us \U0001F33B"
-                            - From:
-                                template: '+000000000000'
+                                template: >-
+                                  Well done for walking
+                                  {{$Trigger.profile.first_name}}
+
+                                  Drink voucher:
+                                  {{$Trigger.event_id}}-{{$Trigger.id}}
+                            - Subject:
+                                template: Have a drink on us!
                             - To:
-                                template: '{{$Trigger.profile.cell_phone}}'
-                          $map: 'http://ibm.com/appconnect/map/v1'
+                                template: '{{$Trigger.profile.email}}'
+                          $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
@@ -78,6 +90,8 @@ integration:
                               $ref: >-
                                 #/node-output/Slack Create
                                 message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
               else:
                 execute: []
               output-schema: {}
