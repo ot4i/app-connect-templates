@@ -497,11 +497,11 @@
     },
     {
       "name": "Welcome guide part 2 - Announce new Eventbrite attendee on Slack and send voucher",
-      "description": "This template contains the flow created in the 'Welcome to IBM App Connect [Part 2 of 4]: Add logic to an event-driven flow' video. When new attendees register for an Eventbrite event, a message is posted to Slack, and if the attendee is walking to the event they'll also receive a text message via Twilio.",
+      "description": "This template contains the flow created in the 'Welcome to IBM App Connect [Part 2 of 4]: Add logic to an event-driven flow' video. When new attendees register for an Eventbrite event, a message is posted to Slack, and if the attendee is walking to the event they'll also receive a drinks voucher by email.",
       "summary": "Eventbrite to 2 applications",
       "sourceApp": "eventbrite",
-      "targetApps": ["slack", "twilio"],
-      "tags": ["eventbrite", "slack", "twilio"],
+      "targetApps": ["slack", "gmail"],
+      "tags": ["eventbrite", "slack", "gmail"],
       "offerings": ["app connect professional"]
     },
     {
