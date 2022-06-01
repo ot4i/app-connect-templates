@@ -314,5 +314,8 @@ integration:
                     $ref: '#/node-output/Batch process/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: _1HCMBatchUC
+  name: Create a list of workers for an upcoming assignment in Google Sheets from Oracle HCM worker records
+  description: >-
+    Use this template to retrieve worker details from Oracle HCM and create an entry in Google Sheets 
+    whenever a worker’s status is ‘inactive’ (this indicates that the worker is not attached to any assignment). 
 models: {}
