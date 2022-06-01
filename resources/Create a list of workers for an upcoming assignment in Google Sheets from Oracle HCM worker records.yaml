@@ -27,7 +27,6 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      account-name: Account 1
     trigger-interface-2:
       type: extract-trigger
       triggers:
@@ -37,7 +36,6 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-2'
       connector-type: oraclehcm
-      account-name: Account 1
     trigger-interface-3:
       type: batch-completion-trigger
       triggers:
@@ -58,42 +56,36 @@ integration:
       type: api-action
       business-object: workerAssignment
       connector-type: oraclehcm
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-5:
       type: api-action
       business-object: talentPersonProfile
       connector-type: oraclehcm
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-4:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 3
       actions:
         CREATE: {}
     action-interface-2:
       type: api-action
       business-object: Message
       connector-type: msteams
-      account-name: Account 4
       actions:
         CREATE: {}
     action-interface-7:
       type: api-action
       business-object: worksheetRow
       connector-type: googlesheet
-      account-name: Account 3
       actions:
         CREATE: {}
     action-interface-6:
       type: api-action
       business-object: payroll
       connector-type: oraclehcm
-      account-name: Account 1
       actions:
         CREATEASSIGNEDPAYROLL: {}
   assemblies:
