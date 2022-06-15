@@ -1260,12 +1260,12 @@
     "tags": ["salesforcemc", "salesforce", "slack"],
     "offerings": ["app connect professional"]
     },
-                {
+    {
     "name": "Sync new Products from Salesforce to PostgreSQL database",
     "description": "This template looks for new Products added in your Salesforce account and syncs this by creating or updating Product in PostgreSQL database.",
     "summary": "Salesforce to PostgreSQL database",
     "sourceApp": "salesforce",
-    "targetApps": "postgresql",
+    "targetApps": ["postgresql"],
     "tags": ["postgresql", "salesforce", "products", "retail"],
     "offerings": ["app connect professional"]
   },
@@ -1274,7 +1274,7 @@
     "description": "This template copies Products in your PostgreSQL database and syncs this by creating or updating Product in Salesforce.",
     "summary": "PostgreSQL database to Salesforce",
     "sourceApp": "postgresql",
-    "targetApps": "salesforce",
+    "targetApps": ["salesforce"],
     "tags": ["postgresql", "salesforce", "products", "retail"],
     "offerings": ["app connect professional"]
   }
