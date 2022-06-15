@@ -1,0 +1,91 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * SUN
+                  runOnceOncheck: false
+                  timeZone: UTC
+                  every: week
+      connector-type: streaming-connector-scheduler
+    trigger-interface-2:
+      type: extract-trigger
+      triggers:
+        RETRIEVEALL:
+          input-context:
+            data: product
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+      connector-type: postgresql
+  action-interfaces:
+    action-interface-3:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
+    action-interface-1:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - batch-retrieve-action:
+              name: Batch process
+              filter: {}
+              pagination-type: SKIP_LIMIT
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+    assembly-2:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create product
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Family:
+                      template: None
+                  - IsActive:
+                      expression: '$Batchprocess.active '
+                  - Name:
+                      template: '{{$Batchprocess.productName}}'
+                  - Quantity__c:
+                      expression: '$Batchprocess.price /$Batchprocess.unitPrice '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  ProductCode: '{{$Batchprocess.productCode}}'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Copy Products from PostgreSQL database to Salesforce
+models: {}
