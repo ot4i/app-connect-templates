@@ -1,0 +1,102 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: SalesOrder
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 5
+              isCreatedQueryable: true
+      connector-type: msdynamicscrmrest
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Order
+      connector-type: ibmsterlingoms
+      actions:
+        CREATEORDERASYNC: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM Sterling Order Management System Create Order Async
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CREATEORDERASYNC
+              map:
+                customSchemas:
+                  properties.`OrderLines`.properties.`OrderLine`.items.properties.`WorkOrders`.properties.`WorkOrder`.items.properties.`WorkOrderAppointments`:
+                    type: object
+                    properties:
+                      custid:
+                        type: string
+                mappings:
+                  - DocumentType:
+                      template: '0001'
+                  - EnterpriseCode:
+                      template: DemoECommOrg
+                  - OrderLines:
+                      mappings:
+                        - OrderLine:
+                            foreach:
+                              input: '[1]'
+                              iterator: OrderLineItem
+                              mappings:
+                                - ChainedFromOrderLine:
+                                    mappings:
+                                      - ReqDeliveryDate:
+                                          template: '2023-09-15'
+                                - DeliveryMethod:
+                                    template: SHP
+                                - Item:
+                                    mappings:
+                                      - ItemID:
+                                          template: 4KTV
+                                      - UnitOfMeasure:
+                                          template: EACH
+                                - OrderedQty:
+                                    expression: '3'
+                  - OrderNo:
+                      template: '{{$Trigger.ordernumber}}'
+                  - PersonInfoBillTo:
+                      mappings:
+                        - AddressLine1:
+                            template: 6000 Ohio Dr
+                        - City:
+                            template: Plano
+                        - Country:
+                            template: US
+                        - DayPhone:
+                            template: 123-456-7890
+                        - EMailID:
+                            template: '{{$Trigger.emailaddress}}'
+                        - FirstName:
+                            template: Sandeep
+                        - LastName:
+                            template: Narasimha
+                        - State:
+                            template: TX
+                        - ZipCode:
+                            template: '75093'
+                  - queueName:
+                      template: DEMOECOMMORG.CREATE.ORDER.IN.QUEUE
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create order in IBM Sterling Order Management System for orders created in Microsoft Dynamics 365 for Sales
+models: {}
