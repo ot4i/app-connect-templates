@@ -232,4 +232,7 @@ integration:
                             $ref: '#/flowDetails'
               output-schema: {}
   name: Create a pickup ready order event based on the IBM Order Management System delivery method 
-models: {}
+  description: >-
+    Use this template to create a pickup ready order event if the IBM Order Management System delivery method is empty. 
+    An email is then sent from flexEngage with the order pickup details. 
+models: {}    
