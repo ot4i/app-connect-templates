@@ -99,4 +99,7 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create order in IBM Sterling Order Management System for orders created in Microsoft Dynamics 365 for Sales
-models: {}
+  description: >-
+    Use this template to create orders by using the IBM Order Management System’s create order asynchronous operation whenever 
+    any new orders are created in Microsoft Dynamics 365 for Sales.
+models: {}  
