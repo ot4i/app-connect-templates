@@ -1,0 +1,238 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Order
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              queueName: DEMOECOMMORG.CREATEORDER.ON.SUCCESS.QUEUE
+      connector-type: ibmsterlingoms
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: OrderEvent
+      connector-type: flexengage
+      actions:
+        CREATECONFIRMORDEREVENT: {}
+    action-interface-3:
+      type: api-action
+      business-object: OrderEvent
+      connector-type: flexengage
+      actions:
+        CREATEREADYORDERPICKUPEVENT: {}
+    action-interface-4:
+      type: api-action
+      business-object: OrderEvent
+      connector-type: flexengage
+      actions:
+        CREATESHIPORDEREVENT: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: flexEngage Create confirm order event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CREATECONFIRMORDEREVENT
+              map:
+                customSchemas:
+                  properties.`data`:
+                    type: object
+                    properties:
+                      Name:
+                        type: string
+                mappings:
+                  - data:
+                      mappings:
+                        - Name:
+                            template: '{{$Trigger.PersonInfoBillTo.FirstName}}'
+                  - items:
+                      foreach:
+                        input: '[1]'
+                        iterator: itemsItem
+                        mappings:
+                          - id:
+                              template: '1'
+                          - name:
+                              template: 4KTV
+                  - notificationChannels:
+                      foreach:
+                        input: '[1]'
+                        iterator: notificationChannelsItem
+                        mappings:
+                          - channelType:
+                              template: EMAIL
+                          - emailAddress_phoneNumber:
+                              template: '{{$Trigger.PersonInfoBillTo.EMailID}}'
+                  - orderId:
+                      template: '{{$Trigger.OrderNo}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flexEngageCreateconfirmorderevent
+                  $ref: >-
+                    #/node-output/flexEngage Create confirm order
+                    event/response/payload
+                - variable: SlackSendmessage3
+                  $ref: '#/node-output/Slack Send message 3/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.DeletedOrderLines.OrderLine.DeliveryMethod}}':
+                      '=': ''
+                  execute:
+                    - custom-action:
+                        name: flexEngage Create pickup ready order event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: CREATEREADYORDERPICKUPEVENT
+                        map:
+                          customSchemas:
+                            properties.`data`:
+                              type: object
+                              properties:
+                                Name:
+                                  type: string
+                                Store:
+                                  type: string
+                          mappings:
+                            - data:
+                                mappings:
+                                  - Name:
+                                      template: >-
+                                        {{$Trigger.PersonInfoBillTo.FirstName}}
+                                        your order number is ready to be pickwed
+                                  - Store:
+                                      template: 'Bandra Branch, mumbai '
+                            - notificationChannels:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: notificationChannelsItem
+                                  mappings:
+                                    - channelType:
+                                        template: EMAIL
+                                    - emailAddress_phoneNumber:
+                                        template: '{{$Trigger.PersonInfoBillTo.EMailID}}'
+                            - orderId:
+                                template: '{{$Trigger.OrderNo}}'
+                            - pickups:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: pickupsItem
+                                  mappings:
+                                    - items:
+                                        foreach:
+                                          input: '[1]'
+                                          iterator: itemsItem
+                                          mappings:
+                                            - id:
+                                                template: '1'
+                                            - name:
+                                                template: adidas yeezy
+                                    - pickupNumber:
+                                        template: '12345'
+                                    - store:
+                                        template: bandra store
+                                    - type1:
+                                        template: IN_STORE
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flexEngageCreateconfirmorderevent
+                              $ref: >-
+                                #/node-output/flexEngage Create confirm order
+                                event/response/payload
+                            - variable: SlackSendmessage3
+                              $ref: >-
+                                #/node-output/Slack Send message
+                                3/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: flexEngage Create ship order event
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      action: CREATESHIPORDEREVENT
+                      map:
+                        customSchemas:
+                          properties.`data`:
+                            type: object
+                            properties:
+                              Name:
+                                type: string
+                        mappings:
+                          - data:
+                              mappings:
+                                - Name:
+                                    template: >-
+                                      {{$Trigger.PersonInfoBillTo.FirstName}}
+                                      your order is ready
+                          - notificationChannels:
+                              foreach:
+                                input: '[1]'
+                                iterator: notificationChannelsItem
+                                mappings:
+                                  - channelType:
+                                      template: EMAIL
+                                  - emailAddress_phoneNumber:
+                                      template: '{{$Trigger.PersonInfoBillTo.EMailID}}'
+                          - orderId:
+                              template: '{{$Trigger.OrderNo}}'
+                          - shipments:
+                              foreach:
+                                input: '[1]'
+                                iterator: shipmentsItem
+                                mappings:
+                                  - carrier:
+                                      template: FEDEX
+                                  - items:
+                                      foreach:
+                                        input: '[1]'
+                                        iterator: itemsItem
+                                        mappings:
+                                          - id:
+                                              template: '1'
+                                          - name:
+                                              template: Adidas Yeezy
+                                  - trackingNumber:
+                                      template: '124445566'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flexEngageCreateconfirmorderevent
+                            $ref: >-
+                              #/node-output/flexEngage Create confirm order
+                              event/response/payload
+                          - variable: SlackSendmessage3
+                            $ref: >-
+                              #/node-output/Slack Send message
+                              3/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a pickup ready order event through flexEngage based on the IBM Sterling Order Management System delivery method 
+  description: >-
+    Use this template to create a pickup ready order event if the IBM Order Management System delivery method is empty. 
+    An email is then sent from flexEngage with the order pickup details. 
+models: {}
