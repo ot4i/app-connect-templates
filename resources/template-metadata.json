@@ -286,15 +286,6 @@
     "targetApps": ["trello"],
     "tags": ["marketo", "trello", "lead", "card"],
     "offerings": ["app connect professional"]
-  },
-{
- "name": "Create a lead in Sugar CRM when a new Wufoo form is submitted",
- "description": "Use this template to create a lead in Sugar CRM when a new form entry is submitted from Wufoo.",
- "summary": "Wufoo to Sugar CRM",
- "sourceApp": "wufoo",
- "targetApps": ["sugarcrm"],
- "tags": ["wufoo", "sugarcrm", "sales", "marketing", "lead", "form"],
- "offerings": ["app connect professional"]
 },
 {
   "name": "Update or create Salesforce contact for a new event attendee and post to Slack depending on action",
@@ -577,15 +568,6 @@
       "offerings": ["app connect professional"]
     },
     {
-      "name": "Create a SugarCRM lead and send email for a new Eventbrite attendee",
-      "description": "This template detects when a new attendee registers for an Eventbrite event, and for the attendee creates a SugarCRM lead and sends an email. The flow illustrates the use of SugarCRM retrieve and create actions, and the use of an If node to take alternative actions depending on the response from the SugarCRM retrieve action.",
-      "summary": "Eventbrite to 2 applications",
-      "sourceApp": "eventbrite",
-      "targetApps": ["sugarcrm", "gmail"],
-      "tags": ["eventbrite", "sugarcrm", "gmail", "if", "event", "lead", "email"],
-      "offerings": ["app connect professional"]
-    },
-    {
       "name": "Assign ServiceNow incidents to Jira and Slack",
       "description": "This template detects when a new ServiceNow incident is created; if the incident has a High urgency creates an issue in Jira and sends a message to a Slack channel; otherwise, create a task in Jira. The flow illustrates the use of Jira create and retrieve actions, and the use of an If node to take alternative actions depending on data from the ServiceNow new incident trigger event.",
       "summary": "ServiceNow to 2 applications",
@@ -673,24 +655,6 @@
     "sourceApp": "jira",
     "targetApps": ["box"],
     "tags": ["msdynamicscrmrest", "slack"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Slack notifications for Closed Won opportunities in SugarCRM",
-    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in SugarCRM.",
-    "summary": "SugarCRM to Slack",
-    "sourceApp": "sugarcrm",
-    "targetApps": ["slack"],
-    "tags": ["sugarcrm", "slack"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Sync new attendee from Eventbrite with SugarCRM lead",
-    "description": "This template creates a new lead in SugarCRM when a new attendee is created in Eventbrite.",
-    "summary": "Eventbrite to SugarCRM",
-    "sourceApp": "eventbrite",
-    "targetApps": ["sugarcrm"],
-    "tags": ["eventbrite", "sugarcrm"],
     "offerings": ["app connect professional"]
     },
     {
@@ -910,15 +874,6 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Sync new or updated lead from SugarCRM to Marketo",
-    "description": "This template finds a matching lead in Marketo based on the email address when a new lead is created or updated in SugarCRM. If a matching lead is not found, the lead is created in Marketo and a Slack notification is sent. If a matching lead is found, the lead is updated in Marketo and a Slack notification is sent.",
-    "summary": "SugarCRM to 2 applications",
-    "sourceApp": "sugarcrm",
-    "targetApps": ["marketo", "slack"],
-    "tags": ["sugarcrm", "marketo", "slack"],
-    "offerings": ["app connect professional"]
-    },
-    {
     "name": "Creates a list item attachment in SharePoint and uploads it to Box when a new attachment is created in ServiceNow",
     "description": "This template uploads an attachment file with its details to a specified Box folder from Microsoft SharePoint when new attachment is created in ServiceNow.",
     "summary": "ServiceNow to 2 applications ",
@@ -1090,15 +1045,6 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Record SugarCRM campaign to Google Sheets",
-    "description": "Use this template to create a new row in Google Sheets when a campaign is created in SugarCRM.",
-    "summary": "SugarCRM to Google Sheets",
-    "sourceApp": "sugarcrm",
-    "targetApps": ["googlesheet"],
-    "tags": ["sugarcrm", "googlesheet"],
-    "offerings": ["app connect professional"]
-    },
-    {
     "name": "Send a Microsoft Teams message when an issue is created in Jira",
     "description": "This template creates a new Microsoft Teams message with the Jira issue details when an issue is created in Jira.",
     "summary": "Jira to Microsoft Teams",
@@ -1159,15 +1105,6 @@
     "sourceApp": "mssharepoint",
     "targetApps": ["trello"],
     "tags": ["mssharepoint", "trello"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Sync leads from SugarCRM to Marketo",
-    "description": "This template finds a matching lead in Marketo based on the email address when new lead is created in SugarCRM. If a matching lead is not found, the lead is created in Marketo.",
-    "summary": "SugarCRM to Marketo",
-    "sourceApp": "sugarcrm",
-    "targetApps": ["marketo"],
-    "tags": ["sugarcrm", "marketo"],
     "offerings": ["app connect professional"]
     },
     {
