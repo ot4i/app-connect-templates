@@ -118,7 +118,7 @@ integration:
                       document/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Add a document in IBM Watson Discovery when a file is created in IBM OpenPages with Watson
+  name: Add a document in IBM Watson Discovery when a file gets created in IBM OpenPages with Watson
   description: >-
     Use this template to add a document in IBM Watson Discovery whenever a file is created and downloaded in IBM OpenPages with Watson.
 models: {}
