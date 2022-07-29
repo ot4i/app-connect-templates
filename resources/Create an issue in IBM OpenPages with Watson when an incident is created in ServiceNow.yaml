@@ -374,8 +374,8 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Create an issue in IBM OpenPages with Watson when an incident is created in ServiceNow
+  name: Create an issue in IBM OpenPages with Watson when an incident gets created in ServiceNow
   description: >-
-    Use this template to create an issue in IBM OpenPages with Watson whenever an incident is created in ServiceNow. 
+    Use this template to create an issue in IBM OpenPages with Watson whenever an incident gets created in ServiceNow. 
     This flow helps you to keep incident data in sync between ServiceNow and IBM OpenPages with Watson.
 models: {}
