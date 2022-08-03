@@ -1,0 +1,97 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED_POLLER:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: msdynamicscrmrest
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Opportunity
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        CREATEEMAIL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - update-action:
+              name: Salesforce Update opportunity
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Amount:
+                      expression: '$Trigger.totalamount '
+                  - CampaignId:
+                      template: '{{$Trigger.campaignid}}'
+                  - LeadSource:
+                      template: '{{$Trigger.originatingleadid}}'
+                  - OrderNumber__c:
+                      template: '100'
+                  - OwnerId:
+                      template: '{{$Trigger.owninguser}}'
+                  - StageName:
+                      template: Needs Analysis
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Id: 0060800000z9f4KAAQ
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: false
+        catch:
+          - default:
+              - custom-action:
+                  name: Email Send email
+                  target:
+                    $ref: '#/integration/action-interfaces/action-interface-1'
+                  action: CREATEEMAIL
+                  map:
+                    mappings:
+                      - emailBody:
+                          template: ' Error Message: {{$errorDetails.message}} <br> <br>    UserAction- {{$errorDetails.userAction}}   <br> <br>   Error Data- {{$errorDetails.errorData}}'
+                      - subjectFilter:
+                          template: Error on Update Opportunity
+                      - toFilter:
+                          template: kamakshi_manerikar@persistent.com
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: errorDetails
+                        $ref: '#/error'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: An email gets sent when a Salesforce opportunity update fails due to incorrect values
+models: {}
