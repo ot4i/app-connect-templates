@@ -1214,6 +1214,15 @@
     "targetApps": ["salesforce"],
     "tags": ["postgresql", "salesforce", "products", "retail"],
     "offerings": ["app connect professional"]
-  }
+  },
+  {
+    "name": "An email gets sent when a Salesforce opportunity update fails due to incorrect values",
+    "description": "Use this template to send an email when a Salesforce opportunity update fails due to incorrect values.",
+    "summary": "Microsoft Dynamics 365 to 2 applications",
+    "sourceApp": "msdynamicfs",
+    "targetApps": ["salesforce", "email"],
+    "tags": ["msdynamicfs", "salesforce", "email", "addErrorCatch"],
+    "offerings": ["app connect professional"]
+  }                
   ]
 }
