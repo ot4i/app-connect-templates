@@ -82,7 +82,7 @@ integration:
                       - subjectFilter:
                           template: Error on Update Opportunity
                       - toFilter:
-                          template: kamakshi_manerikar@persistent.com
+                          template: user@email.com
                     $map: http://ibm.com/appconnect/map/v1
                     input:
                       - variable: Trigger
