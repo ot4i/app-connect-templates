@@ -1,0 +1,266 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: zendeskservice
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: created_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Group
+      connector-type: mondaydotcom
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Item
+      connector-type: mondaydotcom
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: Group
+      connector-type: mondaydotcom
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: Item
+      connector-type: mondaydotcom
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: monday.com Retrieve groups
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  board_id: '3022697917'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      GroupName:
+                        type: string
+                      GroupID:
+                        type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: mondaycomRetrievegroups
+                    $ref: '#/node-output/monday.com Retrieve groups/response/payload'
+                  - variable: mondaycomRetrievegroupsMetadata
+                    $ref: '#/node-output/monday.com Retrieve groups/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - GroupID:
+                            template: >-
+                              {{$mondaycomRetrievegroups[title=$Trigger.type
+                              ].id}}
+                        - GroupName:
+                            template: >-
+                              {{$mondaycomRetrievegroups[title=$Trigger.type
+                              ].title}}
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: mondaycomRetrievegroups
+                  $ref: '#/node-output/monday.com Retrieve groups/response/payload'
+                - variable: mondaycomRetrievegroupsMetadata
+                  $ref: '#/node-output/monday.com Retrieve groups/response'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: SlackSendmessage3
+                  $ref: '#/node-output/Slack Send message 3/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Setvariable.variable.GroupName}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: monday.com Create item
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - board_id:
+                                template: '3022697917'
+                            - create_item:
+                                mappings:
+                                  - column_values:
+                                      mappings:
+                                        - text:
+                                            template: '{{$Trigger.subject}}'
+                                        - text0:
+                                            template: '{{$Trigger.status}}'
+                                        - text1:
+                                            template: '{{$Trigger.description}}'
+                                        - text8:
+                                            template: '[ {{$Trigger.tags}}]'
+                                  - item_name:
+                                      template: '{{$Trigger.id}}'
+                            - group_id:
+                                template: '{{$Setvariable.variable.GroupID}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/block/If 2/node-output/Slack Send
+                                message/response/payload
+                            - variable: mondaycomRetrievegroups
+                              $ref: >-
+                                #/node-output/monday.com Retrieve
+                                groups/response/payload
+                            - variable: mondaycomRetrievegroupsMetadata
+                              $ref: >-
+                                #/node-output/monday.com Retrieve
+                                groups/response
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: monday.com Create group
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - board_id:
+                              template: '3022697917'
+                          - create_group:
+                              mappings:
+                                - group_name:
+                                    template: '{{$Trigger.type}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: mondaycomRetrievegroups
+                            $ref: >-
+                              #/node-output/monday.com Retrieve
+                              groups/response/payload
+                          - variable: mondaycomRetrievegroupsMetadata
+                            $ref: '#/node-output/monday.com Retrieve groups/response'
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: monday.com Create item 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-7'
+                      map:
+                        mappings:
+                          - board_id:
+                              template: '3022697917'
+                          - create_item:
+                              mappings:
+                                - column_values:
+                                    mappings:
+                                      - text:
+                                          template: '{{$Trigger.subject}}'
+                                      - text0:
+                                          template: '{{$Trigger.status}}'
+                                      - text1:
+                                          template: '{{$Trigger.description}}'
+                                      - text8:
+                                          template: '[ {{$Trigger.tags}}]'
+                                - item_name:
+                                    template: '{{$Trigger.id}}'
+                          - group_id:
+                              template: '{{$mondaycomCreategroup.id}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: mondaycomCreategroup
+                            $ref: >-
+                              #/block/If 2/node-output/monday.com Create
+                              group/response/payload
+                          - variable: mondaycomRetrievegroups
+                            $ref: >-
+                              #/node-output/monday.com Retrieve
+                              groups/response/payload
+                          - variable: mondaycomRetrievegroupsMetadata
+                            $ref: '#/node-output/monday.com Retrieve groups/response'
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+          - create-action:
+              name: Slack Send message 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C03FZSRMWRJ
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: Flow completed successfully
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: mondaycomRetrievegroups
+                    $ref: '#/node-output/monday.com Retrieve groups/response/payload'
+                  - variable: mondaycomRetrievegroupsMetadata
+                    $ref: '#/node-output/monday.com Retrieve groups/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an item in mondaydotcom board for tickets created in Zendesk Service
+  description: >-
+    Use this template to create an item in mondaydotcom board for tickets created in Zendesk Service
+models: {}
