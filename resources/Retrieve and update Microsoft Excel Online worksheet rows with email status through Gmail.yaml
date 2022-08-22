@@ -1,0 +1,275 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Excel Online Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - DriveId: >-
+                        b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                    - WorkbookId: 01EMFW4S5W3JTYCK5K25AZX6NYWYS364LV
+                    - WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftExcelOnlineRetrieverows '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas: {}
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailSendemail
+                    $ref: >-
+                      #/block/For each/node-output/Gmail Send
+                      email/response/payload
+                  - variable: MicrosoftExcelOnlineUpdaterow
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Excel Online Update
+                      row/response/payload
+                  - variable: MicrosoftExcelOnlineUpdaterowMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Excel Online Update
+                      row/response
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              display-name: Prospect email
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: New Prospects are mailed
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftExcelOnlineRetrieverows
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve
+                    rows/response/payload
+                - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                  $ref: '#/node-output/Microsoft Excel Online Retrieve rows/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Foreachitem.rowData.F}}':
+                          '=': ''
+                      - '{{$Foreachitem.rowData.E}}':
+                          neq: ''
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: test Use Case
+                            - Subject:
+                                template: '{{$Foreachitem.rowData.B}}'
+                            - To:
+                                template: '{{$Foreachitem.rowData.E}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - update-action:
+                        name: Microsoft Excel Online Update row
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - DriveId:
+                                template: >-
+                                  b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                            - WorkbookId:
+                                template: 01EMFW4S5W3JTYCK5K25AZX6NYWYS364LV
+                            - WorksheetId:
+                                template: '{00000000-0001-0000-0000-000000000000}'
+                            - rowData:
+                                mappings:
+                                  - F:
+                                      template: email sent_{{$GmailSendemail.id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailSendemail
+                              $ref: >-
+                                #/block/If/node-output/Gmail Send
+                                email/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - rowIndex: '{{$Foreachitem.rowIndex}}'
+                              - DriveId: >-
+                                  b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                              - WorkbookId: 01EMFW4S5W3JTYCK5K25AZX6NYWYS364LV
+                              - WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailSendemail
+                              $ref: >-
+                                #/block/If/node-output/Gmail Send
+                                email/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        allow-empty-output: false
+              else:
+                execute: []
+              output-schema: {}
+  name: Retrieve and update Microsoft Excel Online worksheet rows with email status through Gmail
+  description: >-
+    Use this template to retrieve and update Microsoft Excel Online rows with the email status through a Gmail account. 
+models: {}
