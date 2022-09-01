@@ -269,7 +269,7 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Retrieve and update Microsoft Excel Online worksheet rows with email status through Gmail
+  name: Retrieve and update Microsoft Excel Online worksheet rows with the status email sent through Gmail
   description: >-
-    Use this template to retrieve and update Microsoft Excel Online rows with the email status through a Gmail account. 
+    Use this template to retrieve and update Microsoft Excel Online rows with the status email sent through a Gmail account 
 models: {}
