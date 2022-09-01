@@ -260,7 +260,7 @@ integration:
                     $ref: '#/node-output/Set variable/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create an item in mondaydotcom board for tickets created in Zendesk Service
+  name: Create an item on the mondaydotcom board for tickets created in Zendesk Service
   description: >-
-    Use this template to create an item in mondaydotcom board for tickets created in Zendesk Service
+    Use this template to create an item on the mondaydotcom board for tickets created in Zendesk Service
 models: {}
