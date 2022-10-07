@@ -1,0 +1,139 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: function
+      connector-type: amazonlambda
+      actions:
+        INVOKEFUNCTION: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: AWS Lambda Invoke function
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: INVOKEFUNCTION
+              map:
+                mappings:
+                  - FunctionArn:
+                      template: arn:aws:lambda:us-west-2:288919529935:function:LambdaUC
+                  - InvocationType:
+                      template: RequestResponse
+                  - LogType:
+                      template: Tail
+                  - PayloadReqProp:
+                      mappings:
+                        - Amount:
+                            expression: '$Trigger.Amount '
+                        - Id:
+                            template: '{{$Trigger.Id}}'
+                        - Name:
+                            template: '{{$Trigger.Name}}'
+                  - Qualifier:
+                      template: $LATEST
+                customSchemas:
+                  properties.`PayloadReqProp`:
+                    type: object
+                    properties:
+                      Id:
+                        type: string
+                      Name:
+                        type: string
+                      Amount:
+                        type: number
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$AWSLambdaInvokefunction.Payload}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AWSLambdaInvokefunction
+                    $ref: '#/node-output/AWS Lambda Invoke function/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: >-
+                {"statusCode":200,"headers":{"Content-Type":"text/html",
+                "amount": 2000},"body":"hello"}
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                  headers:
+                    type: object
+                    properties:
+                      Content-Type:
+                        type: string
+                      amount:
+                        type: number
+                  body:
+                    type: string
+                title: Parsed JSON
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Hi,
+
+                        The detailed report of opportunities is here-
+                        https://jw2iwevtbpk4f5jfhlcjvnulvi0fswmh.lambda-url.us-west-2.on.aws/
+
+                        The total projections for the upcoming quarter is 
+                        {{$JSONParserParse.headers.amount}} dollars. 
+                  - Subject:
+                      template: Total projections for upcoming quarter_new
+                  - To:
+                      template: >-
+                        user1@email.com,user2@email.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AWSLambdaInvokefunction
+                    $ref: '#/node-output/AWS Lambda Invoke function/response/payload'
+                  - variable: GmailSendemail2
+                    $ref: '#/node-output/Gmail Send email 2/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Invoke a function from AWS Lambda whenever an opportunity gets created in Salesforce
+  description: >-
+    Use this template to invoke a function from AWS Lambda whenever an opportunity gets created in Salesforce. In this example, the flow will create and populate the Salesforce opportunities table on a webpage that contains the opportunities and revenue details and share the information via Gmail with all the relevant stakeholders. 
+models: {}
