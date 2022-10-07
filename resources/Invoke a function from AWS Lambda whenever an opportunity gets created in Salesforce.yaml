@@ -135,5 +135,5 @@ integration:
           - incomplete
   name: Invoke a function from AWS Lambda whenever an opportunity gets created in Salesforce
   description: >-
-    Use this template to invoke a function from AWS Lambda when an opportunity gets created in Salesforce. In this example, the flow will create and populate the Salesforce opportunities table on a webpage that contains the opportunities and revenue details and shared the information via Gmail to all the relevant stakeholders. 
+    Use this template to invoke a function from AWS Lambda whenever an opportunity gets created in Salesforce. In this example, the flow will create and populate the Salesforce opportunities table on a webpage that contains the opportunities and revenue details and share the information via Gmail with all the relevant stakeholders. 
 models: {}
