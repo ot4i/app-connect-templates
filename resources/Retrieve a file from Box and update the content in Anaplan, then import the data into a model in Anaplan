@@ -146,7 +146,7 @@ integration:
                     $ref: '#/node-output/Anaplan Execute import/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Retrieve an Anaplan file from Box and update the file content through Anaplan
+  name: Retrieve a file from Box and update the content in Anaplan, then import the data into a model in Anaplan
   description: >-
-    Use this template to retrieve an Anaplan file from Box and update the content of the file in Anaplan. 
+    Use this template to retrieve a file from Box and update the content in Anaplan, then import the data into a model in Anaplan. 
 models: {}
