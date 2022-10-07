@@ -201,7 +201,7 @@ integration:
         tags:
           - incomplete
   name: >-
-    Stop start or reboot the Amazon EC2 instance whenever a Zendesk Service
+    Stop or start or reboot the Amazon EC2 instance whenever a Zendesk Service
     ticket gets created
   description: >-
     Use this template to stop, start, or reboot the Amazon EC2 instance 
