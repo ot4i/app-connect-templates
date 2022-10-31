@@ -157,7 +157,7 @@
     "description": "This template analyses the tone of your emails and alerts you when you receive emails with the same tone from the same sender. You specify the number of emails and the time period you want to monitor.",
     "summary": "Gmail to 3 applications",
     "sourceApp": "gmail",
-    "targetApps": ["watsontoneanalyzer","slack"],
+    "targetApps": ["watsontoneanalyzer","slack", "notification"],
     "tags": ["watsontoneanalyzer", "slack", "sentiment", "support", "emails", "customer", "tone analysis", "detect", "situation", "notification"],
     "offerings": ["app connect professional"]
 },
@@ -465,7 +465,8 @@
       "summary": "Salesforce to SAP",
       "sourceApp": "salesforce",
       "targetApps": [
-        "sap"
+        "sap",
+        "notification"
       ],
       "tags": [
         "update",
