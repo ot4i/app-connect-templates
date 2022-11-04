@@ -412,7 +412,7 @@
     "summary": "Salesforce to 2 applications",
     "sourceApp": "salesforce",
     "targetApps": ["ibmdb2", "salesforce"],
-    "tags": ["Salesforce", "crm", "IBM Db2", "batch process", "lead"],
+    "tags": ["Salesforce", "crm", "IBM Db2", "batch", "lead"],
     "offerings": ["app connect professional"]
   },
  {
