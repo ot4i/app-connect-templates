@@ -1,0 +1,209 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: metrices
+      connector-type: amazoncloudwatch
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-3:
+      type: api-action
+      business-object: metrices
+      connector-type: amazoncloudwatch
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Zendesk Service Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - description:
+                      template: '{{$Trigger.Reason}}'
+                  - priority:
+                      template: high
+                  - status:
+                      template: new
+                  - subject:
+                      template: '{{$Trigger.Subject}}'
+                  - type:
+                      template: incident
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: CJR8WDG2X
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: '{{$ZendeskServiceCreateticket}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceCreateticket
+                    $ref: >-
+                      #/node-output/Zendesk Service Create
+                      ticket/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - upsert-action:
+              name: Amazon CloudWatch Update or create custom metric
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Dimensions:
+                      foreach:
+                        input: '[0]'
+                        iterator: DimensionsItem
+                        mappings:
+                          - Name:
+                              template: Results
+                          - Value:
+                              template: Success
+                  - Namespace:
+                      template: ZendeskTicket
+                  - Unit:
+                      template: Count
+                  - Value:
+                      expression: '10'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceCreateticket
+                    $ref: >-
+                      #/node-output/Zendesk Service Create
+                      ticket/response/payload
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  MetricName: FlowStatus
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceCreateticket
+                    $ref: >-
+                      #/node-output/Zendesk Service Create
+                      ticket/response/payload
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        catch:
+          - default:
+              - create-action:
+                  name: Slack Send message
+                  target:
+                    $ref: '#/integration/action-interfaces/action-interface-4'
+                  map:
+                    mappings:
+                      - OBJECT_ID:
+                          template: CJR8WDG2X
+                      - OBJECT_NAME:
+                          template: channel
+                      - text:
+                          template: '{{$errorDetails}}----'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: errorDetails
+                        $ref: '#/error'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+              - upsert-action:
+                  name: Amazon CloudWatch Update or create custom metric 2
+                  target:
+                    $ref: '#/integration/action-interfaces/action-interface-3'
+                  map:
+                    mappings:
+                      - Dimensions:
+                          foreach:
+                            input: '[0]'
+                            iterator: DimensionsItem
+                            mappings:
+                              - Name:
+                                  template: Results
+                              - Value:
+                                  template: Failure
+                      - Namespace:
+                          template: ZendeskTicket
+                      - Unit:
+                          template: Count
+                      - Value:
+                          expression: '1'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: errorDetails
+                        $ref: '#/error'
+                      - variable: SlackSendmessage
+                        $ref: '#/node-output/Slack Send message/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  filter:
+                    where:
+                      MetricName: FlowStatus
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: errorDetails
+                        $ref: '#/error'
+                      - variable: SlackSendmessage
+                        $ref: '#/node-output/Slack Send message/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+  name: An alarm is triggered whenever the threshold is violated based on the Amazon CloudWatch published metric data
+  description: >-
+    Use this template to trigger an alarm whenever the published metric data breaches the threshold value set in Amazon CloudWatch. An email gets sent to the intended recipient by AWS Simple Notification Service (SNS) for each threshold violation. 
+models: {}

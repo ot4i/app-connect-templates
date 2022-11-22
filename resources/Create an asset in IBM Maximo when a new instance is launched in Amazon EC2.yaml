@@ -1,0 +1,81 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: awsEvents
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            serviceId: EC2
+            eventId: EC2-RunInstances
+            parentFilter:
+              serviceId: EC2
+              eventId: EC2-RunInstances
+            subscription:
+              roleArn: >-
+                arn:aws:iam::288919529935:role/service-role/Amazon_EventBridge_Invoke_Api_Destination_QA
+      connector-type: amazoneventbridge
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mxapiasset
+      connector-type: maximo
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: IBM Maximo Create asset
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - assetnum:
+                      template: '{{$Trigger.detail.userIdentity.accountId}}'
+                  - siteid:
+                      template: BEDFORD
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Asset created{{$IBMMaximoCreateasset.customUniqueId}}
+                        for new instance created {{$Trigger.detail}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoCreateasset
+                    $ref: '#/node-output/IBM Maximo Create asset/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an asset in IBM Maximo when a new instance is launched in Amazon EC2
+  description: >-
+    Use this template to create an asset in IBM Maximo whenever a new AWS event is triggered in Amazon EventBridge.
+models: {}

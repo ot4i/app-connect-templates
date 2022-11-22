@@ -1,0 +1,120 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: customEvents
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            eventBus: arn:aws:events:us-west-2:288919529935:event-bus/my-custom-bus
+            parentFilter:
+              eventBus: arn:aws:events:us-west-2:288919529935:event-bus/my-custom-bus
+            subscription:
+              roleArn: >-
+                arn:aws:iam::288919529935:role/service-role/Amazon_EventBridge_Invoke_Api_Destination_1728559648
+              pattern: '{"source" : ["salesforce"]}'
+      connector-type: amazoneventbridge
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Trigger.detail}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: '{"email" : "email" , "isleadcreated" : "false"}'
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  email:
+                    type: string
+                  isleadcreated:
+                    type: string
+                title: Parsed JSON
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: JSONParserParse
+                  $ref: '#/node-output/JSON Parser Parse/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$JSONParserParse.isleadcreated}}': 'false'
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04100PVAH3
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Lead is not created in salesforce. Please
+                                  check input provided.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JSONParserParse
+                              $ref: '#/node-output/JSON Parser Parse/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04100PVAH3
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: Lead created successfully in salesforce
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: JSONParserParse
+                            $ref: '#/node-output/JSON Parser Parse/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Amazon EventBridge receives events whenever a Salesforce lead is successfully created or whenever a Salesforce lead creation fails
+  description: >-
+    Use this template to perform the following use case: When the event is received from the specified custom event bus, it checks whether a lead has been successfully created in Salesforce. If a lead is successfully created in Salesforce, a Slack notification gets sent to the relevant squad. Likewise, if a lead is not created in Salesforce, a Slack notification gets sent to the relevant squad.
+models: {}
