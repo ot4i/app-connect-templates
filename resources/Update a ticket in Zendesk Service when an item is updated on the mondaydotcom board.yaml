@@ -1,0 +1,104 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: mondaydotcom
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Item
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            board_id: '3309856828'
+            parentFilter:
+              board_id: '3309856828'
+            subscription: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.column_title}}': Status
+                      - '{{$Trigger.value.label.text}}': Done
+                  execute:
+                    - update-action:
+                        name: Zendesk Service Update ticket
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - status:
+                                template: closed
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            id: '{{$Trigger.pulse_name}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C03HDN72S8M
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Zendesk ticket
+                                  {{$ZendeskServiceUpdateticket.id}} is
+                                  {{$ZendeskServiceUpdateticket.status}} now.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZendeskServiceUpdateticket
+                              $ref: >-
+                                #/block/If/node-output/Zendesk Service Update
+                                ticket/response/payload
+                            - variable: ZendeskServiceUpdateticketMetadata
+                              $ref: >-
+                                #/block/If/node-output/Zendesk Service Update
+                                ticket/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Update a ticket in Zendesk Service when an item is updated on the mondaydotcom board
+  description: >-
+    Use this template to update a ticket in Zendesk Service when an item is updated on the mondaydotcom board. This helps you keep the ticket information in sync. 
+models: {}
