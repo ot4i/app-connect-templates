@@ -1,0 +1,83 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msexcel
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Row
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            DriveId: b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+            WorkbookId: 01EMFW4S2ZVJHYUKNICZAJJXNFNRZU4EB3
+            WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+            parentFilter:
+              DriveId: >-
+                b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+              WorkbookId: 01EMFW4S2ZVJHYUKNICZAJJXNFNRZU4EB3
+              WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Salesforce Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Company:
+                      template: '{{$Trigger.rowData.E}}'
+                  - FirstName:
+                      template: '{{$Trigger.rowData.B}}'
+                  - LastName:
+                      template: '{{$Trigger.rowData.A}}'
+                  - Salutation:
+                      template: '{{$Trigger.rowData.C}}'
+                  - Title:
+                      template: '{{$Trigger.rowData.D}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: CJR8WDG2X
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: Excel and salesforce  =======  {{$SalesforceCreatelead}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SalesforceCreatelead
+                    $ref: '#/node-output/Salesforce Create lead/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a lead in Salesforce whenever a new row that contains potential lead data is appended in Microsoft Excel Online
+  description: >-
+    Use this template to add a new lead in Salesforce whenever a new row is appended in Microsoft Excel Online with potential lead data. A Slack message gets sent to the intended channel. 
+models: {}
