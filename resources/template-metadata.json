@@ -907,6 +907,267 @@
    "targetApps": ["salesforce", "email"],
    "tags": ["msdynamicscrmrest", "salesforce", "email", "addErrorCatch"],
    "offerings": ["app connect professional"]
-  }                
+  },  
+  {
+   "name": "Add a document in IBM Watson Discovery when a file is created in IBM OpenPages with Watson",
+   "description": "Use this template to add a document in IBM Watson Discovery whenever a file is created and downloaded in IBM OpenPages with Watson.",
+   "summary": "IBM OpenPages to 2 applications",
+   "sourceApp": "ibmopenpages",
+   "targetApps": ["slack", "watsondiscovery"],
+   "tags": ["ibmopenpages", "slack", "watsondiscovery"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a document in Couchbase whenever a ticket gets created in Zendesk Service",
+   "description": "Use this template to create a document in Couchbase with the specified document data whenever a ticket is created in Zendesk Service. A Slack message is then sent to the intended channel.",
+   "summary": "Zendesk Service to 2 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["slack", "couchbase"],
+   "tags": ["zendeskservice", "slack", "couchbase"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a list of workers for an upcoming assignment in Google Sheets from Oracle HCM worker records",
+   "description": "Use this template to retrieve worker details from Oracle Human Capital Management and create an entry in Google Sheets whenever a worker’s status is inactive.",
+   "summary": "Oracle HCM to 3 applications",
+   "sourceApp": "oraclehcm",
+   "targetApps": ["slack", "msteams", "googlesheet"],
+   "tags": ["oraclehcm", "slack", "msteams", "googlesheet"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a new work item whenever a new incident is logged in ServiceNow",
+   "description": "Use this template to create a work item in IBM Engineering Workflow Management whenever a new incident is logged in ServiceNow. A notification is then sent to the relevant squad through Microsoft Teams.",
+   "summary": "ServiceNow to 2 applications",
+   "sourceApp": "servicenow",
+   "targetApps": ["ibmewm", "msteams"],
+   "tags": ["servicenow", "ibmewm", "msteams"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a pickup ready order event through flexEngage based on the IBM Sterling Order Management System delivery method",
+   "description": "Use this template to create a pickup ready order event if the IBM Order Management System delivery method is empty. An email is then sent from flexEngage with the order pickup details.",
+   "summary": "IBM Sterling OMS to flexEngage",
+   "sourceApp": "ibmsterlingoms ",
+   "targetApps": ["flexengage"],
+   "tags": ["ibmsterlingoms", "flexengage"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a ticket in Zendesk Service when a new email is received",
+   "description": "Use this template to create a ticket with the email details and attachments when you receive a new email through the connected email server account. A notification gets sent through a Slack channel upon successfully creating a ticket.",
+   "summary": "Email to 2 applications",
+   "sourceApp": "email",
+   "targetApps": ["zendeskservice", "slack"],
+   "tags": ["email", "zendeskservice", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create an incident or problem in ServiceNow when a ticket is created in Zendesk Service",
+   "description": "Use this template to create an incident or problem in ServiceNow when a ticket is created in Zendesk Service. A Slack notification gets sent to the relevant squad.",
+   "summary": "Zendesk Service to 2 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["servicenow", "slack"],
+   "tags": ["zendeskservice", "servicenow", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create an issue in IBM OpenPages with Watson when an incident is created in ServiceNow",
+   "description": "Use this template to create an issue in IBM OpenPages with Watson whenever an incident gets created in ServiceNow. This flow helps you to keep incident data in sync between ServiceNow and IBM OpenPages with Watson. ",
+   "summary": "ServiceNow to 3 applications",
+   "sourceApp": "servicenow",
+   "targetApps": ["ibmopenpages", "servicenow", "slack"],
+   "tags": ["servicenow", "ibmopenpages", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create an item on the monday.com board for tickets created in Zendesk Service",
+   "description": "Use this template to create an item on the monday.com board for tickets created in Zendesk Service.",
+   "summary": "Zendesk Service to 2 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["mondaydotcom", "slack"],
+   "tags": ["zendeskservice", "mondaydotcom", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create new contact in Acoustic Campaign when a new contact is added in Salesforce",
+   "description": "Use this template to create a new contact in Acoustic Campaign when a new contact is created in the Salesforce.",
+   "summary": "Salesforce to Acoustic Campaign",
+   "sourceApp": "salesforce",
+   "targetApps": ["silverpop"],
+   "tags": ["salesforce", "silverpop"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create order in IBM Sterling Order Management System for orders created in Microsoft Dynamics 365 for Sales",
+   "description": "Use this template to create orders by using the IBM Order Management System’s create order asynchronous operation whenever any new orders are created in Microsoft Dynamics 365 for Sales.",
+   "summary": "Microsoft Dynamics 365 to IBM OMS",
+   "sourceApp": "msdynamicscrmrest",
+   "targetApps": ["ibmsterlingoms"],
+   "tags": ["msdynamicscrmrest", "ibmsterlingoms"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Creates a single invoice when an order is closed",
+   "description": "Use this template to create a single invoice when an order status is updated to closed. An email is sent from Gmail with the invoice details.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oracleebs", "gmail"],
+   "tags": ["scheduler", "oracleebs", "gmail"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Creates data extension values in Salesforce Marketing Cloud for contacts created in Salesforce event",
+   "description": "Use this template to create contact’s data extension values table with the contact’s details whenever a contact is created in a Salesforce New contact event.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["salesforcemc", "slack"],
+   "tags": ["salesforce", "salesforcemc", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Invoke a function from AWS Lambda whenever an opportunity gets created in Salesforce",
+   "description": "Use this template to invoke a function from AWS Lambda whenever an opportunity gets created in Salesforce.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["gmail", "amazonlambda"],
+   "tags": ["salesforce", "gmail", "amazonlambda"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Launch an Amazon EC2 instance whenever a new row is appended in Google Sheets requesting to launch the instance",
+   "description": "Use this template to launch an Amazon EC2 instance whenever a new row is appended in the Google Sheets worksheet.",
+   "summary": "Google Sheets to 3 applications",
+   "sourceApp": "googlesheet",
+   "targetApps": ["amazonec2", "gmail", "slack"],
+   "tags": ["", "amazonec2", "gmail", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Retrieve a file from Box and update the content in Anaplan, then import the data into a model in Anaplan",
+   "description": "Use this template to retrieve a file from Box and update the content in Anaplan, then import the data into a model in Anaplan.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["anaplan ", "gmail"],
+   "tags": ["anaplan", "gmail", "scheduler"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Retrieve and update Microsoft Excel Online worksheet rows with the status email sent through Gmail",
+   "description": "Use this template to retrieve and update Microsoft Excel Online rows with the status email sent through a Gmail account.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msexcel", "gmail"],
+   "tags": ["scheduler", "msexcel", "gmail"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Stop or start or reboot the Amazon EC2 instance whenever a Zendesk Service ticket gets created",
+   "description": "Use this template to stop, start, or reboot the Amazon EC2 instance whenever a Zendesk Service ticket gets created.",
+   "summary": "Zendesk Service to 3 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["amazonec2", "gmail", "slack"],
+   "tags": ["zendeskservice", "amazonec2", "gmail", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Sync employee records between Couchbase and Amazon DynamoDB",
+   "description": " ",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["couchbase", "slack", "amazondynamodb"],
+   "tags": ["scheduler", "couchbase", "slack", "amazondynamodb"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Sync Salesforce Leads between accounts and check and record state",
+   "description": "Use this template to perform a check on the status of a batch process. This template schedules a monthly synchronisation (batch) between the Leads of two Salesforce accounts. A Gmail message is then sent with the results of the operation.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "slack"],
+   "tags": ["scheduler", "salesforce", "slack"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Syncs Microsoft Active Directory computers to Microsoft Azure Active Directory",
+   "description": " ",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["slack", "msad", "azuread"],
+   "tags": ["scheduler", "slack", "msad", "azuread"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Syncs Microsoft Active Directory users to Microsoft Azure Active Directory",
+   "description": "Use this template to create or update the user in Microsoft Azure Active Directory whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync. ",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msad", "azuread"],
+   "tags": ["scheduler", "msad", "azuread"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Syncs Salesforce accounts with Oracle E-Business Suite customers",
+   "description": "Use this template to create a customer in Oracle E-Business Suite whenever an account is created in Salesforce.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["gmail", "oracleebs"],
+   "tags": ["salesforce", "gmail", "oracleebs"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Update ServiceNow incident and send a Microsoft Teams notification whenever a work item in IBM EWM is updated",
+   "description": "Use this template to update the incident in ServiceNow when any updates are done to the existing work item in IBM Engineering Workflow Management. A Microsoft Teams notification is then sent to the relevant squad.",
+   "summary": "IBM EWM to 2 applications",
+   "sourceApp": "ibmewm",
+   "targetApps": ["msteams", "servicenow"],
+   "tags": ["ibmewm", "msteams", "servicenow"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Execute a large volume read request for an Anaplan view and share the data as an attachment via Gmail",
+   "description": "Use this template to request a large volume of data insights from a view in Anaplan, download it, and share the data as an attachment via Gmail.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["anaplan", "gmail"],
+   "tags": ["scheduler", "anaplan", "gmail"],
+   "offerings": ["app connect professional"]
+  },    
+    {
+   "name": "Create a lead in Salesforce whenever a new row that contains potential lead data is appended in Microsoft Excel Online",
+   "description": "Use this template to add a new lead in Salesforce whenever a new row is appended in Microsoft Excel Online with potential lead data. A Slack message gets sent to the intended channel.",
+   "summary": "Microsoft Excel Online to 2 applications",
+   "sourceApp": "msexcel",
+   "targetApps": ["salesforce", "slack"],
+   "tags": ["msexcel", "salesforce", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Trigger an alarm whenever the threshold is violated on the Amazon CloudWatch published metric data",
+   "description": "Use this template to trigger an alarm whenever the published metric data breaches the threshold value set in Amazon CloudWatch. An email gets sent to the intended recipient by AWS Simple Notification Service (SNS) for each threshold violation.",
+   "summary": "Salesforce to 3 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["zendeskservice", "amazoncloudwatch", "slack"],
+   "tags": ["salesforce", "zendeskservice", "amazoncloudwatch", "slack", "addErrorCatch"],
+   "offerings": ["app connect professional"]
+  },
+      {
+   "name": "Create a repository or issue in GitHub when a new issue is created in Jira",
+   "description": "Use this template to create a repository or an issue in GitHub whenever an issue is created in Jira, based on the issue type. A GitHub repository is created when a new Jira issue of type Epic is created in the specified Jira project. Otherwise, if a Jira issue is created with any other issue type in the specified Jira project, a GitHub issue is created.",
+   "summary": "Jira to 2 applications",
+   "sourceApp": "jira",
+   "targetApps": ["github", "slack"],
+   "tags": ["jira", "github", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Trigger a Jenkins build for a new commit on GitHub",
+   "description": "Use this template to trigger a Jenkins build whenever a new commit is made in GitHub. A Slack message is then sent to the intended channel.",
+   "summary": "GitHub to 2 applications",
+   "sourceApp": "github",
+   "targetApps": ["jenkins", "slack"],
+   "tags": ["github", "jenkins", "slack"],
+   "offerings": ["app connect professional"]
+  }
   ]
 }
