@@ -1,0 +1,148 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: created_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: '5'
+              isCreatedQueryable: false
+      connector-type: zendeskservice
+  action-interfaces:
+    action-interface-7:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: problem
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.type}}': incident
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create incident
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - description:
+                                template: '{{$Trigger.description}}'
+                            - short_description:
+                                template: '{{$Trigger.subject}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C03HDN72S8M
+                            - text:
+                                template: >-
+                                  Incident with
+                                  {{$ServiceNowCreateincident.sys_id}}  created,
+                                  kindly take the action. Zendesk reference
+                                  {{$Trigger.id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowCreateincident
+                              $ref: >-
+                                #/block/If/node-output/ServiceNow Create
+                                incident/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.type}}': problem
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create problem
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - description:
+                                template: '{{$Trigger.description}}'
+                            - short_description:
+                                template: '{{$Trigger.subject}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C03HDN72S8M
+                            - text:
+                                template: >-
+                                  Problem {{$ServiceNowCreateproblem.sys_id}}
+                                  reported. Kindly check.  Zendesk reference
+                                  {{$Trigger.id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowCreateproblem
+                              $ref: >-
+                                #/block/If/node-output/ServiceNow Create
+                                problem/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create an incident or problem in ServiceNow when a ticket is created in Zendesk Service
+models: {}

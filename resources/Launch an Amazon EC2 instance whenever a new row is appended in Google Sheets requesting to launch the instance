@@ -1,0 +1,131 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1lrgqkHJ-4dO6BIut3kfUGceaXdUzRNHXje3ttPvmc9c
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1lrgqkHJ-4dO6BIut3kfUGceaXdUzRNHXje3ttPvmc9c
+              worksheetID: Sheet1
+      connector-type: googlesheet
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Instance
+      connector-type: amazonec2
+      actions:
+        LAUNCHINSTANCES: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.fields."4"}}': 'Y'
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04100PVAH3
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Launch Configuration as follows : Min count:
+                                  {{$Trigger.fields."1"}} Max count:
+                                  {{$Trigger.fields."2"}} AMI ID:
+                                  {{$Trigger.fields."3"}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Amazon EC2 Launch instances
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: LAUNCHINSTANCES
+                        map:
+                          mappings:
+                            - ImageId:
+                                template: '{{$Trigger.fields."3"}}'
+                            - LaunchTemplateId:
+                                template: lt-0e0c38d985a4478b0
+                            - MaxCount:
+                                expression: '$number($Trigger.fields."2" ) '
+                            - MinCount:
+                                expression: ' $number($Trigger.fields."1")'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  instanceid created :
+                                  {{$AmazonEC2Launchinstances.Instance.InstanceId}}
+                            - Subject:
+                                template: Instancecreation notification
+                            - To:
+                                template: user1@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: AmazonEC2Launchinstances
+                              $ref: >-
+                                #/node-output/Amazon EC2 Launch
+                                instances/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Launch an Amazon EC2 instance whenever a new row is appended in Google Sheets requesting to launch the instance
+models: {}

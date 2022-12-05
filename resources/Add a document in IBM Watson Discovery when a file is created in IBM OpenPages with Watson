@@ -1,0 +1,122 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: ibmopenpages
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: file
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: Creation_Date
+              updatedField: Last_Modification_Date
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: file
+      connector-type: ibmopenpages
+      actions:
+        DOWNLOADFILE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: document
+      connector-type: watsondiscovery
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM OpenPages with Watson Download file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - Resource_ID:
+                      expression: '$Trigger.Resource_ID '
+                  - fileName:
+                      template: '{{$Trigger.Name}}'
+                  - fileType:
+                      template: Binary
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: IBM Watson Discovery Add document
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - _source:
+                      template: OP
+                  - _sourceid:
+                      template: '{{$Trigger.Resource_ID}}'
+                  - collection_id:
+                      template: 1a3f5f4c-8ce5-4d47-0000-017fa77650fe
+                  - content_type:
+                      template: Binary
+                  - file:
+                      template: '{{$IBMOpenPageswithWatsonDownloadfile.fileContent}}'
+                  - file_name:
+                      template: '{{$Trigger.Name}}'
+                  - project_id:
+                      template: cd93d1c7-fc68-463b-9118-2d2f3f718862
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMOpenPageswithWatsonDownloadfile
+                    $ref: >-
+                      #/node-output/IBM OpenPages with Watson Download
+                      file/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - channel:
+                      template: C03KG72B91D
+                  - text:
+                      template: >-
+                        Fileusecase : Document created
+                        {{$IBMWatsonDiscoveryAdddocument.document_id}}for file
+                        {{$Trigger.Resource_ID}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMOpenPageswithWatsonDownloadfile
+                    $ref: >-
+                      #/node-output/IBM OpenPages with Watson Download
+                      file/response/payload
+                  - variable: IBMWatsonDiscoveryAdddocument
+                    $ref: >-
+                      #/node-output/IBM Watson Discovery Add
+                      document/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Add a document in IBM Watson Discovery when a file gets created in IBM OpenPages with Watson
+models: {}

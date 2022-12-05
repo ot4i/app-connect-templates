@@ -1,0 +1,134 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: readRequestForView
+      connector-type: anaplan
+      actions:
+        STARTREADREQUEST: {}
+    action-interface-2:
+      type: api-action
+      business-object: readRequestForView
+      connector-type: anaplan
+      actions:
+        DOWNLOADPAGES: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Anaplan Execute large volume read for view
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: STARTREADREQUEST
+              map:
+                mappings:
+                  - exportType:
+                      template: TABULAR_MULTI_COLUMN
+                  - modelID:
+                      template: 14B11C8BDA8F4B7CBAFDC4457266F637
+                  - viewId:
+                      template: '102000000004'
+                  - workspaceID:
+                      template: 8a868cdd7d906ca9017db500f04e39d1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Anaplan Download page
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADPAGES
+              map:
+                mappings:
+                  - id:
+                      template: >-
+                        {{$AnaplanExecutelargevolumereadforview.viewReadRequest.requestId}}
+                  - modelID:
+                      template: 14B11C8BDA8F4B7CBAFDC4457266F637
+                  - viewId:
+                      template: '102000000004'
+                  - workspaceID:
+                      template: 8a868cdd7d906ca9017db500f04e39d1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AnaplanExecutelargevolumereadforview
+                    $ref: >-
+                      #/node-output/Anaplan Execute large volume read for
+                      view/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Attachments:
+                      foreach:
+                        input: '[1]'
+                        iterator: AttachmentsItem
+                        mappings:
+                          - content:
+                              template: '{{$AnaplanDownloadpage.fileContent}}'
+                          - fileName:
+                              template: dailytrans.csv
+                  - Body:
+                      template: PFA
+                  - Subject:
+                      template: Anaplan file
+                  - To:
+                      template: user1@email.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AnaplanExecutelargevolumereadforview
+                    $ref: >-
+                      #/node-output/Anaplan Execute large volume read for
+                      view/response/payload
+                  - variable: AnaplanDownloadpage
+                    $ref: '#/node-output/Anaplan Download page/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Execute a large volume read request for an Anaplan view and share the data as an attachment via Gmail
+models: {}

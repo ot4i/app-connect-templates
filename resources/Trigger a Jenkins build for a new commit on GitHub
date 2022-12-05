@@ -1,0 +1,85 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: github
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Commit
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            OwnerName: hrishi54
+            RepoName: 1111-OMS-Connector
+            parentFilter:
+              OwnerName: hrishi54
+              RepoName: 1111-OMS-Connector
+            subscription:
+              createdField: updated_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: build
+      connector-type: jenkins
+      actions:
+        START_BUILD: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Jenkins Start build
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: START_BUILD
+              map:
+                mappings:
+                  - jobName:
+                      template: 01latestJob
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C03FZSRMWRJ
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Build# {{$JenkinsStartbuild.queued}} has started for the
+                        commit {{$Trigger.node_id}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: JenkinsStartbuild
+                    $ref: '#/node-output/Jenkins Start build/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Trigger a Jenkins build for a new commit on GitHub
+models: {}
