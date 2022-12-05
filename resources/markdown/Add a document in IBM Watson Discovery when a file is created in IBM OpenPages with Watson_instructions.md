@@ -9,4 +9,4 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 The flow is started whenever a file is created and downloaded in IBM OpenPages with Watson.
 
-For more information, visit the IBM Integration Community for this use case. See, [Using IBM® App Connect to interact with IBM OpenPages with Watson](https://community.ibm.com/community/user/integration/blogs/shamini-arumugam1/2022/07/29/using-ibm-app-connect-with-ibm-openpages).
+For more information, visit the IBM Integration Community for this use case. See, <a href="https://community.ibm.com/community/user/integration/blogs/shamini-arumugam1/2022/07/29/using-ibm-app-connect-with-ibm-openpages">Using IBM® App Connect to interact with IBM OpenPages with Watson</a>.
