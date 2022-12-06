@@ -981,7 +981,7 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Create an item on the monday.com board for tickets created in Zendesk Service",
+   "name": "Create an item on the mondaydotcom board for tickets created in Zendesk Service",
    "description": "Use this template to create an item on the monday.com board for tickets created in Zendesk Service.",
    "summary": "Zendesk Service to 2 applications",
    "sourceApp": "zendeskservice",
