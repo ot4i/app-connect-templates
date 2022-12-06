@@ -1143,7 +1143,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Trigger an alarm whenever the threshold is violated on the Amazon CloudWatch published metric data",
+   "name": "Trigger an alarm whenever the threshold is violated based on the Amazon CloudWatch published metric data",
    "description": "Use this template to trigger an alarm whenever the published metric data breaches the threshold value set in Amazon CloudWatch. An email gets sent to the intended recipient by AWS Simple Notification Service (SNS) for each threshold violation.",
    "summary": "Salesforce to 3 applications",
    "sourceApp": "salesforce",
