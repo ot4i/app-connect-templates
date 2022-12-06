@@ -1080,15 +1080,6 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Sync Salesforce Leads between accounts and check and record state",
-   "description": "Use this template to perform a check on the status of a batch process. This template schedules a monthly synchronisation (batch) between the Leads of two Salesforce accounts. A Gmail message is then sent with the results of the operation.",
-   "summary": "Scheduler to 2 applications",
-   "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["salesforce", "slack"],
-   "tags": ["scheduler", "salesforce", "slack"],
-   "offerings": ["app connect professional"]
-  },  
-  {
    "name": "Syncs Microsoft Active Directory computers to Microsoft Azure Active Directory",
    "description": " ",
    "summary": "Scheduler to 3 applications",
