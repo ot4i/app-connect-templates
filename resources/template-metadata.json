@@ -936,7 +936,7 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Create a new IBM EWM work item whenever a new incident is logged in ServiceNow",
+   "name": "Create a new IBM EWM work item when a new incident is logged in ServiceNow",
    "description": "Use this template to create a work item in IBM Engineering Workflow Management whenever a new incident is logged in ServiceNow. A notification is then sent to the relevant squad through Microsoft Teams.",
    "summary": "ServiceNow to 2 applications",
    "sourceApp": "servicenow",
