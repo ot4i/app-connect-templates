@@ -1048,7 +1048,7 @@
    "description": "Use this template to retrieve a file from Box and update the content in Anaplan, then import the data into a model in Anaplan.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["anaplan ", "gmail"],
+   "targetApps": ["anaplan", "gmail"],
    "tags": ["anaplan", "gmail", "scheduler"],
    "offerings": ["app connect professional"]
   },  
