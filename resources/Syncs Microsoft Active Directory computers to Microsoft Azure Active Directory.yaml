@@ -1,0 +1,224 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Computer
+      connector-type: msad
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Devices
+      connector-type: azuread
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Active Directory Retrieve computers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  ou: OU=AdityaUC,DC=ibm,DC=msad,DC=com
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - channel:
+                      template: CJR8WDG2X
+                  - text:
+                      template: >-
+                        {{$MicrosoftActiveDirectoryRetrievecomputers.cn}}======azure
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftActiveDirectoryRetrievecomputers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Microsoft Active Directory Computer
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      StringVariable:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - StringVariable:
+                            template: '{{$Foreachitem.cn}}_{{$random()}}'
+          - upsert-action:
+              name: Microsoft Azure Active Directory Update or create device
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - accountEnabled:
+                      expression: 'true'
+                  - alternativeSecurityIds:
+                      foreach:
+                        input: '[0]'
+                        iterator: alternativeSecurityIdsItem
+                        mappings:
+                          - altsecIDType:
+                              expression: '2'
+                          - key:
+                              template: >-
+                                {{$base64encode(
+                                $Setvariable.variable.StringVariable, utf-8)}}
+                  - displayName:
+                      template: '{{$Foreachitem.cn}}'
+                  - operatingSystem:
+                      template: '{{$Foreachitem.operatingSystem}}'
+                  - operatingSystemVersion:
+                      template: '{{$Foreachitem.operatingSystemVersion}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  deviceId: '{{$Foreachitem.cn}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Active Directory Retrieve
+                      computers/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Syncs Microsoft Active Directory computers to Microsoft Azure Active Directory
+models: {}

@@ -1,0 +1,198 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Account
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: HZ_CUST_ACCOUNT_V2PUB_Service___CREATE_CUST_ACCOUNT__1
+      connector-type: oracleebs
+      actions:
+        CREATE_CUST_ACCOUNT__1: {}
+    action-interface-2:
+      type: api-action
+      business-object: HZ_LOCATION_V2PUB_Service___CREATE_LOCATION
+      connector-type: oracleebs
+      actions:
+        CREATE_LOCATION: {}
+    action-interface-3:
+      type: api-action
+      business-object: HZ_PARTY_SITE_V2PUB_Service___CREATE_PARTY_SITE
+      connector-type: oracleebs
+      actions:
+        CREATE_PARTY_SITE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Oracle E-Business Suite Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CREATE_CUST_ACCOUNT__1
+              map:
+                mappings:
+                  - P_CUST_ACCOUNT_REC:
+                      mappings:
+                        - ACCOUNT_NUMBER:
+                            template: '{{$Trigger.AccountNumber}}'
+                        - CREATED_BY_MODULE:
+                            template: HZ_CPUI
+                  - P_INIT_MSG_LIST:
+                      template: T
+                  - P_ORGANIZATION_REC:
+                      mappings:
+                        - ORGANIZATION_NAME:
+                            template: '{{$Trigger.Name}}'
+                  - SOAHeader:
+                      mappings:
+                        - NLSLanguage:
+                            template: AMERICAN
+                        - OrgId:
+                            template: '121'
+                        - RespApplication:
+                            template: AR
+                        - Responsibility:
+                            template: ISL_RECEIVABLES_MANAGER
+                        - SecurityGroup:
+                            template: STANDARD
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Oracle E-Business Suite Create location
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CREATE_LOCATION
+              map:
+                mappings:
+                  - P_LOCATION_REC:
+                      mappings:
+                        - ADDRESS1:
+                            template: '{{$Trigger.ShippingStreet}}'
+                        - CITY:
+                            template: '{{$Trigger.ShippingCity}}'
+                        - COUNTRY:
+                            template: '{{$Trigger.ShippingCountry}}'
+                        - CREATED_BY_MODULE:
+                            template: HZ_CPUI
+                        - POSTAL_CODE:
+                            template: '{{$Trigger.ShippingPostalCode}}'
+                        - STATE:
+                            template: '{{$Trigger.ShippingState}}'
+                  - SOAHeader:
+                      mappings:
+                        - NLSLanguage:
+                            template: AMERICAN
+                        - OrgId:
+                            template: '121'
+                        - RespApplication:
+                            template: AR
+                        - Responsibility:
+                            template: ISL_RECEIVABLES_MANAGER
+                        - SecurityGroup:
+                            template: STANDARD
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleEBusinessSuiteCreatecustomer
+                    $ref: >-
+                      #/node-output/Oracle E-Business Suite Create
+                      customer/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Oracle E-Business Suite Create party site
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: CREATE_PARTY_SITE
+              map:
+                mappings:
+                  - P_PARTY_SITE_REC:
+                      mappings:
+                        - CREATED_BY_MODULE:
+                            template: HZ_CPUI
+                        - LOCATION_ID:
+                            template: >-
+                              {{$OracleEBusinessSuiteCreatelocation.X_LOCATION_ID}}
+                        - PARTY_ID:
+                            template: '{{$OracleEBusinessSuiteCreatecustomer.X_PARTY_ID}}'
+                  - SOAHeader:
+                      mappings:
+                        - NLSLanguage:
+                            template: AMERICAN
+                        - OrgId:
+                            template: '121'
+                        - RespApplication:
+                            template: AR
+                        - Responsibility:
+                            template: ISL_RECEIVABLES_MANAGER
+                        - SecurityGroup:
+                            template: STANDARD
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleEBusinessSuiteCreatecustomer
+                    $ref: >-
+                      #/node-output/Oracle E-Business Suite Create
+                      customer/response/payload
+                  - variable: OracleEBusinessSuiteCreatelocation
+                    $ref: >-
+                      #/node-output/Oracle E-Business Suite Create
+                      location/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Create email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Body:
+                      template: createcust-->{{$OracleEBusinessSuiteCreatecustomer}}
+                  - Subject:
+                      template: create customer
+                  - To:
+                      template: aditya_pandit@persistent.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleEBusinessSuiteCreatecustomer
+                    $ref: >-
+                      #/node-output/Oracle E-Business Suite Create
+                      customer/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Syncs Salesforce accounts with Oracle E-Business Suite customers
+models: {}

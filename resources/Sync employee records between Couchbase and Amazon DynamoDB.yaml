@@ -1,0 +1,225 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 5
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Document
+      connector-type: couchbase
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: item
+      connector-type: amazondynamodb
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Couchbase Retrieve documents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - joining_date:
+                        gte: '{{$Trigger.lastEventTime}}'
+                    - BucketNameVal: bucket11
+                    - CollectionNameVal: usecases
+                    - ScopeNameVal: scope1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 2000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$CouchbaseRetrievedocuments '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CouchbaseRetrievedocuments
+                    $ref: >-
+                      #/node-output/Couchbase Retrieve
+                      documents/response/payload
+                  - variable: CouchbaseRetrievedocumentsMetadata
+                    $ref: '#/node-output/Couchbase Retrieve documents/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Couchbase Document
+    assembly-2:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Amazon DynamoDB Update or create item 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - TableName:
+                      template: Employee-Records
+                  - data:
+                      mappings:
+                        - city:
+                            template: '{{$Foreachitem.city}}'
+                        - company:
+                            template: '{{$Foreachitem.company}}'
+                        - designation:
+                            template: '{{$Foreachitem.designation}}'
+                        - email:
+                            template: '{{$Foreachitem.email}}'
+                        - emp_status:
+                            template: '{{$Foreachitem.emp_status}}'
+                        - first_name:
+                            template: '{{$Foreachitem.first_name}}'
+                        - joining_date:
+                            template: '{{$Foreachitem.joining_date}}'
+                        - last_name:
+                            template: '{{$Foreachitem.last_name}}'
+                        - mobile:
+                            expression: '$Foreachitem.mobile '
+                        - rcrtmnt_agency:
+                            template: '{{$Foreachitem.Rcrtmnt_agency}}'
+                customSchemas:
+                  properties.`data`:
+                    type: object
+                    properties:
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      mobile:
+                        type: number
+                      company:
+                        type: string
+                      designation:
+                        type: string
+                      city:
+                        type: string
+                      emp_status:
+                        type: string
+                      email:
+                        type: string
+                      rcrtmnt_agency:
+                        type: string
+                      joining_date:
+                        type: string
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CouchbaseRetrievedocuments
+                    $ref: >-
+                      #/node-output/Couchbase Retrieve
+                      documents/response/payload
+                  - variable: CouchbaseRetrievedocumentsMetadata
+                    $ref: '#/node-output/Couchbase Retrieve documents/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - emp_id: '{{$Foreachitem.emp_id}}'
+                    - TableName: Employee-Records
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CouchbaseRetrievedocuments
+                    $ref: >-
+                      #/node-output/Couchbase Retrieve
+                      documents/response/payload
+                  - variable: CouchbaseRetrievedocumentsMetadata
+                    $ref: '#/node-output/Couchbase Retrieve documents/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C03HDN72S8M
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        for {{$Foreachitem.documentId}}, dynamodb record
+                        {{$AmazonDynamoDBUpdateorcreateitem2.emp_id}}  is
+                        updated. -------------------
+                        {{$AmazonDynamoDBUpdateorcreateitem2Metadata."status-code"}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonDynamoDBUpdateorcreateitem2
+                    $ref: >-
+                      #/block/For each/node-output/Amazon DynamoDB Update or
+                      create item 2/response/payload
+                  - variable: AmazonDynamoDBUpdateorcreateitem2Metadata
+                    $ref: >-
+                      #/block/For each/node-output/Amazon DynamoDB Update or
+                      create item 2/response
+                  - variable: CouchbaseRetrievedocuments
+                    $ref: >-
+                      #/node-output/Couchbase Retrieve
+                      documents/response/payload
+                  - variable: CouchbaseRetrievedocumentsMetadata
+                    $ref: '#/node-output/Couchbase Retrieve documents/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Sync employee records between Couchbase and Amazon DynamoDB
+models: {}

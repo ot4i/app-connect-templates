@@ -1,0 +1,105 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED_POLLER:
+          input-context:
+            data: workitem
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            projectId: _-nf44OlkEeuKaLsP5GITMw
+            workItemType: defect
+            parentFilter:
+              projectId: _-nf44OlkEeuKaLsP5GITMw
+              workItemType: defect
+            subscription:
+              createdField: created
+              updatedField: modified
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: ibmewm
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Teams Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              Issue details from demo k8--Summary 
+                              {{$Trigger.title}}---Description
+                              {{$Trigger.description}} --- Due date
+                              {{$Trigger.due}}--
+                              Estimate---{{$Trigger.estimate}}  issue URL
+                              {{$Trigger.about}}
+                  - channelId:
+                      template: 19:61e1e163a6924abc8a6ddf3444dd7f2f@thread.tacv2
+                  - teamId:
+                      template: 057cbbda-ed17-47ba-b6c1-1e265b2c70f8
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - update-action:
+              name: ServiceNow Update incidents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - comments:
+                      template: '{{$Trigger.description}}'
+                  - short_description:
+                      template: '{{$Trigger.description}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftTeamsCreatemessage
+                    $ref: >-
+                      #/node-output/Microsoft Teams Create
+                      message/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  sys_id: '{{$Trigger.title}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftTeamsCreatemessage
+                    $ref: >-
+                      #/node-output/Microsoft Teams Create
+                      message/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: true
+        tags:
+          - incomplete
+  name: Update ServiceNow incident and send a Microsoft Teams message when a work item in IBM EWM is updated
+models: {}

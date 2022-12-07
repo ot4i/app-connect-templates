@@ -1,0 +1,378 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: servicenow
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: user
+      connector-type: ibmopenpages
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: sys_user
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: user
+      connector-type: ibmopenpages
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: issue
+      connector-type: ibmopenpages
+      actions:
+        CREATE: {}
+    action-interface-9:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.priority}}':
+                      gt: '4'
+                  execute:
+                    - retrieve-action:
+                        name: ServiceNow Retrieve system users
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            sys_id: '{{$Trigger.assigned_to.value}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+                    - retrieve-action:
+                        name: IBM OpenPages with Watson Retrieve users
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          limit: 10
+                        allow-truncation: true
+                        allow-empty-output: true
+                    - if:
+                        name: If
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: ServiceNowRetrieveincidents
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve
+                              incidents/response/payload
+                          - variable: ServiceNowRetrieveincidentsMetadata
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve
+                              incidents/response
+                          - variable: SlackSendmessage3
+                            $ref: >-
+                              #/node-output/Slack Send message
+                              3/response/payload
+                          - variable: ServiceNowRetrievesystemusers
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve system
+                              users/response/payload
+                          - variable: ServiceNowRetrievesystemusersMetadata
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve system
+                              users/response
+                          - variable: IBMOpenPageswithWatsonRetrieveusers
+                            $ref: >-
+                              #/node-output/IBM OpenPages with Watson Retrieve
+                              users/response/payload
+                          - variable: IBMOpenPageswithWatsonRetrieveusersMetadata
+                            $ref: >-
+                              #/node-output/IBM OpenPages with Watson Retrieve
+                              users/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$ServiceNowRetrievesystemusers.user_name in $IBMOpenPageswithWatsonRetrieveusers.userName }}':
+                                '=': 'true'
+                            execute:
+                              - create-action:
+                                  name: Slack Send message
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-2
+                                  map:
+                                    mappings:
+                                      - channel:
+                                          template: C03KG72B91D
+                                      - text:
+                                          template: >-
+                                            Users from OP -
+                                            {{$IBMOpenPageswithWatsonRetrieveusers.userName}}
+                                            contains
+                                            {{$ServiceNowRetrievesystemusers.user_name}}
+                                            - Not creating userin OP
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: ServiceNowRetrievesystemusers
+                                        $ref: >-
+                                          #/block/If 2/node-output/ServiceNow
+                                          Retrieve system users/response/payload
+                                      - variable: ServiceNowRetrievesystemusersMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/ServiceNow
+                                          Retrieve system users/response
+                                      - variable: IBMOpenPageswithWatsonRetrieveusers
+                                        $ref: >-
+                                          #/block/If 2/node-output/IBM OpenPages
+                                          with Watson Retrieve
+                                          users/response/payload
+                                      - variable: >-
+                                          IBMOpenPageswithWatsonRetrieveusersMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/IBM OpenPages
+                                          with Watson Retrieve users/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute:
+                            - create-action:
+                                name: IBM OpenPages with Watson Create user
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-5
+                                map:
+                                  mappings:
+                                    - emailAddress:
+                                        template: '{{$ServiceNowRetrievesystemusers.email}}'
+                                    - firstName:
+                                        template: >-
+                                          {{$ServiceNowRetrievesystemusers.first_name}}
+                                    - lastName:
+                                        template: >-
+                                          {{$ServiceNowRetrievesystemusers.last_name}}
+                                    - localeISOCode:
+                                        template: French
+                                    - password:
+                                        template: '{{$random()}}'
+                                    - userName:
+                                        template: >-
+                                          {{$ServiceNowRetrievesystemusers.user_name}}
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: ServiceNowRetrievesystemusers
+                                      $ref: >-
+                                        #/block/If 2/node-output/ServiceNow
+                                        Retrieve system users/response/payload
+                                    - variable: ServiceNowRetrievesystemusersMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/ServiceNow
+                                        Retrieve system users/response
+                                    - variable: IBMOpenPageswithWatsonRetrieveusers
+                                      $ref: >-
+                                        #/block/If 2/node-output/IBM OpenPages
+                                        with Watson Retrieve
+                                        users/response/payload
+                                    - variable: >-
+                                        IBMOpenPageswithWatsonRetrieveusersMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/IBM OpenPages
+                                        with Watson Retrieve users/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                            - create-action:
+                                name: Slack Send message 2
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-4
+                                map:
+                                  mappings:
+                                    - channel:
+                                        template: C03KG72B91D
+                                    - text:
+                                        template: >-
+                                          OP else
+                                          {{$IBMOpenPageswithWatsonRetrieveusers.userName}}
+                                          doesn't contain
+                                          {{$ServiceNowRetrievesystemusers.user_name}}
+                                          created user in op with usernamein op
+                                          {{$IBMOpenPageswithWatsonCreateuser.id}}
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: IBMOpenPageswithWatsonCreateuser
+                                      $ref: >-
+                                        #/block/If/node-output/IBM OpenPages
+                                        with Watson Create user/response/payload
+                                    - variable: ServiceNowRetrievesystemusers
+                                      $ref: >-
+                                        #/block/If 2/node-output/ServiceNow
+                                        Retrieve system users/response/payload
+                                    - variable: ServiceNowRetrievesystemusersMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/ServiceNow
+                                        Retrieve system users/response
+                                    - variable: IBMOpenPageswithWatsonRetrieveusers
+                                      $ref: >-
+                                        #/block/If 2/node-output/IBM OpenPages
+                                        with Watson Retrieve
+                                        users/response/payload
+                                    - variable: >-
+                                        IBMOpenPageswithWatsonRetrieveusersMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/IBM OpenPages
+                                        with Watson Retrieve users/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                        output-schema: {}
+                    - create-action:
+                        name: IBM OpenPages with Watson Create issue
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - OPLC_Std_LCAssignee:
+                                template: '{{$ServiceNowRetrievesystemusers.user_name}}'
+                            - OPSS_Iss_Due_Date:
+                                template: '{{$Trigger.due_date}}'
+                            - PARENT_TYPE:
+                                template: Business Entity
+                            - description:
+                                template: '{{$Trigger.short_description}}'
+                            - name:
+                                template: '{{$Trigger.number}}'
+                            - primaryParentId:
+                                template: '1735'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowRetrievesystemusers
+                              $ref: >-
+                                #/block/If 2/node-output/ServiceNow Retrieve
+                                system users/response/payload
+                            - variable: ServiceNowRetrievesystemusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/ServiceNow Retrieve
+                                system users/response
+                            - variable: IBMOpenPageswithWatsonRetrieveusers
+                              $ref: >-
+                                #/block/If 2/node-output/IBM OpenPages with
+                                Watson Retrieve users/response/payload
+                            - variable: IBMOpenPageswithWatsonRetrieveusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/IBM OpenPages with
+                                Watson Retrieve users/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message 4
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-9'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C03KG72B91D
+                            - text:
+                                template: >-
+                                  Issue created in OP
+                                  {{$IBMOpenPageswithWatsonCreateissue.Resource_ID}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ServiceNowRetrievesystemusers
+                              $ref: >-
+                                #/block/If 2/node-output/ServiceNow Retrieve
+                                system users/response/payload
+                            - variable: ServiceNowRetrievesystemusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/ServiceNow Retrieve
+                                system users/response
+                            - variable: IBMOpenPageswithWatsonRetrieveusers
+                              $ref: >-
+                                #/block/If 2/node-output/IBM OpenPages with
+                                Watson Retrieve users/response/payload
+                            - variable: IBMOpenPageswithWatsonRetrieveusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/IBM OpenPages with
+                                Watson Retrieve users/response
+                            - variable: IBMOpenPageswithWatsonCreateissue
+                              $ref: >-
+                                #/block/If 2/node-output/IBM OpenPages with
+                                Watson Create issue/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-7'
+                      map:
+                        mappings:
+                          - channel:
+                              template: C03KG72B91D
+                          - text:
+                              template: >-
+                                No need to create issue in OP for
+                                {{$Trigger.number}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create an issue in IBM OpenPages with Watson when an incident gets created in ServiceNow
+models: {}

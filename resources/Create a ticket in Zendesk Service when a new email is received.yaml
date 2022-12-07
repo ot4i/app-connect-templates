@@ -1,0 +1,146 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: email
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: ticketAttachment
+      connector-type: zendeskservice
+      actions:
+        UPLOADATTACHMENT: {}
+    action-interface-3:
+      type: api-action
+      business-object: ticketComment
+      connector-type: zendeskservice
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Zendesk Service Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - description:
+                      template: '{{$Trigger.body.text}}'
+                  - requester:
+                      mappings:
+                        - email:
+                            template: '{{$Trigger.from}}'
+                        - name:
+                            template: Email User1
+                  - status:
+                      template: new
+                  - subject:
+                      template: '{{$Trigger.subject}}'
+                  - tags:
+                      expression: '["eventemail"]'
+                  - type:
+                      template: task
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Zendesk Service Upload attachment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: UPLOADATTACHMENT
+              map:
+                mappings:
+                  - content_type:
+                      template: Binary
+                  - fileContent:
+                      template: '{{$Trigger.attachments.content}}'
+                  - file_name:
+                      template: '{{$Trigger.attachments.filename}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Zendesk Service Create ticket comment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - body:
+                      template: test
+                  - ticket_id:
+                      template: '{{$ZendeskServiceCreateticket.id}}'
+                  - uploads:
+                      expression: '[$ZendeskServiceUploadattachment.token ]'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceUploadattachment
+                    $ref: >-
+                      #/node-output/Zendesk Service Upload
+                      attachment/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: C03HDN72S8M
+                  - text:
+                      template: >-
+                        Ticket#  {{$ZendeskServiceCreateticket}}   created
+                        against Email# {{$Trigger.messageId}} with attachment
+                        associated to
+                        comment#{{$ZendeskServiceCreateticketcomment.id}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceCreateticket
+                    $ref: >-
+                      #/node-output/Zendesk Service Create
+                      ticket/response/payload
+                  - variable: ZendeskServiceUploadattachment
+                    $ref: >-
+                      #/node-output/Zendesk Service Upload
+                      attachment/response/payload
+                  - variable: ZendeskServiceCreateticketcomment
+                    $ref: >-
+                      #/node-output/Zendesk Service Create ticket
+                      comment/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a ticket in Zendesk Service when a new email is received
+models: {}
