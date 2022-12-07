@@ -948,7 +948,7 @@
    "name": "Create a pickup ready order event through flexEngage based on the IBM Sterling Order Management System delivery method",
    "description": "Use this template to create a pickup ready order event if the IBM Order Management System delivery method is empty. An email is then sent from flexEngage with the order pickup details.",
    "summary": "IBM Sterling OMS to flexEngage",
-   "sourceApp": "ibmsterlingoms ",
+   "sourceApp": "ibmsterlingoms",
    "targetApps": ["flexengage"],
    "tags": ["ibmsterlingoms", "flexengage"],
    "offerings": ["app connect professional"]
