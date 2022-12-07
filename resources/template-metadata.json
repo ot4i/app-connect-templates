@@ -292,8 +292,8 @@
    "description": "Use this template to receive a notification in the log for high priority issues.",
    "summary": "Scheduler to Atlassian Jira Service Desk",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["atlassianjira"],
-   "tags": ["scheduler", "atlassianjira", "service desk", "tickets", "issues", "priority", "incidents", "JSONata", "for each", "log", "logging", "high", "highest"],
+   "targetApps": ["jira"],
+   "tags": ["scheduler", "jira", "service desk", "tickets", "issues", "priority", "incidents", "JSONata", "for each", "log", "logging", "high", "highest"],
    "offerings": ["app connect professional"]
   },
   {
