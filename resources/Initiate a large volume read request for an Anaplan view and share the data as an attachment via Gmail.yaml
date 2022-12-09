@@ -130,5 +130,5 @@ integration:
                     $ref: '#/node-output/Anaplan Download page/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Execute a large volume read request for an Anaplan view and share the data as an attachment via Gmail
+  name: Initiate a large volume read request for an Anaplan view and share the data as an attachment via Gmail
 models: {}
