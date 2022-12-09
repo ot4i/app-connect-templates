@@ -1116,7 +1116,7 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Execute a large volume read request for an Anaplan view and share the data as an attachment via Gmail",
+   "name": "Initiate a large volume read request for an Anaplan view and share the data as an attachment via Gmail",
    "description": "Use this template to request a large volume of data insights from a view in Anaplan, download it, and share the data as an attachment via Gmail.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",

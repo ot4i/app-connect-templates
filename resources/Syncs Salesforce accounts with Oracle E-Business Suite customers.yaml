@@ -181,7 +181,7 @@ integration:
                   - Subject:
                       template: create customer
                   - To:
-                      template: aditya_pandit@persistent.com
+                      template: user1@mycompany.com
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger

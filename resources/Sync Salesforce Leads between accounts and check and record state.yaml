@@ -243,5 +243,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Sync Leads between accounts and record state
+  name: Sync Salesforce Leads between accounts and check and record state
 models: {}
