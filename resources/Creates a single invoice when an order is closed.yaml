@@ -194,7 +194,7 @@ integration:
                                   Invoice for an order
                                   {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.ORDER_NUMBER}}
                             - To:
-                                template: aditya_pandit@persistent.com
+                                template: user1@mycompany.com
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: Trigger
@@ -226,7 +226,7 @@ integration:
                                 Invoice is not created for order
                                 {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.ORDER_NUMBER}}
                           - To:
-                              template: aditya_pandit@persistent.com
+                              template: user1@mycompany.com
                         $map: http://ibm.com/appconnect/map/v1
                         input:
                           - variable: Trigger
