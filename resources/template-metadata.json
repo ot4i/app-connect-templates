@@ -929,10 +929,10 @@
   {
    "name": "Create a list of workers for an upcoming assignment in Google Sheets from Oracle HCM worker records",
    "description": "Use this template to retrieve worker details from Oracle Human Capital Management and create an entry in Google Sheets whenever a worker’s status is inactive.",
-   "summary": "Oracle HCM to 3 applications",
-   "sourceApp": "oraclehcm",
-   "targetApps": ["slack", "msteams", "googlesheet"],
-   "tags": ["oraclehcm", "slack", "msteams", "googlesheet"],
+   "summary": "Scheduler to 4 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "slack", "msteams", "googlesheet"],
+   "tags": ["oraclehcm", "slack", "msteams", "googlesheet", "batch", "scheduler"],
    "offerings": ["app connect professional"]
   },  
   {
