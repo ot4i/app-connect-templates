@@ -729,8 +729,8 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a site in SharePoint when new Wufoo form is submitted",
-   "description": "Use this template to create a site in SharePoint when a new form entry is submitted in Wufoo. A Microsoft Teams message is received with the site details.",
+   "name": "Create a list item in SharePoint when a Wufoo form is submitted",
+   "description": "Use this template to create a list item in SharePoint when a completed form entry is submitted in Wufoo. A Microsoft Teams message is received with the list item details.",
    "summary": "Wufoo to 2 applications",
    "sourceApp": "wufoo",
    "targetApps": ["mssharepoint", "msteams"],
