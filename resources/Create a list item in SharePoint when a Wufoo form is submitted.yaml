@@ -1,0 +1,116 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: mqpbfuk00v2laz
+            parentFilter:
+              Hash: mqpbfuk00v2laz
+      connector-type: wufoo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: ListItem
+      connector-type: mssharepoint
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: ListItem
+      connector-type: mssharepoint
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft SharePoint Create list item
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Description:
+                      template: See {{$Trigger.Field8}}
+                  - ListId:
+                      template: edd434c3-0b4f-4c19-91fa-e7b4c58f05cf
+                  - SitePath:
+                      template: /
+                  - Title:
+                      template: 'Form submitted: {{$Trigger.EntryId}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Microsoft SharePoint Retrieve list items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  and:
+                    - ID: '{{$MicrosoftSharePointCreatelistitem.ID}}'
+                    - ListId: edd434c3-0b4f-4c19-91fa-e7b4c58f05cf
+                    - SitePath: /
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftSharePointCreatelistitem
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Create list
+                      item/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              Description:
+                              {{$MicrosoftSharePointRetrievelistitems[0].Description}}
+                  - channelId:
+                      template: >-
+                        19:feF4fEWcMeYpLWklr8bf4th-qK8-EYXU63OkmyRUlN41@thread.tacv2
+                  - subject:
+                      template: >-
+                        New list item created
+                        {{$MicrosoftSharePointCreatelistitem.ID}}
+                  - teamId:
+                      template: 0be719b4-37c9-44a5-a98a-e9e0216e51d7
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftSharePointCreatelistitem
+                    $ref: >-
+                      #/node-output/Microsoft SharePoint Create list
+                      item/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a list item in SharePoint when a Wufoo form is submitted
+models: {}
