@@ -524,7 +524,7 @@
   {
    "name": "Creates a Dropbox folder and shares the link via Slack when a new spreadsheet is created in Google Sheets",
    "description": "This template creates a Dropbox folder when a new spread sheet is created in Google Sheets. A Dropbox share link is created for the folder and shared through a Slack message.",
-   "summary": "Goolge Sheets to 2 applications ",
+   "summary": "Google Sheets to 2 applications ",
    "sourceApp": "googlesheet",
    "targetApps": ["dropbox", "dropbox", "slack"],
    "tags": ["dropbox", "googlesheet", "slack"],
