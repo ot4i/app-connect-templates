@@ -1159,6 +1159,24 @@
    "targetApps": ["jenkins", "slack"],
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever a Gmail message is received",
+   "description": "Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk whenever an email is received from a Gmail account. ",
+   "summary": "Gmail to 2 applications",
+   "sourceApp": "gmail",
+   "targetApps": ["msonedrive", "msonedrive", "zendeskservice"],
+   "tags": ["gmail", "msonedrive", "zendeskservice"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Sync Jira issue attachments with Microsoft OneDrive for Business",
+   "description": "Use this template to sync Jira issue attachments with Microsoft OneDrive for Business. When a new issue with attachments gets created in Jira, a file containing the attachments gets created in Microsoft OneDrive for Business, helping you keep the attachments in sync.",
+   "summary": "Jira to 3 applications",
+   "sourceApp": "jira",
+   "targetApps": ["jira", "jira", "msonedrive"],
+   "tags": ["jira", "msonedrive", "foreach"],
+   "offerings": ["app connect professional"]
   }
   ]
 }
