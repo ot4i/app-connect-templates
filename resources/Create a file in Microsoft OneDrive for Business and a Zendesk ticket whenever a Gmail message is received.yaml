@@ -1,0 +1,119 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: gmail
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: File
+      connector-type: msonedrive
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: msonedrive
+      actions:
+        RETRIEVEALL: {}
+    action-interface-8:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft OneDrive for Business Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - contentType:
+                      template: Text
+                  - fileContent:
+                      template: '{{$Trigger.Body}}'
+                  - name:
+                      template: AVNUADI
+                  - parentDriveId:
+                      template: >-
+                        b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                  - parentFolderId:
+                      template: 01EMFW4SZ5J2XGOQDKONE3O5EDJLOLB2H6
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage3
+                    $ref: '#/node-output/Slack Send message 3/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Microsoft OneDrive for Business Retrieve files
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  id: '{{$MicrosoftOneDriveforBusinessCreatefile.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage3
+                    $ref: '#/node-output/Slack Send message 3/response/payload'
+                  - variable: MicrosoftOneDriveforBusinessCreatefile
+                    $ref: >-
+                      #/node-output/Microsoft OneDrive for Business Create
+                      file/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: false
+              allow-empty-output: true
+          - create-action:
+              name: Zendesk Service Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              map:
+                mappings:
+                  - description:
+                      template: >-
+                        Click here for more details regarding the ticket
+                        ---{{$MicrosoftOneDriveforBusinessRetrievefiles.contentDownloadUrl}}
+                  - subject:
+                      template: '{{$Trigger.Subject}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage3
+                    $ref: '#/node-output/Slack Send message 3/response/payload'
+                  - variable: MicrosoftOneDriveforBusinessCreatefile
+                    $ref: >-
+                      #/node-output/Microsoft OneDrive for Business Create
+                      file/response/payload
+                  - variable: MicrosoftOneDriveforBusinessRetrievefiles
+                    $ref: >-
+                      #/node-output/Microsoft OneDrive for Business Retrieve
+                      files/response/payload
+                  - variable: MicrosoftOneDriveforBusinessRetrievefilesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft OneDrive for Business Retrieve
+                      files/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever a Gmail message is received
+  description: >-
+    Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk whenever an email is received from a Gmail account.
+models: {}
