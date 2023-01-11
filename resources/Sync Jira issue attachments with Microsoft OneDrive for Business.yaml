@@ -1,0 +1,153 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: jira
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: WOR
+            parentFilter:
+              key: WOR
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: IssueAttachment
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: IssueAttachment
+      connector-type: jira
+      actions:
+        DOWNLOADATTACHMENTCONTENT: {}
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: msonedrive
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Jira Retrieve issue attachments
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - issueId: '{{$Trigger.id}}'
+                    - key: WOR
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$JiraRetrieveissueattachments '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveissueattachments
+                    $ref: >-
+                      #/node-output/Jira Retrieve issue
+                      attachments/response/payload
+                  - variable: JiraRetrieveissueattachmentsMetadata
+                    $ref: '#/node-output/Jira Retrieve issue attachments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Jira IssueAttachment
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Jira Download attachment content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADATTACHMENTCONTENT
+              map:
+                mappings:
+                  - fileType:
+                      template: Text
+                  - id:
+                      template: '{{$Foreachitem.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveissueattachments
+                    $ref: >-
+                      #/node-output/Jira Retrieve issue
+                      attachments/response/payload
+                  - variable: JiraRetrieveissueattachmentsMetadata
+                    $ref: '#/node-output/Jira Retrieve issue attachments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft OneDrive for Business Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - contentType:
+                      template: Text
+                  - fileContent:
+                      template: '{{$JiraDownloadattachmentcontent.content}}'
+                  - name:
+                      template: '{{$Foreachitem.author.name}}'
+                  - parentDriveId:
+                      template: >-
+                        b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                  - parentFolderId:
+                      template: 01EMFW4SZ5J2XGOQDKONE3O5EDJLOLB2H6
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraDownloadattachmentcontent
+                    $ref: >-
+                      #/block/For each/node-output/Jira Download attachment
+                      content/response/payload
+                  - variable: JiraRetrieveissueattachments
+                    $ref: >-
+                      #/node-output/Jira Retrieve issue
+                      attachments/response/payload
+                  - variable: JiraRetrieveissueattachmentsMetadata
+                    $ref: '#/node-output/Jira Retrieve issue attachments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Sync Jira issue attachments with Microsoft OneDrive for Business
+models: {}
