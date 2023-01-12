@@ -113,7 +113,7 @@ integration:
                       files/response
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever a Gmail message is received
+  name: Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever an email is received in Gmail
   description: >-
     Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk whenever an email is received from a Gmail account.
 models: {}
