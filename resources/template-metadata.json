@@ -1159,6 +1159,15 @@
    "targetApps": ["jenkins", "slack"],
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Retrieve campaign records from Salesforce and update the rows of the Microsoft Excel Online worksheet with the campaign details",
+   "description": "Use this template to retrieve campaign records from Salesforce and update the rows of the Microsoft Excel Online worksheet with the campaign details. Campaign-related information is queried from Salesforce for a specified year, and these details are then appended to a Microsoft Excel Online worksheet with the specified campaign information. A slack message gets sent to the intended channel.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "msexcel", "slack"],
+   "tags": ["salesforce", "msexcel", "slack", "scheduler", "foreach", "setVariable"],
+   "offerings": ["app connect professional"]
   }
   ]
 }
