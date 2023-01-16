@@ -929,12 +929,12 @@
   {
    "name": "Create a list of workers for an upcoming assignment in Google Sheets from Oracle HCM worker records",
    "description": "Use this template to retrieve worker details from Oracle Human Capital Management and create an entry in Google Sheets whenever a worker’s status is inactive.",
-   "summary": "Scheduler to 4 applications",
+   "summary": "Scheduler to 5 applications",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["oraclehcm", "slack", "msteams", "googlesheet"],
-   "tags": ["oraclehcm", "slack", "msteams", "googlesheet", "batch", "scheduler"],
+   "targetApps": ["oraclehcm", "oraclehcm", "oraclehcm", "googlesheet", "slack"],
+   "tags": ["oraclehcm", "slack", "googlesheet", "scheduler", "foreach", "setVariable", "if", "JSON parser"],
    "offerings": ["app connect professional"]
-  },  
+  },
   {
    "name": "Create a new IBM EWM work item when a new incident is logged in ServiceNow",
    "description": "Use this template to create a work item in IBM Engineering Workflow Management whenever a new incident is logged in ServiceNow. A notification is then sent to the relevant squad through Microsoft Teams.",
