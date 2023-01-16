@@ -954,15 +954,6 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Create a ticket in Zendesk Service when a new email is received",
-   "description": "Use this template to create a ticket with the email details and attachments when you receive a new email through the connected email server account. A notification gets sent through a Slack channel upon successfully creating a ticket.",
-   "summary": "Email to 2 applications",
-   "sourceApp": "email",
-   "targetApps": ["zendeskservice", "slack"],
-   "tags": ["email", "zendeskservice", "slack"],
-   "offerings": ["app connect professional"]
-  },  
-  {
    "name": "Create an incident or problem in ServiceNow when a ticket is created in Zendesk Service",
    "description": "Use this template to create an incident or problem in ServiceNow when a ticket is created in Zendesk Service. A Slack notification gets sent to the relevant squad.",
    "summary": "Zendesk Service to 2 applications",
