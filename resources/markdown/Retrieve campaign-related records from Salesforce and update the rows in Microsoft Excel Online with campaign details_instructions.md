@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](Retrieve%20records%20for%20campaigns%20and%20their%20members%20from%20Salesforce%20and%20update%20the%20rows%20of%20the%20Microsoft%20Excel%20Online%20with%20campaign%20details_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](Retrieve%20campaign-related%20records%20from%20Salesforce%20and%20update%20the%20rows%20in%20Microsoft%20Excel%20Online%20with%20campaign%20details_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
