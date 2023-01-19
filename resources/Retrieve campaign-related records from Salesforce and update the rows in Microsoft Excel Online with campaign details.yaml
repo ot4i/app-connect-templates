@@ -237,5 +237,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: >-
-    Retrieve records for campaigns and their members from Salesforce and update the rows of the Microsoft Excel Online with campaign details
+    Retrieve campaign-related records from Salesforce and update the rows in Microsoft Excel Online with campaign details
 models: {}
