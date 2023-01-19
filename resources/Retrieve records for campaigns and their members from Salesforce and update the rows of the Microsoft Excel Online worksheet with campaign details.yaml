@@ -92,7 +92,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Salesforce records
+              display-name: Campaign Records
         tags:
           - incomplete
     assembly-2:
@@ -148,7 +148,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: undefined undefined
+              display-name: Campaign Member Record
     assembly-4:
       assembly:
         execute:
