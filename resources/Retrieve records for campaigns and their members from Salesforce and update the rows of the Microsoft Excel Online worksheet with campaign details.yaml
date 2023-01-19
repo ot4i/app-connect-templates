@@ -238,4 +238,6 @@ integration:
                     $ref: '#/flowDetails'
   name: >-
     Retrieve records for campaigns and their members from Salesforce and update the rows of the Microsoft Excel Online worksheet with campaign details
+  description: >-
+    Use this template to retrieve campaign records from Salesforce and update the rows of the Microsoft Excel Online worksheet with the campaign details. Campaign-related information is queried from Salesforce for a specified year, and these details are then appended to a Microsoft Excel Online worksheet with the specified campaign information.
 models: {}
