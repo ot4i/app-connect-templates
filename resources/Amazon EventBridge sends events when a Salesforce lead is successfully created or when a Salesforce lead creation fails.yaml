@@ -216,5 +216,5 @@ integration:
                           2/response/payload
                       - variable: flowDetails
                         $ref: '#/flowDetails'
-  name: Amazon EventBridge sends events whenever a Salesforce lead is successfully created or whenever a Salesforce lead creation fails
+  name: Amazon EventBridge sends events when a Salesforce lead is successfully created or when a Salesforce lead creation fails
 models: {}
