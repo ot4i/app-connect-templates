@@ -1166,7 +1166,7 @@
    "summary": "Microsoft Excel Online to 3 applications",
    "sourceApp": "msexcel",
    "targetApps": ["salesforce", "amazoneventbridge", "slack"],
-   "tags": ["msexcel", "salesforce", "amazoneventbridge", "slack", "if" "addErrorCatch"],
+   "tags": ["msexcel", "salesforce", "amazoneventbridge", "slack", "if", "addErrorCatch"],
    "offerings": ["app connect professional"]
   }
   ]
