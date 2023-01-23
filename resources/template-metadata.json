@@ -1159,6 +1159,15 @@
    "targetApps": ["jenkins", "slack"],
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
-  }
+  },
+  {
+    "name": "Create a customer in Square when a new customer created in Shopify",
+    "description": "This template creates a new customer in Square when a new customer is created in Shopify.",
+    "summary": "Shopify to 1 application",
+    "sourceApp": "Shopify",
+    "targetApps": ["Square"],
+    "tags": ["Shopify", "Square"],
+    "offerings": ["app connect professional"]
+   }            
   ]
 }
