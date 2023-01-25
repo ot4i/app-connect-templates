@@ -170,4 +170,6 @@ integration:
                       status-code: 200
               output-schema: {}
   name: Use Slack to notify of unprocessed UKG leave requests
+  description: >-
+    Use this template to send a Slack notification about unprocessed UKG leave requests.
 models: {}
