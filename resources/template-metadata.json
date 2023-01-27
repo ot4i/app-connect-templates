@@ -1161,12 +1161,12 @@
    "offerings": ["app connect professional"]
   },
    {
-    "name": "Insert a data into Snowflake table when a new file is created in Amazon S3",
-    "description": "This template inserts a data into Snowflake table when a new file is created with data in Amazon S3 bucket.",
+    "name": "Insert data into the Snowflake table when a new file gets created in Amazon S3",
+    "description": "Use this template to add data to a Snowflake table whenever a new file gets created in the Amazon S3 bucket.",
     "summary": "Snowflake to 1 application",
-    "sourceApp": "Snowflake",
-    "targetApps": ["Amazon S3"],
-    "tags": ["Snowflake", "Amazon S3"],
+    "sourceApp": "snowflake",
+    "targetApps": ["amazon S3"],
+    "tags": ["snowflake", "amazon S3"],
     "offerings": ["app connect professional"]
    }
   ]
