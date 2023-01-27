@@ -127,7 +127,7 @@ integration:
                       - ContentType:
                           template: '{{$AmazonS3Createobject.Key}}'
                   input: []
-  name: Snowflake Usecase
+  name: Insert data into the Snowflake table when a new file gets created in Amazon S3
 models:
   table:
     name: table
