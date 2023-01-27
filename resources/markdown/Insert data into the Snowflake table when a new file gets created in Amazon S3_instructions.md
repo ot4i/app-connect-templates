@@ -9,4 +9,4 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 
 The flow is started whenever a new file gets created in Amazon s3.
 
-For more information, visit the IBM Integration Community for this use case. See, [Using IBM® App Connect to interact with Snowflake](https://community.ibm.com/community/user/blogs/deepak-ayilliath/2023/01/27/using-ibm-app-connect-to-interact-with-snowflake).
+For more information, visit the IBM Integration Community for this use case. See, [Using IBM® App Connect to interact with Snowflake](https://community.ibm.com/community/user/integration/blogs/deepak-ayilliath/2023/01/27/using-ibm-app-connect-to-interact-with-snowflake).
