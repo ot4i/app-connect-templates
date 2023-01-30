@@ -1159,6 +1159,15 @@
    "targetApps": ["jenkins", "slack"],
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Transfer customer between Square and Shopify",
+   "description": "Use this template to transfer a customer between square and shopify.",
+   "summary": "Square to 1 application",
+   "sourceApp": "square",
+   "targetApps": ["shopify"],
+   "tags": ["square", "shopify"],
+   "offerings": ["app connect professional"]
   }
   ]
 }
