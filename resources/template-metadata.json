@@ -1159,6 +1159,15 @@
    "targetApps": ["jenkins", "slack"],
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
-  }
+  },
+  {
+   "name": "create employees in Freshteam and insert employee data into Smartsheet",
+   "description": "This template creates an employees in Freshteam and then insert data into Smartsheet.",
+   "summary": "Freshteam to Smartsheet",
+   "sourceApp": "Freshteam",
+   "targetApps": ["Smartsheet"],
+   "tags": ["Freshteam", "Smartsheet"],
+   "offerings": ["app connect professional"]
+  }              
   ]
 }
