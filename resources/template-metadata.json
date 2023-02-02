@@ -1159,6 +1159,15 @@
    "targetApps": ["jenkins", "slack"],
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
-  }
+  },
+  {
+    "name": "Transfer customer between Quickbooks and Shopify",
+    "description": "Use this template to transfer a customer between quickbooks and shopify.",
+    "summary": "Quickbooks to 1 application",
+    "sourceApp": "quickbooks",
+    "targetApps": ["shopify"],
+    "tags": ["quickbooks", "shopify"],
+    "offerings": ["app connect professional"]
+   }
   ]
 }
