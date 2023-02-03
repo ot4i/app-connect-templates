@@ -1,0 +1,186 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createTable:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: table
+          output-context:
+            data: table
+      options:
+        resources:
+          - business-object: table
+            model:
+              $ref: '#/models/table'
+            triggers:
+              create: createTable
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: stage
+      connector-type: snowflake
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: copy
+      connector-type: snowflake
+      actions:
+        COPY_INTO_TABLE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - ContentType:
+                      template: '{{$Request.ContentType}}'
+                  - Key:
+                      template: '{{$Request.Key}}'
+                  - bucketName:
+                      template: fr45rt
+                  - content:
+                      template: '{{$Request.content}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Snowflake Create stage
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - aws_bucket_s3_url:
+                      template: '{{$Request.aws_bucket_s3_url}}'
+                  - aws_key_id:
+                      template: '{{$Request.aws_key_id}}'
+                  - aws_secret_key:
+                      template: '{{$Request.aws_secret_key}}'
+                  - name:
+                      template: '{{$Request.name}}'
+                  - stagetypename:
+                      template: Amazon S3
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Createobject
+                    $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Snowflake Copy data into table
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: COPY_INTO_TABLE
+              map:
+                mappings:
+                  - filename:
+                      template: '{{$Request.filename}}'
+                  - stagePath:
+                      template: '{{$Request.stagePath}}'
+                  - tablename:
+                      template: Persons1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Createobject
+                    $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                  - variable: SnowflakeCreatestage
+                    $ref: '#/node-output/Snowflake Create stage/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: table successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: AmazonS3Createobject
+                        $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - ContentType:
+                          template: '{{$AmazonS3Createobject.Key}}'
+                  input: []
+  name: Insert data into the Snowflake table when a new file gets created in Amazon S3
+models:
+  table:
+    name: table
+    properties:
+      ContentType:
+        required: false
+        id: true
+        type: string
+      Key:
+        required: false
+        id: false
+        type: string
+      bucketName:
+        required: false
+        id: false
+        type: string
+      content:
+        required: false
+        id: false
+        type: string
+      aws_bucket_s3_url:
+        required: false
+        id: false
+        type: string
+      aws_key_id:
+        required: false
+        id: false
+        type: string
+      aws_secret_key:
+        required: false
+        id: false
+        type: string
+      name:
+        required: false
+        id: false
+        type: string
+      stagetypename:
+        required: false
+        id: false
+        type: string
+      filename:
+        required: false
+        id: false
+        type: string
+      stagePath:
+        required: false
+        id: false
+        type: string
+      tablename:
+        required: false
+        id: false
+        type: string
+    plural: table
+    description: 'Use this template to add data to a Snowflake table whenever a new file gets created in the Amazon S3 bucket.'
+    operations:
+      create: '#/integration/assemblies/assembly-1'
