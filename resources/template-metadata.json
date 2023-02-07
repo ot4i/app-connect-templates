@@ -1160,7 +1160,7 @@
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
   },
-   {
+  {
     "name": "Insert data into the Snowflake table when a new file gets created in Amazon S3",
     "description": "Use this template to add data to a Snowflake table whenever a new file gets created in the Amazon S3 bucket.",
     "summary": "Snowflake to 1 application",
@@ -1168,6 +1168,24 @@
     "targetApps": ["amazon S3"],
     "tags": ["snowflake", "amazon S3"],
     "offerings": ["app connect professional"]
-   }
+   },
+   {
+    "name": "Create a platform event in Salesforce whenever a product is created or updated in Microsoft Dynamics 365 for Sales",
+    "description": "Use this template to create a platform event whenever a product is created or updated in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to 3 applications",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["salesforce", "slack"],
+    "tags": ["msdynamicscrmrest", "salesforce", "slack", "if"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Send a Gmail message when a platform event is triggered",
+    "description": "Use this template to send a Gmail message to the subscribers of the platform event.",
+    "summary": "Salesforce to Gmail",
+    "sourceApp": "salesforce",
+    "targetApps": ["gmail"],
+    "tags": ["salesforce", "gmail"],
+    "offerings": ["app connect professional"]
+   }                
   ]
 }
