@@ -1,0 +1,192 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Product
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: msdynamicscrmrest
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Covid_Vaccination_mumbai__e
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: Vaccination__e
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.quantityonhand}}':
+                          gt: '0'
+                      - '{{$Trigger.name}}': Covishield Vaccine
+                      - '{{$Trigger.description}}': Pune
+                  execute:
+                    - create-action:
+                        name: Salesforce Create covid vaccination pune
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - Available_Doses__c:
+                                expression: $Trigger.quantityonhand
+                            - Event__c:
+                                template: '{{$Trigger.name}}'
+                            - Location__c:
+                                template: '{{$Trigger.description}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceCreatecovidvaccination
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Create covid
+                                vaccination/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C0231CQCJ7J
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Stock for {{$Trigger.name}} is available.....
+                                  Platform event
+                                  {{$SalesforceCreatecovidvaccination}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceCreatecovidvaccination
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Create covid
+                                vaccination/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    and:
+                      - '{{$Trigger.quantityonhand}}':
+                          gt: '0'
+                      - '{{$Trigger.name}}': Covishield Vaccine
+                      - '{{$Trigger.description}}': Mumbai
+                  execute:
+                    - create-action:
+                        name: Salesforce Create covid vaccination mumbai
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Available_Doses__c:
+                                expression: '$Trigger.quantityonhand '
+                            - Event__c:
+                                template: '{{$Trigger.name}}'
+                            - Location__c:
+                                template: '{{$Trigger.description}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C0231CQCJ7J
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Stock for {{$Trigger.name}} is available.....
+                                  Platform event
+                                  {{$SalesforceCreatecovidvaccinationmumbai}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceCreatecovidvaccinationmumbai
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Create covid
+                                vaccination mumbai/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C0231CQCJ7J
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: Condition not working :(
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties: {}
+  name: Create a platform event in Salesforce whenever a product is created or updated in Microsoft Dynamics 365 for Sales
+models: {}
