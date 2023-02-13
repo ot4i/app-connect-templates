@@ -1166,7 +1166,7 @@
     "summary": "Snowflake to 1 application",
     "sourceApp": "snowflake",
     "targetApps": ["amazons3"],
-    "tags": ["snowflake", "amazons3"],
+    "tags": ["api" "snowflake", "amazons3"],
     "offerings": ["app connect professional"]
    }
   ]
