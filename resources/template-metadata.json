@@ -1170,8 +1170,8 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Sync Jira issue attachments with Microsoft OneDrive for Business",
-   "description": "Use this template to sync Jira issue attachments with Microsoft OneDrive for Business. When a new issue with attachments gets created in Jira, a file containing the attachments gets created in Microsoft OneDrive for Business, helping you keep the attachments in sync.",
+   "name": "Upload the attachments to Microsoft OneDrive for Business whenever a new issue with attachments is created in Jira",
+   "description": "Use this template to create a file with the attachment content in Microsoft OneDrive for Business when a new issue with attachments gets created in Jira.",
    "summary": "Jira to 3 applications",
    "sourceApp": "jira",
    "targetApps": ["jira", "jira", "msonedrive"],
