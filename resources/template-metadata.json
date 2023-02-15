@@ -668,7 +668,7 @@
   {
    "name": "Send a Microsoft Teams message when a new product is created in Microsoft Dynamics 365",
    "description": "This template creates a new Microsoft Teams message when a new product is created in Microsoft Dynamics 365 for Sales.",
-   "summary": " Microsoft Dynamics 365 to Microsoft Teams",
+   "summary": "Microsoft Dynamics 365 to Microsoft Teams",
    "sourceApp": "msdynamicscrmrest",
    "targetApps": ["msteams"],
    "tags": ["msdynamicscrmrest", "msteams"],
@@ -1192,7 +1192,7 @@
     "description": "Use this template to create the lead’s details in Insightly and Amazon DynamoDB whenever a new lead is created in Salesforce.",
     "summary": "Salesforce to 5 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["salesforce", " insightly", "amazondynamodb", "salesforce", "slack"],
+    "targetApps": ["salesforce", "insightly", "amazondynamodb", "salesforce", "slack"],
     "tags": ["salesforce", "insightly", "amazondynamodb", "slack", "if"],
     "offerings": ["app connect professional"]
    },
@@ -1201,7 +1201,7 @@
     "description": "Use this template to update the lead’s details in Insightly and Amazon DynamoDB whenever a new lead is updated in Salesforce.",
     "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["salesforce", " insightly", "amazondynamodb", "slack"],
+    "targetApps": ["salesforce", "insightly", "amazondynamodb", "slack"],
     "tags": ["salesforce", "insightly", "amazondynamodb", "slack", "if"],
     "offerings": ["app connect professional"]
    } 
