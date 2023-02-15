@@ -149,7 +149,7 @@ integration:
                     $ref: '#/node-output/Jira Retrieve issue attachments/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Sync Jira issue attachments with Microsoft OneDrive for Business
+  name: Upload the attachments to Microsoft OneDrive for Business whenever a new issue with attachments is created in Jira
   description: >-
-    When a new issue with attachments gets created in Jira, a file containing the attachments gets created in Microsoft OneDrive for Business, helping you keep the attachments in sync.
+    When a new issue with attachments gets created in Jira, a file containing the attachments gets created in Microsoft OneDrive for Business.
 models: {}
