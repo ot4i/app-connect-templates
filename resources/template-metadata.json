@@ -1165,8 +1165,8 @@
     "description": "Use this template to add data to a Snowflake table whenever a new file gets created in the Amazon S3 bucket.",
     "summary": "Snowflake to 1 application",
     "sourceApp": "snowflake",
-    "targetApps": ["amazon S3"],
-    "tags": ["snowflake", "amazon S3"],
+    "targetApps": ["amazons3"],
+    "tags": ["snowflake", "amazons3"],
     "offerings": ["app connect professional"]
    },
    {
