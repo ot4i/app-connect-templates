@@ -448,5 +448,5 @@ integration:
                       leads/response
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Store lead details in Insightly and Amazon DynamoDB whenever a lead is created in Salesforce
+  name: Create lead in Insightly and store the details in Amazon DynamoDB whenever a new lead is created in Salesforce
 models: {}
