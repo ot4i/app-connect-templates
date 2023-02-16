@@ -931,7 +931,7 @@
    "description": "Use this template to retrieve worker details from Oracle Human Capital Management and create an entry in Google Sheets whenever a worker’s status is inactive.",
    "summary": "Scheduler to 5 applications",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["oraclehcm", "oraclehcm", "oraclehcm", "googlesheet", "slack"],
+   "targetApps": ["oraclehcm", "googlesheet", "slack"],
    "tags": ["oraclehcm", "slack", "googlesheet", "scheduler", "foreach", "setVariable", "if", "JSON parser"],
    "offerings": ["app connect professional"]
   },
