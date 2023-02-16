@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](Amazon%20EventBridge%20sends%20events%20when%20a%20Salesforce%20lead%20is%20successfully%20created%20or%20when%20a%20Salesforce%20lead%20creation%20fails_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Amazon%20EventBridge%20sends%20events%20when%20a%20Salesforce%20lead%20is%20successfully%20created%20or%20when%20a%20Salesforce%20lead%20creation%20fails_instructions.md) (opens in a new window).
 
 1.	Click **Create flow** to start using the template.
 2.	Connect to the following accounts by using your credentials:
