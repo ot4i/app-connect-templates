@@ -7,5 +7,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Slack**
 3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
-The flow is a scheduler-based flow that retrieves purchase orders from IBM Maximo. </br>Use this template to create a supplier and invoice in Coupa for each purchase order retrieved from IBM Maximo. 
-A Slack message is then sent to the intended channel with the supplier and invoice details.
+The flow is a scheduler-based flow that retrieves purchase orders from IBM Maximo. 
+
+Use this template to create a supplier and invoice in Coupa for each purchase order retrieved from IBM Maximo. A Slack message is then sent to the intended channel with the supplier and invoice details.
