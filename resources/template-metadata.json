@@ -1188,17 +1188,17 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Store lead details in Insightly and Amazon DynamoDB whenever a new lead is created in Salesforce",
-    "description": "Use this template to create the lead’s details in Insightly and Amazon DynamoDB whenever a new lead is created in Salesforce.",
-    "summary": "Salesforce to 5 applications",
+    "name": "Create lead in Insightly and store the details in Amazon DynamoDB whenever a new lead is created in Salesforce",
+    "description": "Use this template to create a lead with the lead’s details in Insightly, and store the information of the lead in Amazon DynamoDB whenever a new lead is created in Salesforce.",
+    "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
-    "targetApps": ["salesforce", "insightly", "amazondynamodb", "salesforce", "slack"],
-    "tags": ["salesforce", "insightly", "amazondynamodb", "slack", "if"],
+    "targetApps": ["salesforce", "insightly", "amazondynamodb", "salesforce"],
+    "tags": ["salesforce", "insightly", "amazondynamodb", "if"],
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Store lead details in Insightly and Amazon DynamoDB whenever a lead is updated in Salesforce",
-    "description": "Use this template to update the lead’s details in Insightly and Amazon DynamoDB whenever a new lead is updated in Salesforce.",
+    "name": "Update lead in Insightly and store the updated details in Amazon DynamoDB whenever a lead is updated in Salesforce",
+    "description": "Use this template to update a lead or its details in Insightly, and store the updated information in Amazon DynamoDB whenever a new lead is created in Salesforce.",
     "summary": "Salesforce to 4 applications",
     "sourceApp": "salesforce",
     "targetApps": ["salesforce", "insightly", "amazondynamodb", "slack"],
