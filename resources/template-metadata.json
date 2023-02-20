@@ -929,12 +929,12 @@
   {
    "name": "Create a list of workers for an upcoming assignment in Google Sheets from Oracle HCM worker records",
    "description": "Use this template to retrieve worker details from Oracle Human Capital Management and create an entry in Google Sheets whenever a worker’s status is inactive.",
-   "summary": "Scheduler to 4 applications",
+   "summary": "Scheduler to 5 applications",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["oraclehcm", "slack", "msteams", "googlesheet"],
-   "tags": ["oraclehcm", "slack", "msteams", "googlesheet", "batch", "scheduler"],
+   "targetApps": ["oraclehcm", "googlesheet", "slack"],
+   "tags": ["oraclehcm", "slack", "googlesheet", "scheduler", "foreach", "setVariable", "if", "JSON parser"],
    "offerings": ["app connect professional"]
-  },  
+  },
   {
    "name": "Create a new IBM EWM work item when a new incident is logged in ServiceNow",
    "description": "Use this template to create a work item in IBM Engineering Workflow Management whenever a new incident is logged in ServiceNow. A notification is then sent to the relevant squad through Microsoft Teams.",
@@ -951,15 +951,6 @@
    "sourceApp": "ibmsterlingoms",
    "targetApps": ["flexengage"],
    "tags": ["ibmsterlingoms", "flexengage"],
-   "offerings": ["app connect professional"]
-  },  
-  {
-   "name": "Create a ticket in Zendesk Service when a new email is received",
-   "description": "Use this template to create a ticket with the email details and attachments when you receive a new email through the connected email server account. A notification gets sent through a Slack channel upon successfully creating a ticket.",
-   "summary": "Email to 2 applications",
-   "sourceApp": "email",
-   "targetApps": ["zendeskservice", "slack"],
-   "tags": ["email", "zendeskservice", "slack"],
    "offerings": ["app connect professional"]
   },  
   {
@@ -1204,6 +1195,51 @@
     "targetApps": ["salesforce", "insightly", "amazondynamodb", "slack"],
     "tags": ["salesforce", "insightly", "amazondynamodb", "slack", "if"],
     "offerings": ["app connect professional"]
-   } 
-  ]
+   },
+  {
+   "name": "Retrieve campaign-related records from Salesforce and update the rows in Microsoft Excel Online with campaign details",
+   "description": "Use this template to retrieve campaigns and their members' records from Salesforce and update the rows in the Microsoft Excel Online worksheet with the campaign details. Campaign-related information is queried from Salesforce for a specified year, and these details are then appended to a Microsoft Excel Online worksheet with the specified campaign information.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "msexcel", "slack"],
+   "tags": ["salesforce", "msexcel", "slack", "scheduler", "foreach", "setVariable"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a supplier and invoice in Coupa for each purchase order retrieved from IBM Maximo",
+   "description": "Use this template to create a supplier and invoice in Coupa for each purchase order retrieved from IBM Maximo. A Slack message is then sent to the intended channel with the supplier and invoice details.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["maximo", "coupa", "slack"],
+   "tags": ["scheduler", "maximo", "coupa", "slack", "setVariable", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Amazon EventBridge sends events when a Salesforce lead is successfully created or when a Salesforce lead creation fails",
+   "description": "Use this template to create a lead in Salesforce when a new row is appended to the Microsoft Excel Online worksheet. Upon each successful lead creation in Salesforce, Amazon EventBridge sends events to the specified event bus. A Slack notification then confirms that the event has been published.",
+   "summary": "Microsoft Excel Online to 3 applications",
+   "sourceApp": "msexcel",
+   "targetApps": ["salesforce", "amazoneventbridge", "slack"],
+   "tags": ["msexcel", "salesforce", "amazoneventbridge", "slack", "if", "addErrorCatch"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever a Gmail message is received",
+   "description": "Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk whenever an email is received from a Gmail account. ",
+   "summary": "Gmail to 2 applications",
+   "sourceApp": "gmail",
+   "targetApps": ["msonedrive", "msonedrive", "zendeskservice"],
+   "tags": ["gmail", "msonedrive", "zendeskservice"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Upload the attachments to Microsoft OneDrive for Business whenever a new issue with attachments is created in Jira",
+   "description": "Use this template to create a file with the attachment content in Microsoft OneDrive for Business when a new issue with attachments gets created in Jira.",
+   "summary": "Jira to 3 applications",
+   "sourceApp": "jira",
+   "targetApps": ["jira", "jira", "msonedrive"],
+   "tags": ["jira", "msonedrive", "foreach"],
+   "offerings": ["app connect professional"]
+  }
+]
 }
