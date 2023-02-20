@@ -1,0 +1,237 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: invoices
+      connector-type: coupa
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: suppliers
+      connector-type: coupa
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: mxapipo
+      connector-type: maximo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      millis:
+                        type: number
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - millis:
+                            expression: '$toMillis($Trigger.currentEventTime ) '
+          - retrieve-action:
+              name: IBM Maximo Retrieve purchase orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  orderdate:
+                    gte: >-
+                      {{$formatDate($Setvariable.variable.millis , "YYYY-MM-DD",
+                      "UTC")}} 
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 50000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$IBMMaximoRetrievepurchaseorders '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRetrievepurchaseorders
+                    $ref: >-
+                      #/node-output/IBM Maximo Retrieve purchase
+                      orders/response/payload
+                  - variable: IBMMaximoRetrievepurchaseordersMetadata
+                    $ref: '#/node-output/IBM Maximo Retrieve purchase orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: IBM Maximo mxapipo
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Coupa Create supplier
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - invoice-matching-level:
+                      template: 2-way
+                  - name:
+                      template: maxi_{{$Foreachitem.vendor}}_{{$Foreachitem.ponum}}
+                  - po-method:
+                      template: prompt
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: IBMMaximoRetrievepurchaseorders
+                    $ref: >-
+                      #/node-output/IBM Maximo Retrieve purchase
+                      orders/response/payload
+                  - variable: IBMMaximoRetrievepurchaseordersMetadata
+                    $ref: '#/node-output/IBM Maximo Retrieve purchase orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Coupa Create invoice
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - currency:
+                      mappings:
+                        - code:
+                            template: USD
+                  - invoice-date:
+                      template: '2022-12-26T00:00:00'
+                  - invoice-number:
+                      template: maxi_{{$Foreachitem.ponum}}
+                  - supplier_id:
+                      template: '1'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CoupaCreatesupplier
+                    $ref: >-
+                      #/block/For each/node-output/Coupa Create
+                      supplier/response/payload
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: IBMMaximoRetrievepurchaseorders
+                    $ref: >-
+                      #/node-output/IBM Maximo Retrieve purchase
+                      orders/response/payload
+                  - variable: IBMMaximoRetrievepurchaseordersMetadata
+                    $ref: '#/node-output/IBM Maximo Retrieve purchase orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Coupa created :
+                        {{$CoupaCreateinvoice.id}}and{{$CoupaCreatesupplier.id}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CoupaCreatesupplier
+                    $ref: >-
+                      #/block/For each/node-output/Coupa Create
+                      supplier/response/payload
+                  - variable: CoupaCreateinvoice
+                    $ref: >-
+                      #/block/For each/node-output/Coupa Create
+                      invoice/response/payload
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: IBMMaximoRetrievepurchaseorders
+                    $ref: >-
+                      #/node-output/IBM Maximo Retrieve purchase
+                      orders/response/payload
+                  - variable: IBMMaximoRetrievepurchaseordersMetadata
+                    $ref: '#/node-output/IBM Maximo Retrieve purchase orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a supplier and invoice in Coupa for each purchase order retrieved from IBM Maximo
+models: {}
