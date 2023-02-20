@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome to IBM App Connect [Part 4 of 4]: Create flows for an API](https://www.youtube.com/watch?v=4m4lS5b8Xlw&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) video, which creates an API to update flower orders in Salesforce, and add new orders to a Trello board.
+This template creates the flow from the [Welcome to IBM App Connect [Part 4 of 4]: Create flows for an API](https://www.youtube.com/watch?v=RgYAIl5lXt4&list=PL_4RxtD-BL5tKxx9GiR2BH146ZUC21cOp) video, which creates an API to update flower orders in Salesforce, and add new orders to a Trello board.
 
 ## Prerequisites
 

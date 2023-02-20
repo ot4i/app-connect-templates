@@ -27,38 +27,20 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-    trigger-interface-2:
-      type: extract-trigger
-      triggers:
-        RETRIEVEALL:
-          input-context:
-            data: worker
-          assembly:
-            $ref: '#/integration/assemblies/assembly-2'
-      connector-type: oraclehcm
-    trigger-interface-3:
-      type: batch-completion-trigger
-      triggers:
-        COMPLETE:
-          assembly:
-            $ref: '#/integration/assemblies/assembly-3'
   action-interfaces:
     action-interface-1:
-      type: batch-action
+      type: api-action
+      business-object: worker
+      connector-type: oraclehcm
       actions:
-        START: {}
-      options:
-        extract:
-          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
-        completion:
-          $ref: '#/integration/trigger-interfaces/trigger-interface-3'
-    action-interface-3:
+        RETRIEVEALL: {}
+    action-interface-2:
       type: api-action
       business-object: workerAssignment
       connector-type: oraclehcm
       actions:
         RETRIEVEALL: {}
-    action-interface-5:
+    action-interface-3:
       type: api-action
       business-object: talentPersonProfile
       connector-type: oraclehcm
@@ -66,57 +48,613 @@ integration:
         RETRIEVEALL: {}
     action-interface-4:
       type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
-    action-interface-2:
+    action-interface-7:
       type: api-action
       business-object: Message
       connector-type: msteams
       actions:
         CREATE: {}
-    action-interface-7:
-      type: api-action
-      business-object: worksheetRow
-      connector-type: googlesheet
-      actions:
-        CREATE: {}
-    action-interface-6:
-      type: api-action
-      business-object: payroll
-      connector-type: oraclehcm
-      actions:
-        CREATEASSIGNEDPAYROLL: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
-          - batch-retrieve-action:
-              name: Batch process
-              filter:
-                limit: 50
-              pagination-type: SKIP_LIMIT
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve workers
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 50
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrieveworkers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      work-relationship:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/For each/node-output/JSON Parser
+                      Parse/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkerassignments
+                    $ref: >-
+                      #/block/For each/node-output/Oracle Human Capital
+                      Management Retrieve worker assignments/response/payload
+                  - variable: >-
+                      OracleHumanCapitalManagementRetrieveworkerassignmentsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Oracle Human Capital
+                      Management Retrieve worker assignments/response
+                  - variable: MicrosoftTeamsSendmessagetochannel
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Teams Send message
+                      to channel/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              display-name: Oracle Human Capital Management worker
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              Google sheet is updated with workers Allocation
+                              status - latest
+                  - channelId:
+                      template: 19:1c42e7ae98024015a55fa41f009ada61@thread.tacv2
+                  - subject:
+                      template: UC--HCM
+                  - teamId:
+                      template: 4249438b-2d4b-4d19-9624-cbad5dcbec81
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
     assembly-2:
       assembly:
         execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Output:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Output:
+                            template: '{{$string($Foreachitem.AdditionalProperties )}}'
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Setvariable.variable.Output}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: "{\n\t\"PersonId\": 3,\n\t\"PersonNumber\": \"1158\",\n\t\"CorrespondenceLanguage\": null,\n\t\"BloodType\": null,\n\t\"DateOfBirth\": null,\n\t\"DateOfDeath\": null,\n\t\"CountryOfBirth\": null,\n\t\"RegionOfBirth\": null,\n\t\"TownOfBirth\": null,\n\t\"ApplicantNumber\": null,\n\t\"CreatedBy\": \"HCM.User\",\n\t\"CreationDate\": \"2022-02-02T09:10:34+00:00\",\n\t\"LastUpdatedBy\": \"HCM.User\",\n\t\"LastUpdateDate\": \"2022-02-02T09:11:19.049+00:00\",\n\t\"workersEFF\": [{\n\t\t\"PersonId\": 3,\n\t\t\"CategoryCode\": \"PER_EIT\"\n\t}],\n\t\"workersDFF\": [{\n\t\t\"PersonId\": 3,\n\t\t\"companyVechicleAssigned\": \"No\",\n\t\t\"ibmParkingLot\": null,\n\t\t\"domicileState\": null,\n\t\t\"__FLEX_Context\": null\n\t}],\n\t\"addresses\": [],\n\t\"citizenships\": [],\n\t\"driverLicenses\": [],\n\t\"emails\": [],\n\t\"ethnicities\": [],\n\t\"externalIdentifiers\": [],\n\t\"legislativeInfo\": [{\n\t\t\"PersonLegislativeId\": 300000061813148,\n\t\t\"EffectiveStartDate\": \"2022-02-02\",\n\t\t\"EffectiveEndDate\": \"4712-12-31\",\n\t\t\"LegislationCode\": \"US\",\n\t\t\"Gender\": null,\n\t\t\"MaritalStatus\": null,\n\t\t\"MaritalStatusChangeDate\": null,\n\t\t\"HighestEducationLevel\": null,\n\t\t\"CreatedBy\": \"HCM.User\",\n\t\t\"CreationDate\": \"2022-02-02T09:10:47.133+00:00\",\n\t\t\"LastUpdatedBy\": \"HCM.User\",\n\t\t\"LastUpdateDate\": \"2022-02-02T09:10:56.279+00:00\"\n\t}],\n\t\"names\": [{\n\t\t\"PersonNameId\": 300000061813100,\n\t\t\"EffectiveStartDate\": \"2022-02-02\",\n\t\t\"EffectiveEndDate\": \"4712-12-31\",\n\t\t\"LegislationCode\": \"US\",\n\t\t\"LastName\": \"tes\",\n\t\t\"FirstName\": \"sari\",\n\t\t\"Title\": null,\n\t\t\"PreNameAdjunct\": null,\n\t\t\"Suffix\": null,\n\t\t\"MiddleNames\": null,\n\t\t\"Honors\": null,\n\t\t\"KnownAs\": null,\n\t\t\"PreviousLastName\": null,\n\t\t\"DisplayName\": \"sari tes\",\n\t\t\"OrderName\": \"tes sari\",\n\t\t\"ListName\": \"tes, sari\",\n\t\t\"FullName\": \"tes, sari\",\n\t\t\"MilitaryRank\": null,\n\t\t\"NameLanguage\": \"US\",\n\t\t\"NameInformation1\": \"sari tes\",\n\t\t\"NameInformation2\": null,\n\t\t\"NameInformation3\": null,\n\t\t\"NameInformation4\": null,\n\t\t\"NameInformation5\": null,\n\t\t\"NameInformation6\": null,\n\t\t\"NameInformation7\": null,\n\t\t\"NameInformation8\": null,\n\t\t\"NameInformation9\": null,\n\t\t\"NameInformation10\": null,\n\t\t\"NameInformation11\": null,\n\t\t\"NameInformation12\": null,\n\t\t\"NameInformation13\": null,\n\t\t\"NameInformation14\": null,\n\t\t\"NameInformation15\": null,\n\t\t\"NameInformation16\": null,\n\t\t\"NameInformation17\": null,\n\t\t\"NameInformation18\": null,\n\t\t\"NameInformation19\": null,\n\t\t\"NameInformation20\": null,\n\t\t\"NameInformation21\": null,\n\t\t\"NameInformation22\": null,\n\t\t\"NameInformation23\": null,\n\t\t\"NameInformation24\": null,\n\t\t\"NameInformation25\": null,\n\t\t\"NameInformation26\": null,\n\t\t\"NameInformation27\": null,\n\t\t\"NameInformation28\": null,\n\t\t\"NameInformation29\": null,\n\t\t\"NameInformation30\": null,\n\t\t\"CreatedBy\": \"HCM.User\",\n\t\t\"CreationDate\": \"2022-02-02T09:10:34.234+00:00\",\n\t\t\"LastUpdatedBy\": \"HCM.User\",\n\t\t\"LastUpdateDate\": \"2022-02-02T09:10:42.695+00:00\",\n\t\t\"LocalPersonNameId\": 300000061813101,\n\t\t\"LocalEffectiveStartDate\": \"2022-02-02\",\n\t\t\"LocalEffectiveEndDate\": \"4712-12-31\",\n\t\t\"LocalLegislationCode\": \"US\",\n\t\t\"LocalLastName\": \"tes\",\n\t\t\"LocalFirstName\": \"sari\",\n\t\t\"LocalTitle\": null,\n\t\t\"LocalPreNameAdjunct\": null,\n\t\t\"LocalSuffix\": null,\n\t\t\"LocalMiddleNames\": null,\n\t\t\"LocalHonors\": null,\n\t\t\"LocalKnownAs\": null,\n\t\t\"LocalPreviousLastName\": null,\n\t\t\"LocalDisplayName\": \"sari tes\",\n\t\t\"LocalOrderName\": \"tes sari\",\n\t\t\"LocalListName\": \"tes, sari\",\n\t\t\"LocalFullName\": \"tes sari\",\n\t\t\"LocalMilitaryRank\": null,\n\t\t\"LocalNameLanguage\": \"US\",\n\t\t\"LocalNameInformation1\": \"sari tes\",\n\t\t\"LocalNameInformation2\": null,\n\t\t\"LocalNameInformation3\": null,\n\t\t\"LocalNameInformation4\": null,\n\t\t\"LocalNameInformation5\": null,\n\t\t\"LocalNameInformation6\": null,\n\t\t\"LocalNameInformation7\": null,\n\t\t\"LocalNameInformation8\": null,\n\t\t\"LocalNameInformation9\": null,\n\t\t\"LocalNameInformation10\": null,\n\t\t\"LocalNameInformation11\": null,\n\t\t\"LocalNameInformation12\": null,\n\t\t\"LocalNameInformation13\": null,\n\t\t\"LocalNameInformation14\": null,\n\t\t\"LocalNameInformation15\": null,\n\t\t\"LocalNameInformation16\": null,\n\t\t\"LocalNameInformation17\": null,\n\t\t\"LocalNameInformation18\": null,\n\t\t\"LocalNameInformation19\": null,\n\t\t\"LocalNameInformation20\": null,\n\t\t\"LocalNameInformation21\": null,\n\t\t\"LocalNameInformation22\": null,\n\t\t\"LocalNameInformation23\": null,\n\t\t\"LocalNameInformation24\": null,\n\t\t\"LocalNameInformation25\": null,\n\t\t\"LocalNameInformation26\": null,\n\t\t\"LocalNameInformation27\": null,\n\t\t\"LocalNameInformation28\": null,\n\t\t\"LocalNameInformation29\": null,\n\t\t\"LocalNameInformation30\": null,\n\t\t\"LocalCreatedBy\": \"HCM.User\",\n\t\t\"LocalCreationDate\": \"2022-02-02T09:10:34.235+00:00\",\n\t\t\"LocalLastUpdatedBy\": \"HCM.User\",\n\t\t\"LocalLastUpdateDate\": \"2022-02-02T09:10:42.695+00:00\"\n\t}],\n\t\"nationalIdentifiers\": [],\n\t\"otherCommunicationAccounts\": [],\n\t\"passports\": [],\n\t\"phones\": [],\n\t\"photos\": [],\n\t\"religions\": [],\n\t\"visasPermits\": [],\n\t\"workRelationships\": [{\n\t\t\"PeriodOfServiceId\": 300000061813102,\n\t\t\"LegislationCode\": \"US\",\n\t\t\"LegalEntityId\": 300000017864733,\n\t\t\"LegalEmployerName\": \"114Vision America\",\n\t\t\"WorkerType\": \"E\",\n\t\t\"PrimaryFlag\": true,\n\t\t\"StartDate\": \"2022-02-02\",\n\t\t\"LegalEmployerSeniorityDate\": \"2022-02-02\",\n\t\t\"EnterpriseSeniorityDate\": \"2022-02-02\",\n\t\t\"OnMilitaryServiceFlag\": false,\n\t\t\"WorkerNumber\": null,\n\t\t\"ReadyToConvertFlag\": null,\n\t\t\"TerminationDate\": null,\n\t\t\"NotificationDate\": null,\n\t\t\"LastWorkingDate\": null,\n\t\t\"RevokeUserAccess\": null,\n\t\t\"RecommendedForRehire\": \"ORA_NS\",\n\t\t\"RecommendationReason\": null,\n\t\t\"RecommendationAuthorizedByPersonId\": null,\n\t\t\"CreatedBy\": \"HCM.User\",\n\t\t\"CreationDate\": \"2022-02-02T09:10:34.574+00:00\",\n\t\t\"LastUpdatedBy\": \"HCM.User\",\n\t\t\"LastUpdateDate\": \"2022-02-02T09:10:47.421+00:00\",\n\t\t\"ProjectedTerminationDate\": null\n\t}]\n}"
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  PersonId:
+                    type: number
+                  PersonNumber:
+                    type: string
+                  CorrespondenceLanguage:
+                    type: 'null'
+                  BloodType:
+                    type: 'null'
+                  DateOfBirth:
+                    type: 'null'
+                  DateOfDeath:
+                    type: 'null'
+                  CountryOfBirth:
+                    type: 'null'
+                  RegionOfBirth:
+                    type: 'null'
+                  TownOfBirth:
+                    type: 'null'
+                  ApplicantNumber:
+                    type: 'null'
+                  CreatedBy:
+                    type: string
+                  CreationDate:
+                    type: string
+                  LastUpdatedBy:
+                    type: string
+                  LastUpdateDate:
+                    type: string
+                  workersEFF:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        PersonId:
+                          type: number
+                        CategoryCode:
+                          type: string
+                  workersDFF:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        PersonId:
+                          type: number
+                        companyVechicleAssigned:
+                          type: string
+                        ibmParkingLot:
+                          type: 'null'
+                        domicileState:
+                          type: 'null'
+                        __FLEX_Context:
+                          type: 'null'
+                  addresses:
+                    type: array
+                    items: {}
+                  citizenships:
+                    type: array
+                    items: {}
+                  driverLicenses:
+                    type: array
+                    items: {}
+                  emails:
+                    type: array
+                    items: {}
+                  ethnicities:
+                    type: array
+                    items: {}
+                  externalIdentifiers:
+                    type: array
+                    items: {}
+                  legislativeInfo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        PersonLegislativeId:
+                          type: number
+                        EffectiveStartDate:
+                          type: string
+                        EffectiveEndDate:
+                          type: string
+                        LegislationCode:
+                          type: string
+                        Gender:
+                          type: 'null'
+                        MaritalStatus:
+                          type: 'null'
+                        MaritalStatusChangeDate:
+                          type: 'null'
+                        HighestEducationLevel:
+                          type: 'null'
+                        CreatedBy:
+                          type: string
+                        CreationDate:
+                          type: string
+                        LastUpdatedBy:
+                          type: string
+                        LastUpdateDate:
+                          type: string
+                  names:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        PersonNameId:
+                          type: number
+                        EffectiveStartDate:
+                          type: string
+                        EffectiveEndDate:
+                          type: string
+                        LegislationCode:
+                          type: string
+                        LastName:
+                          type: string
+                        FirstName:
+                          type: string
+                        Title:
+                          type: 'null'
+                        PreNameAdjunct:
+                          type: 'null'
+                        Suffix:
+                          type: 'null'
+                        MiddleNames:
+                          type: 'null'
+                        Honors:
+                          type: 'null'
+                        KnownAs:
+                          type: 'null'
+                        PreviousLastName:
+                          type: 'null'
+                        DisplayName:
+                          type: string
+                        OrderName:
+                          type: string
+                        ListName:
+                          type: string
+                        FullName:
+                          type: string
+                        MilitaryRank:
+                          type: 'null'
+                        NameLanguage:
+                          type: string
+                        NameInformation1:
+                          type: string
+                        NameInformation2:
+                          type: 'null'
+                        NameInformation3:
+                          type: 'null'
+                        NameInformation4:
+                          type: 'null'
+                        NameInformation5:
+                          type: 'null'
+                        NameInformation6:
+                          type: 'null'
+                        NameInformation7:
+                          type: 'null'
+                        NameInformation8:
+                          type: 'null'
+                        NameInformation9:
+                          type: 'null'
+                        NameInformation10:
+                          type: 'null'
+                        NameInformation11:
+                          type: 'null'
+                        NameInformation12:
+                          type: 'null'
+                        NameInformation13:
+                          type: 'null'
+                        NameInformation14:
+                          type: 'null'
+                        NameInformation15:
+                          type: 'null'
+                        NameInformation16:
+                          type: 'null'
+                        NameInformation17:
+                          type: 'null'
+                        NameInformation18:
+                          type: 'null'
+                        NameInformation19:
+                          type: 'null'
+                        NameInformation20:
+                          type: 'null'
+                        NameInformation21:
+                          type: 'null'
+                        NameInformation22:
+                          type: 'null'
+                        NameInformation23:
+                          type: 'null'
+                        NameInformation24:
+                          type: 'null'
+                        NameInformation25:
+                          type: 'null'
+                        NameInformation26:
+                          type: 'null'
+                        NameInformation27:
+                          type: 'null'
+                        NameInformation28:
+                          type: 'null'
+                        NameInformation29:
+                          type: 'null'
+                        NameInformation30:
+                          type: 'null'
+                        CreatedBy:
+                          type: string
+                        CreationDate:
+                          type: string
+                        LastUpdatedBy:
+                          type: string
+                        LastUpdateDate:
+                          type: string
+                        LocalPersonNameId:
+                          type: number
+                        LocalEffectiveStartDate:
+                          type: string
+                        LocalEffectiveEndDate:
+                          type: string
+                        LocalLegislationCode:
+                          type: string
+                        LocalLastName:
+                          type: string
+                        LocalFirstName:
+                          type: string
+                        LocalTitle:
+                          type: 'null'
+                        LocalPreNameAdjunct:
+                          type: 'null'
+                        LocalSuffix:
+                          type: 'null'
+                        LocalMiddleNames:
+                          type: 'null'
+                        LocalHonors:
+                          type: 'null'
+                        LocalKnownAs:
+                          type: 'null'
+                        LocalPreviousLastName:
+                          type: 'null'
+                        LocalDisplayName:
+                          type: string
+                        LocalOrderName:
+                          type: string
+                        LocalListName:
+                          type: string
+                        LocalFullName:
+                          type: string
+                        LocalMilitaryRank:
+                          type: 'null'
+                        LocalNameLanguage:
+                          type: string
+                        LocalNameInformation1:
+                          type: string
+                        LocalNameInformation2:
+                          type: 'null'
+                        LocalNameInformation3:
+                          type: 'null'
+                        LocalNameInformation4:
+                          type: 'null'
+                        LocalNameInformation5:
+                          type: 'null'
+                        LocalNameInformation6:
+                          type: 'null'
+                        LocalNameInformation7:
+                          type: 'null'
+                        LocalNameInformation8:
+                          type: 'null'
+                        LocalNameInformation9:
+                          type: 'null'
+                        LocalNameInformation10:
+                          type: 'null'
+                        LocalNameInformation11:
+                          type: 'null'
+                        LocalNameInformation12:
+                          type: 'null'
+                        LocalNameInformation13:
+                          type: 'null'
+                        LocalNameInformation14:
+                          type: 'null'
+                        LocalNameInformation15:
+                          type: 'null'
+                        LocalNameInformation16:
+                          type: 'null'
+                        LocalNameInformation17:
+                          type: 'null'
+                        LocalNameInformation18:
+                          type: 'null'
+                        LocalNameInformation19:
+                          type: 'null'
+                        LocalNameInformation20:
+                          type: 'null'
+                        LocalNameInformation21:
+                          type: 'null'
+                        LocalNameInformation22:
+                          type: 'null'
+                        LocalNameInformation23:
+                          type: 'null'
+                        LocalNameInformation24:
+                          type: 'null'
+                        LocalNameInformation25:
+                          type: 'null'
+                        LocalNameInformation26:
+                          type: 'null'
+                        LocalNameInformation27:
+                          type: 'null'
+                        LocalNameInformation28:
+                          type: 'null'
+                        LocalNameInformation29:
+                          type: 'null'
+                        LocalNameInformation30:
+                          type: 'null'
+                        LocalCreatedBy:
+                          type: string
+                        LocalCreationDate:
+                          type: string
+                        LocalLastUpdatedBy:
+                          type: string
+                        LocalLastUpdateDate:
+                          type: string
+                  nationalIdentifiers:
+                    type: array
+                    items: {}
+                  otherCommunicationAccounts:
+                    type: array
+                    items: {}
+                  passports:
+                    type: array
+                    items: {}
+                  phones:
+                    type: array
+                    items: {}
+                  photos:
+                    type: array
+                    items: {}
+                  religions:
+                    type: array
+                    items: {}
+                  visasPermits:
+                    type: array
+                    items: {}
+                  workRelationships:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        PeriodOfServiceId:
+                          type: number
+                        LegislationCode:
+                          type: string
+                        LegalEntityId:
+                          type: number
+                        LegalEmployerName:
+                          type: string
+                        WorkerType:
+                          type: string
+                        PrimaryFlag:
+                          type: boolean
+                        StartDate:
+                          type: string
+                        LegalEmployerSeniorityDate:
+                          type: string
+                        EnterpriseSeniorityDate:
+                          type: string
+                        OnMilitaryServiceFlag:
+                          type: boolean
+                        WorkerNumber:
+                          type: 'null'
+                        ReadyToConvertFlag:
+                          type: 'null'
+                        TerminationDate:
+                          type: 'null'
+                        NotificationDate:
+                          type: 'null'
+                        LastWorkingDate:
+                          type: 'null'
+                        RevokeUserAccess:
+                          type: 'null'
+                        RecommendedForRehire:
+                          type: string
+                        RecommendationReason:
+                          type: 'null'
+                        RecommendationAuthorizedByPersonId:
+                          type: 'null'
+                        CreatedBy:
+                          type: string
+                        CreationDate:
+                          type: string
+                        LastUpdatedBy:
+                          type: string
+                        LastUpdateDate:
+                          type: string
+                        ProjectedTerminationDate:
+                          type: 'null'
+                title: Parsed JSON
           - retrieve-action:
               name: Oracle Human Capital Management Retrieve worker assignments
               target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
+                $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
                 where:
                   and:
-                    - PeriodOfServiceId: >-
-                        {{$Batchprocess.AdditionalProperties.workRelationships[0].PeriodOfServiceId}}
-                    - WorkerUniqueId: '{{$Batchprocess.WorkerUniqueId}}'
+                    - PeriodOfServiceId: '{{$JSONParserParse.workRelationships.PeriodOfServiceId}}'
+                    - WorkerUniqueId: '{{$Foreachitem.WorkerUniqueId}}'
                 input:
-                  - variable: Batchprocess
-                    $ref: '#/block/Batch process/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/For each/node-output/JSON Parser
+                      Parse/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 50
@@ -126,19 +664,33 @@ integration:
           - if:
               name: If
               input:
-                - variable: Batchprocess
-                  $ref: '#/block/Batch process/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
                 - variable: Trigger
                   $ref: '#/trigger/payload'
+                - variable: Setvariable
+                  $ref: '#/block/For each/node-output/Set variable/response/payload'
+                - variable: JSONParserParse
+                  $ref: >-
+                    #/block/For each/node-output/JSON Parser
+                    Parse/response/payload
                 - variable: OracleHumanCapitalManagementRetrieveworkerassignments
                   $ref: >-
-                    #/block/Batch process/node-output/Oracle Human Capital
-                    Management Retrieve worker assignments/response/payload
+                    #/block/For each/node-output/Oracle Human Capital Management
+                    Retrieve worker assignments/response/payload
                 - variable: >-
                     OracleHumanCapitalManagementRetrieveworkerassignmentsMetadata
                   $ref: >-
-                    #/block/Batch process/node-output/Oracle Human Capital
-                    Management Retrieve worker assignments/response
+                    #/block/For each/node-output/Oracle Human Capital Management
+                    Retrieve worker assignments/response
+                - variable: OracleHumanCapitalManagementRetrieveworkers
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response/payload
+                - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response
                 - variable: flowDetails
                   $ref: '#/flowDetails'
               branch:
@@ -150,27 +702,44 @@ integration:
                           Oracle Human Capital Management Retrieve talent person
                           profiles
                         target:
-                          $ref: '#/integration/action-interfaces/action-interface-5'
+                          $ref: '#/integration/action-interfaces/action-interface-3'
                         filter:
                           where:
-                            PersonNumber: '{{$Batchprocess.PersonNumber}}'
+                            PersonNumber: '{{$Foreachitem.PersonNumber}}'
                           input:
-                            - variable: Batchprocess
-                              $ref: '#/block/Batch process/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
                             - variable: Trigger
                               $ref: '#/trigger/payload'
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/For each/node-output/Set
+                                variable/response/payload
+                            - variable: JSONParserParse
+                              $ref: >-
+                                #/block/For each/node-output/JSON Parser
+                                Parse/response/payload
                             - variable: >-
                                 OracleHumanCapitalManagementRetrieveworkerassignments
                               $ref: >-
-                                #/block/Batch process/node-output/Oracle Human
+                                #/block/For each/node-output/Oracle Human
                                 Capital Management Retrieve worker
                                 assignments/response/payload
                             - variable: >-
                                 OracleHumanCapitalManagementRetrieveworkerassignmentsMetadata
                               $ref: >-
-                                #/block/Batch process/node-output/Oracle Human
+                                #/block/For each/node-output/Oracle Human
                                 Capital Management Retrieve worker
                                 assignments/response
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
                           limit: 100
@@ -180,29 +749,22 @@ integration:
                     - create-action:
                         name: Google Sheets Create row
                         target:
-                          $ref: '#/integration/action-interfaces/action-interface-7'
+                          $ref: '#/integration/action-interfaces/action-interface-4'
                         map:
                           mappings:
                             - fields:
                                 mappings:
                                   - '1':
                                       template: >-
-                                        {{$OracleHumanCapitalManagementRetrievetalentpersonprofiles.ProfileId}}
-                                  - '2':
-                                      template: >-
-                                        {{$Batchprocess.names.FirstName}}
-                                        {{$Batchprocess.names.LastName}}
-                                  - '3':
-                                      template: >-
-                                        {{$OracleHumanCapitalManagementRetrieveworkerassignments.AdditionalProperties.AssignmentStatusType}}
+                                        {{$OracleHumanCapitalManagementRetrievetalentpersonprofiles.DisplayName}}
                             - spreadsheetID:
-                                template: 1mf0j0LiXygxoj4WrWRtoCDDY4c6feyVviaNSe0ief6w
+                                template: 1e1uYtdBpfgX-li6FebUQybVoE72ntHsswJDsF3fEibc
                             - worksheetID:
-                                template: Sheet1
+                                template: Sheet2
                           $map: http://ibm.com/appconnect/map/v1
                           input:
-                            - variable: Batchprocess
-                              $ref: '#/block/Batch process/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
                             - variable: Trigger
                               $ref: '#/trigger/payload'
                             - variable: >-
@@ -217,102 +779,91 @@ integration:
                                 #/block/If/node-output/Oracle Human Capital
                                 Management Retrieve talent person
                                 profiles/response
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/For each/node-output/Set
+                                variable/response/payload
+                            - variable: JSONParserParse
+                              $ref: >-
+                                #/block/For each/node-output/JSON Parser
+                                Parse/response/payload
                             - variable: >-
                                 OracleHumanCapitalManagementRetrieveworkerassignments
                               $ref: >-
-                                #/block/Batch process/node-output/Oracle Human
+                                #/block/For each/node-output/Oracle Human
                                 Capital Management Retrieve worker
                                 assignments/response/payload
                             - variable: >-
                                 OracleHumanCapitalManagementRetrieveworkerassignmentsMetadata
                               $ref: >-
-                                #/block/Batch process/node-output/Oracle Human
+                                #/block/For each/node-output/Oracle Human
                                 Capital Management Retrieve worker
                                 assignments/response
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
               else:
                 execute:
                   - create-action:
-                      name: Slack Send message 2
+                      name: Slack Send message
                       target:
-                        $ref: '#/integration/action-interfaces/action-interface-4'
+                        $ref: '#/integration/action-interfaces/action-interface-5'
                       map:
                         mappings:
-                          - channel:
-                              template: CKGG4MH7C
+                          - OBJECT_ID:
+                              template: C017RD2PHU7
+                          - OBJECT_NAME:
+                              template: channel
                           - text:
-                              template: '{{$Batchprocess.PersonId}} is active'
+                              template: >-
+                                {{$Foreachitem.PersonId}} is active , not
+                                available for project
                         $map: http://ibm.com/appconnect/map/v1
                         input:
-                          - variable: Batchprocess
-                            $ref: '#/block/Batch process/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
                           - variable: Trigger
                             $ref: '#/trigger/payload'
+                          - variable: Setvariable
+                            $ref: >-
+                              #/block/For each/node-output/Set
+                              variable/response/payload
+                          - variable: JSONParserParse
+                            $ref: >-
+                              #/block/For each/node-output/JSON Parser
+                              Parse/response/payload
                           - variable: >-
                               OracleHumanCapitalManagementRetrieveworkerassignments
                             $ref: >-
-                              #/block/Batch process/node-output/Oracle Human
-                              Capital Management Retrieve worker
+                              #/block/For each/node-output/Oracle Human Capital
+                              Management Retrieve worker
                               assignments/response/payload
                           - variable: >-
                               OracleHumanCapitalManagementRetrieveworkerassignmentsMetadata
                             $ref: >-
-                              #/block/Batch process/node-output/Oracle Human
-                              Capital Management Retrieve worker
-                              assignments/response
+                              #/block/For each/node-output/Oracle Human Capital
+                              Management Retrieve worker assignments/response
+                          - variable: OracleHumanCapitalManagementRetrieveworkers
+                            $ref: >-
+                              #/node-output/Oracle Human Capital Management
+                              Retrieve workers/response/payload
+                          - variable: >-
+                              OracleHumanCapitalManagementRetrieveworkersMetadata
+                            $ref: >-
+                              #/node-output/Oracle Human Capital Management
+                              Retrieve workers/response
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-    assembly-3:
-      assembly:
-        execute:
-          - custom-action:
-              name: Oracle Human Capital Management Create assigned payroll
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-6'
-              action: CREATEASSIGNEDPAYROLL
-              map:
-                mappings:
-                  - PayrollRelationshipUniqueId:
-                      template: >-
-                        00020000000EACED00057708000110D932E136770000004AACED00057372000D6A6176612E73716C2E4461746514FA46683F3566970200007872000E6A6176612E7574696C2E44617465686A81014B5974190300007870770800000180729E040078
-                  - PayrollUniqueId:
-                      template: >-
-                        00040000000EACED00057708000110D932E1367C0000004AACED00057372000D6A6176612E73716C2E4461746514FA46683F3566970200007872000E6A6176612E7574696C2E44617465686A81014B5974190300007870770800000176B0F1B800780000004AACED00057372000D6A6176612E73716C2E4461746514FA46683F3566970200007872000E6A6176612E7574696C2E44617465686A81014B5974190300007870770800004EB9F6DD1400780000000EACED00057708000110D932E1367C
-                $map: http://ibm.com/appconnect/map/v1
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: BatchprocessOutput
-                    $ref: '#/node-output/Batch process/response/payload'
-                  - variable: flowDetails
-                    $ref: '#/flowDetails'
-          - create-action:
-              name: Microsoft Teams Send message to channel
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-2'
-              map:
-                mappings:
-                  - body:
-                      mappings:
-                        - content:
-                            template: >-
-                              Google sheet is updated with workers Allocation
-                              status - latest
-                  - channelId:
-                      template: 19:d04c2e464fb0493cb864566e868d1649@thread.tacv2
-                  - subject:
-                      template: UC--HCM
-                  - teamId:
-                      template: 3a41ad11-334b-4c10-a48f-ac185cf18043
-                $map: http://ibm.com/appconnect/map/v1
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: BatchprocessOutput
-                    $ref: '#/node-output/Batch process/response/payload'
-                  - variable: flowDetails
-                    $ref: '#/flowDetails'
-  name: Create a list of workers for an upcoming assignment in Google Sheets from Oracle HCM worker records
+  name: >-
+    Create a list of workers for an upcoming assignment in Google Sheets from
+    Oracle HCM worker records
 models: {}
