@@ -668,7 +668,7 @@
   {
    "name": "Send a Microsoft Teams message when a new product is created in Microsoft Dynamics 365",
    "description": "This template creates a new Microsoft Teams message when a new product is created in Microsoft Dynamics 365 for Sales.",
-   "summary": " Microsoft Dynamics 365 to Microsoft Teams",
+   "summary": "Microsoft Dynamics 365 to Microsoft Teams",
    "sourceApp": "msdynamicscrmrest",
    "targetApps": ["msteams"],
    "tags": ["msdynamicscrmrest", "msteams"],
@@ -1151,13 +1151,49 @@
    "tags": ["github", "jenkins", "slack"],
    "offerings": ["app connect professional"]
   },
-   {
+  {
     "name": "Insert data into the Snowflake table when a new file gets created in Amazon S3",
     "description": "Use this template to add data to a Snowflake table whenever a new file gets created in the Amazon S3 bucket.",
-    "summary": "API to 2 applications",
-    "sourceApp": "api",
-    "targetApps": ["amazons3", "snowflake"],
-    "tags": ["api", "snowflake", "amazons3"],
+    "summary": "Snowflake to 1 application",
+    "sourceApp": "snowflake",
+    "targetApps": ["amazons3"],
+    "tags": ["snowflake", "amazons3"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Create a platform event in Salesforce whenever a product is created or updated in Microsoft Dynamics 365 for Sales",
+    "description": "Use this template to create a platform event whenever a product is created or updated in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 to 3 applications",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["salesforce", "slack"],
+    "tags": ["msdynamicscrmrest", "salesforce", "slack", "if"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Send a Gmail message when a platform event is triggered",
+    "description": "Use this template to send a Gmail message to the subscribers of the platform event.",
+    "summary": "Salesforce to Gmail",
+    "sourceApp": "salesforce",
+    "targetApps": ["gmail"],
+    "tags": ["salesforce", "gmail"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Create lead in Insightly and store the details in Amazon DynamoDB whenever a new lead is created in Salesforce",
+    "description": "Use this template to create a lead with the lead’s details in Insightly, and store the information of the lead in Amazon DynamoDB whenever a new lead is created in Salesforce.",
+    "summary": "Salesforce to 4 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["salesforce", "insightly", "amazondynamodb", "salesforce"],
+    "tags": ["salesforce", "insightly", "amazondynamodb", "if"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Update lead in Insightly and store the updated details in Amazon DynamoDB whenever a lead is updated in Salesforce",
+    "description": "Use this template to update a lead or its details in Insightly, and store the updated information in Amazon DynamoDB whenever a new lead is created in Salesforce.",
+    "summary": "Salesforce to 4 applications",
+    "sourceApp": "salesforce",
+    "targetApps": ["salesforce", "insightly", "amazondynamodb", "slack"],
+    "tags": ["salesforce", "insightly", "amazondynamodb", "slack", "if"],
     "offerings": ["app connect professional"]
    },
   {

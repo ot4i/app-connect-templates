@@ -1,0 +1,50 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Vaccination__e
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              ReplayId: '-1'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        === Available No. of Doses:--
+                        {{$Trigger.Available_Doses__c}}  ====
+                        Location:--{{$Trigger.Location__c}}  ===
+                  - Subject:
+                      template: Pune==Event=={{$Trigger.Event__c}}  ===
+                  - To:
+                      template: pratik_tare@persistent.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a Gmail message when a platform event is triggered
+models: {}
