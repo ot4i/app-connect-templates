@@ -1159,6 +1159,15 @@
     "targetApps": ["amazons3", "snowflake"],
     "tags": ["api", "snowflake", "amazons3"],
     "offerings": ["app connect professional"]
-   }
+   },
+  {
+   "name": "Retrieve campaign-related records from Salesforce and update the rows in Microsoft Excel Online with campaign details",
+   "description": "Use this template to retrieve campaigns and their members' records from Salesforce and update the rows in the Microsoft Excel Online worksheet with the campaign details. Campaign-related information is queried from Salesforce for a specified year, and these details are then appended to a Microsoft Excel Online worksheet with the specified campaign information.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "msexcel", "slack"],
+   "tags": ["salesforce", "msexcel", "slack", "scheduler", "foreach", "setVariable"],
+   "offerings": ["app connect professional"]
+  }
   ]
 }

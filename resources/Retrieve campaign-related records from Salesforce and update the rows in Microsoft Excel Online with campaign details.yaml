@@ -1,0 +1,241 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Soql
+      connector-type: salesforce
+      actions:
+        EXECUTECUSTOMSOQL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        APPENDROW: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Salesforce Execute custom SOQL
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: EXECUTECUSTOMSOQL
+              map:
+                mappings:
+                  - customSoql:
+                      format:
+                        type: sql
+                      template: >-
+                        select id, name, (select id, Name, Type,
+                        FirstRespondedDate, Status, CreatedDate, ContactId from
+                        CampaignMembers) from campaign where EndDate = THIS_YEAR
+                  - scanAll:
+                      expression: 'false'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceExecutecustomSOQL.records '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceExecutecustomSOQL
+                    $ref: >-
+                      #/node-output/Salesforce Execute custom
+                      SOQL/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Campaign Records
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Records:
+                        type: array
+                        items:
+                          type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Records:
+                            expression: '[$Foreachitem .CampaignMembers.records]'
+          - for-each:
+              name: For each 3
+              assembly:
+                $ref: '#/integration/assemblies/assembly-4'
+              source:
+                expression: '$Setvariable2.variable.Records '
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: SalesforceExecutecustomSOQL
+                    $ref: >-
+                      #/node-output/Salesforce Execute custom
+                      SOQL/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Campaign Member Record
+    assembly-4:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Excel Online Append row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: APPENDROW
+              map:
+                mappings:
+                  - DriveId:
+                      template: >-
+                        b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                  - WorkbookId:
+                      template: 01NODPFITY5EXJDXX6YNAL5C2TZYIEOZ4I
+                  - WorksheetId:
+                      template: '{2D9C9A62-C463-4AC9-88A0-647A8666BA98}'
+                  - rowData:
+                      mappings:
+                        - A:
+                            template: '{{$Foreachitem.Id}}'
+                        - B:
+                            template: '{{$Foreachitem.Name}}'
+                        - C:
+                            template: '{{$Foreach3item.Id}}'
+                        - D:
+                            template: '{{$Foreach3item.Name}}'
+                        - E:
+                            template: '{{$Foreach3item.FirstRespondedDate}}'
+                        - F:
+                            template: '{{$Foreach3item.Status}}'
+                        - G:
+                            template: '{{$Foreach3item.CreatedDate}}'
+                        - H:
+                            template: '{{$Foreach3item.Type}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach3item
+                    $ref: '#/block/For each 3/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage3
+                    $ref: >-
+                      #/block/For each 3/node-output/Slack Send message
+                      3/response/payload
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: SalesforceExecutecustomSOQL
+                    $ref: >-
+                      #/node-output/Salesforce Execute custom
+                      SOQL/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message 3
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C03HDN72S8M
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: TD --- {{$Foreach3item.Id}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach3item
+                    $ref: '#/block/For each 3/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: SalesforceExecutecustomSOQL
+                    $ref: >-
+                      #/node-output/Salesforce Execute custom
+                      SOQL/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Retrieve campaign-related records from Salesforce and update the rows in Microsoft Excel Online with campaign details
+models: {}
