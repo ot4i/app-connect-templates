@@ -1186,6 +1186,24 @@
    "targetApps": ["salesforce", "amazoneventbridge", "slack"],
    "tags": ["msexcel", "salesforce", "amazoneventbridge", "slack", "if", "addErrorCatch"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever a Gmail message is received",
+   "description": "Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk whenever an email is received from a Gmail account. ",
+   "summary": "Gmail to 2 applications",
+   "sourceApp": "gmail",
+   "targetApps": ["msonedrive", "msonedrive", "zendeskservice"],
+   "tags": ["gmail", "msonedrive", "zendeskservice"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Upload the attachments to Microsoft OneDrive for Business whenever a new issue with attachments is created in Jira",
+   "description": "Use this template to create a file with the attachment content in Microsoft OneDrive for Business when a new issue with attachments gets created in Jira.",
+   "summary": "Jira to 3 applications",
+   "sourceApp": "jira",
+   "targetApps": ["jira", "jira", "msonedrive"],
+   "tags": ["jira", "msonedrive", "foreach"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
