@@ -1177,6 +1177,15 @@
    "targetApps": ["maximo", "coupa", "slack"],
    "tags": ["scheduler", "maximo", "coupa", "slack", "setVariable", "foreach"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Amazon EventBridge sends events when a Salesforce lead is successfully created or when a Salesforce lead creation fails",
+   "description": "Use this template to create a lead in Salesforce when a new row is appended to the Microsoft Excel Online worksheet. Upon each successful lead creation in Salesforce, Amazon EventBridge sends events to the specified event bus. A Slack notification then confirms that the event has been published.",
+   "summary": "Microsoft Excel Online to 3 applications",
+   "sourceApp": "msexcel",
+   "targetApps": ["salesforce", "amazoneventbridge", "slack"],
+   "tags": ["msexcel", "salesforce", "amazoneventbridge", "slack", "if", "addErrorCatch"],
+   "offerings": ["app connect professional"]
   }
-  ]
+]
 }
