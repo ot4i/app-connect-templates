@@ -1,0 +1,171 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: filteredlogevents
+      connector-type: amazoncloudwatch
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: dataStreamRecord
+      connector-type: amazonkinesis
+      actions:
+        PUTRECORDS: {}
+    action-interface-4:
+      type: api-action
+      business-object: application
+      connector-type: amazonkinesis
+      actions:
+        STARTAPPLICATION: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon Kinesis Start application
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: STARTAPPLICATION
+              map:
+                mappings:
+                  - ApplicationARN:
+                      template: >-
+                        arn:aws:kinesisanalytics:us-east-1:288919529935:application/test
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Amazon CloudWatch Retrieve filtered log events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - logGroupName: /aws/lambda/convertToJSON
+                    - logStreamName: usecasekinesis
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonKinesisStartapplication
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Start
+                      application/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - custom-action:
+              name: Amazon Kinesis Add multiple records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              action: PUTRECORDS
+              map:
+                mappings:
+                  - PutRecordsRequestEntry:
+                      foreach:
+                        input: '$AmazonCloudWatchRetrievefilteredlogevents '
+                        iterator: PutRecordsRequestEntryItem
+                        mappings:
+                          - Data:
+                              template: '{{$PutRecordsRequestEntryItem.message}}'
+                          - PartitionKey:
+                              template: '234'
+                  - StreamARN:
+                      template: >-
+                        arn:aws:kinesis:us-east-1:288919529935:stream/input-stream
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonKinesisStartapplication
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Start
+                      application/response/payload
+                  - variable: AmazonCloudWatchRetrievefilteredlogevents
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve filtered log
+                      events/response/payload
+                  - variable: AmazonCloudWatchRetrievefilteredlogeventsMetadata
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve filtered log
+                      events/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: Challans sent to respective owners
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonKinesisStartapplication
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Start
+                      application/response/payload
+                  - variable: AmazonCloudWatchRetrievefilteredlogevents
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve filtered log
+                      events/response/payload
+                  - variable: AmazonCloudWatchRetrievefilteredlogeventsMetadata
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve filtered log
+                      events/response
+                  - variable: AmazonKinesisAddmultiplerecords
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Add multiple
+                      records/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Add vehicle records with speed limit violation in Amazon Kinesis from the Amazon CloudWatch log events
+  description: >-
+    Use this template to add the vehicle records with speed limit violation in Amazon Kinesis. The Amazon CloudWatch event logs are seamlessly retrieved and published to an Amazon Kinesis data stream. The data is processed, and the filtered data (which violates the speed limit) is added to the Amazon S3 bucket via Amazon Kinesis delivery streams. 
+models: {}

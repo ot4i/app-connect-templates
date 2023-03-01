@@ -1,0 +1,200 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: dataStreamRecord
+      connector-type: amazonkinesis
+      actions:
+        PUTRECORD: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        DOWNLOAD_OBJECT: {}
+    action-interface-7:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Amazon S3 Retrieve object metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              filter:
+                where:
+                  bucketName: yc-lambda-bucket
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 5
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$AmazonS3Retrieveobjectmetadata '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Retrieveobjectmetadata
+                    $ref: >-
+                      #/node-output/Amazon S3 Retrieve object
+                      metadata/response/payload
+                  - variable: AmazonS3RetrieveobjectmetadataMetadata
+                    $ref: '#/node-output/Amazon S3 Retrieve object metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Amazon S3 object
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon S3 Retrieve object content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              action: DOWNLOAD_OBJECT
+              map:
+                mappings:
+                  - Key:
+                      template: '{{$Foreachitem.Key}}'
+                  - bucketName:
+                      template: yc-lambda-bucket
+                  - fileType:
+                      template: Text
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Retrieveobjectmetadata
+                    $ref: >-
+                      #/node-output/Amazon S3 Retrieve object
+                      metadata/response/payload
+                  - variable: AmazonS3RetrieveobjectmetadataMetadata
+                    $ref: '#/node-output/Amazon S3 Retrieve object metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Amazon Kinesis Add record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: PUTRECORD
+              map:
+                mappings:
+                  - Data:
+                      template: '{{$AmazonS3Retrieveobjectcontent.content}}'
+                  - PartitionKey:
+                      template: '123'
+                  - StreamARN:
+                      template: >-
+                        arn:aws:kinesis:us-west-2:288919529935:stream/DNTusecases
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Retrieveobjectcontent
+                    $ref: >-
+                      #/block/For each/node-output/Amazon S3 Retrieve object
+                      content/response/payload
+                  - variable: AmazonS3Retrieveobjectmetadata
+                    $ref: >-
+                      #/node-output/Amazon S3 Retrieve object
+                      metadata/response/payload
+                  - variable: AmazonS3RetrieveobjectmetadataMetadata
+                    $ref: '#/node-output/Amazon S3 Retrieve object metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Inserted data:
+                        {{$AmazonKinesisAddrecord.SequenceNumber}} and
+                        {{$AmazonKinesisAddrecord.ShardId}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Retrieveobjectcontent
+                    $ref: >-
+                      #/block/For each/node-output/Amazon S3 Retrieve object
+                      content/response/payload
+                  - variable: AmazonKinesisAddrecord
+                    $ref: >-
+                      #/block/For each/node-output/Amazon Kinesis Add
+                      record/response/payload
+                  - variable: AmazonS3Retrieveobjectmetadata
+                    $ref: >-
+                      #/node-output/Amazon S3 Retrieve object
+                      metadata/response/payload
+                  - variable: AmazonS3RetrieveobjectmetadataMetadata
+                    $ref: '#/node-output/Amazon S3 Retrieve object metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Add records to Amazon Kinesis data streams for each object retrieved from Amazon S3
+  description: >-
+    Use this template to add records to Amazon Kinesis data streams for each object retrieved from Amazon S3. Make sure that you run the Get Amazon Kinesis data stream record flow before running this flow.
+models: {}
