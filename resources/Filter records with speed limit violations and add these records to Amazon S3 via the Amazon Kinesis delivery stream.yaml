@@ -165,7 +165,7 @@ integration:
                       records/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Add vehicle records with speed limit violation in Amazon Kinesis from the Amazon CloudWatch log events
+  name: Filter records with speed limit violations and add these records to Amazon S3 via the Amazon Kinesis delivery stream
   description: >-
-    Use this template to add the vehicle records with speed limit violation in Amazon Kinesis. The Amazon CloudWatch event logs are seamlessly retrieved and published to an Amazon Kinesis data stream. The data is processed, and the filtered data (which violates the speed limit) is added to the Amazon S3 bucket via Amazon Kinesis delivery streams. 
+    Use this template to add the vehicle records with speed limit violation in Amazon Kinesis. The Amazon CloudWatch event logs are seamlessly retrieved and published to an Amazon Kinesis data stream. The data is processed via analytics application, and the filtered data (which violates the speed limit) is added to the Amazon S3 bucket via Amazon Kinesis delivery streams. 
 models: {}
