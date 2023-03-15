@@ -1,7 +1,7 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/IBM%20Sterling%20Inventory%20Visibility%20performs%20a%20supply%20check%20for%20each%20product%20that%20it%20retrieves_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
-2. Click **Operations**, then **Edit flow**.
+2. Click **Operations**, and then click **Edit flow**.
 3. Connect to the following accounts by using your credentials:
    - **IBM Sterling Inventory Visibility** 
    - **Microsoft Teams**
