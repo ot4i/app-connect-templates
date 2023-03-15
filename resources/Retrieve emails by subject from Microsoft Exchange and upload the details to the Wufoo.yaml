@@ -1,0 +1,441 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createEvents:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: events
+          output-context:
+            data: events
+        retrieveEmails:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-7'
+          input-context:
+            data: emails
+          output-context:
+            data: emails
+      options:
+        resources:
+          - business-object: emails
+            model:
+              $ref: '#/models/emails'
+            triggers:
+              retrieve: retrieveEmails
+      type: api-trigger
+  action-interfaces:
+    action-interface-10:
+      type: api-action
+      business-object: Events
+      connector-type: msexchange
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Events
+      connector-type: msexchange
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Events
+      connector-type: msexchange
+      actions:
+        UPDATEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Events
+      connector-type: msexchange
+      actions:
+        DELETEALL: {}
+    action-interface-8:
+      type: api-action
+      business-object: Messages
+      connector-type: msexchange
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: FormEntry
+      connector-type: wufoo
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Exchange Create calendar event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-10'
+              map:
+                mappings:
+                  - CalendarGroupId:
+                      template: >-
+                        AQMkAGU4YTlhZTMwLTdiODUtNDYzMC05YmQ1LTU0YjMyN2UyOGVkMwBGAAADn72Hfyt98EiwqKOkmIeo9gcAXXvpBYqYGkGsV32Pk9q_iAAAAgEGAAAAXXvpBYqYGkGsV32Pk9q_iAAAAhnSAAAA
+                  - CalendarId:
+                      template: >-
+                        AQMkAGU4YTlhZTMwLTdiODUtNDYzMC05YmQ1LTU0YjMyN2UyOGVkMwBGAAADn72Hfyt98EiwqKOkmIeo9gcAXXvpBYqYGkGsV32Pk9q_iAAAAgEGAAAAXXvpBYqYGkGsV32Pk9q_iAAAAhnTAAAA
+                  - attendeesRequested:
+                      template: '{{$Request.participants}}'
+                  - body:
+                      mappings:
+                        - contentType:
+                            template: HTML
+                  - importance:
+                      template: Normal
+                  - sensitivity:
+                      template: Normal
+                  - showAs:
+                      template: Busy
+                  - subject:
+                      template: '{{$Request.subject}}'
+                  - type:
+                      template: SingleInstance
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - retrieve-action:
+              name: Microsoft Exchange Retrieve calendar events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  id: '{{$MicrosoftExchangeCreatecalendarevent.id}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExchangeCreatecalendarevent
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Create calendar
+                      event/response/payload
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - update-action:
+              name: Microsoft Exchange Update calendar event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - contentType:
+                            template: HTML
+                  - importance:
+                      template: Normal
+                  - sensitivity:
+                      template: Normal
+                  - showAs:
+                      template: Busy
+                  - subject:
+                      template: changed
+                  - type:
+                      template: SingleInstance
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExchangeCreatecalendarevent
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Create calendar
+                      event/response/payload
+                  - variable: MicrosoftExchangeRetrievecalendarevents
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve calendar
+                      events/response/payload
+                  - variable: MicrosoftExchangeRetrievecalendareventsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve calendar
+                      events/response
+              filter:
+                where:
+                  id: '{{$MicrosoftExchangeRetrievecalendarevents.id}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExchangeCreatecalendarevent
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Create calendar
+                      event/response/payload
+                  - variable: MicrosoftExchangeRetrievecalendarevents
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve calendar
+                      events/response/payload
+                  - variable: MicrosoftExchangeRetrievecalendareventsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve calendar
+                      events/response
+              allow-empty-output: true
+          - delete-action:
+              name: Microsoft Exchange Delete calendar event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  id: '{{$MicrosoftExchangeRetrievecalendarevents.id}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExchangeCreatecalendarevent
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Create calendar
+                      event/response/payload
+                  - variable: MicrosoftExchangeRetrievecalendarevents
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve calendar
+                      events/response/payload
+                  - variable: MicrosoftExchangeRetrievecalendareventsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve calendar
+                      events/response
+                  - variable: MicrosoftExchangeUpdatecalendarevent
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Update calendar
+                      event/response/payload
+                  - variable: MicrosoftExchangeUpdatecalendareventMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Update calendar
+                      event/response
+              allow-empty-output: false
+          - response:
+              name: response-1
+              reply-maps:
+                - title: events successfully created
+                  status-code: '201'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: MicrosoftExchangeCreatecalendarevent
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Create calendar
+                          event/response/payload
+                      - variable: MicrosoftExchangeRetrievecalendarevents
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Retrieve calendar
+                          events/response/payload
+                      - variable: MicrosoftExchangeRetrievecalendareventsMetadata
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Retrieve calendar
+                          events/response
+                      - variable: MicrosoftExchangeUpdatecalendarevent
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Update calendar
+                          event/response/payload
+                      - variable: MicrosoftExchangeUpdatecalendareventMetadata
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Update calendar
+                          event/response
+                      - variable: MicrosoftExchangeDeletecalendarevent
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Delete calendar
+                          event/response/payload
+                      - variable: MicrosoftExchangeDeletecalendareventMetadata
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Delete calendar
+                          event/response
+                    mappings:
+                      - calendar:
+                          template: '{{$MicrosoftExchangeRetrievecalendarevents}}'
+                      - cgroups:
+                          template: '{{$MicrosoftExchangeCreatecalendarevent}}'
+                      - participants:
+                          template: '{{$MicrosoftExchangeDeletecalendarevent}}'
+                      - subject:
+                          template: '{{$MicrosoftExchangeUpdatecalendarevent}}'
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: MicrosoftExchangeCreatecalendarevent
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Create calendar
+                        event/response/payload
+                    - variable: MicrosoftExchangeRetrievecalendarevents
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Retrieve calendar
+                        events/response/payload
+                    - variable: MicrosoftExchangeRetrievecalendareventsMetadata
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Retrieve calendar
+                        events/response
+                    - variable: MicrosoftExchangeUpdatecalendarevent
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Update calendar
+                        event/response/payload
+                    - variable: MicrosoftExchangeUpdatecalendareventMetadata
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Update calendar
+                        event/response
+                    - variable: MicrosoftExchangeDeletecalendarevent
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Delete calendar
+                        event/response/payload
+                    - variable: MicrosoftExchangeDeletecalendareventMetadata
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Delete calendar
+                        event/response
+    assembly-7:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Exchange Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              filter:
+                where:
+                  subject: '{{$api.keyword}}'
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftExchangeRetrieveemails '
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: MicrosoftExchangeRetrieveemails
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve
+                      emails/response/payload
+                  - variable: MicrosoftExchangeRetrieveemailsMetadata
+                    $ref: '#/node-output/Microsoft Exchange Retrieve emails/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: MicrosoftExchangeRetrieveemails
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve
+                      emails/response/payload
+                  - variable: MicrosoftExchangeRetrieveemailsMetadata
+                    $ref: '#/node-output/Microsoft Exchange Retrieve emails/response'
+                mappings: []
+              display-name: create_entry
+          - response:
+              name: response-1
+              reply-maps:
+                - title: emails successfully retrieved
+                  status-code: '200'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: MicrosoftExchangeRetrieveemails
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Retrieve
+                          emails/response/payload
+                      - variable: MicrosoftExchangeRetrieveemailsMetadata
+                        $ref: >-
+                          #/node-output/Microsoft Exchange Retrieve
+                          emails/response
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings:
+                      - keyword:
+                          template: >-
+                            Form entry created under wufoo with key word
+                            {{$MicrosoftExchangeRetrieveemails.subject}}
+                  input:
+                    - variable: api
+                      $ref: '#/trigger/api/parameters'
+                    - variable: MicrosoftExchangeRetrieveemails
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Retrieve
+                        emails/response/payload
+                    - variable: MicrosoftExchangeRetrieveemailsMetadata
+                      $ref: >-
+                        #/node-output/Microsoft Exchange Retrieve
+                        emails/response
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Wufoo Create form entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Field15:
+                      template: '{{$Foreachitem.toRecipients.name}}'
+                  - Field9:
+                      template: '{{$Foreachitem.toRecipients.address}}'
+                  - Hash:
+                      template: q1z0scqf0z2bi37
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: MicrosoftExchangeRetrieveemails
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve
+                      emails/response/payload
+                  - variable: MicrosoftExchangeRetrieveemailsMetadata
+                    $ref: '#/node-output/Microsoft Exchange Retrieve emails/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Retrieve emails by subject from Microsoft Exchange and upload the details to the Wufoo
+models:
+  events:
+    name: events
+    properties:
+      cgroups:
+        required: false
+        id: true
+        type: string
+      calendar:
+        required: false
+        id: false
+        type: string
+      subject:
+        required: false
+        id: false
+        type: string
+      participants:
+        required: false
+        id: false
+        type: string
+    plural: events
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+  emails:
+    name: emails
+    properties:
+      keyword:
+        required: false
+        id: true
+        type: string
+    plural: emails
+    description: ' '
+    operations:
+      retrieve: '#/integration/assemblies/assembly-7'
+    interactions: {}
+    methods: {}
