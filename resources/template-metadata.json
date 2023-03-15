@@ -1240,6 +1240,33 @@
    "targetApps": ["jira", "jira", "msonedrive"],
    "tags": ["jira", "msonedrive", "foreach"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Retrieve orders from Salesforce and notify customers about any weather dependent delays",
+   "description": "Use this template to retrieve an order from Salesforce, map the shipping address to IBM Weather Company Data to retrieve the forecast, and send a delayed order notification to the customer via Domino. This use case helps you inform your customers when the delivery of an order is going to be delayed due to bad weather conditions.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "ibmtwc", "domino"],
+   "tags": ["scheduler", "salesforce", "ibmtwc", "domino", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create order in Salesforce whenever a new customer order is created in Magento",
+   "description": "Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by Gmail whenever a new customer order is created in Magento.",
+   "summary": "Magento to 2 applications",
+   "sourceApp": "magento",
+   "targetApps": ["salesforce", "gmail"],
+   "tags": ["salesforce", "magento", "gmail"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve emails by subject from Microsoft Exchange and upload the details to the Wufoo",
+   "description": "Use this template to retrieve emails from Microsoft Exchange based on the subject by searching for a specified keyword.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["msexchange", "wufoo"],
+   "tags": ["api", "msexchange", "wufoo", "foreach"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }
