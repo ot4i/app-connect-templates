@@ -1,0 +1,353 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        categorizationProduct:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Product
+          output-context:
+            data: Product
+      options:
+        resources:
+          - business-object: Product
+            model:
+              $ref: '#/models/Product'
+            triggers:
+              categorization: categorizationProduct
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Supply
+      connector-type: ibmsterlingiv
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Request.Product '
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                    $ref: >-
+                      #/block/For each/node-output/IBM Sterling Inventory
+                      Visibility Retrieve supplies/response/payload
+                  - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                    $ref: >-
+                      #/block/For each/node-output/IBM Sterling Inventory
+                      Visibility Retrieve supplies/response
+                mappings: []
+              display-name: Request Product
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Product successfully add custom operation
+                  status-code: '200'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings: []
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: IBM Sterling Inventory Visibility Retrieve supplies
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - itemId: '{{$Foreachitem.itemid}}'
+                    - productClass: '{{$Foreachitem.ProductClass}}'
+                    - shipNode: '{{$Foreachitem.ShipNode}}'
+                    - unitOfMeasure: '{{$Foreachitem.unitOfMeasure}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$IBMSterlingInventoryVisibilityRetrievesupplies '
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                    $ref: >-
+                      #/block/For each/node-output/IBM Sterling Inventory
+                      Visibility Retrieve supplies/response/payload
+                  - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                    $ref: >-
+                      #/block/For each/node-output/IBM Sterling Inventory
+                      Visibility Retrieve supplies/response
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                    $ref: >-
+                      #/block/For each/node-output/IBM Sterling Inventory
+                      Visibility Retrieve supplies/response/payload
+                  - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                    $ref: >-
+                      #/block/For each/node-output/IBM Sterling Inventory
+                      Visibility Retrieve supplies/response
+                mappings: []
+              display-name: IBM Sterling Inventory Visibility Supply
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+                - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                  $ref: >-
+                    #/block/For each/node-output/IBM Sterling Inventory
+                    Visibility Retrieve supplies/response/payload
+                - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                  $ref: >-
+                    #/block/For each/node-output/IBM Sterling Inventory
+                    Visibility Retrieve supplies/response
+              branch:
+                - condition:
+                    '{{$Foreach2item.attr_type}}': ONHAND
+                  execute:
+                    - create-action:
+                        name: Microsoft Teams Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: '{{$Foreach2item}}'
+                            - channelId:
+                                template: >-
+                                  19:987c9098d7d745868a59d2e1ddebb013@thread.tacv2
+                            - subject:
+                                template: 'Supplies availalbe on-hand:'
+                            - teamId:
+                                template: 3f484539-82b4-42f7-b80e-58eca1a10a56
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                              $ref: >-
+                                #/block/For each/node-output/IBM Sterling
+                                Inventory Visibility Retrieve
+                                supplies/response/payload
+                            - variable: >-
+                                IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                              $ref: >-
+                                #/block/For each/node-output/IBM Sterling
+                                Inventory Visibility Retrieve supplies/response
+                - condition:
+                    and:
+                      - '{{$Foreach2item.attr_type}}': INTRANSIT
+                      - '{{$Foreach2item.shipByDate}}':
+                          lt: '{{$now()}}'
+                  execute:
+                    - create-action:
+                        name: Microsoft Teams Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: '{{$Foreach2item}}'
+                            - channelId:
+                                template: >-
+                                  19:8d617ac678d44a4fb99ea7a1ba556efc@thread.tacv2
+                            - subject:
+                                template: >-
+                                  Delayed Shipments: Expected date of delivery
+                                  was {{$Foreach2item.shipByDate}}
+                            - teamId:
+                                template: 3f484539-82b4-42f7-b80e-58eca1a10a56
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                              $ref: >-
+                                #/block/For each/node-output/IBM Sterling
+                                Inventory Visibility Retrieve
+                                supplies/response/payload
+                            - variable: >-
+                                IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                              $ref: >-
+                                #/block/For each/node-output/IBM Sterling
+                                Inventory Visibility Retrieve supplies/response
+              else:
+                execute:
+                  - create-action:
+                      name: Microsoft Teams Create message 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - body:
+                              mappings:
+                                - content:
+                                    template: '{{$Foreach2item}}'
+                          - channelId:
+                              template: '19:c98e234722294625b2ab521019cc6d1c@thread.tacv2'
+                          - subject:
+                              template: >-
+                                This supply will be shipped
+                                by:{{$Foreach2item.shipByDate}}
+                          - teamId:
+                              template: 3f484539-82b4-42f7-b80e-58eca1a10a56
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Request
+                            $ref: '#/trigger/payload'
+                          - variable: IBMSterlingInventoryVisibilityRetrievesupplies
+                            $ref: >-
+                              #/block/For each/node-output/IBM Sterling
+                              Inventory Visibility Retrieve
+                              supplies/response/payload
+                          - variable: >-
+                              IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
+                            $ref: >-
+                              #/block/For each/node-output/IBM Sterling
+                              Inventory Visibility Retrieve supplies/response
+              output-schema: {}
+  name: IBM Sterling Inventory Visibility performs a supply check for each product that it retrieves
+  description: Use this template to retrieve a list of products from IBM Sterling Inventory Visibility and create a message in a Microsoft Team channel based on the status of the retrieved item and where it is in the delivery process.
+models:
+  Product:
+    name: Product
+    properties:
+      Products:
+        required: false
+        id: true
+        type: string
+      Product:
+        required: false
+        id: false
+        type:
+          - type:
+              ProductClass:
+                required: false
+                id: false
+                type: string
+              ShipNode:
+                required: false
+                id: false
+                type: string
+              unitOfMeasure:
+                required: false
+                id: false
+                type: string
+              itemid:
+                required: false
+                id: false
+                type: string
+    plural: Product
+    description: ' '
+    operations:
+      categorization: '#/integration/assemblies/assembly-1'
+    methods:
+      categorization:
+        name: categorization
+        display:
+          name: Categorize
+        accessType: WRITE
+        accepts:
+          - arg: data
+            type: Product
+            http:
+              source: body
+        returns:
+          arg: data
+          type: Product
+          root: true
+        http:
+          verb: POST
+          path: /categorization
