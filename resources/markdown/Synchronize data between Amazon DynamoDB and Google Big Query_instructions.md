@@ -1,7 +1,7 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Synchronize%20data%20between%20Amazon%20DynamoDB%20and%20Google%20Big%20Query_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
-2. Click **Operations**, then **Edit flow** for the Create Customer operation.
+2. Click **Operations**, and then click **Edit flow**.
 3. Connect to the following accounts by using your credentials:
    - **Amazon DynamoDB** 
    - **Google Cloud BigQuery**
