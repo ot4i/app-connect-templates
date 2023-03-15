@@ -7,4 +7,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Wufoo**
 4. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
+Use this template to retrieve emails from Microsoft Exchange based on the subject by searching for a specified keyword.
+
 For more information about this flow, see [Using IBM App Connect to interact with Microsoft Exchange](https://community.ibm.com/community/user/integration/blogs/sharvari-gokahle1/2020/10/01/using-ibm-app-connect-to-interact-with-microsoft-e).
