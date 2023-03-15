@@ -1,0 +1,144 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: servicenow
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: incident
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Issue
+      connector-type: gitlab
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Issue
+      connector-type: gitlab
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: GitLab Create issue
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - description:
+                      template: '{{$Trigger.description}}_from_SNOW'
+                  - project_id:
+                      template: '354'
+                  - title:
+                      template: >-
+                        {{$Trigger.short_description}}_Incident{{$Trigger.number}}_from_SNOW
+                  - weight:
+                      expression: '$Trigger.urgency '
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - retrieve-action:
+              name: GitLab Retrieve issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - iids: '{{$GitLabCreateissue.iid}}'
+                    - project_id: '354'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GitLabCreateissue
+                    $ref: '#/node-output/GitLab Create issue/response/payload'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - channel:
+                      template: CLPP3J2AJ
+                  - text:
+                      template: >-
+                        GitLab Issue iid ::: {{$GitLabRetrieveissues.iid}}
+                        created for Servicenow Incident::: {{$Trigger.number}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GitLabCreateissue
+                    $ref: '#/node-output/GitLab Create issue/response/payload'
+                  - variable: GitLabRetrieveissues
+                    $ref: '#/node-output/GitLab Retrieve issues/response/payload'
+                  - variable: GitLabRetrieveissuesMetadata
+                    $ref: '#/node-output/GitLab Retrieve issues/response'
+          - update-action:
+              name: ServiceNow Update incidents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - description:
+                      template: >-
+                        {{$Trigger.description}}::::Gitlab IssueIID is :::::
+                        {{$GitLabRetrieveissues.iid}} and URL
+                        as:::{{$GitLabRetrieveissues.web_url}}
+                  - short_description:
+                      template: '{{$Trigger.short_description}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GitLabCreateissue
+                    $ref: '#/node-output/GitLab Create issue/response/payload'
+                  - variable: GitLabRetrieveissues
+                    $ref: '#/node-output/GitLab Retrieve issues/response/payload'
+                  - variable: GitLabRetrieveissuesMetadata
+                    $ref: '#/node-output/GitLab Retrieve issues/response'
+                  - variable: SlackCreatemessage
+                    $ref: '#/node-output/Slack Create message/response/payload'
+              filter:
+                where:
+                  sys_id: '{{$Trigger.sys_id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GitLabCreateissue
+                    $ref: '#/node-output/GitLab Create issue/response/payload'
+                  - variable: GitLabRetrieveissues
+                    $ref: '#/node-output/GitLab Retrieve issues/response/payload'
+                  - variable: GitLabRetrieveissuesMetadata
+                    $ref: '#/node-output/GitLab Retrieve issues/response'
+                  - variable: SlackCreatemessage
+                    $ref: '#/node-output/Slack Create message/response/payload'
+              allow-empty-output: false
+  name: An issue is created in GitLab whenever a new incident is logged in ServiceNow
+models: {}
