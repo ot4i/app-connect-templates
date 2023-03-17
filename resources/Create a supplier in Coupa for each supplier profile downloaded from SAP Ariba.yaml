@@ -1,0 +1,223 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Supplier
+      connector-type: sapariba
+      actions:
+        SupplierProfileExportOperation: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: suppliers
+      connector-type: coupa
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP Ariba Download supplier profiles data
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: SupplierProfileExportOperation
+              map:
+                mappings:
+                  - WSSupplierProfileExportInputBean_Item:
+                      mappings:
+                        - item:
+                            mappings:
+                              - FromDate:
+                                  template: '2022-12-12T00:00:00'
+                              - RealmName:
+                                  template: IBMAPPCONDSAPP-T
+                              - ToDate:
+                                  template: '2023-02-23T00:00:00'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - parse:
+              name: CSV Parser Parse
+              parse-format: csv
+              source:
+                template: >-
+                  {{$base64decode($SAPAribaDownloadsupplierprofilesdata.content
+                  , 'utf8')}}
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SAPAribaDownloadsupplierprofilesdata
+                    $ref: >-
+                      #/node-output/SAP Ariba Download supplier profiles
+                      data/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: ''
+              output-schema:
+                type: array
+                $schema: http://json-schema.org/draft-04/schema#
+                items:
+                  type: object
+                  properties:
+                    field1:
+                      type: string
+                    field2:
+                      type: string
+                    field3:
+                      type: string
+                    field4:
+                      type: string
+                    field5:
+                      type: string
+                    field6:
+                      type: string
+                    field7:
+                      type: string
+                    field8:
+                      type: string
+                    field9:
+                      type: string
+                  additionalProperties: true
+                title: Parsed CSV
+              options: {}
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$CSVParserParse '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SAPAribaDownloadsupplierprofilesdata
+                    $ref: >-
+                      #/node-output/SAP Ariba Download supplier profiles
+                      data/response/payload
+                  - variable: CSVParserParse
+                    $ref: '#/node-output/CSV Parser Parse/response/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: CSV Parser CSVParserParse
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Send message 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C03HDN72S8M
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: '{{$Foreachitem.field7}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SAPAribaDownloadsupplierprofilesdata
+                    $ref: >-
+                      #/node-output/SAP Ariba Download supplier profiles
+                      data/response/payload
+                  - variable: CSVParserParse
+                    $ref: '#/node-output/CSV Parser Parse/response/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Coupa Create supplier
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - display-name:
+                      template: '{{$Foreachitem.field7}}'
+                  - invoice-matching-level:
+                      template: none
+                  - name:
+                      template: '{{$Foreachitem.field7}}'
+                  - number:
+                      template: '{{$Foreachitem.field8}}'
+                  - po-method:
+                      template: prompt
+                  - supplier-status:
+                      template: active
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      2/response/payload
+                  - variable: CoupaRetrievesuppliers
+                    $ref: >-
+                      #/block/For each/node-output/Coupa Retrieve
+                      suppliers/response/payload
+                  - variable: CoupaRetrievesuppliersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Coupa Retrieve
+                      suppliers/response
+                  - variable: SAPAribaDownloadsupplierprofilesdata
+                    $ref: >-
+                      #/node-output/SAP Ariba Download supplier profiles
+                      data/response/payload
+                  - variable: CSVParserParse
+                    $ref: '#/node-output/CSV Parser Parse/response/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a supplier in Coupa for each supplier profile downloaded from SAP Ariba
+models: {}
