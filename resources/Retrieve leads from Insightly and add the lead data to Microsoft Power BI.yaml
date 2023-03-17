@@ -1,0 +1,358 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tablerows
+      connector-type: mspowerbi
+      actions:
+        INSERTMULTIPLEROWS: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Lead
+      connector-type: insightly
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Insightly Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                limit: 50
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      jsonstring:
+                        type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveleads
+                    $ref: '#/node-output/Insightly Retrieve leads/response/payload'
+                  - variable: InsightlyRetrieveleadsMetadata
+                    $ref: '#/node-output/Insightly Retrieve leads/response'
+                  - variable: SalesforceRetrieveleads
+                    $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                  - variable: SalesforceRetrieveleadsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve leads/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - jsonstring:
+                            template: '{{$InsightlyRetrieveleads}}'
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Setvariable.variable.jsonstring}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveleads
+                    $ref: '#/node-output/Insightly Retrieve leads/response/payload'
+                  - variable: InsightlyRetrieveleadsMetadata
+                    $ref: '#/node-output/Insightly Retrieve leads/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: |-
+                [
+                  {
+                    "LEAD_ID": 38825910,
+                    "FIRST_NAME": "Heather",
+                    "LAST_NAME": "Sanders",
+                    "LEAD_STATUS_ID": 2740738,
+                    "TITLE": "Director",
+                    "CONVERTED": false,
+                    "CONVERTED_DATE_UTC": null,
+                    "DATE_CREATED_UTC": "2019-01-15T12:04:32.000Z",
+                    "DATE_UPDATED_UTC": "2019-01-15T12:04:34.000Z",
+                    "EMAIL": "user1@trophygroup.com",
+                    "INDUSTRY": null,
+                    "MOBILE": null,
+                    "ADDRESS_STREET": "13 Birchwood Junction",
+                    "ADDRESS_CITY": "Bellevue",
+                    "ADDRESS_STATE": "WA",
+                    "ADDRESS_POSTCODE": "98008",
+                    "ORGANISATION_NAME": "Trophy Group"
+                     },
+                  {
+                    "LEAD_ID": 38825912,
+                     "FIRST_NAME": "Mark",
+                    "LAST_NAME": "Carroll",
+                    "LEAD_STATUS_ID": 2740738,
+                    "TITLE": "CEO",
+                    "CONVERTED": false,
+                    "CONVERTED_DATE_UTC": null,
+                    "DATE_CREATED_UTC": "2019-01-15T12:04:32.000Z",
+                    "DATE_UPDATED_UTC": "2019-01-15T12:04:34.000Z",
+                    "EMAIL": "user2@gsd.com",
+                    "INDUSTRY": null,
+                    "LEAD_DESCRIPTION": "Interested in model: Whirlygig X520",
+                    "LEAD_RATING": null,
+                    "MOBILE": null,
+                    "ADDRESS_STREET": "14 Spenser Center",
+                    "ADDRESS_CITY": "North Little Rock",
+                    "ADDRESS_STATE": "AR",
+                    "ADDRESS_POSTCODE": "72118",
+                    "ORGANISATION_NAME": "Gottlieb, Schultz and D'Amore"
+                  }
+                ]
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: array
+                items:
+                  type: object
+                  properties:
+                    LEAD_ID:
+                      type: number
+                    FIRST_NAME:
+                      type: string
+                    LAST_NAME:
+                      type: string
+                    LEAD_STATUS_ID:
+                      type: number
+                    TITLE:
+                      type: string
+                    CONVERTED:
+                      type: boolean
+                    CONVERTED_DATE_UTC:
+                      type: 'null'
+                    DATE_CREATED_UTC:
+                      type: string
+                    DATE_UPDATED_UTC:
+                      type: string
+                    EMAIL:
+                      type: string
+                    INDUSTRY:
+                      type: 'null'
+                    MOBILE:
+                      type: 'null'
+                    ADDRESS_STREET:
+                      type: string
+                    ADDRESS_CITY:
+                      type: string
+                    ADDRESS_STATE:
+                      type: string
+                    ADDRESS_POSTCODE:
+                      type: string
+                    ORGANISATION_NAME:
+                      type: string
+                    LEAD_DESCRIPTION:
+                      type: string
+                    LEAD_RATING:
+                      type: 'null'
+                title: Parsed JSON
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      FinalOutput:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            LEAD_ID:
+                              type: string
+                            FIRST_NAME:
+                              type: string
+                            TITLE:
+                              type: string
+                            ORGANISATION_NAME:
+                              type: string
+                            ADDRESS_STREET:
+                              type: string
+                            ADDRESS_CITY:
+                              type: string
+                            ADDRESS_STATE:
+                              type: string
+                            ADDRESS_POSTCODE:
+                              type: number
+                            MOBILE:
+                              type: number
+                            EMAIL:
+                              type: string
+                            LAST_NAME:
+                              type: string
+                            INDUSTRY:
+                              type: string
+                            CONVERTED:
+                              type: boolean
+                            CONVERTED_DATE_UTC:
+                              type: string
+                              format: date-time
+                            DATE_CREATED_UTC:
+                              type: string
+                              format: date-time
+                            DATE_UPDATED_UTC:
+                              type: string
+                            LEAD_STATUS_ID:
+                              type: number
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveleads
+                    $ref: '#/node-output/Insightly Retrieve leads/response/payload'
+                  - variable: InsightlyRetrieveleadsMetadata
+                    $ref: '#/node-output/Insightly Retrieve leads/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - FinalOutput:
+                            foreach:
+                              input: '$JSONParserParse '
+                              iterator: FinalOutputItem
+                              mappings:
+                                - ADDRESS_CITY:
+                                    template: '{{$FinalOutputItem.ADDRESS_CITY}}'
+                                - ADDRESS_POSTCODE:
+                                    expression: '$FinalOutputItem.ADDRESS_POSTCODE '
+                                - ADDRESS_STATE:
+                                    template: '{{$FinalOutputItem.ADDRESS_STATE}}'
+                                - ADDRESS_STREET:
+                                    template: '{{$FinalOutputItem.ADDRESS_STREET}}'
+                                - CONVERTED:
+                                    expression: '$FinalOutputItem.CONVERTED '
+                                - CONVERTED_DATE_UTC:
+                                    template: '{{$FinalOutputItem.CONVERTED_DATE_UTC}}'
+                                - DATE_CREATED_UTC:
+                                    template: '{{$FinalOutputItem.DATE_CREATED_UTC}}'
+                                - DATE_UPDATED_UTC:
+                                    template: '{{$FinalOutputItem.DATE_UPDATED_UTC}}'
+                                - EMAIL:
+                                    template: '{{$FinalOutputItem.EMAIL}}'
+                                - FIRST_NAME:
+                                    template: '{{$FinalOutputItem.FIRST_NAME}}'
+                                - INDUSTRY:
+                                    template: '{{$FinalOutputItem.INDUSTRY}}'
+                                - LAST_NAME:
+                                    template: '{{$FinalOutputItem.LAST_NAME}}'
+                                - LEAD_ID:
+                                    template: '{{$FinalOutputItem.LEAD_ID}}'
+                                - LEAD_STATUS_ID:
+                                    expression: LEAD_STATUS_ID
+                                - MOBILE:
+                                    expression: '$FinalOutputItem.MOBILE '
+                                - ORGANISATION_NAME:
+                                    template: '{{$FinalOutputItem.ORGANISATION_NAME}}'
+                                - TITLE:
+                                    template: '{{$FinalOutputItem.TITLE}}'
+          - custom-action:
+              name: Microsoft Power BI Insert multiple rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: INSERTMULTIPLEROWS
+              map:
+                mappings:
+                  - datasetId:
+                      template: e01d8218-9a78-43fb-a8dd-28e01e1b6cd1
+                  - groupId:
+                      template: ea039c46-994c-4c6d-ab4d-50b397554aa4
+                  - rows:
+                      expression: '$Setvariable2.variable.FinalOutput '
+                  - tableName:
+                      template: InsightlyLeads
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveleads
+                    $ref: '#/node-output/Insightly Retrieve leads/response/payload'
+                  - variable: InsightlyRetrieveleadsMetadata
+                    $ref: '#/node-output/Insightly Retrieve leads/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C0231CQCJ7J
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: '-- {{$Setvariable2.variable.FinalOutput}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveleads
+                    $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                  - variable: SalesforceRetrieveleadsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve leads/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Retrieve leads from Insightly and add the lead data to Microsoft Power BI
+models: {}
