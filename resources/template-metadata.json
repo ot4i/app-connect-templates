@@ -1276,6 +1276,24 @@
    "targetApps": ["amazonkinesis", "slack"],
    "tags": ["scheduler", "amazonkinesis", "slack"],
    "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create a supplier in Coupa for each supplier profile downloaded from SAP Ariba",
+   "description": "Use this template to download the supplier profiles from SAP Ariba and create these suppliers in Coupa for each of the supplier profiles that were downloaded from SAP Ariba with the relevant supplier information.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["sapariba", "slack", "coupa"],
+   "tags": ["scheduler", "sapariba", "slack", "coupa"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create a sourcing project in SAP Ariba for each project retrieved from Insightly",
+   "description": "Use this template to create a sourcing project in SAP Ariba for each project retrieved from Insightly.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["insightly", "sapariba"],
+   "tags": ["scheduler", "insightly", "sapariba"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }
