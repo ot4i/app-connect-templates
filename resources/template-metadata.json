@@ -1298,7 +1298,7 @@
   {
    "name": "Data integration between Microsoft Azure Blob storage and Amazon S3",
    "description": "Use this template to create a scheduler-based flow that retrieves a large blob file’s metadata from a specified Azure blob container, splits the file into a user-defined file size, downloads the file content, and uploads the spilt files to an Amazon S3 bucket or any other storage endpoint.",
-   "summary": "ServiceNow to 2 applications",
+   "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["azureblobstorage", "amazons3"],
    "tags": ["scheduler", "azureblobstorage", "amazons3", "foreach", "setVariable"],
@@ -1321,6 +1321,15 @@
    "targetApps": ["cloudantdb", "googlepubsub"],
    "tags": ["api", "cloudantdb", "googlepubsub", "foreach", "if"],
    "offerings": ["app connect professional"] 
-  }              
+  },
+  {
+   "name": "Data Ingestion to Google Cloud Storage from Dropbox",
+   "description": "Use this template to retrieve any type of file from the specified Dropbox path, downloads the content, and uploads the metadata and the file to a Google Cloud Storage bucket.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["dropbox", "googlecloudstorage", "slack"],
+   "tags": ["scheduler", "dropbox", "slack", "googlecloudstorage", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  }
 ]
 }
