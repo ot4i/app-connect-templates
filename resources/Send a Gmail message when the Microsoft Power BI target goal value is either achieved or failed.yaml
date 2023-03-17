@@ -148,5 +148,5 @@ integration:
               output-schema: {}
   name: Send a Gmail message when the Microsoft Power BI target goal value is either achieved or failed
   description: >-
-    Use this template to retrieve lead records from Insightly, and the lead data is added to Microsoft Power BI. In this example, the lead data is inserted into a Microsoft Power BI dataset. This data helps analyse and visualise the data patterns in reports.
+    Use this template to send a Gmail message to the intended recipient if the retrieved Microsoft Power BI goal value set is not achieved. A Gmail message will also be sent if the goal value is achieved.
 models: {}
