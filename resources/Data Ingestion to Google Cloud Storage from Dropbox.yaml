@@ -1,0 +1,329 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: folderitem
+      connector-type: dropbox
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        DOWNLOADFILE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Object
+      connector-type: googlecloudstorage
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Object
+      connector-type: googlecloudstorage
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Dropbox Retrieve folder items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  path: /dropboxgcs
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 20
+              allow-truncation: true
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$DropboxRetrievefolderitems '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DropboxRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Dropbox Retrieve folder
+                      items/response/payload
+                  - variable: DropboxRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folder items/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DropboxRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Dropbox Retrieve folder
+                      items/response/payload
+                  - variable: DropboxRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folder items/response'
+                mappings: []
+              display-name: Folder item
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - channel:
+                      template: CLPP3J2AJ
+                  - text:
+                      template: '{{$DropboxRetrievefolderitems.name}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DropboxRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Dropbox Retrieve folder
+                      items/response/payload
+                  - variable: DropboxRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folder items/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: DropboxRetrievefolderitems
+                  $ref: '#/node-output/Dropbox Retrieve folder items/response/payload'
+                - variable: DropboxRetrievefolderitemsMetadata
+                  $ref: '#/node-output/Dropbox Retrieve folder items/response'
+              branch:
+                - condition:
+                    '{{$Foreachitem.tag}}': file
+                  execute:
+                    - custom-action:
+                        name: Dropbox Download file content
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: DOWNLOADFILE
+                        map:
+                          mappings:
+                            - fileType:
+                                template: Binary
+                            - path:
+                                template: '{{$Foreachitem.id}}'
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DropboxRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response/payload
+                            - variable: DropboxRetrievefolderitemsMetadata
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response
+                    - upsert-action:
+                        name: Google Cloud Storage Update or create object
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$Foreachitem}}'
+                            - ContentType:
+                                template: application/json
+                            - bucketName:
+                                template: 0000dropboxgcsmeta
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DropboxDownloadfilecontent
+                              $ref: >-
+                                #/block/If/node-output/Dropbox Download file
+                                content/response/payload
+                            - variable: DropboxRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response/payload
+                            - variable: DropboxRetrievefolderitemsMetadata
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response
+                        filter:
+                          where:
+                            and:
+                              - Key: '{{$Foreachitem.id}}_{{$Foreachitem.name}}'
+                              - bucketName: 0000dropboxgcsmeta
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DropboxDownloadfilecontent
+                              $ref: >-
+                                #/block/If/node-output/Dropbox Download file
+                                content/response/payload
+                            - variable: DropboxRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response/payload
+                            - variable: DropboxRetrievefolderitemsMetadata
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response
+                    - upsert-action:
+                        name: Google Cloud Storage Update or create object 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$DropboxDownloadfilecontent.fileContent}}'
+                            - ContentType:
+                                template: '{{$DropboxDownloadfilecontent.contentType}}'
+                            - bucketName:
+                                template: 0000dropboxgcs
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DropboxDownloadfilecontent
+                              $ref: >-
+                                #/block/If/node-output/Dropbox Download file
+                                content/response/payload
+                            - variable: GoogleCloudStorageUpdateorcreateobject
+                              $ref: >-
+                                #/block/If/node-output/Google Cloud Storage
+                                Update or create object/response/payload
+                            - variable: GoogleCloudStorageUpdateorcreateobjectMetadata
+                              $ref: >-
+                                #/block/If/node-output/Google Cloud Storage
+                                Update or create object/response
+                            - variable: DropboxRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response/payload
+                            - variable: DropboxRetrievefolderitemsMetadata
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response
+                        filter:
+                          where:
+                            and:
+                              - Key: '{{$Foreachitem.id}}_{{$Foreachitem.name}}'
+                              - bucketName: 0000dropboxgcs
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DropboxDownloadfilecontent
+                              $ref: >-
+                                #/block/If/node-output/Dropbox Download file
+                                content/response/payload
+                            - variable: GoogleCloudStorageUpdateorcreateobject
+                              $ref: >-
+                                #/block/If/node-output/Google Cloud Storage
+                                Update or create object/response/payload
+                            - variable: GoogleCloudStorageUpdateorcreateobjectMetadata
+                              $ref: >-
+                                #/block/If/node-output/Google Cloud Storage
+                                Update or create object/response
+                            - variable: DropboxRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response/payload
+                            - variable: DropboxRetrievefolderitemsMetadata
+                              $ref: >-
+                                #/node-output/Dropbox Retrieve folder
+                                items/response
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Create message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-6'
+                      map:
+                        mappings:
+                          - channel:
+                              template: CLPP3J2AJ
+                          - text:
+                              template: '{{$Foreachitem.name}} is a folder'
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: DropboxRetrievefolderitems
+                            $ref: >-
+                              #/node-output/Dropbox Retrieve folder
+                              items/response/payload
+                          - variable: DropboxRetrievefolderitemsMetadata
+                            $ref: >-
+                              #/node-output/Dropbox Retrieve folder
+                              items/response
+              output-schema: {}
+  name: Data Ingestion to Google Cloud Storage from Dropbox
+models: {}
