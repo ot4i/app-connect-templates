@@ -999,8 +999,8 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Creates a single invoice when an order is closed",
-   "description": "Use this template to create a single invoice when an order status is updated to closed. An email is sent from Gmail with the invoice details.",
+   "name": "Creates a single invoice in Oracle E-Business Suite when an order is closed",
+   "description": "Use this template to create a single invoice in Oracle E-Business Suite when an order status is updated to closed in Oracle E-Business Suite. An email is sent from Gmail with the invoice details.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["oracleebs", "gmail"],
