@@ -1240,6 +1240,15 @@
    "targetApps": ["jira", "jira", "msonedrive"],
    "tags": ["jira", "msonedrive", "foreach"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Creates an order in Oracle E-Business Suite when a new opportunity is created in Salesforce",
+   "description": "Use this template to create a new order whenever a new opportunity is created in Salesforce and a Slack notification is sent to the dedicated channel.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["oracleebs", "slack"],
+   "tags": ["salesforce", "oracleebs", "slack"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
