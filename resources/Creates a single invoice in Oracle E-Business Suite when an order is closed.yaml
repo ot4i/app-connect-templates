@@ -238,5 +238,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Creates a single invoice when an order is closed
+  name: Creates a single invoice in Oracle E-Business Suite when an order is closed
 models: {}
