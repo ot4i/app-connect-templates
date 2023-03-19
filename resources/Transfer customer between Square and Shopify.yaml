@@ -1,0 +1,192 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCustomer:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: customer
+          output-context:
+            data: customer
+      options:
+        resources:
+          - business-object: customer
+            model:
+              $ref: '#/models/customer'
+            triggers:
+              create: createCustomer
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: customers
+      connector-type: square
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: customers
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: customer
+      connector-type: shopify
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Square Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - address:
+                      mappings:
+                        - address_line_1:
+                            template: '{{$Request.address.address_line_1}}'
+                        - address_line_2:
+                            template: '{{$Request.address.address_line_2}}'
+                        - country:
+                            template: '{{$Request.address.country}}'
+                        - postal_code:
+                            template: '{{$Request.address.postal_code}}'
+                  - email_address:
+                      template: '{{$Request.email_address}}'
+                  - given_name:
+                      template: '{{$Request.given_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Square Retrieve customers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  customer_id: '{{$SquareCreatecustomer.customer_id}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: SquareCreatecustomer
+                    $ref: '#/node-output/Square Create customer/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: Shopify Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - addresses:
+                      foreach:
+                        input: '[{}]'
+                        iterator: addressesItem
+                        mappings:
+                          - address1:
+                              template: >-
+                                {{$SquareRetrievecustomers.address.address_line_1}}
+                          - address2:
+                              template: >-
+                                {{$SquareRetrievecustomers.address.address_line_2}}
+                          - country:
+                              template: '{{$SquareRetrievecustomers.address.country}}'
+                          - zip:
+                              template: '{{$SquareRetrievecustomers.address.postal_code}}'
+                  - email:
+                      template: '{{$SquareRetrievecustomers.email_address}}'
+                  - first_name:
+                      template: '{{$SquareRetrievecustomers.given_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: SquareCreatecustomer
+                    $ref: '#/node-output/Square Create customer/response/payload'
+                  - variable: SquareRetrievecustomers
+                    $ref: '#/node-output/Square Retrieve customers/response/payload'
+                  - variable: SquareRetrievecustomersMetadata
+                    $ref: '#/node-output/Square Retrieve customers/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: customer successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: SquareCreatecustomer
+                        $ref: '#/node-output/Square Create customer/response/payload'
+                      - variable: SquareRetrievecustomers
+                        $ref: >-
+                          #/node-output/Square Retrieve
+                          customers/response/payload
+                      - variable: SquareRetrievecustomersMetadata
+                        $ref: '#/node-output/Square Retrieve customers/response'
+                      - variable: ShopifyCreatecustomer
+                        $ref: '#/node-output/Shopify Create customer/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - id:
+                          template: '{{$SquareRetrievecustomers.id}}'
+                  input: []
+  name: Transfer customer between Square and Shopify
+models:
+  customer:
+    name: customer
+    properties:
+      id:
+        required: false
+        id: true
+        type: string
+      given_name:
+        required: false
+        id: false
+        type: string
+      email_address:
+        required: false
+        id: false
+        type: string
+      address:
+        required: false
+        id: false
+        type:
+          address_line_1:
+            required: false
+            id: false
+            type: string
+          address_line_2:
+            required: false
+            id: false
+            type: string
+          country:
+            required: false
+            id: false
+            type: string
+          postal_code:
+            required: false
+            id: false
+            type: string
+    plural: customer
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
