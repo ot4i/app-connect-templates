@@ -1,0 +1,91 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: String
+      connector-type: rediscache
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Redis Update or create string
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - expireTimeOut:
+                      expression: '9000'
+                  - expireTimeUnit:
+                      template: seconds
+                  - value:
+                      template: redis
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  key: testing
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - channel:
+                      template: CER2M2GGG
+                  - text:
+                      template: '{{$RedisUpdateorcreatestringMetadata}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: RedisUpdateorcreatestring
+                    $ref: >-
+                      #/node-output/Redis Update or create
+                      string/response/payload
+                  - variable: RedisUpdateorcreatestringMetadata
+                    $ref: '#/node-output/Redis Update or create string/response'
+  name: Update or create a configuration string in Redis
+  description: Use this template to update or create a string in Redis and then display the response payload from Redis in a Slack channel as confirmation.
+models: {}
