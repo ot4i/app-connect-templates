@@ -82,5 +82,5 @@ integration:
                       order/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Creates an order in Oracle E-Business Suite when a new opportunity is created in Salesforce
+  name: Create an order in Oracle E-Business Suite when a new opportunity is created in Salesforce
 models: {}
