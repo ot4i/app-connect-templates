@@ -1339,6 +1339,24 @@
    "targetApps": ["jenkins", "jira", "slack"],
    "tags": ["scheduler", "jenkins", "jira", "if"],
    "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Update or create a configuration string in Redis",
+   "description": "Use this template to update or create a string in Redis and then display the response payload from Redis in a Slack channel as confirmation.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["redis", "slack"],
+   "tags": ["scheduler", "redis", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve documents from IBM Cloudant and insert document data into a Google Cloud BigQuery table",
+   "description": "Use this template to retrieve documents from an IBM Cloudant database and inserts data from these documents into a Google Cloud BigQuery table.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["cloudantdb", "googlebigquery"],
+   "tags": ["scheduler", "cloudantdb", "googlebigquery", "foreach"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }
