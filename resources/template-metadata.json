@@ -1350,6 +1350,15 @@
    "offerings": ["app connect professional"] 
   },
   {
+   "name": "Retrieve a configuration string from Redis",
+   "description": "Use this template to retrieve an existing string in Redis and then display the response payload from Redis in a Slack channel as confirmation. This is a sequal use case of 'Update or create a configuration string in Redis'.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["redis", "slack"],
+   "tags": ["scheduler", "redis", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
    "name": "Retrieve documents from IBM Cloudant and insert document data into a Google Cloud BigQuery table",
    "description": "Use this template to retrieve documents from an IBM Cloudant database and inserts data from these documents into a Google Cloud BigQuery table.",
    "summary": "Scheduler to 2 applications",
