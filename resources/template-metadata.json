@@ -1330,6 +1330,15 @@
    "targetApps": ["dropbox", "googlecloudstorage", "slack"],
    "tags": ["scheduler", "dropbox", "slack", "googlecloudstorage", "foreach", "if"],
    "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve the last build from Jenkins and, if the build fails, create an issue in Jira if an issue doesn’t already exist",
+   "description": "Use this template to retrieve the last build details from Jenkins. If the build fails, an issue is created in Jira if an issue doesn’t already exist.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["jenkins", "jira", "slack"],
+   "tags": ["scheduler", "jenkins", "jira", "if"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }
