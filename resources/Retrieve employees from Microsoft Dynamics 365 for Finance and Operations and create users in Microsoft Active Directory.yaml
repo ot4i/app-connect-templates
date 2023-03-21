@@ -1,0 +1,175 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 10
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Employee
+      connector-type: msdynamicsfando
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: User
+      connector-type: msad
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: >-
+                Microsoft Dynamics 365 for Finance and Operations Retrieve
+                employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: $MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryCreateuser
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Active Directory
+                      Create user/response/payload
+                  - variable: SlackCreatemessage
+                    $ref: >-
+                      #/block/For each/node-output/Slack Create
+                      message/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                mappings: []
+              display-name: Microsoft Dynamics 365 for Finance and Operations Employee
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Active Directory Create user
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - cn:
+                      template: '{{$Foreachitem.Name}}_{{$now()}}'
+                  - ou:
+                      template: 'OU=sgou004,DC=ibm,DC=msad,DC=com'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - channel:
+                      template: CC6Q3SGQN
+                  - text:
+                      template: >-
+                        Added in AD
+                        is:::{{$MicrosoftActiveDirectoryCreateuser.distinguishedName}}
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryCreateuser
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Active Directory
+                      Create user/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+  name: Retrieve employees from Microsoft Dynamics 365 for Finance and Operations and create users in Microsoft Active Directory
+  description: Use this template to retrieve employees from Microsoft Dynamics 365 Finance and Operations and create a new user in Microsoft Active Directory (MSAD).
+models: {}
