@@ -1366,6 +1366,15 @@
    "targetApps": ["cloudantdb", "googlebigquery"],
    "tags": ["scheduler", "cloudantdb", "googlebigquery", "foreach"],
    "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve employees from Microsoft Dynamics 365 for Finance and Operations and create users in Microsoft Active Directory",
+   "description": "Use this template to retrieve employees from Microsoft Dynamics 365 Finance and Operations and create a new user in Microsoft Active Directory (MSAD).",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msdynamicsfando", "msad", "slack"],
+   "tags": ["scheduler", "msdynamicsfando", "msad", "slack", "foreach"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }
