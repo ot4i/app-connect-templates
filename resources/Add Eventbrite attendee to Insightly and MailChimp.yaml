@@ -1,0 +1,73 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: insightly
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Insightly Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - EMAIL_ADDRESS:
+                      template: '{{$Trigger.profile.email}}'
+                  - FIRST_NAME:
+                      template: '{{$Trigger.profile.first_name}}'
+                  - LAST_NAME:
+                      template: '{{$Trigger.profile.last_name}}'
+                  - LEAD_DESCRIPTION:
+                      template: 'Attendee at {{$Trigger.event_id}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: MailChimp Add subscriber to a list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - email_address:
+                      template: '{{$Trigger.profile.email}}'
+                  - list_id:
+                      template: 4b987b8188
+                  - merge_fields:
+                      mappings:
+                        - FNAME:
+                            template: '{{$Trigger.profile.first_name}}'
+                        - LNAME:
+                            template: '{{$Trigger.profile.last_name}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyCreatelead
+                    $ref: '#/node-output/Insightly Create lead/response/payload'
+  name: Add Eventbrite attendee to Insightly and MailChimp
+ description: This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.
+models: {}

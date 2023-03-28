@@ -1,0 +1,67 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '344797520005'
+            parentFilter:
+              organizationID: '344797520005'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: insightly
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Insightly Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - ADDRESS_CITY:
+                      template: '{{$Trigger.profile.addresses.home.city}}'
+                  - ADDRESS_COUNTRY:
+                      template: '{{$Trigger.profile.addresses.home.country}}'
+                  - ADDRESS_POSTCODE:
+                      template: '{{$Trigger.profile.addresses.home.postal_code}}'
+                  - ADDRESS_STATE:
+                      template: '{{$Trigger.profile.addresses.home.region}}'
+                  - ADDRESS_STREET:
+                      template: '{{$Trigger.profile.addresses.home.address_1}}'
+                  - EMAIL:
+                      template: '{{$Trigger.profile.email}}'
+                  - FIRST_NAME:
+                      template: '{{$Trigger.profile.first_name}}'
+                  - LAST_NAME:
+                      template: '{{$Trigger.profile.last_name}}'
+                  - MOBILE:
+                      template: '{{$Trigger.profile.cell_phone}}'
+                  - ORGANISATION_NAME:
+                      template: '{{$Trigger.profile.company}}'
+                  - TITLE:
+                      template: '{{$Trigger.profile.job_title}}'
+                  - WEBSITE:
+                      template: '{{$Trigger.profile.website}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Sync new attendee from Eventbrite to lead in Insightly
+  description: This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.
+models: {}
