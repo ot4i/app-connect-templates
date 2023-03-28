@@ -1252,7 +1252,7 @@
   },
   {
     "name": "Create a new contact in Salesforce for a new Eventbrite order",
-    "description": "When a new order for an event is created in Eventbrite, this flow tries to retrieve a matching contact in Salesforce by email address. If a matching contact is not found in Salesforce, the flow creates a new contact in Salesforce",
+    "description": "When a new order for an event is created in Eventbrite, this flow tries to retrieve a matching contact in Salesforce by email address. If a matching contact is not found in Salesforce, the flow creates a new contact in Salesforce.",
     "summary": "Eventbrite to Salesforce",
     "sourceApp": "eventbrite",
     "targetApps": ["salesforce"],
@@ -1261,7 +1261,7 @@
   },
   {
     "name": "Add Eventbrite event as a new Salesforce campaign and notify via Slack",
-    "description": "When a new event is created in Eventbrite, this flow tries to retrieve a matching campaign in Salesforce. If a matching campaign is not found in Salesforce, the flow creates a new campaign in Salesforce and adds a message to a Slack channel",
+    "description": "When a new event is created in Eventbrite, this flow tries to retrieve a matching campaign in Salesforce. If a matching campaign is not found in Salesforce, the flow creates a new campaign in Salesforce and adds a message to a Slack channel.",
     "summary": "Eventbrite to 2 applications",
     "sourceApp": "eventbrite",
     "targetApps": ["salesforce", "slack"],
@@ -1378,7 +1378,7 @@
     },
     {
       "name": "Record Eventbrite attendees to Google Sheets",
-      "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets",
+      "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets.",
       "summary": "Eventbrite to Google Sheets",
       "sourceApp": "eventbrite",
       "targetApps": ["googlesheet"],
@@ -1396,7 +1396,7 @@
     },
     {
       "name": "Announce new Eventbrite attendee on Slack",
-      "description": "Use this template to send a Slack message when new attendees register for an Eventbrite event",
+      "description": "Use this template to send a Slack message when new attendees register for an Eventbrite event.",
       "summary": "Eventbrite to Slack",
       "sourceApp": "eventbrite",
       "targetApps": ["slack"],
@@ -1405,7 +1405,7 @@
     },
 	 {
     "name": "Announce new Eventbrite attendee on Slack and send voucher",
-    "description": "Use this template to send a free drink voucher to attendees of Eventbrite event",
+    "description": "Use this template to send a free drink voucher to attendees of Eventbrite event.",
     "summary": "Eventbrite to 2 applications",
     "sourceApp": "eventbrite",
     "targetApps": ["slack", "gmail"],
