@@ -1314,13 +1314,13 @@
     "offerings": ["app connect professional"]
    },
   {
-	"name": "Update or create a Salesforce contact for a new Eventbrite event attendee",
-	"description": "This template updates or creates a Salesforce contact when a new attendee signs up for an Eventbrite event, depending on whether the Salesforce contact exists. It then posts a message to a Slack channel, depending on whether the contact was created or updated.",
-	"summary": "Eventbrite to 2 applications",
-	"sourceApp": "eventbrite",
-	"targetApps": ["salesforce", "slack"],
-	"tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if", "conditional"],
-	"offerings": ["app connect professional"]
+    "name": "Update or create a Salesforce contact for a new Eventbrite event attendee",
+    "description": "This template updates or creates a Salesforce contact when a new attendee signs up for an Eventbrite event, depending on whether the Salesforce contact exists. It then posts a message to a Slack channel, depending on whether the contact was created or updated.",
+    "summary": "Eventbrite to 2 applications",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce", "slack"],
+    "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if", "conditional"],
+    "offerings": ["app connect professional"]
   },
   {
     "name": "Send Gmail message when a new event is added in Eventbrite",
@@ -1341,58 +1341,76 @@
     "offerings": ["app connect professional"]
     },
     {
-    "name": "Create Sharepoint team site for new Eventbrite event",
-    "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
+      "name": "Create Sharepoint team site for new Eventbrite event",
+      "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
+      "summary": "Eventbrite to 2 applications",
+      "sourceApp": "eventbrite",
+      "targetApps": ["mssharepoint", "slack"],
+      "tags": ["eventbrite", "mssharepoint", "slack", "site", "list", "message"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
+      "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
+      "summary": "Eventbrite to Microsoft Dynamics 365",
+      "sourceApp": "eventbrite",
+      "targetApps": ["msdynamicscrmrest"],
+      "tags": ["eventbrite", "msdynamicscrmrest"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
+      "description": "This template allows you to receive a Microsoft Teams message with the event details when a new event is created in Eventbrite.",
+      "summary": "Eventbrite to Microsoft Teams",
+      "sourceApp": "eventbrite",
+      "targetApps": ["msteams"],
+      "tags": ["eventbrite", "msteams"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Sync new attendee from Eventbrite to lead in Insightly",
+      "description": "This template creates a new lead in Insightly when a new attendee is created in Eventbrite.",
+      "summary": " Eventbrite to Insightly",
+      "sourceApp": "eventbrite",
+      "targetApps": ["insightly"],
+      "tags": ["eventbrite", "insightly"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Record Eventbrite attendees to Google Sheets",
+      "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets",
+      "summary": "Eventbrite to Google Sheets",
+      "sourceApp": "eventbrite",
+      "targetApps": ["googlesheet"],
+      "tags": ["googlesheet", "eventbrite"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Update Eventbrite event based on IBM Weather forecast",
+      "description": "An API to get the weather forecast for an Eventbrite event and take different actions based on weather criteria.",
+      "summary": "1 flow using 4 applications",
+      "sourceApp": "api",
+      "targetApps": ["eventbrite", "http", "ibmtwc"],
+      "tags": ["api", "eventbrite", "http", "ibmtwc", "weather"],
+      "offerings": ["app connect professional"]
+    },
+    {
+      "name": "Announce new Eventbrite attendee on Slack",
+      "description": "Use this template to send a Slack message when new attendees register for an Eventbrite event",
+      "summary": "Eventbrite to Slack",
+      "sourceApp": "eventbrite",
+      "targetApps": ["slack"],
+      "tags": ["eventbrite", "slack"],
+      "offerings": ["app connect professional"]
+    },
+	 {
+    "name": "Announce new Eventbrite attendee on Slack and send voucher",
+    "description": "Use this template to send a free drink voucher to attendees of Eventbrite event",
     "summary": "Eventbrite to 2 applications",
     "sourceApp": "eventbrite",
-    "targetApps": ["mssharepoint", "slack"],
-    "tags": ["eventbrite", "mssharepoint", "slack", "site", "list", "message"],
+    "targetApps": ["slack", "gmail"],
+    "tags": ["eventbrite", "slack", "gmail", "if"],
     "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
-    "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
-    "summary": "Eventbrite to Microsoft Dynamics 365",
-    "sourceApp": "eventbrite",
-    "targetApps": ["msdynamicscrmrest"],
-    "tags": ["eventbrite", "msdynamicscrmrest"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
-    "description": "This template allows you to receive a Microsoft Teams message with the event details when a new event is created in Eventbrite.",
-    "summary": "Eventbrite to Microsoft Teams",
-    "sourceApp": "eventbrite",
-    "targetApps": ["msteams"],
-    "tags": ["eventbrite", "msteams"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Sync new attendee from Eventbrite to lead in Insightly",
-    "description": "This template creates a new lead in Insightly when a new attendee is created in Eventbrite.",
-    "summary": " Eventbrite to Insightly",
-    "sourceApp": "eventbrite",
-    "targetApps": ["insightly"],
-    "tags": ["eventbrite", "insightly"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Record Eventbrite attendees to Google Sheets",
-    "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets",
-    "summary": "Eventbrite to Google Sheets",
-    "sourceApp": "eventbrite",
-    "targetApps": ["googlesheet"],
-    "tags": ["googlesheet", "eventbrite"],
-    "offerings": ["app connect professional"]
-    },
-    {
-    "name": "Update Eventbrite event based on IBM Weather forecast",
-    "description": "An API to get the weather forecast for an Eventbrite event and take different actions based on weather criteria.",
-    "summary": "1 flow using 4 applications",
-    "sourceApp": "api",
-    "targetApps": ["eventbrite", "http", "ibmtwc"],
-    "tags": ["api", "eventbrite", "http", "ibmtwc", "weather"],
-    "offerings": ["app connect professional"]
-    }
+   }
 ]
 }
