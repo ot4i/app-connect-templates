@@ -1249,6 +1249,15 @@
    "targetApps": ["oracleebs", "slack"],
    "tags": ["salesforce", "oracleebs", "slack"],
    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create a new contact in Salesforce for a new Eventbrite order",
+    "description": "When a new order for an event is created in Eventbrite, this flow tries to retrieve a matching contact in Salesforce by email address. If a matching contact is not found in Salesforce, the flow creates a new contact in Salesforce",
+    "summary": "Eventbrite to Salesforce",
+    "sourceApp": "eventbrite",
+    "targetApps": ["salesforce"],
+    "tags": ["eventbrite", "salesforce"],
+    "offerings": ["app connect professional"]
   }
 ]
 }
