@@ -1249,6 +1249,15 @@
    "targetApps": ["oracleebs", "slack"],
    "tags": ["salesforce", "oracleebs", "slack"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add records to Amazon Kinesis data streams for each object retrieved from Amazon S3",
+   "description": "Use this template to add records to Amazon Kinesis data streams for each object retrieved from Amazon S3. Make sure that you run the Get Amazon Kinesis data stream record flow before running this flow.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["amazons3", "amazonkinesis", "slack"],
+   "tags": ["scheduler", "amazons3", "slack", "amazonkinesis", "foreach"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }
