@@ -122,7 +122,7 @@ integration:
                       Update file/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Export report from Power Bi and create the file in Microsoft OneDrive for Business
+  name: Export the report from Microsoft Power BI and create the file in Microsoft OneDrive for Business
   description: >-
     Use this template to export a report from Microsoft Power BI and create the file in Microsoft OneDrive for Business. If the report already exists, it will be updated in Microsoft OneDrive for Business.
 models: {}
