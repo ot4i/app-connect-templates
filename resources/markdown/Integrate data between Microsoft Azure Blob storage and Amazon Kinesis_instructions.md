@@ -1,5 +1,5 @@
 
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Data%20integration%20between%20Microsoft%20Azure%20Blob%20storage%20and%20Amazon%20Kinesis_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Integrate%20data%20between%20Microsoft%20Azure%20Blob%20storage%20and%20Amazon%20Kinesis_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
