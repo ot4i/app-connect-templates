@@ -1,0 +1,260 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: build
+      connector-type: jenkins
+      actions:
+        GET_LAST_BUILD: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Jenkins Get last build
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: JenkinsRetrievebuilds
+                  $ref: '#/node-output/Jenkins Retrieve builds/response/payload'
+                - variable: JenkinsRetrievebuildsMetadata
+                  $ref: '#/node-output/Jenkins Retrieve builds/response'
+                - variable: JenkinsRetrievebuilds2
+                  $ref: '#/node-output/Jenkins Retrieve builds 2/response/payload'
+                - variable: JenkinsRetrievebuilds2Metadata
+                  $ref: '#/node-output/Jenkins Retrieve builds 2/response'
+              branch:
+                - condition:
+                    '{{$JenkinsRetrievebuilds.id}}': '{{$JenkinsRetrievebuilds2.id}}'
+                  execute:
+                    - retrieve-action:
+                        name: Jira Retrieve issues
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            description: Build no. {{$JenkinsRetrievebuilds2.id}} failed.
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: false
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - if:
+                        name: If 2
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: JiraRetrieveissues
+                            $ref: >-
+                              #/block/If/node-output/Jira Retrieve
+                              issues/response/payload
+                          - variable: JiraRetrieveissuesMetadata
+                            $ref: >-
+                              #/block/If/node-output/Jira Retrieve
+                              issues/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$JiraRetrieveissues.fields.issuetype.name}}': Bug
+                            execute:
+                              - create-action:
+                                  name: Slack Send message
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-6
+                                  map:
+                                    mappings:
+                                      - OBJECT_ID:
+                                          template: C04100PVAH3
+                                      - OBJECT_NAME:
+                                          template: channel
+                                      - text:
+                                          template: Jira Issue Already raised!
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: JiraRetrieveissues
+                                        $ref: >-
+                                          #/block/If/node-output/Jira Retrieve
+                                          issues/response/payload
+                                      - variable: JiraRetrieveissuesMetadata
+                                        $ref: >-
+                                          #/block/If/node-output/Jira Retrieve
+                                          issues/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute:
+                            - create-action:
+                                name: Jira Create issue
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-4
+                                map:
+                                  mappings:
+                                    - description:
+                                        template: ' Build no. {{$JenkinsRetrievebuilds2.id}} failed.'
+                                    - issuetype:
+                                        mappings:
+                                          - name:
+                                              template: Bug
+                                    - key:
+                                        template: WOR
+                                    - summary:
+                                        template: >-
+                                          {{$JenkinsRetrievebuilds2.fullDisplayName}}
+                                          build failed!
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: JiraRetrieveissues
+                                      $ref: >-
+                                        #/block/If/node-output/Jira Retrieve
+                                        issues/response/payload
+                                    - variable: JiraRetrieveissuesMetadata
+                                      $ref: >-
+                                        #/block/If/node-output/Jira Retrieve
+                                        issues/response
+                                    - variable: JenkinsRetrievebuilds
+                                      $ref: >-
+                                        #/node-output/Jenkins Retrieve
+                                        builds/response/payload
+                                    - variable: JenkinsRetrievebuildsMetadata
+                                      $ref: >-
+                                        #/node-output/Jenkins Retrieve
+                                        builds/response
+                                    - variable: JenkinsRetrievebuilds2
+                                      $ref: >-
+                                        #/node-output/Jenkins Retrieve builds
+                                        2/response/payload
+                                    - variable: JenkinsRetrievebuilds2Metadata
+                                      $ref: >-
+                                        #/node-output/Jenkins Retrieve builds
+                                        2/response
+                            - create-action:
+                                name: Slack Send message 2
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-5
+                                map:
+                                  mappings:
+                                    - OBJECT_ID:
+                                        template: C04100PVAH3
+                                    - OBJECT_NAME:
+                                        template: channel
+                                    - text:
+                                        template: Jira issue created.
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: JiraCreateissue
+                                      $ref: >-
+                                        #/block/If 2/node-output/Jira Create
+                                        issue/response/payload
+                                    - variable: JiraRetrieveissues
+                                      $ref: >-
+                                        #/block/If/node-output/Jira Retrieve
+                                        issues/response/payload
+                                    - variable: JiraRetrieveissuesMetadata
+                                      $ref: >-
+                                        #/block/If/node-output/Jira Retrieve
+                                        issues/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                        output-schema: {}
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-7'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04100PVAH3
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: Last Build is Passed
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Retrieve the last build from Jenkins and if the build fails create an issue in Jira if an issue does not already exist
+  description: Use this template to retrieve any type of file from the specified Dropbox path, downloads the content, and uploads the metadata and the file to a Google Cloud Storage bucket.
+models: {}

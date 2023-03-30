@@ -1,0 +1,220 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        retrieveServicenowteamsUC2:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: servicenowteamsUC2
+          output-context:
+            data: servicenowteamsUC2
+      options:
+        resources:
+          - business-object: servicenowteamsUC2
+            model:
+              $ref: '#/models/servicenowteamsUC2'
+            triggers:
+              retrieve: retrieveServicenowteamsUC2
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ServiceNow Retrieve incidents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  severity: '{{$api.Severity_level}}'
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ServiceNowRetrieveincidents '
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: >-
+                      #/node-output/ServiceNow Retrieve
+                      incidents/response/payload
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/node-output/ServiceNow Retrieve incidents/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: >-
+                      #/node-output/ServiceNow Retrieve
+                      incidents/response/payload
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/node-output/ServiceNow Retrieve incidents/response'
+                mappings: []
+              display-name: ServiceNow incident
+          - response:
+              name: response-1
+              reply-maps:
+                - title: servicenow_teamsUC2 successfully retrieved
+                  status-code: '200'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: ServiceNowRetrieveincidents
+                        $ref: >-
+                          #/node-output/ServiceNow Retrieve
+                          incidents/response/payload
+                      - variable: ServiceNowRetrieveincidentsMetadata
+                        $ref: '#/node-output/ServiceNow Retrieve incidents/response'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings:
+                      - Severity_level:
+                          template: '{{$ServiceNowRetrieveincidents}}'
+                  input:
+                    - variable: api
+                      $ref: '#/trigger/api/parameters'
+                    - variable: ServiceNowRetrieveincidents
+                      $ref: >-
+                        #/node-output/ServiceNow Retrieve
+                        incidents/response/payload
+                    - variable: ServiceNowRetrieveincidentsMetadata
+                      $ref: '#/node-output/ServiceNow Retrieve incidents/response'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: api
+                  $ref: '#/trigger/api/parameters'
+                - variable: ServiceNowRetrieveincidents
+                  $ref: '#/node-output/ServiceNow Retrieve incidents/response/payload'
+                - variable: ServiceNowRetrieveincidentsMetadata
+                  $ref: '#/node-output/ServiceNow Retrieve incidents/response'
+              branch:
+                - condition:
+                    '{{$Foreachitem.active}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: Microsoft Teams Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Escalated ticket that are active for
+                                        this for this week
+                                        {{$ServiceNowRetrieveincidents}}
+                            - channelId:
+                                template: >-
+                                  19:abbef5bdc8a4468c918ed054229316e9@thread.tacv2
+                            - teamId:
+                                template: 4ce33cb7-415a-4511-a447-a1d98f5a9399
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
+                            - variable: ServiceNowRetrieveincidents
+                              $ref: >-
+                                #/node-output/ServiceNow Retrieve
+                                incidents/response/payload
+                            - variable: ServiceNowRetrieveincidentsMetadata
+                              $ref: >-
+                                #/node-output/ServiceNow Retrieve
+                                incidents/response
+              else:
+                execute:
+                  - create-action:
+                      name: Microsoft Teams Create message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - body:
+                              mappings:
+                                - content:
+                                    template: >-
+                                      Inactive tickets
+                                      are{{$ServiceNowRetrieveincidents.sys_id}}
+                          - channelId:
+                              template: '19:3cee350d9067412994921b9596620dda@thread.tacv2'
+                          - teamId:
+                              template: 4ce33cb7-415a-4511-a447-a1d98f5a9399
+                        $map: 'http://ibm.com/appconnect/map/v1'
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: api
+                            $ref: '#/trigger/api/parameters'
+                          - variable: ServiceNowRetrieveincidents
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve
+                              incidents/response/payload
+                          - variable: ServiceNowRetrieveincidentsMetadata
+                            $ref: >-
+                              #/node-output/ServiceNow Retrieve
+                              incidents/response
+              output-schema: {}
+  name: Retrieve incidents from ServiceNow based on the severity level and push incident details to a Microsoft Teams channel
+  description: Use this template to retrieve incidents from ServiceNow and send those incidents, along with incident details, to a channel in Microsoft Teams.
+models:
+  servicenowteamsUC2:
+    name: servicenowteamsUC2
+    properties:
+      Severity_level:
+        required: false
+        id: true
+        type: string
+    plural: servicenowteamsUC2
+    description: ' '
+    operations:
+      retrieve: '#/integration/assemblies/assembly-1'

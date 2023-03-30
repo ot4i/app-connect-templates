@@ -1,0 +1,337 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createUseCase:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: UseCase
+          output-context:
+            data: UseCase
+      options:
+        resources:
+          - business-object: UseCase
+            model:
+              $ref: '#/models/UseCase'
+            triggers:
+              create: createUseCase
+      type: api-trigger
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: document
+      connector-type: cloudantdb
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: googlepubsub
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: googlepubsub
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: googlepubsub
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: IBM Cloudant Retrieve documents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  db_name: a0flights
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: $IBMCloudantRetrievedocuments
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: IBMCloudantRetrievedocuments
+                    $ref: >-
+                      #/node-output/IBM Cloudant Retrieve
+                      documents/response/payload
+                  - variable: IBMCloudantRetrievedocumentsMetadata
+                    $ref: '#/node-output/IBM Cloudant Retrieve documents/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: IBMCloudantRetrievedocuments
+                    $ref: >-
+                      #/node-output/IBM Cloudant Retrieve
+                      documents/response/payload
+                  - variable: IBMCloudantRetrievedocumentsMetadata
+                    $ref: '#/node-output/IBM Cloudant Retrieve documents/response'
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      Output:
+                        type: string
+                mappings:
+                  - output:
+                      mappings:
+                        - Output:
+                            template: '{{$Foreachitem}}'
+              display-name: IBM Cloudant document
+          - response:
+              name: response-1
+              reply-maps:
+                - title: UseCase successfully created
+                  status-code: '201'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: IBMCloudantRetrievedocuments
+                        $ref: >-
+                          #/node-output/IBM Cloudant Retrieve
+                          documents/response/payload
+                      - variable: IBMCloudantRetrievedocumentsMetadata
+                        $ref: '#/node-output/IBM Cloudant Retrieve documents/response'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings:
+                      - CloudantDB:
+                          template: '{{$IBMCloudantRetrievedocuments}}'
+                      - GooglePubSub:
+                          template: '{{$Foreach}}'
+                      - time:
+                          expression: '$Request '
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: IBMCloudantRetrievedocuments
+                      $ref: >-
+                        #/node-output/IBM Cloudant Retrieve
+                        documents/response/payload
+                    - variable: IBMCloudantRetrievedocumentsMetadata
+                      $ref: '#/node-output/IBM Cloudant Retrieve documents/response'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+                - variable: IBMCloudantRetrievedocuments
+                  $ref: >-
+                    #/node-output/IBM Cloudant Retrieve
+                    documents/response/payload
+                - variable: IBMCloudantRetrievedocumentsMetadata
+                  $ref: '#/node-output/IBM Cloudant Retrieve documents/response'
+              branch:
+                - condition:
+                    '{{$Foreachitem.data.time}}':
+                      gt: '{{$Request.time}}'
+                  execute:
+                    - if:
+                        name: If
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Request
+                            $ref: '#/trigger/payload'
+                          - variable: IBMCloudantRetrievedocuments
+                            $ref: >-
+                              #/node-output/IBM Cloudant Retrieve
+                              documents/response/payload
+                          - variable: IBMCloudantRetrievedocumentsMetadata
+                            $ref: >-
+                              #/node-output/IBM Cloudant Retrieve
+                              documents/response
+                        branch:
+                          - condition:
+                              '{{$Foreachitem.data.status}}': cancelled
+                            execute:
+                              - create-action:
+                                  name: Google Cloud Pub Sub Create message
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-1
+                                  map:
+                                    mappings:
+                                      - data:
+                                          template: >-
+                                            Flight {{$Foreachitem.data.flightname}}
+                                            is cancelled.
+                                      - topic:
+                                          template: >-
+                                            projects/wds-project-225410/topics/aaFlightsCancelled
+                                    $map: 'http://ibm.com/appconnect/map/v1'
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Request
+                                        $ref: '#/trigger/payload'
+                                      - variable: IBMCloudantRetrievedocuments
+                                        $ref: >-
+                                          #/node-output/IBM Cloudant Retrieve
+                                          documents/response/payload
+                                      - variable: IBMCloudantRetrievedocumentsMetadata
+                                        $ref: >-
+                                          #/node-output/IBM Cloudant Retrieve
+                                          documents/response
+                          - condition:
+                              '{{$Foreachitem.data.status}}': ontime
+                            execute:
+                              - create-action:
+                                  name: Google Cloud Pub Sub Create message 2
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-3
+                                  map:
+                                    mappings:
+                                      - data:
+                                          template: >-
+                                            Flight {{$Foreachitem.data.flightname}}
+                                            is on time.
+                                      - topic:
+                                          template: >-
+                                            projects/wds-project-225410/topics/aaFlightsOnTime
+                                    $map: 'http://ibm.com/appconnect/map/v1'
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Request
+                                        $ref: '#/trigger/payload'
+                                      - variable: IBMCloudantRetrievedocuments
+                                        $ref: >-
+                                          #/node-output/IBM Cloudant Retrieve
+                                          documents/response/payload
+                                      - variable: IBMCloudantRetrievedocumentsMetadata
+                                        $ref: >-
+                                          #/node-output/IBM Cloudant Retrieve
+                                          documents/response
+                          - condition:
+                              '{{$Foreachitem.data.status}}': delayed
+                            execute:
+                              - create-action:
+                                  name: Google Cloud Pub Sub Create message 3
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-4
+                                  map:
+                                    mappings:
+                                      - data:
+                                          template: >-
+                                            Flight {{$Foreachitem.data.flightname}}
+                                            is delayed.
+                                      - topic:
+                                          template: >-
+                                            projects/wds-project-225410/topics/aaFlightsDelayed
+                                    $map: 'http://ibm.com/appconnect/map/v1'
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Request
+                                        $ref: '#/trigger/payload'
+                                      - variable: IBMCloudantRetrievedocuments
+                                        $ref: >-
+                                          #/node-output/IBM Cloudant Retrieve
+                                          documents/response/payload
+                                      - variable: IBMCloudantRetrievedocumentsMetadata
+                                        $ref: >-
+                                          #/node-output/IBM Cloudant Retrieve
+                                          documents/response
+                        else:
+                          execute: []
+                          completion-action:
+                            terminate:
+                              error:
+                                input:
+                                  - variable: Foreachitem
+                                    $ref: '#/block/For each/current-item'
+                                  - variable: Request
+                                    $ref: '#/trigger/payload'
+                                  - variable: IBMCloudantRetrievedocuments
+                                    $ref: >-
+                                      #/node-output/IBM Cloudant Retrieve
+                                      documents/response/payload
+                                  - variable: IBMCloudantRetrievedocumentsMetadata
+                                    $ref: >-
+                                      #/node-output/IBM Cloudant Retrieve
+                                      documents/response
+                                message: Please Check The Inputs
+                                status-code: 400
+                        output-schema: {}
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    error:
+                      input:
+                        - variable: Foreachitem
+                          $ref: '#/block/For each/current-item'
+                        - variable: Request
+                          $ref: '#/trigger/payload'
+                        - variable: IBMCloudantRetrievedocuments
+                          $ref: >-
+                            #/node-output/IBM Cloudant Retrieve
+                            documents/response/payload
+                        - variable: IBMCloudantRetrievedocumentsMetadata
+                          $ref: >-
+                            #/node-output/IBM Cloudant Retrieve
+                            documents/response
+                      message: Flow Stops Here
+                      status-code: 400
+              output-schema: {}
+  name: Retrieve documents from IBM Cloudant and publish them in Google Cloud PubSub topics
+  description: Use this template to retrieve the flight times from an IBM Cloudant database and publish them into Google Cloud PubSub topics.
+models:
+  UseCase:
+    name: UseCase
+    properties:
+      time:
+        required: false
+        id: false
+        type: date
+      GooglePubSub:
+        required: false
+        id: true
+        type: string
+      CloudantDB:
+        required: false
+        id: false
+        type: string
+    plural: UseCase
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    methods: {}
