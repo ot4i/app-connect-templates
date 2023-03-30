@@ -1260,7 +1260,7 @@
    "offerings": ["app connect professional"] 
   },
   {
-   "name": "Data integration between Microsoft Azure Blob storage and Amazon Kinesis",
+   "name": "Integrate data between Microsoft Azure Blob storage and Amazon Kinesis",
    "description": "Use this template to retrieve a blob file from a specified Azure blob container, split the content into a user-defined file size, download the file content, and add the spilt records to an Amazon S3 bucket through Amazon Kinesis delivery streams.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
@@ -1314,7 +1314,7 @@
    "offerings": ["app connect professional"] 
   },
   {
-   "name": "Export report from Power Bi and create the file in Microsoft OneDrive for Business",
+   "name": "Export the report from Microsoft Power BI and create the file in Microsoft OneDrive for Business",
    "description": "Use this template to export a report from Microsoft Power BI and create the file in Microsoft OneDrive for Business. If the report already exists, it will be updated in Microsoft OneDrive for Business.",
    "summary": "Scheduler to 3 applications",
    "sourceApp": "streaming-connector-scheduler",
