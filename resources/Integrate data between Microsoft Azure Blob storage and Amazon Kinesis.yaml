@@ -318,5 +318,5 @@ integration:
                     $ref: '#/node-output/Set variable 2/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Data integration between Microsoft Azure Blob storage and Amazon Kinesis
+  name: Integrate data between Microsoft Azure Blob storage and Amazon Kinesis
 models: {}
