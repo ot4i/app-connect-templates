@@ -77,7 +77,7 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: SalesforceCreateorder
                     $ref: '#/node-output/Salesforce Create order/response/payload'
-  name: Create order in Salesforce whenever a new customer order is created in Magento
+  name: Create an order in Salesforce whenever a new customer order is created in Magento
   description: >-
     Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce, and send the order confirmation number by Gmail whenever a new customer order is created in Magento.
 models: {}
