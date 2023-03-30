@@ -1,0 +1,152 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Goalvalues
+      connector-type: mspowerbi
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Power BI Retrieve goal values
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - goalId: 95273ea2-a4f6-4694-9afd-41f4acfc7bbe
+                    - groupId: ea039c46-994c-4c6d-ab4d-50b397554aa4
+                    - scorecardId: 3d210122-5adb-4a18-88ef-28e83e54cebe
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftPowerBIRetrievegoalvalues
+                  $ref: >-
+                    #/node-output/Microsoft Power BI Retrieve goal
+                    values/response/payload
+                - variable: MicrosoftPowerBIRetrievegoalvaluesMetadata
+                  $ref: >-
+                    #/node-output/Microsoft Power BI Retrieve goal
+                    values/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MicrosoftPowerBIRetrievegoalvalues.value}}':
+                      lt: '5'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Targett not achieved.
+
+                                  Expected Value:
+                                  {{$MicrosoftPowerBIRetrievegoalvalues.target}}
+
+                                  Completed:
+                                  {{$MicrosoftPowerBIRetrievegoalvalues.value}}
+                            - Subject:
+                                template: 'Alert: Goal Not Achieved '
+                            - To:
+                                template: user2@company.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftPowerBIRetrievegoalvalues
+                              $ref: >-
+                                #/node-output/Microsoft Power BI Retrieve goal
+                                values/response/payload
+                            - variable: MicrosoftPowerBIRetrievegoalvaluesMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Power BI Retrieve goal
+                                values/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - Body:
+                              template: >-
+                                Goal is on track. Achieved
+                                {{$MicrosoftPowerBIRetrievegoalvalues.value}}
+                                out of
+                                {{$MicrosoftPowerBIRetrievegoalvalues.target}}
+                          - Subject:
+                              template: Goal is on track!
+                          - To:
+                              template: user1@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: MicrosoftPowerBIRetrievegoalvalues
+                            $ref: >-
+                              #/node-output/Microsoft Power BI Retrieve goal
+                              values/response/payload
+                          - variable: MicrosoftPowerBIRetrievegoalvaluesMetadata
+                            $ref: >-
+                              #/node-output/Microsoft Power BI Retrieve goal
+                              values/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Send a Gmail message when the Microsoft Power BI target goal value is either achieved or failed
+  description: >-
+    Use this template to send a Gmail message to the intended recipient if the retrieved Microsoft Power BI goal value set is not achieved. A Gmail message will also be sent if the goal value is achieved.
+models: {}
