@@ -1,0 +1,244 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Epic
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            group_id: '4058'
+            parentFilter:
+              group_id: '4058'
+            subscription:
+              createdField: created_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+      connector-type: gitlab
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Trigger.labels '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: GitLab Labels
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Excel Online Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  and:
+                    - DriveId: >-
+                        b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                    - WorkbookId: 01NODPFIRI5HAJNTT5GVE3FUWBC7F4XVTS
+                    - WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Attendees:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send
+                      message/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Excel Online
+                      Retrieve rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Excel Online
+                      Retrieve rows/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Attendees:
+                            template: >-
+                              {{$MicrosoftExcelOnlineRetrieverows[rowData.B=$Foreachitem]}}
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Setvariable.variable.Attendees}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: SlackSendmessage3
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      3/response/payload
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: >
+                [{"rowIndex":2,"rowData":{"A":"AdityaPandit","B":"Codejiggers","C":"user2@company.com"},"address":"Sheet1!A1:C4","addressLocal":"Sheet1!A1:C4","columnCount":3,"cellCount":12,"columnHidden":false,"rowHidden":false},{"rowIndex":3,"rowData":{"A":"Amurta","B":"Codejiggers","C":"user3@company.com"},"address":"Sheet1!A1:C4","addressLocal":"Sheet1!A1:C4","columnCount":3,"cellCount":12,"columnHidden":false,"rowHidden":false}]
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: array
+                items:
+                  type: object
+                  properties:
+                    rowIndex:
+                      type: number
+                    rowData:
+                      type: object
+                      properties:
+                        A:
+                          type: string
+                        B:
+                          type: string
+                        C:
+                          type: string
+                    address:
+                      type: string
+                    addressLocal:
+                      type: string
+                    columnCount:
+                      type: number
+                    cellCount:
+                      type: number
+                    columnHidden:
+                      type: boolean
+                    rowHidden:
+                      type: boolean
+                title: Parsed JSON
+          - create-action:
+              name: Google Calendar Create event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - attendees:
+                      foreach:
+                        input: '$JSONParserParse '
+                        iterator: attendeesItem
+                        mappings:
+                          - email:
+                              template: '{{$attendeesItem.rowData.C}}'
+                  - endTime:
+                      template: '2023-03-07T19:30:00'
+                  - id:
+                      template:user1@company.com
+                  - recurrenceRequest:
+                      foreach:
+                        input: '[1]'
+                        iterator: recurrenceRequestItem
+                        mappings:
+                          - frequency:
+                              template: Daily
+                          - until:
+                              template: >-
+                                {{$formatDate($toMillis($Trigger.due_date) ,
+                                "YYYYMMDD", "UTC")}}
+                  - startTime:
+                      template: '2023-03-07T19:00:00'
+                  - summary:
+                      template: '{{$Trigger.title}}'
+                  - timeZone:
+                      template: Asia/Kolkata
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Excel Online
+                      Retrieve rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Excel Online
+                      Retrieve rows/response
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/For each/node-output/JSON Parser
+                      Parse/response/payload
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      2/response/payload
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a Google Calendar event whenever an epic is created in GitLab
+  description: >-
+    Use this template to create an event in Google Calendar whenever an epic is created in Gitlab. In this example, the GitLab epic details are parsed to Google Calendar, and an invite gets sent to the intended attendees with the epic details.
+models: {}
