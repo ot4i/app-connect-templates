@@ -325,6 +325,6 @@ integration:
                               #/node-output/Dropbox Retrieve folder
                               items/response
               output-schema: {}
-  name: Data Ingestion to Google Cloud Storage from Dropbox
+  name: Data ingestion to Google Cloud Storage from Dropbox
   description: Use this template to retrieve any type of file from the specified Dropbox path, downloads the content, and uploads the metadata and the file to a Google Cloud Storage bucket.
 models: {}
