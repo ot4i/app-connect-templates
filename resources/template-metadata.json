@@ -1249,6 +1249,96 @@
    "targetApps": ["oracleebs", "slack"],
    "tags": ["salesforce", "oracleebs", "slack"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add records to Amazon Kinesis data streams for each object retrieved from Amazon S3",
+   "description": "Use this template to add records to Amazon Kinesis data streams for each object retrieved from Amazon S3. Make sure that you run the Get Amazon Kinesis data stream record flow before running this flow.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["amazons3", "amazonkinesis", "slack"],
+   "tags": ["scheduler", "amazons3", "slack", "amazonkinesis", "foreach"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Integrate data between Microsoft Azure Blob storage and Amazon Kinesis",
+   "description": "Use this template to retrieve a blob file from a specified Azure blob container, split the content into a user-defined file size, download the file content, and add the spilt records to an Amazon S3 bucket through Amazon Kinesis delivery streams.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["azureblobstorage", "amazonkinesis", "slack"],
+   "tags": ["scheduler", "azureblobstorage", "slack", "amazonkinesis", "foreach"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Filter records with speed limit violations and add these records to Amazon S3 via the Amazon Kinesis delivery stream",
+   "description": "Use this template to add the vehicle records with speed limit violation in Amazon Kinesis. The Amazon CloudWatch event logs are seamlessly retrieved and published to an Amazon Kinesis data stream. The data is processed, and the filtered data (which violates the speed limit) is added to the Amazon S3 bucket via Amazon Kinesis delivery streams.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["amazonkinesis", "amazoncloudwatch", "slack"],
+   "tags": ["scheduler", "amazonkinesis", "slack", "amazoncloudwatch"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Get Amazon Kinesis data stream records",
+   "description": "Use this template to retrieve data stream records. This flow acts as a consumer for the use case: Add records to Amazon Kinesis data streams for each object retrieved from Amazon S3.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["amazonkinesis", "slack"],
+   "tags": ["scheduler", "amazonkinesis", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create a supplier in Coupa for each supplier profile downloaded from SAP Ariba",
+   "description": "Use this template to download the supplier profiles from SAP Ariba and create these suppliers in Coupa for each of the supplier profiles that were downloaded from SAP Ariba with the relevant supplier information.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["sapariba", "slack", "coupa"],
+   "tags": ["scheduler", "sapariba", "slack", "coupa"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create a sourcing project in SAP Ariba for each project retrieved from Insightly",
+   "description": "Use this template to create a sourcing project in SAP Ariba for each project retrieved from Insightly.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["insightly", "sapariba"],
+   "tags": ["scheduler", "insightly", "sapariba"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create a Google Calendar event whenever an epic is created in GitLab",
+   "description": "Use this template to create an event in Google Calendar whenever an epic is created in Gitlab. In this example, the GitLab epic details are parsed to Google Calendar, and an invite gets sent to the intended attendees with the epic details.",
+   "summary": "GitLab to 2 applications",
+   "sourceApp": "gitlab",
+   "targetApps": ["msexcel", "googlecalendar"],
+   "tags": ["gitlab", "msexcel", "googlecalendar", "foreach", "setVariable", "JSON parser"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Export the report from Microsoft Power BI and create the file in Microsoft OneDrive for Business",
+   "description": "Use this template to export a report from Microsoft Power BI and create the file in Microsoft OneDrive for Business. If the report already exists, it will be updated in Microsoft OneDrive for Business.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["mspowerbi", "msonedrive", "slack"],
+   "tags": ["scheduler", "mspowerbi", "msonedrive", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve leads from Insightly and add the lead data to Microsoft Power BI",
+   "description": "Use this template to retrieve lead records from Insightly, and the lead data is added to Microsoft Power BI. In this example, the lead data is inserted into a Microsoft Power BI dataset. This data helps analyse and visualise the data patterns in reports.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["insightly", "mspowerbi"],
+   "tags": ["scheduler", "insightly", "mspowerbi", "setVariable", "JSON parser"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Send a Gmail message when the Microsoft Power BI target goal value is either achieved or failed",
+   "description": "Use this template to send a Gmail message to the intended recipient if the retrieved Microsoft Power BI goal value set is not achieved. A Gmail message will also be sent if the goal value is achieved.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["mspowerbi", "gmail"],
+   "tags": ["scheduler", "mspowerbi", "gmail", "if"],
+   "offerings": ["app connect professional"] 
   }
 ]
 }

@@ -1,0 +1,121 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: SourcingProject
+      connector-type: sapariba
+      actions:
+        CreateSourcingProject: {}
+    action-interface-2:
+      type: api-action
+      business-object: Project
+      connector-type: insightly
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Insightly Retrieve projects
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  updated_after_utc: '2023-02-28T12:54:29.642Z'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 6
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$InsightlyRetrieveprojects '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveprojects
+                    $ref: '#/node-output/Insightly Retrieve projects/response/payload'
+                  - variable: InsightlyRetrieveprojectsMetadata
+                    $ref: '#/node-output/Insightly Retrieve projects/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Insightly Project
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP Ariba Create sourcing project
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CreateSourcingProject
+              map:
+                mappings:
+                  - WSSourcingProjectInputBean_Item:
+                      mappings:
+                        - item:
+                            mappings:
+                              - OnBehalfUserId:
+                                  template: puser1
+                              - ProjectHeaderFields:
+                                  mappings:
+                                    - ContractEffectiveDate:
+                                        template: '{{$now()}}'
+                                    - ContractMonths:
+                                        expression: '12'
+                                    - ProjectReason:
+                                        template: New Requirement
+                                    - Title:
+                                        mappings:
+                                          - DefaultStringTranslation:
+                                              template: '{{$Foreachitem.PROJECT_NAME}}'
+                              - TemplateId:
+                                  template: SYS0208
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveprojects
+                    $ref: '#/node-output/Insightly Retrieve projects/response/payload'
+                  - variable: InsightlyRetrieveprojectsMetadata
+                    $ref: '#/node-output/Insightly Retrieve projects/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a sourcing project in SAP Ariba for each project retrieved from Insightly
+models: {}
