@@ -255,6 +255,6 @@ integration:
               output-schema: {}
         tags:
           - incomplete
-  name: Retrieve the last build from Jenkins and, if the build fails, create an issue in Jira if an issue doesn’t already exist
+  name: Retrieve the last build from Jenkins and if the build fails create an issue in Jira if an issue does not already exist
   description: Use this template to retrieve any type of file from the specified Dropbox path, downloads the content, and uploads the metadata and the file to a Google Cloud Storage bucket.
 models: {}
