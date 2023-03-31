@@ -1,0 +1,71 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '696807928253'
+            parentFilter:
+              organizationID: '696807928253'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.id}}'
+                        - '10':
+                            template: '{{$Trigger.order_id}}'
+                        - '11':
+                            template: '{{$Trigger.status}}'
+                        - '2':
+                            template: '{{$Trigger.profile.name}}'
+                        - '3':
+                            template: '{{$Trigger.profile.first_name}}'
+                        - '4':
+                            template: '{{$Trigger.profile.suffix}}'
+                        - '5':
+                            template: '{{$Trigger.profile.email}}'
+                        - '6':
+                            template: '{{$Trigger.created}}'
+                        - '7':
+                            template: '{{$Trigger.ticket_class_id}}'
+                        - '8':
+                            template: '{{$Trigger.ticket_class_name}}'
+                        - '9':
+                            template: '{{$Trigger.event_id}}'
+                  - spreadsheetID:
+                      template: 13RdVOzievG48FqppdtLTA0MNAwX6F1ejTLUX8BOk1bE
+                  - worksheetID:
+                      template: Attendees
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Record Eventbrite attendees to Google Sheets
+  description: Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets.
+models: {}

@@ -1,0 +1,89 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '344797520005'
+            parentFilter:
+              organizationID: '344797520005'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: msdynamicscrmrest
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Dynamics 365 for Sales Create lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - address1_city:
+                      template: '{{$Trigger.profile.addresses.home.city}}'
+                  - address1_country:
+                      template: '{{$Trigger.profile.addresses.home.region}}'
+                  - address1_county:
+                      template: '{{$Trigger.profile.addresses.home.country}}'
+                  - address1_line1:
+                      template: '{{$Trigger.profile.addresses.home.address_1}}'
+                  - address1_line2:
+                      template: '{{$Trigger.profile.addresses.home.address_2}}'
+                  - address1_postalcode:
+                      template: '{{$Trigger.profile.addresses.home.postal_code}}'
+                  - address1_telephone1:
+                      template: '{{$Trigger.profile.cell_phone}}'
+                  - address2_city:
+                      template: '{{$Trigger.profile.addresses.ship.city}}'
+                  - address2_country:
+                      template: '{{$Trigger.profile.addresses.ship.region}}'
+                  - address2_county:
+                      template: '{{$Trigger.profile.addresses.ship.country}}'
+                  - address2_line1:
+                      template: '{{$Trigger.profile.addresses.ship.address_1}}'
+                  - address2_line2:
+                      template: '{{$Trigger.profile.addresses.ship.address_2}}'
+                  - address2_postalcode:
+                      template: '{{$Trigger.profile.addresses.ship.postal_code}}'
+                  - companyname:
+                      template: '{{$Trigger.profile.company}}'
+                  - emailaddress1:
+                      template: '{{$Trigger.profile.email}}'
+                  - firstname:
+                      template: '{{$Trigger.profile.first_name}}'
+                  - jobtitle:
+                      template: '{{$Trigger.profile.job_title}}'
+                  - lastname:
+                      template: '{{$Trigger.profile.last_name}}'
+                  - salutation:
+                      template: '{{$Trigger.profile.prefix}}'
+                  - subject:
+                      template: '{{$Trigger.profile.name}}'
+                  - telephone2:
+                      template: '{{$Trigger.profile.cell_phone}}'
+                  - websiteurl:
+                      template: '{{$Trigger.profile.website}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365 for Sales
+  description: This template creates a new lead in Insightly when a new attendee is created in Eventbrite.
+models: {}
