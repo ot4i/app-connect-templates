@@ -1339,6 +1339,150 @@
    "targetApps": ["mspowerbi", "gmail"],
    "tags": ["scheduler", "mspowerbi", "gmail", "if"],
    "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create an order in Salesforce whenever a new customer order is created in Magento",
+   "description": "Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by Gmail whenever a new customer order is created in Magento.",
+   "summary": "Magento to 2 applications",
+   "sourceApp": "magento",
+   "targetApps": ["salesforce", "gmail"],
+   "tags": ["salesforce", "magento", "gmail"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve orders from Salesforce and notify customers about any weather dependent delays",
+   "description": "Use this template to retrieve an order from Salesforce, map the shipping address to IBM Weather Company Data to retrieve the forecast, and send a delayed order notification to the customer via Domino. This use case helps you inform your customers when the delivery of an order is going to be delayed due to bad weather conditions.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "ibmtwc", "domino"],
+   "tags": ["scheduler", "salesforce", "ibmtwc", "domino", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve emails by subject from Microsoft Exchange and upload the details to the Wufoo",
+   "description": "Use this template to retrieve emails from Microsoft Exchange based on the subject by searching for a specified keyword.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["msexchange", "wufoo"],
+   "tags": ["api", "msexchange", "wufoo", "foreach"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Synchronize data between Amazon DynamoDB and Google Big Query",
+   "description": "Use this template to retrieve employee records from Amazon DynamoDB and synchronise that data with Google Cloud BigQuery.",
+   "summary": "1 flow using 3 applications",
+   "sourceApp": "api",
+   "targetApps": ["amazondynamodb", "googlebigquery", "slack"],
+   "tags": ["api", "amazondynamodb", "googlebigquery", "foreach", "if", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "IBM Sterling Inventory Visibility performs a supply check for each product that it retrieves",
+   "description": "Use this template to retrieve a list of products from IBM Sterling Inventory Visibility and create a message in a Microsoft Team channel based on the status of the retrieved item and where it is in the delivery process.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["ibmsterlingiv", "msteams"],
+   "tags": ["api", "ibmsterlingiv", "msteams", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Create an issue in GitLab whenever a new incident is logged in ServiceNow",
+   "description": "Use this template to create a new issue in GitLab whenever a new incident is logged in ServiceNow and the incident is updated in ServiceNow with GitLab detail.",
+   "summary": "ServiceNow to 2 applications",
+   "sourceApp": "servicenow",
+   "targetApps": ["gitlab", "slack", "servicenow"],
+   "tags": ["scheduler", "gitlab", "servicenow", "slack"],
+   "offerings": ["app connect professional"] 
+  },  
+  {
+   "name": "Data integration between Microsoft Azure Blob storage and Amazon S3",
+   "description": "Use this template to create a scheduler-based flow that retrieves a large blob file’s metadata from a specified Azure blob container, splits the file into a user-defined file size, downloads the file content, and uploads the spilt files to an Amazon S3 bucket or any other storage endpoint.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["azureblobstorage", "amazons3"],
+   "tags": ["scheduler", "azureblobstorage", "amazons3", "foreach", "setVariable"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve incidents from ServiceNow based on the severity level and push incident details to a Microsoft Teams channel",
+   "description": "Use this template to retrieve incidents from ServiceNow and send those incidents, along with incident details, to a channel in Microsoft Teams.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["servicenow", "msteams"],
+   "tags": ["api", "servicenow", "msteams", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve documents from IBM Cloudant and publish them in Google Cloud PubSub topics",
+   "description": "Use this template to retrieve the flight times from an IBM Cloudant database and publish them into Google Cloud PubSub topics.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["cloudantdb", "googlepubsub"],
+   "tags": ["api", "cloudantdb", "googlepubsub", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Data ingestion to Google Cloud Storage from Dropbox",
+   "description": "Use this template to retrieve any type of file from the specified Dropbox path, downloads the content, and uploads the metadata and the file to a Google Cloud Storage bucket.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["dropbox", "googlecloudstorage", "slack"],
+   "tags": ["scheduler", "dropbox", "slack", "googlecloudstorage", "foreach", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve the last build from Jenkins and if the build fails create an issue in Jira if an issue does not already exist",
+   "description": "Use this template to retrieve the last build details from Jenkins. If the build fails, an issue is created in Jira if an issue doesn’t already exist.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["jenkins", "jira", "slack"],
+   "tags": ["scheduler", "jenkins", "jira", "if"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Update or create a configuration string in Redis",
+   "description": "Use this template to update or create a string in Redis and then display the response payload from Redis in a Slack channel as confirmation.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["redis", "slack"],
+   "tags": ["scheduler", "redis", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve a configuration string from Redis",
+   "description": "Use this template to retrieve an existing string in Redis and then display the response payload from Redis in a Slack channel as confirmation. This is a sequal use case of 'Update or create a configuration string in Redis'.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["redis", "slack"],
+   "tags": ["scheduler", "redis", "slack"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve documents from IBM Cloudant and insert document data into a Google Cloud BigQuery table",
+   "description": "Use this template to retrieve documents from an IBM Cloudant database and inserts data from these documents into a Google Cloud BigQuery table.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["cloudantdb", "googlebigquery"],
+   "tags": ["scheduler", "cloudantdb", "googlebigquery", "foreach"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve employees from Microsoft Dynamics 365 for Finance and Operations and create users in Microsoft Active Directory",
+   "description": "Use this template to retrieve employees from Microsoft Dynamics 365 Finance and Operations and create a new user in Microsoft Active Directory (MSAD).",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msdynamicsfando", "msad", "slack"],
+   "tags": ["scheduler", "msdynamicsfando", "msad", "slack", "foreach"],
+   "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Retrieve documents from Microsoft SharePoint and upload them to an IBM FileNet repository",
+   "description": "Use this template to retrieve documents from Microsoft SharePoint and upload those documents to an IBM FileNet repository.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["mssharepoint", "filenet"],
+   "tags": ["api", "mssharepoint", "filenet", "foreach"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
