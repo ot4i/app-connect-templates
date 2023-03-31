@@ -1,0 +1,126 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Report
+      connector-type: mspowerbi
+      actions:
+        EXPORTREPORT: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: msonedrive
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Power BI Export report
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: EXPORTREPORT
+              map:
+                mappings:
+                  - groupId:
+                      template: f2fa56c7-8def-4aa5-b313-de0e82152878
+                  - id:
+                      template: 9f9733ab-ecc4-4239-9d98-1e95f552d953
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft OneDrive for Business Create or Update file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - contentType:
+                      template: Binary
+                  - fileContent:
+                      template: '{{$MicrosoftPowerBIExportreport.content}}'
+                  - name:
+                      template: PowerBI.pbix
+                  - parentDriveId:
+                      template: >-
+                        b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                  - parentFolderId:
+                      template: 01EMFW4S6C53GDJPDIMNCY3K3UDXYC2YVW
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftPowerBIExportreport
+                    $ref: >-
+                      #/node-output/Microsoft Power BI Export
+                      report/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C02GD4LTEBE
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        PowerBIReport is updated at oneDrive with fileId: 
+                        {{$MicrosoftOneDriveforBusinessCreateorUpdatefile.id}} 
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftPowerBIExportreport
+                    $ref: >-
+                      #/node-output/Microsoft Power BI Export
+                      report/response/payload
+                  - variable: MicrosoftOneDriveforBusinessCreateorUpdatefile
+                    $ref: >-
+                      #/node-output/Microsoft OneDrive for Business Create or
+                      Update file/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Export the report from Microsoft Power BI and create the file in Microsoft OneDrive for Business
+models: {}
