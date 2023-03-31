@@ -95,6 +95,6 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Announce new Eventbrite attendee on Slack and send voucher
+  name: Announce new Eventbrite attendees on Slack and send a voucher
   description: Use this template to send a Slack message when new attendees register for an Eventbrite event. 
 models: {}
