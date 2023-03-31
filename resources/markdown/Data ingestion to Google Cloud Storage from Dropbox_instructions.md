@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Data%20Ingestion%20to%20Google%20Cloud%20Storage%20from%20Dropbox_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Data%20ingestion%20to%20Google%20Cloud%20Storage%20from%20Dropbox_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
