@@ -41,5 +41,5 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Send Gmail message when a new event is added in Eventbrite
+  name: Send a Gmail message when a new event is added to Eventbrite
 models: {}
