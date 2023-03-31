@@ -1341,7 +1341,7 @@
    "offerings": ["app connect professional"] 
   },
   {
-   "name": "Create order in Salesforce whenever a new customer order is created in Magento",
+   "name": "Create an order in Salesforce whenever a new customer order is created in Magento",
    "description": "Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by Gmail whenever a new customer order is created in Magento.",
    "summary": "Magento to 2 applications",
    "sourceApp": "magento",
@@ -1386,7 +1386,7 @@
    "offerings": ["app connect professional"] 
   },
   {
-   "name": "An issue is created in GitLab whenever a new incident is logged in ServiceNow",
+   "name": "Create an issue in GitLab whenever a new incident is logged in ServiceNow",
    "description": "Use this template to create a new issue in GitLab whenever a new incident is logged in ServiceNow and the incident is updated in ServiceNow with GitLab detail.",
    "summary": "ServiceNow to 2 applications",
    "sourceApp": "servicenow",
@@ -1431,7 +1431,7 @@
    "offerings": ["app connect professional"] 
   },
   {
-   "name": "Retrieve the last build from Jenkins and, if the build fails, create an issue in Jira if an issue doesn’t already exist",
+   "name": "Retrieve the last build from Jenkins and if the build fails create an issue in Jira if an issue does not already exist",
    "description": "Use this template to retrieve the last build details from Jenkins. If the build fails, an issue is created in Jira if an issue doesn’t already exist.",
    "summary": "Scheduler to 3 applications",
    "sourceApp": "streaming-connector-scheduler",
