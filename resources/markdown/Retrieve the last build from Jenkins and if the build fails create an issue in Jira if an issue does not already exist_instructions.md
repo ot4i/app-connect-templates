@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Retrieve%20the%20last%20build%20from%20Jenkins%20and%2C%20if%20the%20build%20fails%2C%20create%20an%20issue%20in%20Jira%20if%20an%20issue%20doesn’t%20already%20exist_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Retrieve%20the%20last%20build%20from%20Jenkins%20and%20if%20the%20build%20fails%20create%20an%20issue%20in%20Jira%20if%20an%20issue%20does%20not%20already%20exist_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
