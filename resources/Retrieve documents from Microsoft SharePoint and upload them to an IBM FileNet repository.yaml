@@ -1,0 +1,206 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createTest:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: test
+          output-context:
+            data: test
+      options:
+        resources:
+          - business-object: test
+            model:
+              $ref: '#/models/test'
+            triggers:
+              create: createTest
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: document
+      connector-type: filenet
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: document
+      connector-type: filenet
+      actions:
+        DOWNLOADCONTENT: {}
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: mssharepoint
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: FileNet Retrieve Documents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  repositoryIdentifier: '{{$Request.repositoryidentifier}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$FileNetRetrieveDocuments '
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FileNetRetrieveDocuments
+                    $ref: '#/node-output/FileNet Retrieve Documents/response/payload'
+                  - variable: FileNetRetrieveDocumentsMetadata
+                    $ref: '#/node-output/FileNet Retrieve Documents/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FileNetDownloadContent
+                    $ref: >-
+                      #/block/For each/node-output/FileNet Download
+                      Content/response/payload
+                  - variable: MicrosoftSharePointCreatefile
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft SharePoint Create
+                      file/response/payload
+                  - variable: FileNetRetrieveDocuments
+                    $ref: '#/node-output/FileNet Retrieve Documents/response/payload'
+                  - variable: FileNetRetrieveDocumentsMetadata
+                    $ref: '#/node-output/FileNet Retrieve Documents/response'
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      output:
+                        type: string
+                mappings:
+                  - output:
+                      mappings:
+                        - output:
+                            template: >-
+                              {{$MicrosoftSharePointCreatefile}}//usecase//{{$FileNetDownloadContent.content}}
+              display-name: FileNet document
+          - response:
+              name: response-1
+              reply-maps:
+                - title: test successfully created
+                  status-code: '201'
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: FileNetRetrieveDocuments
+                        $ref: >-
+                          #/node-output/FileNet Retrieve
+                          Documents/response/payload
+                      - variable: FileNetRetrieveDocumentsMetadata
+                        $ref: '#/node-output/FileNet Retrieve Documents/response'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                    mappings:
+                      - repositoryidentifier:
+                          template: '{{$Foreach.output.output}}'
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: FileNetRetrieveDocuments
+                      $ref: >-
+                        #/node-output/FileNet Retrieve
+                        Documents/response/payload
+                    - variable: FileNetRetrieveDocumentsMetadata
+                      $ref: '#/node-output/FileNet Retrieve Documents/response'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: FileNet Download Content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADCONTENT
+              map:
+                mappings:
+                  - identifier:
+                      template: '{{$Foreachitem.identifier}}'
+                  - repositoryIdentifier:
+                      template: NewTestOS1
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FileNetRetrieveDocuments
+                    $ref: '#/node-output/FileNet Retrieve Documents/response/payload'
+                  - variable: FileNetRetrieveDocumentsMetadata
+                    $ref: '#/node-output/FileNet Retrieve Documents/response'
+          - create-action:
+              name: Microsoft SharePoint Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Name:
+                      template: '{{$Foreachitem.documents.name}}'
+                  - Overwrite:
+                      expression: 'true'
+                  - ParentFolderPath:
+                      template: /DocLib/testfolderfilenet
+                  - SitePath:
+                      template: /
+                  - content:
+                      template: '{{$FileNetDownloadContent}}'
+                  - fileType:
+                      template: Text
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FileNetDownloadContent
+                    $ref: >-
+                      #/block/For each/node-output/FileNet Download
+                      Content/response/payload
+                  - variable: FileNetRetrieveDocuments
+                    $ref: '#/node-output/FileNet Retrieve Documents/response/payload'
+                  - variable: FileNetRetrieveDocumentsMetadata
+                    $ref: '#/node-output/FileNet Retrieve Documents/response'
+  name: Retrieve documents from Microsoft SharePoint and upload them to an IBM FileNet repository
+models:
+  test:
+    name: test
+    properties:
+      repositoryidentifier:
+        required: false
+        id: true
+        type: string
+    plural: test
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
