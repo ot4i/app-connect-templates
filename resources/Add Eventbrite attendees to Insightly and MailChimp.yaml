@@ -68,6 +68,6 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: InsightlyCreatelead
                     $ref: '#/node-output/Insightly Create lead/response/payload'
-  name: Add Eventbrite attendee to Insightly and MailChimp
+  name: Add Eventbrite attendees to Insightly and MailChimp
  description: This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.
 models: {}
