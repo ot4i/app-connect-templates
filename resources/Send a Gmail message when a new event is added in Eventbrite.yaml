@@ -41,6 +41,6 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-  name: Send Gmail message when a new event is added in Eventbrite
+  name: Send a Gmail message when a new event is added in Eventbrite
   description: This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.
 models: {}
