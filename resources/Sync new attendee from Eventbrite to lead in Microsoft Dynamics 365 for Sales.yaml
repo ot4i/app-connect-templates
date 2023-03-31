@@ -84,6 +84,6 @@ integration:
                     $ref: '#/flowDetails'
         tags:
           - incomplete
-  name: Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365
+  name: Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365 for Sales
   description: This template creates a new lead in Insightly when a new attendee is created in Eventbrite.
 models: {}
