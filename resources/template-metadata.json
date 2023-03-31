@@ -1494,7 +1494,7 @@
    "offerings": ["app connect professional"]
   },
   {	
-   "name": "Add Eventbrite attendee to Insightly and MailChimp",
+   "name": "Add Eventbrite attendees to Insightly and MailChimp",
    "description": "This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.",
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
@@ -1521,7 +1521,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Announce new Eventbrite attendee on Slack",
+   "name": "Announce new Eventbrite attendees on Slack",
    "description": "Use this template to send a Slack message when new attendees register for an Eventbrite event.",
    "summary": "Eventbrite to Slack",
    "sourceApp": "eventbrite",
@@ -1530,7 +1530,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Announce new Eventbrite attendee on Slack and send voucher",
+   "name": "Announce new Eventbrite attendees on Slack and send a voucher",
    "description": "Use this template to send a free drink voucher to attendees of Eventbrite event.",
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
@@ -1566,7 +1566,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create Sharepoint team site for new Eventbrite event",
+   "name": "Create a Sharepoint team site for new the Eventbrite event",
    "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
@@ -1593,7 +1593,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Send Gmail message when a new event is added in Eventbrite",
+   "name": "Send a Gmail message when a new event is added to Eventbrite",
    "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
    "summary": "Eventbrite to Gmail",
    "sourceApp": "eventbrite",
@@ -1611,7 +1611,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365",
+   "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365 for Sales",
    "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
    "summary": "Eventbrite to Microsoft Dynamics 365",
    "sourceApp": "eventbrite",
