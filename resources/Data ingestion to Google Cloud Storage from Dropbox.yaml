@@ -325,5 +325,5 @@ integration:
                               #/node-output/Dropbox Retrieve folder
                               items/response
               output-schema: {}
-  name: Data Ingestion to Google Cloud Storage from Dropbox
+  name: Data ingestion to Google Cloud Storage from Dropbox
 models: {}
