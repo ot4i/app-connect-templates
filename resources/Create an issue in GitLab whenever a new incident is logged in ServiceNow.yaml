@@ -140,5 +140,5 @@ integration:
                   - variable: SlackCreatemessage
                     $ref: '#/node-output/Slack Create message/response/payload'
               allow-empty-output: false
-  name: An issue is created in GitLab whenever a new incident is logged in ServiceNow
+  name: Create an issue in GitLab whenever a new incident is logged in ServiceNow
 models: {}
