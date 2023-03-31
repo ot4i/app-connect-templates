@@ -84,5 +84,5 @@ integration:
                     $ref: '#/flowDetails'
         tags:
           - incomplete
-  name: Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365
+  name: Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365 for Sales
 models: {}
