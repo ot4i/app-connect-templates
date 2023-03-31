@@ -68,5 +68,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: InsightlyCreatelead
                     $ref: '#/node-output/Insightly Create lead/response/payload'
-  name: Add Eventbrite attendee to Insightly and MailChimp
+  name: Add Eventbrite attendees to Insightly and MailChimp
 models: {}
