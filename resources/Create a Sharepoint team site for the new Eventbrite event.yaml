@@ -138,5 +138,5 @@ integration:
                     $ref: >-
                       #/node-output/Microsoft SharePoint Create
                       list/response/payload
-  name: Create Sharepoint team site for new Eventbrite event
+  name: Create a Sharepoint team site for the new Eventbrite event
 models: {}
