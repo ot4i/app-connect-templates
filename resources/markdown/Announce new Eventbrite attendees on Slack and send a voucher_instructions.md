@@ -1,6 +1,5 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Announce%20new%20Eventbrite%20attendee%20on%20Slack%20and%20send%20voucher_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Announce%20new%20Eventbrite%20attendees%20on%20Slack%20and%20send%20a%20voucher_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome to IBM App Connect \[Part 2 of 4\]: Add logic to an event-driven flow](https://www.youtube.com/watch?v=FpZNNginPAM&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) video to send a free drink voucher to attendees walking to the Sunflower festival Eventbrite event.
 
 ## Prerequisites
 
@@ -33,6 +32,6 @@ Set the question as a required field for your event.
 
 ## Related templates
 
-The previous template in this series is 'Announce new Eventbrite attendee on Slack'.
+The previous template in this series is 'Announce new Eventbrite attendees on Slack'.
 
 The next template in this series is 'Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce'.
