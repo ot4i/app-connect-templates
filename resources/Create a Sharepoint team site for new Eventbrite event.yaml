@@ -138,6 +138,6 @@ integration:
                     $ref: >-
                       #/node-output/Microsoft SharePoint Create
                       list/response/payload
-  name: Create Sharepoint team site for new Eventbrite event
+  name: Create a Sharepoint team site for new Eventbrite event
   description: This template creates a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.
 models: {}
