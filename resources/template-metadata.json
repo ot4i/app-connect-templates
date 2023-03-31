@@ -1154,10 +1154,10 @@
   {
     "name": "Insert data into the Snowflake table when a new file gets created in Amazon S3",
     "description": "Use this template to add data to a Snowflake table whenever a new file gets created in the Amazon S3 bucket.",
-    "summary": "Snowflake to 1 application",
-    "sourceApp": "snowflake",
-    "targetApps": ["amazons3"],
-    "tags": ["snowflake", "amazons3"],
+    "summary": "API to 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["amazons3", "snowflake"],
+    "tags": ["api", "snowflake", "amazons3"],
     "offerings": ["app connect professional"]
    },
    {
@@ -1444,8 +1444,8 @@
    "description": "Use this template to update or create a string in Redis and then display the response payload from Redis in a Slack channel as confirmation.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["redis", "slack"],
-   "tags": ["scheduler", "redis", "slack"],
+   "targetApps": ["rediscache", "slack"],
+   "tags": ["scheduler", "rediscache", "slack"],
    "offerings": ["app connect professional"] 
   },
   {
@@ -1453,8 +1453,8 @@
    "description": "Use this template to retrieve an existing string in Redis and then display the response payload from Redis in a Slack channel as confirmation. This is a sequal use case of 'Update or create a configuration string in Redis'.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["redis", "slack"],
-   "tags": ["scheduler", "redis", "slack"],
+   "targetApps": ["rediscache", "slack"],
+   "tags": ["scheduler", "rediscache", "slack"],
    "offerings": ["app connect professional"] 
   },
   {
