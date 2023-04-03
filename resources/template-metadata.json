@@ -1643,7 +1643,7 @@
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
    "targetApps": ["salesforce", "slack"],
-   "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if", "conditional"],
+   "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if"],
    "offerings": ["app connect professional"]
   }
 ]
