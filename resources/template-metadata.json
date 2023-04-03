@@ -1566,7 +1566,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a Sharepoint team site for new the Eventbrite event",
+   "name": "Create a Sharepoint team site for the new Eventbrite event",
    "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
@@ -1643,7 +1643,7 @@
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
    "targetApps": ["salesforce", "slack"],
-   "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if"],
+   "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if", "conditional"],
    "offerings": ["app connect professional"]
   }
 ]
