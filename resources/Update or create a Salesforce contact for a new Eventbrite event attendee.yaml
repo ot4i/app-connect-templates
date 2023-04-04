@@ -1,0 +1,198 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Email:
+                      template: '{{$Trigger.profile.email}}'
+                  - FirstName:
+                      template: '{{$Trigger.profile.first_name}}'
+                  - LastName:
+                      template: '{{$Trigger.profile.last_name}}'
+                  - MailingCity:
+                      template: '{{$Trigger.profile.addresses.home.city}}'
+                  - MailingCountry:
+                      template: '{{$Trigger.profile.addresses.home.country}}'
+                  - MailingPostalCode:
+                      template: '{{$Trigger.profile.addresses.home.postal_code}}'
+                  - MailingState:
+                      template: '{{$Trigger.profile.addresses.home.region}}'
+                  - MailingStreet:
+                      template: '{{$Trigger.profile.addresses.home.address_1}}'
+                  - MobilePhone:
+                      template: '{{$Trigger.profile.cell_phone}}'
+                  - Salutation:
+                      template: '{{$Trigger.profile.prefix}}'
+                  - Title:
+                      template: '{{$Trigger.profile.job_title}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  Email: '{{$Trigger.profile.email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceUpdateorcreatecontact
+                  $ref: >-
+                    #/node-output/Salesforce Update or create
+                    contact/response/payload
+                - variable: SalesforceUpdateorcreatecontactMetadata
+                  $ref: '#/node-output/Salesforce Update or create contact/response'
+              branch:
+                - condition:
+                    '{{$SalesforceUpdateorcreatecontactMetadata."status-code"}}': '200'
+                  execute:
+                    - create-action:
+                        name: Slack Create message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C7UDQ9KSQ
+                            - text:
+                                template: >-
+                                  Contact updated for attendee at event
+                                  {{$Trigger.event_id}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceUpdateorcreatecontact
+                              $ref: >-
+                                #/node-output/Salesforce Update or create
+                                contact/response/payload
+                            - variable: SalesforceUpdateorcreatecontactMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Update or create
+                                contact/response
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage
+                        $ref: >-
+                          #/block/If/node-output/Slack Create
+                          message/response/payload
+                      - variable: SalesforceUpdateorcreatecontact
+                        $ref: >-
+                          #/node-output/Salesforce Update or create
+                          contact/response/payload
+                      - variable: SalesforceUpdateorcreatecontactMetadata
+                        $ref: >-
+                          #/node-output/Salesforce Update or create
+                          contact/response
+                    mappings: []
+                - condition:
+                    '{{$SalesforceUpdateorcreatecontactMetadata."status-code"}}': '201'
+                  execute:
+                    - create-action:
+                        name: Slack Create message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - channel:
+                                template: C4GHPM484
+                            - text:
+                                template: >-
+                                  New contact created for attendee of event
+                                  {{$Trigger.event_id}}
+                          $map: 'http://ibm.com/appconnect/map/v1'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceUpdateorcreatecontact
+                              $ref: >-
+                                #/node-output/Salesforce Update or create
+                                contact/response/payload
+                            - variable: SalesforceUpdateorcreatecontactMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Update or create
+                                contact/response
+                  map:
+                    $map: 'http://ibm.com/appconnect/map/v1'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: SlackCreatemessage2
+                        $ref: >-
+                          #/block/If/node-output/Slack Create message
+                          2/response/payload
+                      - variable: SalesforceUpdateorcreatecontact
+                        $ref: >-
+                          #/node-output/Salesforce Update or create
+                          contact/response/payload
+                      - variable: SalesforceUpdateorcreatecontactMetadata
+                        $ref: >-
+                          #/node-output/Salesforce Update or create
+                          contact/response
+                    mappings: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: SalesforceUpdateorcreatecontact
+                          $ref: >-
+                            #/node-output/Salesforce Update or create
+                            contact/response/payload
+                        - variable: SalesforceUpdateorcreatecontactMetadata
+                          $ref: >-
+                            #/node-output/Salesforce Update or create
+                            contact/response
+                      message: No Salesforce contacts were created or updated
+                      status-code: 200
+              output-schema: {}
+  name: Update or create a Salesforce contact for a new Eventbrite event attendee
+models: {}

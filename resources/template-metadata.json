@@ -1483,6 +1483,168 @@
    "targetApps": ["mssharepoint", "filenet"],
    "tags": ["api", "mssharepoint", "filenet", "foreach"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add a Mailchimp subscriber from a Slack slash command",
+   "description": "Use this template to add a new member as a subscriber of a Mailchimp list from a Slack slash command.",
+   "summary": "Slack to Mailchimp",
+   "sourceApp": "slack",
+   "targetApps": ["mailchimp"],
+   "tags": ["slack", "mailchimp"],
+   "offerings": ["app connect professional"]
+  },
+  {	
+   "name": "Add Eventbrite attendees to Insightly and MailChimp",
+   "description": "This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.",
+   "summary": "Eventbrite to 2 applications",
+   "sourceApp": "eventbrite",
+   "targetApps": ["insightly", "mailchimp"],
+   "tags": ["eventbrite", "insightly", "mailchimp", "subscribe", "publicize", "promote", "marketing"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add Eventbrite event as a new Salesforce campaign and notify via Slack",
+   "description": "When a new event is created in Eventbrite, this flow tries to retrieve a matching campaign in Salesforce. If a matching campaign is not found in Salesforce, the flow creates a new campaign in Salesforce and adds a message to a Slack channel.",
+   "summary": "Eventbrite to 2 applications",
+   "sourceApp": "eventbrite",
+   "targetApps": ["salesforce", "slack"],
+   "tags": ["eventbrite", "salesforce", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add new Eventbrite attendees to MailChimp lists",
+   "description": "This template adds attendees of Eventbrite events to different mailing lists in MailChimp, depending on the event that they sign up to.",
+   "summary": "Eventbrite to MailChimp",
+   "sourceApp": "eventbrite",
+   "targetApps": ["mailchimp"],
+   "tags": ["eventbrite", "mailchimp", "marketing", "events", "mailing list"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Announce new Eventbrite attendees on Slack",
+   "description": "Use this template to send a Slack message when new attendees register for an Eventbrite event.",
+   "summary": "Eventbrite to Slack",
+   "sourceApp": "eventbrite",
+   "targetApps": ["slack"],
+   "tags": ["eventbrite", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Announce new Eventbrite attendees on Slack and send a voucher",
+   "description": "Use this template to send a free drink voucher to attendees of Eventbrite event.",
+   "summary": "Eventbrite to 2 applications",
+   "sourceApp": "eventbrite",
+   "targetApps": ["slack", "gmail"],
+   "tags": ["eventbrite", "slack", "gmail", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a new contact in Salesforce for a new Eventbrite order",
+   "description": "When a new order for an event is created in Eventbrite, this flow tries to retrieve a matching contact in Salesforce by email address. If a matching contact is not found in Salesforce, the flow creates a new contact in Salesforce.",
+   "summary": "Eventbrite to Salesforce",
+   "sourceApp": "eventbrite",
+   "targetApps": ["salesforce"],
+   "tags": ["eventbrite", "salesforce"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create targeted contact lists in Eventbrite based on unconverted Salesforce leads and geography",
+   "description": "This template triggers on a new Eventbrite event. It retrieves new unconverted leads from Salesforce and checks to see if their city features in the event.  If it does, they they are added to a newly created Eventbrite contact list which can be reviewed by the organisers, who are notified about this list creation in Slack.",
+   "summary": "Eventbrite to 3 applications",
+   "sourceApp": "eventbrite",
+   "targetApps": ["eventbrite", "salesforce", "slack"],
+   "tags": ["eventbrite", "slack", "salesforce", "contact", "marketing", "lead", "event", "matching", "city", "notification"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a new Trello card when a new event in Eventbrite is added",
+   "description": "This template creates a new card in Trello when a new event is added in Eventbrite. You can use this template to track tasks such as checking attendee lists prior to the event.",
+   "summary": "Eventbrite to Trello",
+   "sourceApp": "eventbrite",
+   "targetApps": ["trello"],
+   "tags": ["eventbrite", "trello", "marketing", "events", "project management"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a Sharepoint team site for the new Eventbrite event",
+   "description": "This template detects when a new Eventbrite event is created and then automatically creates a site in Microsoft Sharepoint online, adds a list to the site, and then posts a message in Slack.",
+   "summary": "Eventbrite to 2 applications",
+   "sourceApp": "eventbrite",
+   "targetApps": ["mssharepoint", "slack"],
+   "tags": ["eventbrite", "mssharepoint", "slack", "site", "list", "message"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Record Eventbrite attendees to Google Sheets",
+   "description": "Use this template to record each newly-registered attendee of an Eventbrite event as a new row in Google Sheets.",
+   "summary": "Eventbrite to Google Sheets",
+   "sourceApp": "eventbrite",
+   "targetApps": ["googlesheet"],
+   "tags": ["googlesheet", "eventbrite"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Microsoft Teams message when a new event is created in Eventbrite",
+   "description": "This template allows you to receive a Microsoft Teams message with the event details when a new event is created in Eventbrite.",
+   "summary": "Eventbrite to Microsoft Teams",
+   "sourceApp": "eventbrite",
+   "targetApps": ["msteams"],
+   "tags": ["eventbrite", "msteams"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Gmail message when a new event is added to Eventbrite",
+   "description": "This template creates and sends an email via Gmail when a new event is added in Eventbrite. You can use this template to boost sign ups to your events.",
+   "summary": "Eventbrite to Gmail",
+   "sourceApp": "eventbrite",
+   "targetApps": ["gmail"],
+   "tags": ["eventbrite", "gmail", "marketing", "events", "email"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Sync new attendee from Eventbrite to lead in Insightly",
+   "description": "This template creates a new lead in Insightly when a new attendee is created in Eventbrite.",
+   "summary": " Eventbrite to Insightly",
+   "sourceApp": "eventbrite",
+   "targetApps": ["insightly"],
+   "tags": ["eventbrite", "insightly"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Sync new attendee from Eventbrite to lead in Microsoft Dynamics 365 for Sales",
+   "description": "This template creates a new lead in Microsoft Dynamics 365 for Sales whenever a new attendee is created in Eventbrite.",
+   "summary": "Eventbrite to Microsoft Dynamics 365",
+   "sourceApp": "eventbrite",
+   "targetApps": ["msdynamicscrmrest"],
+   "tags": ["eventbrite", "msdynamicscrmrest"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Sync Salesforce contacts and Mailchimp mailing list subscribers",
+   "description": "This template adds new Salesforce contacts to Mailchimp lists and sends an email via Gmail to alert you if a contact's email address is missing.",
+   "summary": "Salesforce to 3 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["salesforce", "gmail", "mailchimp"],
+   "tags": ["Salesforce", "gmail", "marketing", "contact", "email", "crm", "mailchimp"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update Eventbrite event based on IBM Weather forecast",
+   "description": "An API to get the weather forecast for an Eventbrite event and take different actions based on weather criteria.",
+   "summary": "1 flow using 4 applications",
+   "sourceApp": "api",
+   "targetApps": ["eventbrite", "http", "ibmtwc"],
+   "tags": ["api", "eventbrite", "http", "ibmtwc", "weather"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update or create a Salesforce contact for a new Eventbrite event attendee",
+   "description": "This template updates or creates a Salesforce contact when a new attendee signs up for an Eventbrite event, depending on whether the Salesforce contact exists. It then posts a message to a Slack channel, depending on whether the contact was created or updated.",
+   "summary": "Eventbrite to 2 applications",
+   "sourceApp": "eventbrite",
+   "targetApps": ["salesforce", "slack"],
+   "tags": ["eventbrite", "salesforce", "slack", "marketing", "events", "contact", "notification", "if", "conditional"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
