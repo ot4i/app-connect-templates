@@ -1483,6 +1483,15 @@
    "targetApps": ["mssharepoint", "filenet"],
    "tags": ["api", "mssharepoint", "filenet", "foreach"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Use Slack to notify of unprocessed UKG leave requests",
+   "description": "Use this template to send a Slack notification about unprocessed UKG leave requests.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["kronos", "slack"],
+   "tags": ["scheduler", "kronos", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
