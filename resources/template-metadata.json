@@ -378,15 +378,6 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Use Slack to notify of unprocessed Kronos leave requests",
-   "description": "This template contains a flow to notify you when leave requests in Kronos require attention. A scheduler runs the flow every Monday morning to retrieve leave records from Kronos then notify you on Slack if any requests have a status of 'pending'.",
-   "summary": "Scheduler to 2 applications",
-   "sourceApp": "streaming-connector-scheduler",
-   "targetApps": ["kronos", "slack"],
-   "tags": ["scheduler", "kronos", "for each", "if", "slack"],
-   "offerings": ["app connect professional"]
-  },
-  {
    "name": "Open Banking - Account information data load",
    "description": "This flow aggregates the account information of users with active consents set up in Yapily and stores it in IBM Cloudant",
    "summary": "Scheduler to 2 applications",
