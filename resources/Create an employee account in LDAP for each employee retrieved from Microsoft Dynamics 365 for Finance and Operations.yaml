@@ -1,0 +1,327 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 14
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: inetOrgPerson
+      connector-type: ldap
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Employee
+      connector-type: msdynamicsfando
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Employee
+      connector-type: msdynamicsfando
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: >-
+                Microsoft Dynamics 365 for Finance and Operations Retrieve
+                employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$MicrosoftDynamics365forFinanceandOperationsRetrieveemployees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: >-
+                      #/block/For each 2/node-output/Set
+                      variable/response/payload
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each 2/node-output/Set variable
+                      2/response/payload
+                  - variable: LDAPCreateinetOrgPersonobject
+                    $ref: >-
+                      #/block/For each 2/node-output/LDAP Create inetOrgPerson
+                      object/response/payload
+                  - variable: LDAPRetrieveinetOrgPersonobjects
+                    $ref: >-
+                      #/block/For each 2/node-output/LDAP Retrieve inetOrgPerson
+                      objects/response/payload
+                  - variable: LDAPRetrieveinetOrgPersonobjectsMetadata
+                    $ref: >-
+                      #/block/For each 2/node-output/LDAP Retrieve inetOrgPerson
+                      objects/response
+                  - variable: SlackCreatemessage
+                    $ref: >-
+                      #/block/For each 2/node-output/Slack Create
+                      message/response/payload
+                  - variable: NetSuiteSuitePeopleHCMRetrieveemployees
+                    $ref: >-
+                      #/node-output/NetSuite SuitePeople HCM Retrieve
+                      employees/response/payload
+                  - variable: NetSuiteSuitePeopleHCMRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/NetSuite SuitePeople HCM Retrieve
+                      employees/response
+                mappings: []
+              display-name: Microsoft employees
+        tags:
+          - incomplete
+    assembly-3:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      sn:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - sn:
+                            template: '{{$Foreach2item.LastName}}_1'
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: >-
+                      #/block/For each 2/node-output/Set
+                      variable/response/payload
+                  - variable: OracleHumanCapitalManagementRetrievecandidates
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      candidates/response/payload
+                  - variable: OracleHumanCapitalManagementRetrievecandidatesMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      candidates/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      myemail:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - myemail:
+                            template: >-
+                              {{$Foreach2item.FirstName}}_{{$Foreach2item.LastName}}@oracle.com
+          - create-action:
+              name: LDAP Create inetOrgPerson object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - businessCategory:
+                      expression: '["finance"]'
+                  - cn:
+                      template: '{{$Foreach2item.FirstName}}_{{$now()}}'
+                  - departmentNumber:
+                      expression: '["10","10"]'
+                  - displayName:
+                      template: testdisplay_{{$Foreach2item.FirstName}}
+                  - employeeNumber:
+                      template: '111'
+                  - employeeType:
+                      expression: '["permanent"]'
+                  - mail:
+                      expression: '[$Setvariable2.variable.myemail]'
+                  - ou:
+                      template: ou=appcon5pshho,dc=apacheds,dc=ibm,dc=com
+                  - sn:
+                      expression: '[$Setvariable.variable.sn]'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: >-
+                      #/block/For each 2/node-output/Set
+                      variable/response/payload
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each 2/node-output/Set variable
+                      2/response/payload
+                  - variable: OracleHumanCapitalManagementRetrievecandidates
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      candidates/response/payload
+                  - variable: OracleHumanCapitalManagementRetrievecandidatesMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      candidates/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - update-action:
+              name: >-
+                Microsoft Dynamics 365 for Finance and Operations Update
+                employee
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - PrimaryContactEmail:
+                      template: '{{$LDAPCreateinetOrgPersonobject.dn}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: >-
+                      #/block/For each 2/node-output/Set
+                      variable/response/payload
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each 2/node-output/Set variable
+                      2/response/payload
+                  - variable: LDAPCreateinetOrgPersonobject
+                    $ref: >-
+                      #/block/For each 2/node-output/LDAP Create inetOrgPerson
+                      object/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - EmploymentEndDate: '{{$Foreach2item.EmploymentEndDate}}'
+                    - EmploymentLegalEntityId: '{{$Foreach2item.EmploymentLegalEntityId}}'
+                    - EmploymentStartDate: '{{$Foreach2item.EmploymentStartDate}}'
+                    - PersonnelNumber: '{{$Foreach2item.PersonnelNumber}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: >-
+                      #/block/For each 2/node-output/Set
+                      variable/response/payload
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each 2/node-output/Set variable
+                      2/response/payload
+                  - variable: LDAPCreateinetOrgPersonobject
+                    $ref: >-
+                      #/block/For each 2/node-output/LDAP Create inetOrgPerson
+                      object/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-empty-output: false
+  name: Create an employee account in LDAP for each employee retrieved from Microsoft Dynamics 365 for Finance and Operations
+models: {}
