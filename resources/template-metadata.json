@@ -1645,6 +1645,15 @@
    "targetApps": ["kronos", "slack"],
    "tags": ["scheduler", "kronos", "slack", "foreach", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create job requisition and send email to hiring manager for the created job requisition",
+   "description": "Use this template to send a gmail message for the created job requisition.",
+   "summary": "SAP SuccessFactors to gmail",
+   "sourceApp": "sapsuccessfactors",
+   "targetApps": ["gmail"],
+   "tags": ["sapsuccessfactors", "gmail"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
