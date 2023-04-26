@@ -1645,6 +1645,24 @@
    "targetApps": ["kronos", "slack"],
    "tags": ["scheduler", "kronos", "slack", "foreach", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create an employee account in LDAP for each employee retrieved from Microsoft Dynamics 365 for Finance and Operations",
+   "description": "Use this template to retrieve new employees from Microsoft Dynamics 365 for Finance and Operations, create accounts for each employee in LDAP, and update Microsoft Dynamics 365 for Finance and Operations with the employee email address.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msdynamicsfando", "ldap"],
+   "tags": ["scheduler", "msdynamicsfando", "ldap", "setVariable"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update a Workday opportunity and send a Slack message whenever an opportunity is updated in Salesforce",
+   "description": "Use this template to update an opportunity in Workday when any updates are made to the existing opportunity in Salesforce. A Slack message gets sent to the relevant channel.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["slack", "workday"],
+   "tags": ["salesforce", "slack", "workday"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
