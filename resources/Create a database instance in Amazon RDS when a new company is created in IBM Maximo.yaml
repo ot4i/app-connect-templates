@@ -1,0 +1,73 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mxapivendor
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: MycJYE3XpnmbH4gEqudsh-cD_znaSlBpbweTHwlbRBOKzCoOQx7oM2sofF0yiZbj
+      connector-type: maximo
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: DatabaseInstance
+      connector-type: amazonrds
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Amazon RDS Create database instance
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - DBInstanceClass:
+                      template: db.m6gd.large
+                  - DBInstanceIdentifier:
+                      template: myorg
+                  - Engine:
+                      template: mysql
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Details :
+                        {{$AmazonRDSCreatedatabaseinstance.DBInstanceArn}}
+                  - Subject:
+                      template: Database created
+                  - To:
+                      template: abc@email.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: AmazonRDSCreatedatabaseinstance
+                    $ref: >-
+                      #/node-output/Amazon RDS Create database
+                      instance/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a database instance in Amazon RDS when a new company is created in IBM Maximo
+  description: Use this template to create a database instance in Amazon RDS when a new company is created in IBM Maximo.
+models: {}
