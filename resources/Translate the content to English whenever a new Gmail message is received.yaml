@@ -1,0 +1,174 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: gmail
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postLocationsUsCentral1translateText_model
+      connector-type: googletranslate
+      actions:
+        postLocationsUsCentral1translateText: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: postLocationsGlobaldetectLanguage_model
+      connector-type: googletranslate
+      actions:
+        postLocationsGlobaldetectLanguage: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Translate Detect language
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postLocationsGlobaldetectLanguage
+              map:
+                mappings:
+                  - content:
+                      template: '{{$Trigger.Body}}'
+                  - locationName:
+                      template: us-central1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Detected language code is
+                        {{$GoogleTranslateDetectlanguage.languages.languageCode}}
+                  - CC:
+                      template: abc@gmail.com
+                  - Subject:
+                      template: Language detection
+                  - To:
+                      template: xyz@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleTranslateDetectlanguage
+                    $ref: >-
+                      #/node-output/Google Translate Detect
+                      language/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleTranslateDetectlanguage
+                  $ref: >-
+                    #/node-output/Google Translate Detect
+                    language/response/payload
+                - variable: GmailSendemail2
+                  $ref: '#/node-output/Gmail Send email 2/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$GoogleTranslateDetectlanguage.languages.languageCode}}':
+                      neq: en
+                  execute:
+                    - custom-action:
+                        name: Google Translate Translate text
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postLocationsUsCentral1translateText
+                        map:
+                          mappings:
+                            - contents:
+                                expression: '$Trigger.Body '
+                            - locationName:
+                                template: us-central1
+                            - mimeType:
+                                template: text/html
+                            - targetLanguageCode:
+                                template: en
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleTranslateDetectlanguage
+                              $ref: >-
+                                #/node-output/Google Translate Detect
+                                language/response/payload
+                            - variable: GmailSendemail2
+                              $ref: >-
+                                #/node-output/Gmail Send email
+                                2/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Translated Email is -
+                                  ----{{$GoogleTranslateTranslatetext.translations.translatedText}}
+                            - CC:
+                                template: >-
+                                  ab1@gmail.com,abc@gmail.com
+                            - Subject:
+                                template: Translated Email - 1
+                            - To:
+                                template: xyz@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleTranslateTranslatetext
+                              $ref: >-
+                                #/block/If/node-output/Google Translate
+                                Translate text/response/payload
+                            - variable: GoogleTranslateDetectlanguage
+                              $ref: >-
+                                #/node-output/Google Translate Detect
+                                language/response/payload
+                            - variable: GmailSendemail2
+                              $ref: >-
+                                #/node-output/Gmail Send email
+                                2/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Translate the content to English whenever a new Gmail message is received
+  description: Use this template to translate the non-English content of a Gmail message to English whenever a new Gmail message is received.
+models: {}
