@@ -169,6 +169,6 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Translate the content to English whenever a new Gmail message is received
+  name: Translate the non-English content to English whenever a new Gmail message is received
   description: Use this template to translate the non-English content of a Gmail message to English whenever a new Gmail message is received.
 models: {}
