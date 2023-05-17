@@ -11,11 +11,11 @@ If you do not have access to an API with this kind of information and you want t
 1. Click **Create flow** to start using the template.
 1. Click **Operations** &gt; **Edit flow** for the _Retrieve repository with filter_ operation.
 1. Click each node to review its configuration. If necessary:
-   - Connect to your [HTTP invoke method](http://ibm.biz/ach2http). (To test this template, you can use the following URL in the **Override the HTTP endpoint host name and port of the URL used in the flow:** field - `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`).
-   - Connect to your [Gmail account](http://ibm.biz/acgmail).
+   - Connect to your [HTTP invoke method](https://ibm.biz/aashttp). (To test this template, you can use the following URL in the **Override the HTTP endpoint host name and port of the URL used in the flow:** field - `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`).
+   - Connect to your [Gmail account](https://ibm.biz/aasgmail).
 1. In the Gmail node, update the mandatory **To** field by adding a valid email address.
 1. Click **Done**.
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.
 
 ## Testing the template
 

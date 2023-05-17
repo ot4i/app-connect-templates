@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Microsoft Dynamics 365 for Sales** 
     - **Salesforce**
     - **Email**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
     Whenever a Salesforce opportunity update fails because of incorrect values, an email with the error details gets sent to the intended recipient.
     In this flow, the opportunity gets updated with the wrong campaign ID. Hence, the updated opportunity fails, and an email gets sent to the intended recipient from your email account. 
