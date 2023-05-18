@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2. Connect to the following accounts by using your credentials:
    - **Microsoft Excel Online** 
    - **Gmail**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 This flow is a scheduler-based flow that retrieves the information from each of the rows in the Microsoft Excel Online worksheet.
 

@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 2. Connect to the following accounts by using your credentials:
    - **Amazon S3** 
    - **Snowflake**
-3. To start the flow, in the banner, open the options menu [⋮], and then click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 The flow is started whenever a new file gets created in Amazon s3.
 

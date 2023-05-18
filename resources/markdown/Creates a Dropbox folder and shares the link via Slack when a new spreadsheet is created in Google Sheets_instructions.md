@@ -6,6 +6,6 @@ To refer to these instructions while editing the flow, open [the github page](Cr
     - **Dropbox**
     - **Slack**
 3.  Select a preferred spreadsheet and worksheet from your Google Sheets account.
-4.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+4.	To start the flow, in the banner click **Start flow**.
 
 The flow is started when a new spreadsheet is created in Google Sheets.

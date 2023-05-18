@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Amazon Kinesis**
    - **Amazon CloudWatch**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to add the vehicle records with speed limit violation in Amazon Kinesis. The Amazon CloudWatch event logs are seamlessly retrieved and published to an Amazon Kinesis data stream. The data is processed, and the filtered data (which violates the speed limit) is added to the Amazon S3 bucket via Amazon Kinesis delivery streams.

@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 3. Connect to the following accounts by using your credentials:
    - **IBM Cloudant** 
    - **Google Cloud Pub/Sub**
-4. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+4. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve the flight times from an IBM Cloudant database and publish them into Google Cloud PubSub topics.
 

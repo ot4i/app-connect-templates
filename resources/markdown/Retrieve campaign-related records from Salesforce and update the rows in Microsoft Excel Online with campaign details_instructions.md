@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Salesforce** 
    - **Microsoft Excel Online**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve campaigns and their members' records from Salesforce and update the rows in the Microsoft Excel Online worksheet with the campaign details. Campaign-related information is queried from Salesforce for a specified year, and these details are then appended to a Microsoft Excel Online worksheet with the specified campaign information. A slack message gets sent to the intended channel.

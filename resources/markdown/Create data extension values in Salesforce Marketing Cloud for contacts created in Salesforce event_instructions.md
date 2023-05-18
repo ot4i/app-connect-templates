@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     -	**Salesforce** 
     - **Salesforce Marketing Cloud**
     - **Slack**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 The flow is triggered whenever a new contact is created in Salesforce.  The action then taken depends on the new contact's Mailing Country (MailingCountry):
 - If the new contact's MailingCountry is either USA or India, a contact’s data extension values table in Salesforce Marketing Cloud is created with the contact’s details.

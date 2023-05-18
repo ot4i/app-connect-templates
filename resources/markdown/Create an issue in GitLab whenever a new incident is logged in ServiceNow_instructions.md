@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **ServiceNow** 
    - **GitLab**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to create a new issue in GitLab whenever a new incident is logged in ServiceNow and the incident is updated in ServiceNow with GitLab detail.
 

@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **IBM Engineering Workflow Management** 
    - **ServiceNow**
    - **Microsoft Teams**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 The flow is started when a new incident is logged in ServiceNow.
 

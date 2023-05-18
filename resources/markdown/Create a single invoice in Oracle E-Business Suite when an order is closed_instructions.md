@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2. Connect to the following accounts by using your credentials:
    - **Oracle E-Business Suite** 
    - **Gmail**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 This is a schedule-based flow that retrieves the specified order from Oracle E-Business Suite orders.
 

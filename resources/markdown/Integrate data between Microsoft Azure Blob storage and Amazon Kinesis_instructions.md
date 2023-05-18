@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Microsoft Azure Blob storage** 
    - **Amazon Kinesis**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve a blob file from a specified Azure blob container, split the content into a user-defined file size, download the file content, and add the spilt records to an Amazon S3 bucket through Amazon Kinesis delivery streams.
 

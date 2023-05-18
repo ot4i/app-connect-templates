@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **GitLab** 
    - **Microsoft Excel Online**
    - **Google Calendar**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to create an event in Google Calendar whenever an epic is created in Gitlab. In this example, the GitLab epic details are parsed to Google Calendar, and an invite gets sent to the intended attendees with the epic details.
