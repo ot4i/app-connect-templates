@@ -4,6 +4,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2. Connect to the following accounts by using your credentials:
    - **Microsoft Power BI**
    - **Insightly**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
-Use this template to retrieve lead records from Insightly, and the lead data is added to Microsoft Power BI. In this example, the lead data is inserted into a Microsoft Power BI dataset. This data helps analyse and visualise the data patterns in reports.
+Use this template to retrieve lead records from Insightly, and the lead data is added to Microsoft Power BI. In this example, the lead data is inserted into a Microsoft Power BI dataset. This data helps analyze and visualize the data patterns in reports.
