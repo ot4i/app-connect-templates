@@ -2,7 +2,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 1. Click **Create flow** to start using the template.
 1. (Optional) Update the Scheduler node to suit your requirements.
-1. Connect to your [NetSuite ERP account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-netsuite/).
+1. Connect to your [NetSuite ERP account](https://ibm.biz/aasnetsuite).
 1. (Optional) Update the maximum number of items to retrieve at each interval.
 1. Connect to your [Salesforce account](https://ibm.biz/aassalesforce).
 1. (Optional) If your product is not a Food item, update the message in the **Product description** field.

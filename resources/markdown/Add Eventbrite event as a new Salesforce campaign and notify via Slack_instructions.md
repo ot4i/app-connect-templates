@@ -2,7 +2,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 1. Clicking **Create flow** to start using the template.
 2. Click the Eventbrite / **New order** node.
-3. Connect to your [Eventbrite](https://ibm.biz/aceventbrite) account and then select the Organization that you want to use.
+3. Connect to your [Eventbrite](https://ibm.biz/aaseventbrite) account and then select the Organization that you want to use.
 4. Click the [Salesforce](https://ibm.biz/aassalesforce) / **Create campaign** node.
 5. Connect to your Salesforce account.
 6. Click the [Slack](https://ibm.biz/aasslack) / **Create message** node.

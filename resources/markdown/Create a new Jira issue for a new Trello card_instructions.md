@@ -2,7 +2,7 @@ To refer to these instructions while editing the flow, open [the github page](Cr
 
 1.	Click **Create flow** to start using the template.
 2.	Click Jira / **New issue**.
-3.	Connect to [**Jira** ](https://ibm.biz/aasjira) and then select the project that you want to use.
+3.	Connect to [**Jira**](https://ibm.biz/aasjira) and then select the project that you want to use.
 4.	Click Trello / **Add card to list**.
 5.	Connect to [**Trello**](https://ibm.biz/aastrello) and then select a preferred team, board, and list from your Trello account
 6.	To start the flow, in the banner click **Start flow**.

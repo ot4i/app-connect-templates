@@ -1,9 +1,9 @@
 To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Add%20Eventbrite%20attendees%20to%20Insightly%20and%20MailChimp_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
-1. Connect to your [Eventbrite account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-eventbrite/).
+1. Connect to your [Eventbrite account](https://ibm.biz/aaseventbrite).
 1. Connect to your [Insightly account](https://ibm.biz/aasinsightly).
-1. Connect to your [MailChimp account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-mailchimp/).
+1. Connect to your [MailChimp account](https://ibm.biz/aasmailchimp).
 1. Click on the MailChimp node and select the list where the attendee needs to be added.
 1. To start the flow, in the banner click **Start flow**.
 
