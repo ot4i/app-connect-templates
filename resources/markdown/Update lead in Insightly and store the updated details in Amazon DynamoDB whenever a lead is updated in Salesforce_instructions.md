@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Insightly**
     - **Amazon DynamoDB**
     - **Slack**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 Use this template to update a lead or its details in Insightly, and store the updated information in Amazon DynamoDB whenever a new lead is created in Salesforce. In Amazon DynamoDB, the lead will have the created and last modified timestamp records. A Slack message gets sent to the intended channel.
 

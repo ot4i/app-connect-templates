@@ -25,10 +25,10 @@ You can use the template 'Welcome guide setup 1 - Add products to Salesforce' to
 ## Using the template
 
 1. Click **Create flow** to start using the template.
-1. Click the Salesforce event and connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
-1. Click the Box "Create file" action and connect to your [Box account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-box/).
+1. Click the Salesforce event and connect to your [Salesforce account](https://ibm.biz/aassalesforce).
+1. Click the Box "Create file" action and connect to your [Box account](https://ibm.biz/aas_box).
 1. In the Box "Create file" action, choose the folder where you'd like the file to be created.
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.
 
 ## Related templates
 

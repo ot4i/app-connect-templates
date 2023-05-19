@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Salesforce** 
     - **Slack**
     - **Workday**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 Use this template to update an opportunity in Workday when any updates are made to the existing opportunity in Salesforce. A Slack message gets sent to the relevant channel. 

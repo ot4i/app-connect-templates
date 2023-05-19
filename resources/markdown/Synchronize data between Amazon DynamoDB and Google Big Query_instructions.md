@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Amazon DynamoDB** 
    - **Google Cloud BigQuery**
    - **Slack**
-4. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+4. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve employee records from Amazon DynamoDB and synchronise that data with Google Cloud BigQuery.
 
