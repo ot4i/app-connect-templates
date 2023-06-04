@@ -114,6 +114,6 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Stop, start, or reboot the Amazon RDS instance whenever a Zendesk Service ticket gets created
+  name: Stop or start or reboot the Amazon RDS instance whenever a Zendesk Service ticket gets created
   description: Use this template to stop, start, or reboot the Amazon RDS instance whenever a Zendesk Service ticket gets created.
 models: {}
