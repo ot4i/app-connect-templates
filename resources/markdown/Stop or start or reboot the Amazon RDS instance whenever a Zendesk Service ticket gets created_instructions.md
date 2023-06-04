@@ -10,3 +10,5 @@ The flow is started whenever a new ticket gets created in Zendesk Service.
 
 In this example, the flow checks the Zendesk Service ticket’s subject to whether to start, stop, or reboot the Amazon RDS instance based on the instance ID from the Zendesk Service ticket.
 
+For more information, see [Using IBM® App Connect to interact with Amazon RDS](https://community.ibm.com/community/user/integration/blogs/shamini-arumugam1/2023/06/04/using-ibm-app-connect-to-interact-with-amazon-rds).
+
