@@ -3,8 +3,8 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - **Amazon S3** 
-   - **Google Translate**
+   - [Amazon S3](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-amazon-s3)
+   - [Google Translate](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-google-translate)
 3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
 
