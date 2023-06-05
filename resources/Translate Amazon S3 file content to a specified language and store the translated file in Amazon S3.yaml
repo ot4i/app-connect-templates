@@ -1,0 +1,127 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        DOWNLOAD_OBJECT: {}
+    action-interface-6:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: postLocationsUsCentral1translateDocument_model
+      connector-type: googletranslate
+      actions:
+        postLocationsUsCentral1translateDocument: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon S3 Retrieve object content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOAD_OBJECT
+              map:
+                mappings:
+                  - Key:
+                      template: Google_Translate_ScopeV1.pdf
+                  - bucketName:
+                      template: aaeventburst
+                  - fileType:
+                      template: Binary
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Google Translate Translate document
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postLocationsUsCentral1translateDocument
+              map:
+                mappings:
+                  - documentInputConfig:
+                      mappings:
+                        - content:
+                            template: '{{$AmazonS3Retrieveobjectcontent.content}}'
+                        - mimeType:
+                            template: application/pdf
+                  - locationName:
+                      template: us-central1
+                  - sourceLanguageCode:
+                      template: en
+                  - targetLanguageCode:
+                      template: mr
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              map:
+                mappings:
+                  - ContentType:
+                      template: application/pdf
+                  - Key:
+                      template: trynewdemoLatest.pdf
+                  - bucketName:
+                      template: aaeventburst
+                  - content:
+                      template: >-
+                        {{$GoogleTranslateTranslatedocument.documentTranslation.byteStreamOutputs[0]}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonS3Retrieveobjectcontent
+                    $ref: >-
+                      #/node-output/Amazon S3 Retrieve object
+                      content/response/payload
+                  - variable: GoogleTranslateTranslatedocument
+                    $ref: >-
+                      #/node-output/Google Translate Translate
+                      document/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Translate Amazon S3 file content to a specified language and store the translated file in Amazon S3
+models: {}

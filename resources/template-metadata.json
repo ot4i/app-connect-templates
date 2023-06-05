@@ -1663,6 +1663,42 @@
    "targetApps": ["slack", "workday"],
    "tags": ["salesforce", "slack", "workday"],
    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Translate non-English content to English whenever a new Gmail message is received",
+    "description": "Use this template to translate the non-English content of a Gmail message to English whenever a new Gmail message is received.",
+    "summary": "Gmail to 2 applications",
+    "sourceApp": "gmail",
+    "targetApps": ["googletranslate","gmail"],
+    "tags": ["googletranslate", "gmail", "if"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Translate Amazon S3 file content to a specified language and store the translated file in Amazon S3",
+    "description": "Use this template to translate Amazon S3 file content to a specified language and store the translated file in Amazon S3.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["amazons3","googletranslate"],
+    "tags": ["scheduler", "googletranslate", "amazons3"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Stop or start or reboot the Amazon RDS instance whenever a Zendesk Service ticket gets created",
+    "description": "Use this template to stop, start, or reboot the Amazon RDS instance whenever a Zendesk Service ticket gets created.",
+    "summary": "Zendesk Service to Amazon RDS",
+    "sourceApp": "zendeskservice",
+    "targetApps": ["amazonrds"],
+    "tags": ["zendeskservice", "amazonrds", "if"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create a database instance in Amazon RDS when a new company is created in IBM Maximo",
+    "description": "Use this template to create a database instance in Amazon RDS when a new company is created in IBM Maximo.",
+    "summary": "IBM Maximo to 2 applications",
+    "sourceApp": "maximo",
+    "targetApps": ["amazonrds", "gmail"],
+    "tags": ["maximo", "amazonrds", "gmail"],
+    "offerings": ["app connect professional"]
   }
 ]
 }
