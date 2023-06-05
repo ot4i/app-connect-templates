@@ -7,7 +7,3 @@ To refer to these instructions while editing the flow, open [the github page](ht
 3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
 
 Use this template to translate the non-English content of a Gmail message to English whenever a new Gmail message is received.
-
-For more information, see [Using IBM® App Connect to interact with Google Translate](https://community.ibm.com/community/user/integration/blogs/shamini-arumugam1/2023/06/04/using-ibm-app-connect-to-interact-googletranslate).
-
-
