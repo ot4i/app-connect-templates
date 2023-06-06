@@ -24,7 +24,7 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: Oracle Database Create LEADS record
+              name: Oracle Database Create leads record
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
