@@ -1699,6 +1699,15 @@
     "targetApps": ["amazonrds", "gmail"],
     "tags": ["maximo", "amazonrds", "gmail"],
     "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Store the lead details in Oracle Database when a new Salesforce lead gets created",
+    "description": "Use this template to store the lead details in Oracle Database when a new Salesforce lead gets created.",
+    "summary": "Salesforce to Oracle Database",
+    "sourceApp": "salesforce",
+    "targetApps": ["oracle"],
+    "tags": ["salesforce", "oracle"],
+    "offerings": ["app connect professional"]
   }
 ]
 }
