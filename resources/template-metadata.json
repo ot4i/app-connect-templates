@@ -1716,7 +1716,7 @@
    "sourceApp": "sapsuccessfactors",
    "targetApps": ["gmail"],
    "tags": ["sapsuccessfactors", "gmail"],
-   "offerings": ["app connect professio"]
+   "offerings": ["app connect professional"]
   }
 ]
 }
