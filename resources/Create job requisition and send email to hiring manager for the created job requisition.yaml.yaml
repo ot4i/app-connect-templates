@@ -20,13 +20,6 @@ integration:
               jobrequisitionsendemail: jobrequisitionsendemailJobRequisition
       type: api-trigger
   action-interfaces:
-    action-interface-1:
-      type: api-action
-      business-object: postJobRequisition_model
-      connector-type: UDA.default.openapi.SAPSuccessFactors
-      account-name: Account 1
-      actions:
-        postJobRequisition: {}
     action-interface-2:
       type: api-action
       business-object: mail
@@ -34,12 +27,19 @@ integration:
       account-name: Account 1
       actions:
         CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: postJobRequisition_model
+      connector-type: sapsuccessfactors
+      account-name: Account 1
+      actions:
+        postJobRequisition: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
           - custom-action:
-              name: SAPSuccessFactors Create job requisition
+              name: SAP SuccessFactors Create job requisition
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               action: postJobRequisition
@@ -61,22 +61,8 @@ integration:
                             template: '{{$Request.employee_id}}'
                   - hiringManager:
                       mappings:
-                        - email:
-                            template: '{{$Request.hiring_manager_email}}'
-                        - firstName:
-                            template: Ralph
-                        - isAdminSelected:
-                            expression: 'false'
-                        - jobReqId:
-                            template: '2445'
-                        - lastName:
-                            template: Brunnert
-                        - operatorRole:
-                            template: G
-                        - phone:
-                            template: '9812345678'
                         - userName:
-                            template: rbrunnert
+                            template: '{{$Request.username}}'
                         - usersSysId:
                             template: '{{$Request.users_id}}'
                   - state:
@@ -152,6 +138,8 @@ integration:
                       - variable: flowDetails
                         $ref: '#/flowDetails'
                   input: []
+        tags:
+          - incomplete
   name: Usecase2
 models:
   jobRequisition:
@@ -190,6 +178,10 @@ models:
         id: false
         type: string
       hiring_manager_email:
+        required: false
+        id: false
+        type: string
+      username:
         required: false
         id: false
         type: string
