@@ -4,6 +4,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2. Connect to the following accounts by using your credentials:
    - **Microsoft Power BI**
    - **Gmail**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to send a Gmail message to the intended recipient if the retrieved Microsoft Power BI goal value set is not achieved. A Gmail message will also be sent if the goal value is achieved.

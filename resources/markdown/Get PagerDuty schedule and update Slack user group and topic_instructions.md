@@ -46,4 +46,4 @@ You can create this from the [Slack apps](https://api.slack.com/apps/) page.
 1. Again, update the URL to match your Slack workspace domain (e.g. https://my-company.slack.com) and include your OAuth Access Token between `token=` and `&usergroup`.  Also, include your user group ID between `usergroup=` and `&users`.
 1. Click on the fourth **HTTP** node, and connect to your HTTP account.
 1. Again, update the URL to match your Slack workspace domain (e.g. https://my-company.slack.com) and include your OAuth Access Token between `token=` and `&channel`.  Also, include your channel ID between `channel=` and `&topic`.
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.

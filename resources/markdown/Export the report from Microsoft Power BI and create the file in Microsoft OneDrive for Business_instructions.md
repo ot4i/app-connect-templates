@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Microsoft OneDrive for Business** 
    - **Microsoft Power BI**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to export a report from Microsoft Power BI and create the file in Microsoft OneDrive for Business. If the report already exists, it will be updated in Microsoft OneDrive for Business.

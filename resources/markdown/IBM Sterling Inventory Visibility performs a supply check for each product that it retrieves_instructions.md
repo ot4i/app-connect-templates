@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 3. Connect to the following accounts by using your credentials:
    - **IBM Sterling Inventory Visibility** 
    - **Microsoft Teams**
-4. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+4. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve a list of products from IBM Sterling Inventory Visibility and create a message in a Microsoft Team channel based on the status of the retrieved item and where it is in the delivery process.
 

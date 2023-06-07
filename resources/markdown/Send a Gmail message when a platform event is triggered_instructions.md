@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2.	Connect to the following accounts by using your credentials:
     - **Salesforce**
     - **Gmail**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 Use this template for the following scenario: 
 An email gets sent from your Gmail account to the subscribers of the platform event. The Salesforce custom platform event in this example is either the COVID vaccination in Pune or Mumbai.

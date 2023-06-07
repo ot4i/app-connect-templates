@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 3. Connect to the following accounts by using your credentials:
    - **Microsoft Exchange** 
    - **Wufoo**
-4. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+4. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve emails from Microsoft Exchange based on the subject by searching for a specified keyword.
 

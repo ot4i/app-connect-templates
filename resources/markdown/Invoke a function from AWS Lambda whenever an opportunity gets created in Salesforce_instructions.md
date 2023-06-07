@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Salesforce**
    - **AWS Lambda** 
    - **Gmail**
-3. To start the flow, in the banner open the options menu [⋮] and then click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 The flow is started when an opportunity gets created in Salesforce.
 

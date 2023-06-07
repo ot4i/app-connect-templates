@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Microsoft Excel Online** 
    - **Salesforce**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 The flow is started whenever a new row is appended in Microsoft Excel Online with potential lead data.
 

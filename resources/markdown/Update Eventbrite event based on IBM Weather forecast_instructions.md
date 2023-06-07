@@ -9,15 +9,15 @@ Before you use this flow, you must have an Eventbrite event ready.  You can get 
 
 1. Click **Create flow** to start using the template.
 1. Click **Operations**, then **Edit flow** for the _Retrieve event_forecast by ID_ operation.
-1. Click the **Eventbrite / Retrieve events** node, and if you're not already connected, connect to your [Eventbrite account](https://ibm.biz/aceventbrite).
+1. Click the **Eventbrite / Retrieve events** node, and if you're not already connected, connect to your [Eventbrite account](https://ibm.biz/aaseventbrite).
 1. Select the Organization to use for this flow.
 1. Click the **HTTP / Invoke method** node, and in the Authorization field replace PERSONAL_OAUTH_TOKEN with your personal OAuth token for Eventbrite.  For information about your personal OAuth token, see the [Eventbrite API documentation](https://www.eventbrite.com/platform/api).
-1. Click the **IBM Weather Company Data Limited Edition / Get forecast** node, and if you're not already connected, connect to your [IBM Weather Company account](https://ibm.biz/acweathercdle).
+1. Click the **IBM Weather Company Data Limited Edition / Get forecast** node, and if you're not already connected, connect to your [IBM Weather Company account](https://ibm.biz/aasweathercdle).
 1. Click the **Eventbrite / Update events** nodes, and select your Eventbrite account.
-2. Click the **Slack / Send message** nodes, and select your Slack account.  If you're not already connected, connect to your [Slack account](https://ibm.biz/acslack).
+2. Click the **Slack / Send message** nodes, and select your Slack account.  If you're not already connected, connect to your [Slack account](https://ibm.biz/aasslack).
 3. Optionally check the other nodes such as the JSON parser, Set variable, and Response nodes.
 4. Click **Done**.
-5. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+5. To start the flow, in the banner click **Start flow**.
 
 Want to see the API working? 
 Click **Manage** in the API flow, then follow the instructions on getting started to create an API key and documentation link. Use the documentation link to open your API portal, and there click the **Try it** link. 

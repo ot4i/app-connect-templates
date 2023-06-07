@@ -24,11 +24,11 @@ Set the question as a required field for your event.
 ## Using the template
 
 1. Click **Create flow** to start using the template.
-1. Click the Eventbrite event and then connect to your [Eventbrite account](https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-eventbrite).
-1. Click the Slack "Create message" action and then connect to your [Slack account](https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-slack).
+1. Click the Eventbrite event and then connect to your [Eventbrite account](https://ibm.biz/aaseventbrite).
+1. Click the Slack "Create message" action and then connect to your [Slack account](https://ibm.biz/aasslack).
 1. In the Slack "Create message" action, choose the channel that you want to post the message to.
-1. Click the Gmail "Send email" action and then connect to your [Google account](https://www.ibm.com/docs/en/app-connect/cloud?topic=apps-gmail).
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. Click the Gmail "Send email" action and then connect to your [Google account](https://ibm.biz/aasgoauth2).
+1. To start the flow, in the banner click **Start flow**.
 
 ## Related templates
 

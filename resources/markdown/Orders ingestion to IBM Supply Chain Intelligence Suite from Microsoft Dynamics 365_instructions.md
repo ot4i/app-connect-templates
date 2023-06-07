@@ -2,10 +2,10 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 1.	Click **Create flow** to start using the template.
 2.	Connect to the following accounts by using your credentials:
-    -	**Microsoft Dynamics 365 for Sales** 
+    - **Microsoft Dynamics 365 for Sales** 
     - **IBM Supply Chain Intelligence Suite**
     - **Slack**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 Want to see the flow working? The flow is started by a scheduler. Modify the Schedule flow event to start the flow when you need.
 

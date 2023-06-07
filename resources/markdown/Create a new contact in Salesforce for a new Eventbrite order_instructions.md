@@ -7,9 +7,9 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 2. In App Connect, Click **Create flow** to start using the template.
 3. Click the Eventbrite / **New order** node.
-4. Connect to your [Eventbrite](https://ibm.biz/aceventbrite) accountand then select the Organization that you want to use.
+4. Connect to your [Eventbrite](https://ibm.biz/aaseventbrite) account and then select the Organization that you want to use.
 5. Click the Salesforce / **Create contact** node.
-6. Connect to your [Salesforce](http://ibm.biz/ach2salesforce) account.
-7. To start the flow, in the banner open the options menu [⋮] then click **Start flow**.
+6. Connect to your [Salesforce](http://ibm.biz/aassalesforce) account.
+7. To start the flow, in the banner click **Start flow**.
 
 To test the flow, create a new order in the Eventbrite account. In response, the flow creates a new contact in Salesforce.

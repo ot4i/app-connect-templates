@@ -50,9 +50,9 @@ integration:
                                 template: CGAKSJKBL
                             - text:
                                 template: >-
-                                  Opportunities with name {{$Trigger.name}} is
+                                  Opportunity with name {{$Trigger.name}} is
                                   marked as closed
-                                  won-->{{$Trigger}}///{{$Trigger.parentaccountid}}
+                                  won-->{{$Trigger.opportunityid}}///{{$Trigger.parentaccountid}}
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: Trigger

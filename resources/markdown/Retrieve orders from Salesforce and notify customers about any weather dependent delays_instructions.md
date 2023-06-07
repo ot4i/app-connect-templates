@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Salesforce** 
    - **IBM Weather Company Data Limited Edition**
    - **Domino**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve an order from Salesforce, map the shipping address to IBM Weather Company Data to retrieve the forecast, and send a delayed order notification to the customer via Domino. This use case helps you inform your customers when the delivery of an order is going to be delayed due to bad weather conditions.
 

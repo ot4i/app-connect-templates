@@ -11,11 +11,11 @@ In Google Sheets, create a sheet with the [products to add to Salesforce](https:
 ## Using the template
 
 1. Click **Create flow** to start using the template.
-1. Click the Google Sheets "Retrieve rows" action and connect to your [Google Sheets account](http://ibm.biz/acgsheets).
+1. Click the Google Sheets "Retrieve rows" action and connect to your [Google Sheets account](http://ibm.biz/aasgsheets).
 1. In the Google Sheets "Retrieve rows" action, select the Spreadsheet and Worksheet you want to use.
-1. Click the Salesforce "Update or create price book" action and connect to your [Salesforce account](http://ibm.biz/ach2salesforce).
+1. Click the Salesforce "Update or create price book" action and connect to your [Salesforce account](http://ibm.biz/aassalesforce).
 1. Check that an account has been set for the other "Salesforce" actions.
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.
 1. Once the flow has run, in the banner open the options menu [&#8942;] then click **Stop flow**, otherwise it will try to create the products again as scheduled.
 
 ## Clean up

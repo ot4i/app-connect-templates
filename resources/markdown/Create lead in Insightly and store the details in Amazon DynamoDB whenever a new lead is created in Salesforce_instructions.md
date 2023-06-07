@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Salesforce** 
     - **Insightly**
     - **Amazon DynamoDB**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 Use this template to create a lead with the lead’s details in Insightly, and store the information of the lead in Amazon DynamoDB with the created and last modified timestamp records whenever a new lead is created in Salesforce.
 

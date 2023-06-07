@@ -6,6 +6,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Amazon S3** 
    - **Amazon Kinesis**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to add records to Amazon Kinesis data streams for each object retrieved from Amazon S3. Make sure that you run the Get Amazon Kinesis data stream record flow before running this flow.

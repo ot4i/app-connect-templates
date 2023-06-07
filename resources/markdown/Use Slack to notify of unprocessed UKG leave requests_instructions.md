@@ -10,7 +10,7 @@ This template assumes that the following resources are available:
 2. Connect to the following accounts by using your credentials:
    - **UKG** 
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to send a Slack notification about unprocessed UKG leave requests.
 

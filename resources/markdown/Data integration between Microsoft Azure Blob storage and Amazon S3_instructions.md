@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **ServiceNow** 
    - **Microsoft Azure Blob storage**
    - **Amazon S3**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to create a scheduler-based flow that retrieves a large blob file’s metadata from a specified Azure blob container, splits the file into a user-defined file size, downloads the file content, and uploads the spilt files to an Amazon S3 bucket or any other storage endpoint.
 

@@ -6,7 +6,7 @@ This template references entities that you can create as follows:
 ## Using the template
 1. Click **Create flow** to start using the template.
 1. Click each node to review its configuration. If necessary:
-   - Connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
-   - Connect to your [Box account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-box/).
+   - Connect to your [Salesforce account](https://ibm.biz/aassalesforce).
+   - Connect to your [Box account](https://ibm.biz/aas_box).
 1. In the Box node, select **Daily leads** from the **Folder** drop-down list.
-1. To start the flow, in the banner open the options menu [&#8942;] and then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.

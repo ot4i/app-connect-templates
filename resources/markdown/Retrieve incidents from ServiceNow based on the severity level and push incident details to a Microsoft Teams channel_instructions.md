@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 3. Connect to the following accounts by using your credentials:
    - **ServiceNow** 
    - **Microsoft Teams**
-4. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+4. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve incidents from ServiceNow and send those incidents, along with incident details, to a channel in Microsoft Teams.
 

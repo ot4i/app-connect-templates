@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
     - **Salesforce**
     - **Amazon EventBridge**
     - **Slack**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 Use this template to perform the following use case: When a new row is appended to the Microsoft Excel Online worksheet, a lead is created in Salesforce.
 Upon each successful lead creation in Salesforce, Amazon EventBridge sends events to the specified event bus. 

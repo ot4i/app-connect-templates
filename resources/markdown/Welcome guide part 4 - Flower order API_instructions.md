@@ -21,10 +21,10 @@ You can use the following templates to help with this setup in Salesforce:
 
 1. Click **Create flow** to start using the template.
 1. Click "Operations", then "Edit flow" next to the "Create order" operation.
-1. Click the Trello "Add New Card to List" action and connect to your [Trello account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-trello/).
+1. Click the Trello "Add New Card to List" action and connect to your [Trello account](https://ibm.biz/aastrello).
 1. On the Trello action select the "Board" and "List" where you'd like the new card created.
-1. Click the Salesforce "Retrieve order product" action and connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. Click the Salesforce "Retrieve order product" action and connect to your [Salesforce account](https://ibm.biz/aassalesforce).
+1. To start the flow, in the banner click **Start flow**.
 
 ## Related templates
 

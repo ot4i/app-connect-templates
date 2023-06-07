@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2. Connect to the following accounts by using your credentials:
    - **Redis** 
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 Use this template to update or create a string in Redis and then display the response payload from Redis in a Slack channel as confirmation.
 

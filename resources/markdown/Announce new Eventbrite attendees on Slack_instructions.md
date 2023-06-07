@@ -14,10 +14,10 @@ In the video of this flow, the event also collects information about the attende
 ## Using the template
 
 1. Click **Create flow** to start using the template.
-1. Click the Eventbrite event and connect to your [Eventbrite account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-eventbrite/).
-1. Click the Slack "Create message" action and connect to your [Slack account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-slack/).
+1. Click the Eventbrite event and connect to your [Eventbrite account](https://ibm.biz/aaseventbrite).
+1. Click the Slack "Create message" action and connect to your [Slack account](https://ibm.biz/aasslack).
 1. In the Slack "Create message" action, choose the channel that you want to post the message to.
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.
 
 ## Related templates
 

@@ -9,6 +9,6 @@ To refer to these instructions while editing the flow, open [the github page](ht
 4.	Click the **Sharepoint / Create list item** node and select the Site and List that you want App Connect to create a new list item for
 5.	Click the **Sharepoint / Retrieve list items** node and select the Site and List that you want App Connect to create a new list item for.  This retrieve action is used to retrieve all the properties of the list item created in the previous action.
 6.	Click the **Microsoft Teams / Send message to channel** node and select the Team and Channel that you want App Connect to send a message to
-7.	To start the flow, in the banner, open the options menu [⋮] and then click **Start flow**.
+7.	To start the flow, in the banner click **Start flow**.
 
 The flow is started when a completed form is submitted in Wufoo.

@@ -2,9 +2,9 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 1. Click **Create flow** to create an event-driven flow from the template.
 2. Click Google Sheets / **New complete row appended**
-3. Connect to your [Google sheet account](http://ibm.biz/acgsheets) and then select the spreadsheet and worksheet to which you will add new rows.
+3. Connect to your [Google sheet account](http://ibm.biz/aasgsheets) and then select the spreadsheet and worksheet to which you will add new rows.
 4. Click Trello / **Add card to list**
-5. Connect to your [Trello account](https://ibm.biz/actrello) and then select the board and list in which cards are to be added when a new opportunity record is created on salesforce.
+5. Connect to your [Trello account](https://ibm.biz/aastrello) and then select the board and list in which cards are to be added when a new opportunity record is created on salesforce.
 6. To start the flow, click **Start flow**.
 
 ## Testing the Flow

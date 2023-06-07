@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Jira** 
    - **GitHub**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 The flow is started when a new Jira issue of type Epic is created in the specified Jira project.
 
