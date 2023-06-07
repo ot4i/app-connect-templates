@@ -1,0 +1,96 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration: ''
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getCallsjson_model
+      connector-type: twilio
+      actions:
+        RETRIEVEALL: {}
+    action-interface-8:
+      type: api-action
+      business-object: Note
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Twilio Retrieve details of calls
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  To: '+917798198299'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - create-action:
+              name: Salesforce Create note
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$TwilioRetrievedetailsofcalls}}'
+                  - ParentId:
+                      template: 0012w00001ZpPywAAF
+                  - Title:
+                      template: TwilioCallDetails
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: TwilioRetrievedetailsofcalls
+                    $ref: >-
+                      #/node-output/Twilio Retrieve details of
+                      calls/response/payload
+                  - variable: TwilioRetrievedetailsofcallsMetadata
+                    $ref: '#/node-output/Twilio Retrieve details of calls/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: SalesforceRetrievefilesmetadata
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve files
+                      metadata/response/payload
+                  - variable: SalesforceRetrievefilesmetadataMetadata
+                    $ref: '#/node-output/Salesforce Retrieve files metadata/response'
+                  - variable: SalesforceCreatefile
+                    $ref: '#/node-output/Salesforce Create file/response/payload'
+                  - variable: SalesforceRetrievenotes
+                    $ref: '#/node-output/Salesforce Retrieve notes/response/payload'
+                  - variable: SalesforceRetrievenotesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve notes/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a note in Salesforce for the retrieved call details of a phone number from Twilio
+  description: Use this template to create a note that contains the call details of a phone number from Twilio that is associated with a Salesforce account.
+models: {}
