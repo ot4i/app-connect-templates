@@ -24,14 +24,12 @@ integration:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-1:
       type: api-action
       business-object: postJobRequisition_model
       connector-type: sapsuccessfactors
-      account-name: Account 1
       actions:
         postJobRequisition: {}
   assemblies:
