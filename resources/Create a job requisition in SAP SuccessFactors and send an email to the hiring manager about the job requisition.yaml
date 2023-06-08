@@ -1,0 +1,207 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        jobrequisitionsendemailJobRequisition:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: jobRequisition
+          output-context:
+            data: jobRequisition
+      options:
+        resources:
+          - business-object: jobRequisition
+            model:
+              $ref: '#/models/jobRequisition'
+            triggers:
+              jobrequisitionsendemail: jobrequisitionsendemailJobRequisition
+      type: api-trigger
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: postJobRequisition_model
+      connector-type: sapsuccessfactors
+      actions:
+        postJobRequisition: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP SuccessFactors Create job requisition
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postJobRequisition
+              map:
+                mappings:
+                  - country:
+                      template: '{{$Request.country}}'
+                  - filter1:
+                      mappings:
+                        - id:
+                            template: '{{$Request.country_id}}'
+                  - filter2:
+                      mappings:
+                        - id:
+                            template: '{{$Request.job_id}}'
+                  - filter3:
+                      mappings:
+                        - id:
+                            template: '{{$Request.employee_id}}'
+                  - hiringManager:
+                      mappings:
+                        - userName:
+                            template: '{{$Request.username}}'
+                        - usersSysId:
+                            template: '{{$Request.users_id}}'
+                  - state:
+                      mappings:
+                        - id:
+                            template: '{{$Request.state}}'
+                  - templateId:
+                      expression: '$Request.template_id '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: |-
+                        Job ID: {{$Request.job_id}}
+                        Job State:{{$Request.state}}
+                        Template ID: {{$Request.template_id}}
+                        Users ID: {{$Request.users_id}}
+                        Country ID: {{$Request.country_id}}
+                  - Subject:
+                      template: Created job requisition
+                  - To:
+                      template: '{{$Request.hiring_manager_email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: SAPSuccessFactorsCreatejobrequisition
+                    $ref: >-
+                      #/node-output/SAPSuccessFactors Create job
+                      requisition/response/payload
+                  - variable: SAPSuccessFactorsCreatejobrequisitionMetadata
+                    $ref: >-
+                      #/node-output/SAPSuccessFactors Create job
+                      requisition/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: jobRequisition successfully add custom operation
+                  status-code: 200
+                  map:
+                    mappings:
+                      - hiring_manager_email:
+                          template: '{{$Request.hiring_manager_email}}'
+                      - id:
+                          template: '{{$GmailSendemail.id}}'
+                      - template_id:
+                          template: '{{$Request.template_id}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: SAPSuccessFactorsCreatejobrequisition
+                        $ref: >-
+                          #/node-output/SAPSuccessFactors Create job
+                          requisition/response/payload
+                      - variable: SAPSuccessFactorsCreatejobrequisitionMetadata
+                        $ref: >-
+                          #/node-output/SAPSuccessFactors Create job
+                          requisition/response
+                      - variable: GmailSendemail
+                        $ref: '#/node-output/Gmail Send email/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  input: []
+        tags:
+          - incomplete
+  name: Create a job requisition in SAP SuccessFactors and send an email to the hiring manager about the job requisition
+models:
+  jobRequisition:
+    name: jobRequisition
+    properties:
+      id:
+        required: false
+        id: true
+        type: string
+      template_id:
+        required: false
+        id: false
+        type: string
+      users_id:
+        required: false
+        id: false
+        type: string
+      country_id:
+        required: false
+        id: false
+        type: string
+      job_id:
+        required: false
+        id: false
+        type: string
+      employee_id:
+        required: false
+        id: false
+        type: string
+      state:
+        required: false
+        id: false
+        type: string
+      country:
+        required: false
+        id: false
+        type: string
+      hiring_manager_email:
+        required: false
+        id: false
+        type: string
+      username:
+        required: false
+        id: false
+        type: string
+    plural: jobRequisition
+    description: ' '
+    operations:
+      jobrequisitionsendemail: '#/integration/assemblies/assembly-1'
+    methods:
+      jobrequisitionsendemail:
+        name: jobRequisitionSendEmail
+        display:
+          name: jobRequisition
+        accessType: WRITE
+        accepts:
+          - arg: data
+            type: jobRequisition
+            http:
+              source: body
+        returns:
+          arg: data
+          type: jobRequisition
+          root: true
+        http:
+          verb: POST
+          path: /jobRequisitionSendEmail
