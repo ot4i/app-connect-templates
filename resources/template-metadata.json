@@ -1710,12 +1710,12 @@
     "offerings": ["app connect professional"]
   },
   {
-   "name": "Create job requisition and send email to hiring manager for the created job requisition",
-   "description": "Use this template to send a gmail message for the created job requisition.",
-   "summary": "SAP SuccessFactors to gmail",
-   "sourceApp": "sapsuccessfactors",
-   "targetApps": ["gmail"],
-   "tags": ["sapsuccessfactors", "gmail"],
+   "name": "Create a job requisition in SAP SuccessFactors and send an email to the hiring manager about the job requisition",
+   "description": "Use this template to send a gmail message when a new job requisition is created.",
+   "summary": "API to 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["sapsuccessfactors", "gmail"],
+   "tags": ["api", "sapsuccessfactors", "gmail"],
    "offerings": ["app connect professional"]
   }                
 ]
