@@ -138,7 +138,9 @@ integration:
                   input: []
         tags:
           - incomplete
-  name: Create a job requisition in SAP SuccessFactors and send an email to the hiring manager about the job requisition
+  name: >-
+    Create a job requisition in SAP SuccessFactors and send an email to the
+    hiring manager about the job requisition
 models:
   jobRequisition:
     name: jobRequisition
