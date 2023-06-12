@@ -1717,6 +1717,15 @@
    "targetApps": ["sapsuccessfactors", "gmail"],
    "tags": ["api", "sapsuccessfactors", "gmail"],
    "offerings": ["app connect professional"]
-  }                
+  },
+  {
+    "name": "Store the contact details in Salesforce when a new contact record is added to Microsoft SQL Server",
+    "description": "Use this template to Store the contact details in Salesforce when a new contact record is added to Microsoft SQL Server.",
+    "summary": "Microsoft SQL Server to Salesforce",
+    "sourceApp": "mssql",
+    "targetApps": ["salesforce"],
+    "tags": ["mssql", "salesforce"],
+    "offerings": ["app connect professional"]
+  }
 ]
 }
