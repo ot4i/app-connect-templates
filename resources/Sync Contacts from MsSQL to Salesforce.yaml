@@ -19,13 +19,11 @@ integration:
               timeZone: UTC
               pollingInterval: '5'
               isCreatedQueryable: true
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Contact
       connector-type: salesforce
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
