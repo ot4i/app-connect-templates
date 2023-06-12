@@ -1717,6 +1717,15 @@
    "targetApps": ["sapsuccessfactors", "gmail"],
    "tags": ["api", "sapsuccessfactors", "gmail"],
    "offerings": ["app connect professional"]
-  }                
+  },
+  {
+    "name": "Sync Contacts from MsSQL to Salesforce",
+    "description": "Use this template to sync the contacts details in Salesforce when a new contact gets inserted in Microsoft SQL Server Table.",
+    "summary": "Microsoft SQL Server to Salesforce",
+    "sourceApp": "mssql",
+    "targetApps": ["salesforce"],
+    "tags": ["mssql", "salesforce"],
+    "offerings": ["app connect professional"]
+  }
 ]
 }
