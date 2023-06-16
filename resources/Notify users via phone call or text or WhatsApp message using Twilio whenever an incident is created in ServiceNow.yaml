@@ -117,5 +117,4 @@ integration:
                             $ref: '#/flowDetails'
               output-schema: {}
   name: Notify users via phone call or text or WhatsApp message using Twilio whenever an incident is created in ServiceNow
-  description: Use this template to notify users via phone call, text message, or WhatsApp message by using Twilio whenever an incident is created in ServiceNow.
 models: {}
