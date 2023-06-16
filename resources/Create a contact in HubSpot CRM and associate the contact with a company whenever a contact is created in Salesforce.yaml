@@ -1,0 +1,341 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postCrmV3ObjectsContacts_model
+      connector-type: hubspotcrm
+      actions:
+        postCrmV3ObjectsContacts: {}
+    action-interface-3:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: postCrmV3ObjectsCompanies_model
+      connector-type: hubspotcrm
+      actions:
+        postCrmV3ObjectsCompanies: {}
+    action-interface-4:
+      type: api-action
+      business-object: getCrmV3ObjectsCompaniesSearch_model
+      connector-type: hubspotcrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: >-
+        putCrmV4ObjectsContactsByFromObjectIdAssociationsDefaultByToObjectTypeByToObjectId_model
+      connector-type: hubspotcrm
+      actions:
+        putCrmV4ObjectsContactsByFromObjectIdAssociationsDefaultByToObjectTypeByToObjectId: {}
+    action-interface-7:
+      type: api-action
+      business-object: >-
+        putCrmV4ObjectsContactsByFromObjectIdAssociationsDefaultByToObjectTypeByToObjectId_model
+      connector-type: hubspotcrm
+      actions:
+        putCrmV4ObjectsContactsByFromObjectIdAssociationsDefaultByToObjectTypeByToObjectId: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: HubSpot CRM Create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postCrmV3ObjectsContacts
+              map:
+                mappings:
+                  - properties:
+                      mappings:
+                        - email:
+                            template: '{{$Trigger.Email}}'
+                        - firstname:
+                            template: '{{$Trigger.FirstName}}'
+                        - jobtitle:
+                            template: '{{$Trigger.Title}}'
+                        - lastname:
+                            template: '{{$Trigger.LastName}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailSendemail2
+                  $ref: '#/node-output/Gmail Send email 2/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.AccountId}}':
+                      neq: ''
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve accounts
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            Id: '{{$Trigger.AccountId}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: false
+                        pagination-type: TOKEN
+                        allow-empty-output: false
+                    - retrieve-action:
+                        name: HubSpot CRM Retrieve companies with filter
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            name: '{{$SalesforceRetrieveaccounts.Name}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: HubSpotCRMCreatecontact
+                              $ref: >-
+                                #/node-output/HubSpot CRM Create
+                                contact/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - if:
+                        name: If
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrieveaccounts
+                            $ref: >-
+                              #/block/If 2/node-output/Salesforce Retrieve
+                              accounts/response/payload
+                          - variable: SalesforceRetrieveaccountsMetadata
+                            $ref: >-
+                              #/block/If 2/node-output/Salesforce Retrieve
+                              accounts/response
+                          - variable: HubSpotCRMCreatecontact
+                            $ref: >-
+                              #/block/If 2/node-output/HubSpot CRM Create
+                              contact/response/payload
+                          - variable: HubSpotCRMRetrievecompanieswithfilter
+                            $ref: >-
+                              #/block/If 2/node-output/HubSpot CRM Retrieve
+                              companies with filter/response/payload
+                          - variable: HubSpotCRMRetrievecompanieswithfilterMetadata
+                            $ref: >-
+                              #/block/If 2/node-output/HubSpot CRM Retrieve
+                              companies with filter/response
+                          - variable: GmailSendemail
+                            $ref: >-
+                              #/block/If 2/node-output/Gmail Send
+                              email/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$count($HubSpotCRMRetrievecompanieswithfilter)}}': '0'
+                            execute:
+                              - custom-action:
+                                  name: HubSpot CRM Create company
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-6
+                                  action: postCrmV3ObjectsCompanies
+                                  map:
+                                    mappings:
+                                      - properties:
+                                          mappings:
+                                            - domain:
+                                                template: '{{$split(''$Trigger.Email'', "@")[1]}}'
+                                            - name:
+                                                template: '{{$SalesforceRetrieveaccounts[0].Name}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: HubSpotCRMRetrievecompanieswithfilter
+                                        $ref: >-
+                                          #/block/If 2/node-output/HubSpot CRM
+                                          Retrieve companies with
+                                          filter/response/payload
+                                      - variable: >-
+                                          HubSpotCRMRetrievecompanieswithfilterMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/HubSpot CRM
+                                          Retrieve companies with filter/response
+                                      - variable: HubSpotCRMCreatecontact
+                                        $ref: >-
+                                          #/node-output/HubSpot CRM Create
+                                          contact/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - custom-action:
+                                  name: >-
+                                    HubSpot CRM Create association with a
+                                    contact
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-2
+                                  action: >-
+                                    putCrmV4ObjectsContactsByFromObjectIdAssociationsDefaultByToObjectTypeByToObjectId
+                                  map:
+                                    mappings:
+                                      - fromObjectId:
+                                          template: '{{$HubSpotCRMCreatecontact.id}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: HubSpotCRMCreatecompany
+                                        $ref: >-
+                                          #/block/If/node-output/HubSpot CRM
+                                          Create company/response/payload
+                                      - variable: HubSpotCRMRetrievecompanieswithfilter
+                                        $ref: >-
+                                          #/block/If 2/node-output/HubSpot CRM
+                                          Retrieve companies with
+                                          filter/response/payload
+                                      - variable: >-
+                                          HubSpotCRMRetrievecompanieswithfilterMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/HubSpot CRM
+                                          Retrieve companies with filter/response
+                                      - variable: HubSpotCRMCreatecontact
+                                        $ref: >-
+                                          #/node-output/HubSpot CRM Create
+                                          contact/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                                  filter:
+                                    where:
+                                      and:
+                                        - toObjectId: '{{$HubSpotCRMCreatecompany.id}}'
+                                        - toObjectType: Companies
+                                        - fromObjectId: '{{$HubSpotCRMCreatecontact.id}}'
+                                    input:
+                                      - variable: HubSpotCRMCreatecompany
+                                        $ref: >-
+                                          #/block/If/node-output/HubSpot CRM
+                                          Create company/response/payload
+                                      - variable: HubSpotCRMRetrievecompanieswithfilter
+                                        $ref: >-
+                                          #/block/If 2/node-output/HubSpot CRM
+                                          Retrieve companies with
+                                          filter/response/payload
+                                      - variable: >-
+                                          HubSpotCRMRetrievecompanieswithfilterMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/HubSpot CRM
+                                          Retrieve companies with filter/response
+                                      - variable: HubSpotCRMCreatecontact
+                                        $ref: >-
+                                          #/node-output/HubSpot CRM Create
+                                          contact/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                                    limit: 10
+                        else:
+                          execute:
+                            - custom-action:
+                                name: >-
+                                  HubSpot CRM Create association with a contact
+                                  2
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-7
+                                action: >-
+                                  putCrmV4ObjectsContactsByFromObjectIdAssociationsDefaultByToObjectTypeByToObjectId
+                                map:
+                                  mappings:
+                                    - fromObjectId:
+                                        template: '{{$HubSpotCRMCreatecontact.id}}'
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: HubSpotCRMAddassociations2
+                                      $ref: >-
+                                        #/block/If/node-output/HubSpot CRM Add
+                                        associations 2/response/payload
+                                    - variable: HubSpotCRMRetrievecompanieswithfilter
+                                      $ref: >-
+                                        #/block/If 2/node-output/HubSpot CRM
+                                        Retrieve companies with
+                                        filter/response/payload
+                                    - variable: >-
+                                        HubSpotCRMRetrievecompanieswithfilterMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/HubSpot CRM
+                                        Retrieve companies with filter/response
+                                    - variable: HubSpotCRMCreatecontact
+                                      $ref: >-
+                                        #/node-output/HubSpot CRM Create
+                                        contact/response/payload
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                                filter:
+                                  where:
+                                    and:
+                                      - toObjectId: >-
+                                          {{$HubSpotCRMRetrievecompanieswithfilter[0].id}}
+                                      - toObjectType: Companies
+                                      - fromObjectId: '{{$HubSpotCRMCreatecontact.id}}'
+                                  input:
+                                    - variable: HubSpotCRMAddassociations2
+                                      $ref: >-
+                                        #/block/If/node-output/HubSpot CRM Add
+                                        associations 2/response/payload
+                                    - variable: HubSpotCRMRetrievecompanieswithfilter
+                                      $ref: >-
+                                        #/block/If 2/node-output/HubSpot CRM
+                                        Retrieve companies with
+                                        filter/response/payload
+                                    - variable: >-
+                                        HubSpotCRMRetrievecompanieswithfilterMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/HubSpot CRM
+                                        Retrieve companies with filter/response
+                                    - variable: HubSpotCRMCreatecontact
+                                      $ref: >-
+                                        #/node-output/HubSpot CRM Create
+                                        contact/response/payload
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                                  limit: 10
+                        output-schema: {}
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a contact in HubSpot CRM and associate the contact with a company whenever a contact is created in Salesforce
+  description: Use this template to create a contact in HubSpot CRM with the contact details whenever a contact is created in Salesforce. If the Salesforce contact has the company’s details, then the company will be associated with the contact in HubSpot CRM.
+models: {}

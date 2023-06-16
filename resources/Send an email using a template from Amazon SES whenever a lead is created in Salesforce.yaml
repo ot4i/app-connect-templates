@@ -1,0 +1,108 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postV2EmailOutboundEmailsByTemplateName_model
+      connector-type: amazonses
+      actions:
+        postV2EmailOutboundEmailsByTemplateName: {}
+    action-interface-3:
+      type: api-action
+      business-object: postV2EmailOutboundEmails_model
+      connector-type: amazonses
+      actions:
+        postV2EmailOutboundEmails: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Status}}': Open - Not Contacted
+                  execute:
+                    - custom-action:
+                        name: Amazon SES Send email using template
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postV2EmailOutboundEmailsByTemplateName
+                        map:
+                          customSchemas:
+                            properties.`TemplateData`:
+                              type: object
+                              properties:
+                                name:
+                                  type: string
+                                emailBody:
+                                  type: string
+                          mappings:
+                            - FromEmailAddress:
+                                template: template1@gmail.com
+                            - TemplateData:
+                                mappings:
+                                  - emailBody:
+                                      template: >-
+                                        thank for showing intrest in xyz, we are
+                                        pleased 
+                                  - name:
+                                      template: '{{$Trigger.Name}}'
+                            - TemplateName:
+                                template: example-template11
+                            - ToAddresses:
+                                template: '{{$Trigger.Email}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: Amazon SES Send email
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      action: postV2EmailOutboundEmails
+                      map:
+                        mappings:
+                          - Body:
+                              mappings:
+                                - Content:
+                                    template: '{{$Trigger.Name}} is already contacted'
+                                - ContentType:
+                                    template: Text
+                          - FromEmailAddress:
+                              template: template1@gmail.com
+                          - Subject:
+                              template: This lead is already contacted
+                          - ToAddresses:
+                              template: aditya@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Send an email using a template from Amazon SES whenever a lead is created in Salesforce
+  description: Use this template to send an email using the template from Amazon SES if the lead's Salesforce status is open and they have not been contacted.
+models: {}
