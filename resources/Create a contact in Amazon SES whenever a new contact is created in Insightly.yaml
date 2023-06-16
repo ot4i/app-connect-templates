@@ -70,5 +70,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a contact in Amazon SES whenever a new contact is created in Insightly
-  description: Use this template to create a contact in Amazon SES whenever a new contact is created in Insightly. 
 models: {}
