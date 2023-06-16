@@ -104,5 +104,4 @@ integration:
                             $ref: '#/flowDetails'
               output-schema: {}
   name: Send an email using a template from Amazon SES whenever a lead is created in Salesforce
-  description: Use this template to send an email using the template from Amazon SES if the lead's Salesforce status is open and they have not been contacted.
 models: {}
