@@ -49,5 +49,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a prospect in Salesforce Account Engagement whenever a new form is created in Wufoo
+  name: Create a prospect in Salesforce Account Engagement whenever a new form entry is created in Wufoo
 models: {}
