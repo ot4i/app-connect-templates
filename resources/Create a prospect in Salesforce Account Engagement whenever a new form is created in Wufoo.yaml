@@ -50,5 +50,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a prospect in Salesforce Account Engagement whenever a new form is created in Wufoo
-  description: Use this template to create a prospect in Salesforce Account Engagement with the prospect's information whenever a new form with a campaign attendee's information is created. 
 models: {}
