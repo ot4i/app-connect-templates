@@ -135,5 +135,4 @@ integration:
                     $ref: '#/flowDetails'
                 limit: 10
   name: Assign a visitor to a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor
-  description: Use this template to assign a visitor to a prospect for each of the retrieved Salesforce account engagement visitors.
 models: {}
