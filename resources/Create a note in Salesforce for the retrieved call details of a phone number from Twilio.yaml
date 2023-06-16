@@ -92,5 +92,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a note in Salesforce for the retrieved call details of a phone number from Twilio
-  description: Use this template to create a note that contains the call details of a phone number from Twilio that is associated with a Salesforce account.
 models: {}
