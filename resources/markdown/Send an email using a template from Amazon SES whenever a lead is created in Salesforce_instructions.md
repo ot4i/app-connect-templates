@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 2. Connect to the following accounts by using your credentials:
    - [Salesforce](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-salesforce)
    - [Amazon SES](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-amazon-ses)
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to send an email using the template from Amazon SES if the lead's Salesforce status is open and they have not been contacted.
 
