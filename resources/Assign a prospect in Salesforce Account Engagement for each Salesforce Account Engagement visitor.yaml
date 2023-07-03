@@ -134,5 +134,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Assign a visitor to a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor
+  name: Assign a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor
 models: {}
