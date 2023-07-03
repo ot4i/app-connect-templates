@@ -1764,12 +1764,12 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Assign a visitor to a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor",
-   "description": "Use this template to assign a visitor to a prospect for each of the retrieved Salesforce account engagement visitors.",
-   "summary": "Salesforce Account Engagement to Salesforce Account Engagement",
-   "sourceApp": "salesforceae",
+   "name": "Assign a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor",
+   "description": "Use this template to assign a visitor to a prospect for each of the retrieved Salesforce Account Engagement visitors.",
+   "summary": "Scheduler to Salesforce Account Engagement",
+   "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["salesforceae"],
-   "tags": ["salesforceae", "if"],
+   "tags": ["scheduler", "salesforceae", "if"],
    "offerings": ["app connect professional"]
   }
 ]
