@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 2. Connect to the following accounts by using your credentials:
    - [ServiceNow](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-servicenow)
    - [Twilio](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-twilio)
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to notify users via phone call, text message, or WhatsApp message by using Twilio whenever an incident is created in ServiceNow.
 
