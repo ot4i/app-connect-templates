@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page]() (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Store%20the%20issue%20data%20in%20IBM%20Db2%20whenever%20a%20new%20issue%20gets%20created%20in%20Jira_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Connect to your [Jira account](https://ibm.biz/ach2jira).
