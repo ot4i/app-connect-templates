@@ -4,7 +4,7 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 2. Connect to the following accounts by using your credentials:
      - [Wufoo](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-wufoo)
      - [Salesforce Account Engagement](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-salesforce-account-engagement)
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner, click **Start flow**.
   
 Use this template to create a prospect in Salesforce Account Engagement with the prospect's information whenever a new form entry with a campaign attendee's information is created.
 
