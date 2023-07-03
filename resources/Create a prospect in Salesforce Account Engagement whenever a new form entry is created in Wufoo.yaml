@@ -1,0 +1,54 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: p11ni0rf0aqmhy6
+            parentFilter:
+              Hash: p11ni0rf0aqmhy6
+      connector-type: wufoo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postApiV5ObjectsProspects_model
+      connector-type: salesforceae
+      actions:
+        postApiV5ObjectsProspects: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Salesforce Account Engagement Create prospect
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postApiV5ObjectsProspects
+              map:
+                mappings:
+                  - Pardot-Business-Unit-Id:
+                      template: 0Uv4L000000blJTSAY
+                  - email:
+                      template: '{{$Trigger.Field3}}'
+                  - firstName:
+                      template: '{{$Trigger.Field1}}'
+                  - lastName:
+                      template: '{{$Trigger.Field2}}'
+                  - userId:
+                      expression: '3236342'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a prospect in Salesforce Account Engagement whenever a new form entry is created in Wufoo
+  description: Use this template to create a prospect in Salesforce Account Engagement with the prospect's information whenever a new form entry with a campaign attendee's information is created. 
+models: {}
