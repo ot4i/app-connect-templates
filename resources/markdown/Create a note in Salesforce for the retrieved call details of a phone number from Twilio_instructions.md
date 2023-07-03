@@ -4,6 +4,6 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 2. Connect to the following accounts by using your credentials:
    - [Twilio](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-twilio)
    - [Salesforce](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-salesfoce)
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to create a note that contains the call details of a phone number from Twilio that is associated with a Salesforce account.
