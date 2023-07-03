@@ -1,0 +1,62 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: AC
+            parentFilter:
+              key: AC
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: jira
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: NULLID_JIRA_ISSUES
+      connector-type: db2
+      actions:
+        CREATE: {}
+      account-info:
+        dbType: IBM Db2 for i
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: IBM Db2 Create JIRA_ISSUES record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - CREATED_DATE:
+                      template: '{{$Trigger.fields.created}}'
+                  - DUE_DATE:
+                      template: '{{$Trigger.fields.resolutiondate}}'
+                  - ISSUE_ID:
+                      template: '{{$Trigger.id}}'
+                  - PRIORITY:
+                      template: '{{$Trigger.fields.priority.name}}'
+                  - REPORTER:
+                      template: '{{$Trigger.fields.creator.name}}'
+                  - STATUS:
+                      template: '{{$Trigger.fields.status.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Store the issue data in IBM Db2 whenever a new issue gets created in Jira
+models: {}

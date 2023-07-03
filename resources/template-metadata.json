@@ -1771,6 +1771,15 @@
    "targetApps": ["salesforceae"],
    "tags": ["scheduler", "salesforceae", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Store the issue data in IBM Db2 whenever a new issue gets created in Jira",
+    "description": "Use this template to store the issue data in IBM Db2 whenever a new issue gets created in Jira.",
+    "summary": "Jira to IBM Db2",
+    "sourceApp": "jira",
+    "targetApps": ["db2"],
+    "tags": ["jira", "db2"],
+    "offerings": ["app connect professional"]
   }
 ]
 }
