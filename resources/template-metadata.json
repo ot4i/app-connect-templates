@@ -1717,6 +1717,60 @@
    "targetApps": ["sapsuccessfactors", "gmail"],
    "tags": ["api", "sapsuccessfactors", "gmail"],
    "offerings": ["app connect professional"]
-  }                
+  },
+  {
+   "name": "Send an email using a template from Amazon SES whenever a lead is created in Salesforce",
+   "description": "Use this template to send an email using the template from Amazon SES if the lead's Salesforce status is open and they have not been contacted.",
+   "summary": "Salesforce to Amazon SES",
+   "sourceApp": "salesforce",
+   "targetApps": ["amazonses"],
+   "tags": ["salesforce", "amazonses", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a contact in Amazon SES whenever a new contact is created in Insightly",
+   "description": "Use this template to create a contact in Amazon SES whenever a new contact is created in Insightly.",
+   "summary": "Insightly to 2 applications",
+   "sourceApp": "insightly",
+   "targetApps": ["amazonses", "gmail"],
+   "tags": ["insightly", "amazonses", "gmail"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Notify users via phone call or text or WhatsApp message using Twilio whenever an incident is created in ServiceNow",
+   "description": "Use this template to notify users via phone call, text message, or WhatsApp message by using Twilio whenever an incident is created in ServiceNow.",
+   "summary": "ServiceNow to Twilio",
+   "sourceApp": "servicenow",
+   "targetApps": ["twilio"],
+   "tags": ["servicenow", "twilio", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a note in Salesforce for the retrieved call details of a phone number from Twilio",
+   "description": "Use this template to create a note that contains the call details of a phone number from Twilio that is associated with a Salesforce account.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["twilio", "salesforce"],
+   "tags": ["scheduler", "twilio", "salesforce"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a prospect in Salesforce Account Engagement whenever a new form entry is created in Wufoo",
+   "description": "Use this template to create a prospect in Salesforce Account Engagement with the prospect's information whenever a new form entry with a campaign attendee's information is created.",
+   "summary": "Wufoo to Salesforce Account Engagement",
+   "sourceApp": "wufoo",
+   "targetApps": ["salesforceae"],
+   "tags": ["wufoo", "salesforceae"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Assign a visitor to a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor",
+   "description": "Use this template to assign a visitor to a prospect for each of the retrieved Salesforce account engagement visitors.",
+   "summary": "Salesforce Account Engagement to Salesforce Account Engagement",
+   "sourceApp": "salesforceae",
+   "targetApps": ["salesforceae"],
+   "tags": ["salesforceae", "if"],
+   "offerings": ["app connect professional"]
+  }
 ]
 }
