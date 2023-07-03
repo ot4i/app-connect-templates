@@ -7,3 +7,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 1. To start the flow, in the banner, click **Start flow**.
 
 Want to see the flow working? Create a new issue in Jira, then go back to IBM Db2 for i table to see the new lead.
+For more information about using this template, see https://community.ibm.com/community/user/integration/blogs/divya-jha1/2023/07/03/using-ibmappconnect-to-interact-with-ibm-db2-for-i
