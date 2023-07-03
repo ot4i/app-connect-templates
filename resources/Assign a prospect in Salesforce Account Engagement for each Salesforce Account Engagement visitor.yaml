@@ -1,0 +1,138 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getApiV5ObjectsVisitors_model
+      connector-type: salesforceae
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postApiV5ObjectsVisitorsByIdDoAssignToProspect_model
+      connector-type: salesforceae
+      actions:
+        postApiV5ObjectsVisitorsByIdDoAssignToProspect: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Account Engagement Retrieve visitors
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 2
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceAccountEngagementRetrievevisitors '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceAccountEngagementRetrievevisitors
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visitors/response/payload
+                  - variable: SalesforceAccountEngagementRetrievevisitorsMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visitors/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Salesforce Account Engagement Visitors
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Salesforce Account Engagement Assign to prospect
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postApiV5ObjectsVisitorsByIdDoAssignToProspect
+              map:
+                mappings:
+                  - prospectId:
+                      expression: '29085705'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceAccountEngagementRetrievevisitors
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visitors/response/payload
+                  - variable: SalesforceAccountEngagementRetrievevisitorsMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visitors/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - id: '{{$Foreachitem.id}}'
+                    - Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceAccountEngagementRetrievevisitors
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visitors/response/payload
+                  - variable: SalesforceAccountEngagementRetrievevisitorsMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visitors/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+  name: Assign a prospect in Salesforce Account Engagement for each Salesforce Account Engagement visitor
+models: {}

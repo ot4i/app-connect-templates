@@ -1,0 +1,73 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: insightly
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postV2EmailContactListsByContactListNameContacts_model
+      connector-type: amazonses
+      actions:
+        postV2EmailContactListsByContactListNameContacts: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon SES Create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postV2EmailContactListsByContactListNameContacts
+              map:
+                mappings:
+                  - ContactListName:
+                      template: TestContactList
+                  - EmailAddress:
+                      template: '{{$Trigger.EMAIL_ADDRESS}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Following {{$AmazonSESCreatecontact.EmailAddress}} has
+                        been created in Amazon SES
+                        ---from{{$Trigger.EMAIL_ADDRESS}} insightly
+                  - Subject:
+                      template: contact has been created in Amazon SES
+                  - To:
+                      template: aditya@abc.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonSESCreatecontact
+                    $ref: '#/node-output/Amazon SES Create contact/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a contact in Amazon SES whenever a new contact is created in Insightly
+models: {}
