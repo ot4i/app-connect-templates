@@ -24,7 +24,7 @@ integration:
   action-interfaces:
     action-interface-3:
       type: api-action
-      business-object: NULLID_JIRA_ISSUES
+      business-object: JIRA_ISSUES
       connector-type: db2
       actions:
         CREATE: {}
