@@ -8,4 +8,4 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 Use this template to send an email using the template from Amazon SES if the lead's Salesforce status is open and they have not been contacted.
 
-You can also visit the IBM Integration Community to learn more about this use case. See, [XXX](??).
+You can also visit the IBM Integration Community to learn more about this use case. See, [Using IBM® App Connect to interact with Amazon SES](https://community.ibm.com/community/user/integration/blogs/shamini-arumugam1/2023/06/28/using-ibm-app-connect-to-interact-with-amazon-ses).
