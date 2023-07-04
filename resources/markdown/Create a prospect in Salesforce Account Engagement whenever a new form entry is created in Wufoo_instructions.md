@@ -8,4 +8,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
   
 Use this template to create a prospect in Salesforce Account Engagement with the prospect's information whenever a new form entry with a campaign attendee's information is created.
 
-You can also visit the IBM Integration Community to learn more about this use case. See, [XXX](??).
+You can also visit the IBM Integration Community to learn more about this use case. See, [Using IBM® App Connect to interact with Salesforce Account Engagement](https://community.ibm.com/community/user/integration/blogs/shamini-arumugam1/2023/07/03/using-ibm-app-connect-to-interact-w-salesforce-ae).
