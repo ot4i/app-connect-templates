@@ -7,4 +7,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 5. To start the flow, in the banner, click **Start flow**.
 
 Want to see the flow working? Create a new customer issue in IBM Db2, then go back to ServiceNow to see the new incident.
-For more information about using this template, see [Using IBM® App Connect to interact with IBM DB2 onCloud]().
+For more information about using this template, see [Using IBM® App Connect to interact with IBM DB2 onCloud](https://community.ibm.com/community/user/integration/blogs/himani-bhardwaj2/2023/07/10/using-ibmappconnect-to-interact-with-ibm-db2cloud).
