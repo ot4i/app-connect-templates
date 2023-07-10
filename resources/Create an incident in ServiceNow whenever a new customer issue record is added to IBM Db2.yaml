@@ -58,5 +58,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Sync CustomerIssues from Db2 to ServiceNow
+  name: Create an incident in ServiceNow whenever a new customer issue record is added to IBM Db2
 models: {}
