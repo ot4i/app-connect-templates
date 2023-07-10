@@ -1785,7 +1785,7 @@
       "name": "Create an incident in ServiceNow whenever a new customer issue record is added to IBM Db2",
       "description": "Use this template to create an incident in ServiceNow whenever a new customer issue record is added to IBM Db2.",
       "summary": "IBM Db2 to ServiceNow",
-      "sourceApp": "IBM Db2",
+      "sourceApp": "db2",
       "targetApps": ["servicenow"],
       "tags": ["db2", "servicenow"],
       "offerings": ["app connect professional"]
