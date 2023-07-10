@@ -1,0 +1,62 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: db2
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: WQP38781_CUSTOMERISSUES
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CREATEDDATE
+              updatedField: CREATEDDATE
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: ServiceNow Create incident
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - business_service:
+                      template: '{{$Trigger.Service}}'
+                  - caller_id:
+                      template: '{{$Trigger.CUSTOMERNAME}}'
+                  - category:
+                      template: database
+                  - cmdb_ci:
+                      template: '{{$Trigger.CONFIGURATIONITEM}}'
+                  - number:
+                      template: '{{$Trigger.NUMBER}}'
+                  - opened_at:
+                      template: '{{$Trigger.CREATEDDATE}}'
+                  - short_description:
+                      template: '{{$Trigger.ISSUEDESCRIPTION}}'
+                  - subcategory:
+                      template: db2
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an incident in ServiceNow whenever a new customer issue record is added to IBM Db2
+models: {}
