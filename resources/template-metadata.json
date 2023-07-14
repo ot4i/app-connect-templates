@@ -1798,6 +1798,24 @@
    "targetApps": ["box"],
    "tags": ["salesforce", "box"],
    "offerings": ["app connect professional"]
+  },
+{
+   "name": "Create a folder in Box whenever a new opportunity is created in Salesforce",
+   "description": "Use this template to create a folder in Box whenever a new opportunity is created in Salesforce.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["gmail", "box"],
+   "tags": ["salesforce", "box", "gmail"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a folder in Box whenever a new account is created in Salesforce",
+   "description": "Use this template to create a folder in Box whenever a new account is created in Salesforce.",
+   "summary": "Salesforce to Box",
+   "sourceApp": "salesforce",
+   "targetApps": ["box"],
+   "tags": ["salesforce", "box"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
