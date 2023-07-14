@@ -85,5 +85,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a row in Google Sheets whenever a new task is created in Asana
-  description: Use this template to create a row in a Google Sheets spreadsheet whenever a new task is created in Asana. A Slack notification is then posted in the intended channel.
 models: {}
