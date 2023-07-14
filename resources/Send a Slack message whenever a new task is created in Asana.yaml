@@ -52,5 +52,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Send a Slack message whenever a new task is created in Asana
-  description: Use this template to send a Slack message to the intended channel whenever a new task is created in Asana.
 models: {}
