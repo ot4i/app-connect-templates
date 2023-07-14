@@ -1816,6 +1816,24 @@
    "targetApps": ["box"],
    "tags": ["salesforce", "box"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box whenever a new incident is created in ServiceNow",
+   "description": "Use this template to create a folder in Box whenever a new incident is created in ServiceNow.",
+   "summary": "ServiceNow to Box",
+   "sourceApp": "",
+   "targetApps": ["servicenow", "box"],
+   "tags": ["servicenow", "box"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a folder in Box for each event retrieved from Eventbrite",
+   "description": "Use this template to create a folder in Box for each event retrieved from Eventbrite.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "box"],
+   "tags": ["scheduler", "eventbrite", "box", "foreach"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
