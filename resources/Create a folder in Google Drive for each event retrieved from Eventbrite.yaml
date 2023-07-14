@@ -107,5 +107,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a folder in Google Drive for each event retrieved from Eventbrite 
-  description: Use this template to create a folder in Google Drive for each event retrieved from Eventbrite.
 models: {}
