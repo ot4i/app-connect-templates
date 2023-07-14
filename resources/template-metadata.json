@@ -1834,6 +1834,33 @@
    "targetApps": ["eventbrite", "box"],
    "tags": ["scheduler", "eventbrite", "box", "foreach"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box whenever a new form entry is created in Wufoo",
+   "description": "Use this template to create a folder in Box whenever a new form entry is created in Wufoo.",
+   "summary": "Wufoo to Box",
+   "sourceApp": "wufoo",
+   "targetApps": ["box"],
+   "tags": ["wufoo", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box whenever a new campaign is created in MailChimp",
+   "description": "Use this template to create a folder in Box whenever a new campaign is created in MailChimp.",
+   "summary": "MailChimp to Box,
+   "sourceApp": "mailchimp",
+   "targetApps": ["box"],
+   "tags": ["mailchimp", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive for each event retrieved from Eventbrite",
+   "description": "Use this template to create a folder in Google Drive for each event retrieved from Eventbrite.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "googledrive"],
+   "tags": ["scheduler", "googledrive", "eventbrite", "foreach"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
