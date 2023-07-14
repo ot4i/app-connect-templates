@@ -43,5 +43,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a folder in Box whenever a new form entry is created in Wufoo
-  description: Use this template to create a folder in Box whenever a new form entry is created in Wufoo.
 models: {}
