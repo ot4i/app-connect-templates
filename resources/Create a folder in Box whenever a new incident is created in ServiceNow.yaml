@@ -40,5 +40,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a folder in Box whenever a new incident is created in ServiceNow
-  description: Use this template to create a folder in Box whenever a new incident is created in ServiceNow.
 models: {}
