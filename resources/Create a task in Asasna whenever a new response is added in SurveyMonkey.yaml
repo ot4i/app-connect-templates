@@ -51,5 +51,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a task in Asasna whenever a new response is added in SurveyMonkey
-  description: Use this template to create a task in Asasna whenever a new response is added in SurveyMonkey.
 models: {}
