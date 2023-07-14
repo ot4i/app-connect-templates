@@ -53,5 +53,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Add a card to a list in Trello whenever a new task is created in Asana
-  description: Use this template to add a card to a list in Trello whenever a new task is created in Asana.
 models: {}
