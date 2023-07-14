@@ -38,5 +38,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a folder in Google Drive whenever a new campaign is created in Salesforce
-  description: Use this template to create a folder in Google Drive whenever a new campaign is created in Salesforce.
 models: {}
