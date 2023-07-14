@@ -50,5 +50,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a task in Asasna whenever a new response is added in SurveyMonkey
+  name: Create a task in Asana whenever a new response is added in SurveyMonkey
 models: {}
