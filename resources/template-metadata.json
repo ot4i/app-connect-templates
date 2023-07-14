@@ -1834,6 +1834,15 @@
    "targetApps": ["eventbrite", "box"],
    "tags": ["scheduler", "eventbrite", "box", "foreach"],
    "offerings": ["app connect professional"]
-  }
+  },
+{
+   "name": "Create a folder in Box whenever a new case is created in Salesforce",
+   "description": "Use this template to create a folder in Box whenever a new case is created in Salesforce.",
+   "summary": "Salesforce to Box",
+   "sourceApp": "salesforce",
+   "targetApps": ["box"],
+   "tags": ["salesforce", "box"],
+   "offerings": ["app connect professional"]
+  },
 ]
 }
