@@ -17,7 +17,6 @@ integration:
       type: api-action
       business-object: Folder
       connector-type: box
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-2:
