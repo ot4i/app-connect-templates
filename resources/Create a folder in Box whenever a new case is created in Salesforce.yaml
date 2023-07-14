@@ -42,5 +42,4 @@ integration:
         tags:
           - incomplete
   name: Create a folder in Box whenever a new case is created in Salesforce
-  description: Use this template to create a folder in Box whenever a case is created in Salesforce.
 models: {}
