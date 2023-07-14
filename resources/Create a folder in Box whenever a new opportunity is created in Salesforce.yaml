@@ -67,5 +67,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a folder in Box whenever a new opportunity is created in Salesforce
-  description: Use this template to create a folder in Box whenever a new opportunity is created in Salesforce.
 models: {}
