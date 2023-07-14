@@ -109,5 +109,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a folder in Box for each event retrieved from Eventbrite 
-  description: Use this template to create a folder in Box for each event retrieved from Eventbrite.
 models: {}
