@@ -55,5 +55,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Send a Gmail message whenever a new task is created in Asana
-  description: Use this template to send a Gmail message to the intended receipients whenever a new task is created in Asana.
+  description: Use this template to send a Gmail message to the intended recipients whenever a new task is created in Asana.
 models: {}
