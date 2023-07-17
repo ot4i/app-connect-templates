@@ -49,5 +49,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a task in Asana whenever a new subscriber is added in MailChimp
+  name: Create a task in Asana whenever a new subscriber is added to MailChimp
 models: {}

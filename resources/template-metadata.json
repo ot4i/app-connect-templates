@@ -10,7 +10,7 @@
   },
   {
    "name": "Open a ticket on ServiceNow from an identified issue in Slack and send an email using Gmail",
-   "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow will send you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
+   "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow sends you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
    "summary": "Slack to 2 applications",
    "sourceApp": "slack",
    "targetApps": ["servicenow", "gmail"],
@@ -19,7 +19,7 @@
   },
   {
    "name": "Create a Slack translation bot",
-   "description": "Configure a /translate Slack slash command and use this template to translate messages from English to French, and French to English. Use /translate before a message for the bot to identify the language and translate the message. A message then appears in the channel in both languages, allowing for real time multilingual chat.",
+   "description": "Configure a /translate Slack slash command and use this template to translate messages from English to French, and French to English. Use /translate before a message for the bot to identify the language and translate the message. A message then appears in the channel in both languages, allowing for real-time multilingual chat.",
    "summary": "Slack to 2 applications",
    "sourceApp": "slack",
    "targetApps": ["watsonlt", "slack"],
@@ -1908,7 +1908,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a task in Asana whenever a new subscriber is added in MailChimp",
+   "name": "Create a task in Asana whenever a new subscriber is added to MailChimp",
    "description": "Use this template to create a task in Asana whenever a new subscriber is added in MailChimp.",
    "summary": "MailChimp to Asana ",
    "sourceApp": "mailchimp",
@@ -1918,7 +1918,7 @@
   },
   {
    "name": "Send a Gmail message whenever a new task is created in Asana",
-   "description": "Use this template to send a Gmail message to the intended receipients whenever a new task is created in Asana.",
+   "description": "Use this template to send a Gmail message to the intended recipients whenever a new task is created in Asana.",
    "summary": "Asana to Gmail",
    "sourceApp": "asana",
    "targetApps": ["gmail"],
