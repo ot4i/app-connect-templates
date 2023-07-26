@@ -54,5 +54,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create an event from a new Gmail message
+  name: Create an event in Google Calendar from a new Gmail message
 models: {}
