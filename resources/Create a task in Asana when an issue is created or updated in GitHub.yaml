@@ -1,0 +1,74 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: github
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            OwnerName: non-ibm
+            RepoName: multicct
+            parentFilter:
+              OwnerName: non-ibm
+              RepoName: multicct
+            subscription:
+              createdField: updated_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tasks
+      connector-type: asana
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.milestone1.created_at}}': '{{$Trigger.updated_at}}'
+                  execute:
+                    - create-action:
+                        name: Asana Create task
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - name:
+                                template: '{{$Trigger.number}} {{$Trigger.title}}'
+                            - notes:
+                                template: '{{$Trigger.body}}'
+                            - project:
+                                template: '1204205585687152'
+                            - team-id:
+                                template: '1204205586130693'
+                            - workspace-id:
+                                template: '1204205574829453'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a task in Asana when an issue is created or updated in GitHub
+models: {}
