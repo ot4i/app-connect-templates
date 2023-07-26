@@ -1,0 +1,58 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: gmail
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Calendar Create event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - attendees:
+                      foreach:
+                        input: '[1]'
+                        iterator: attendeesItem
+                        mappings:
+                          - email:
+                              template: '{{$Trigger.From}}'
+                  - description:
+                      template: '{{$Trigger.Subject}}'
+                  - endTime:
+                      template: '2023-07-15T19:30:00'
+                  - id:
+                      template: ffbld01@ibmappcon.com
+                  - startTime:
+                      template: '2023-07-15T19:00:00'
+                  - summary:
+                      template: '{{$Trigger.Body}}'
+                  - timeZone:
+                      template: Asia/Kolkata
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an event from a new Gmail message
+models: {}
