@@ -1,0 +1,178 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getApiV5ObjectsProspects_model
+      connector-type: salesforceae
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postApiEmailVersion4DoSendProspectIdByIdTemplate_model
+      connector-type: salesforceae
+      actions:
+        postApiEmailVersion4DoSendProspectIdByIdTemplate: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Account Engagement Retrieve prospects
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                    - createdAt: '{{$Trigger.currentEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceAccountEngagementRetrieveprospects '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceAccountEngagementRetrieveprospects
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      prospects/response/payload
+                  - variable: SalesforceAccountEngagementRetrieveprospectsMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      prospects/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Salesforce Account Engagement Prospects
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceAccountEngagementRetrieveprospects
+                  $ref: >-
+                    #/node-output/Salesforce Account Engagement Retrieve
+                    prospects/response/payload
+                - variable: SalesforceAccountEngagementRetrieveprospectsMetadata
+                  $ref: >-
+                    #/node-output/Salesforce Account Engagement Retrieve
+                    prospects/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - is {{$Foreachitem.isDoNotCall}}:
+                          neq: ''
+                      - '{{$Foreachitem.isDoNotCall}}':
+                          '=': 'true'
+                        hashKey: object:394
+                  execute:
+                    - custom-action:
+                        name: >-
+                          Salesforce Account Engagement Send email using
+                          template
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postApiEmailVersion4DoSendProspectIdByIdTemplate
+                        map:
+                          mappings:
+                            - campaign_id:
+                                expression: '$Foreachitem.campaignId '
+                            - email_template_id:
+                                expression: '297874'
+                            - html_content:
+                                template: Exciting News!!!
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceAccountEngagementRetrieveprospects
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve prospects/response/payload
+                            - variable: >-
+                                SalesforceAccountEngagementRetrieveprospectsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve prospects/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                              - prospectId: '{{$Foreachitem.id}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceAccountEngagementRetrieveprospects
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagements
+                                Retrieve prospects/response/payload
+                            - variable: >-
+                                SalesforceAccountEngagementRetrieveprospectsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve prospects/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+              else:
+                execute: []
+              output-schema: {}
+  name: Send an email using a template from Salesforce Account Engagement for each Salesforce Account Engagement prospect
+  description: Use this template to send an email by using a template from Salesforce Account Engagement for each prospect retrieved from Salesforce Account Engagement that has opted out of phone or voice calls.
+models: {}
