@@ -1,0 +1,162 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: magento
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Product
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: arwc2spWz2KqQLYQLuAZFtqnX5hmBYpfJlUNYUi9rKjLDlgvZ-ZNSsyMXyjBxq-w
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: PricebookEntry
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: PricebookEntry
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  ExternalId: '{{$Trigger.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - retrieve-action:
+              name: Salesforce Retrieve price book entrys
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  Id: '{{$SalesforceRetrieveproducts[0].Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      products/response/payload
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveproducts
+                  $ref: '#/node-output/Salesforce Retrieve products/response/payload'
+                - variable: SalesforceRetrieveproductsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve products/response'
+                - variable: SalesforceRetrievepricebookentrys
+                  $ref: >-
+                    #/node-output/Salesforce Retrieve price book
+                    entrys/response/payload
+                - variable: SalesforceRetrievepricebookentrysMetadata
+                  $ref: '#/node-output/Salesforce Retrieve price book entrys/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$SalesforceRetrieveproductsMetadata."status-code"}}':
+                          neq: '204'
+                      - '{{$Trigger.price}}':
+                          neq: '{{$SalesforceRetrievepricebookentrys[0].UnitPrice}}'
+                        hashKey: object:940
+                  execute:
+                    - update-action:
+                        name: Salesforce Update price book entry
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveproducts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                products/response/payload
+                            - variable: SalesforceRetrieveproductsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                products/response
+                            - variable: SalesforceRetrievepricebookentrys
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve price book
+                                entrys/response/payload
+                            - variable: SalesforceRetrievepricebookentrysMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve price book
+                                entrys/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings: []
+                        filter:
+                          where:
+                            Id: '{{$SalesforceRetrievepricebookentrys[0].Id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveproducts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                products/response/payload
+                            - variable: SalesforceRetrieveproductsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                products/response
+                            - variable: SalesforceRetrievepricebookentrys
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve price book
+                                entrys/response/payload
+                            - variable: SalesforceRetrievepricebookentrysMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve price book
+                                entrys/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-empty-output: false
+              else:
+                execute: []
+              output-schema: {}
+  name: Update the price book entry in Salesforce whenever a product is updated in Magento
+  description: Use this template to update the price of a product in Salesforce whenever a product price has been updated in Magento.
+models: {}

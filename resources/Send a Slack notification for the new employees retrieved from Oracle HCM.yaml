@@ -1,0 +1,138 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worker
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve workers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrieveworkers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management worker
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: OracleHumanCapitalManagementRetrieveworkers
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response/payload
+                - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$OracleHumanCapitalManagementRetrieveworkers.AdditionalProperties.CreationDate}} ':
+                          gte: '{{$Trigger.lastEventTime}}'
+                      - '{{$Foreachitem.workRelationships.WorkerType}}':
+                          lte: E
+                        hashKey: object:208
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04FRCNTLLX
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  {{$Foreachitem.FullName}} is added to Oracle
+                                  HCM
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Slack notification for the new employees retrieved from Oracle HCM
+  description: Use this template to send a Slack notification for the new employees retrieved from Oracle HCM. These workers details are retrieved from Oracle HCM.
+models: {}
