@@ -1,0 +1,244 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Recruiting___Get_Candidates
+      connector-type: workday
+      actions:
+        Get_Candidates: {}
+    action-interface-2:
+      type: api-action
+      business-object: candidate
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: candidate
+      connector-type: oraclehcm
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Workday Get Candidates
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: Get_Candidates
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$WorkdayGetCandidates '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: WorkdayGetCandidates
+                    $ref: '#/node-output/Workday Get Candidates/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Workday Recruiting___Get_Candidates
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve candidates
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrievecandidates '
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrievecandidates
+                    $ref: >-
+                      #/block/For each/node-output/Oracle Human Capital
+                      Management Retrieve candidates/response/payload
+                  - variable: OracleHumanCapitalManagementRetrievecandidatesMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Oracle Human Capital
+                      Management Retrieve candidates/response
+                  - variable: WorkdayGetCandidates
+                    $ref: '#/node-output/Workday Get Candidates/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management candidate
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: OracleHumanCapitalManagementRetrievecandidates
+                  $ref: >-
+                    #/block/For each/node-output/Oracle Human Capital Management
+                    Retrieve candidates/response/payload
+                - variable: OracleHumanCapitalManagementRetrievecandidatesMetadata
+                  $ref: >-
+                    #/block/For each/node-output/Oracle Human Capital Management
+                    Retrieve candidates/response
+                - variable: WorkdayGetCandidates
+                  $ref: '#/node-output/Workday Get Candidates/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.Response_Data.Candidate[0].Candidate_Data.Contact_Data.Email_Address}}':
+                      neq: '{{$Foreach2item.Email}}'
+                  execute:
+                    - create-action:
+                        name: Oracle Human Capital Management Create candidate
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Email:
+                                template: >-
+                                  {{$Foreachitem.Response_Data.Candidate.Candidate_Data.Contact_Data.Email_Address}}
+                            - FirstName:
+                                template: >-
+                                  {{$Foreachitem.Response_Data.Candidate[0].Candidate_Data.Name_Data.Legal_Name.Name_Detail_Data.First_Name}}
+                            - LastName:
+                                template: >-
+                                  {{$Foreachitem.Response_Data.Candidate[0].Candidate_Data.Name_Data.Legal_Name.Name_Detail_Data.Last_Name}}
+                            - SourceName:
+                                template: LinkedIn
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleHumanCapitalManagementRetrievecandidates
+                              $ref: >-
+                                #/block/For each/node-output/Oracle Human
+                                Capital Management Retrieve
+                                candidates/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrievecandidatesMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Oracle Human
+                                Capital Management Retrieve candidates/response
+                            - variable: WorkdayGetCandidates
+                              $ref: >-
+                                #/node-output/Workday Get
+                                Candidates/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04FRCNTLLX
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                This candidate already exists
+                                {{$Foreachitem.Response_Data.Candidate.Candidate_Data.Name_Data.Legal_Name.Name_Detail_Data.Full_Name}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: OracleHumanCapitalManagementRetrievecandidates
+                            $ref: >-
+                              #/block/For each/node-output/Oracle Human Capital
+                              Management Retrieve candidates/response/payload
+                          - variable: >-
+                              OracleHumanCapitalManagementRetrievecandidatesMetadata
+                            $ref: >-
+                              #/block/For each/node-output/Oracle Human Capital
+                              Management Retrieve candidates/response
+                          - variable: WorkdayGetCandidates
+                            $ref: >-
+                              #/node-output/Workday Get
+                              Candidates/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a candidate in Oracle HCM for each candidate who has a unique email address from Workday
+  description: Use this template to create a candidate in Oracle Human Capital Management for each Workday candidate. The flow periodically checks for new candidates and creates the candidate with a unique email address in Oracle Human Capital Management. If the candidate already exists in Oracle Human Capital Management, a Slack notification is sent to the specified channel. 
+models: {}
