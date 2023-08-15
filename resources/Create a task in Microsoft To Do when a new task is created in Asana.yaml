@@ -1,0 +1,64 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '1204205574829453'
+            team-id: '1204205586130693'
+            project: '1204205585687152'
+            parentFilter:
+              workspace-id: '1204205574829453'
+              team-id: '1204205586130693'
+              project: '1204205585687152'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft To Do Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: '{{$Trigger.notes}}'
+                        - contentType:
+                            template: text
+                  - dueDateTimeRequest:
+                      template: '{{$Trigger.due_on}}'
+                  - title:
+                      template: '{{$Trigger.name}}'
+                  - todoTaskListId:
+                      template: >-
+                        AQMkADAwATMwMAItNjMwZC1lMzUzLTAwAi0wMAoALgAAA-iqddhCOYFIqbBYzmYMREEBAM-2hQL9SExJhAVapIRU3isAAAIBEgAAAA==
+                  - userId:
+                      template: me
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a task in Microsoft To Do when a new task is created in Asana
+models: {}
