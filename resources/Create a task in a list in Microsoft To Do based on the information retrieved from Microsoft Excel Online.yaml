@@ -1,0 +1,271 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Row
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            DriveId: b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+            WorkbookId: 01NODPFIWLMMH5XXYVSJHYYWXAUROK7PXG
+            WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+            parentFilter:
+              DriveId: >-
+                b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+              WorkbookId: 01NODPFIWLMMH5XXYVSJHYYWXAUROK7PXG
+              WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+      connector-type: msexcel
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getUsersByUserIdTodoLists_model
+      connector-type: mstodo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: postUsersByUserIdTodoLists_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoLists: {}
+    action-interface-5:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+    action-interface-6:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft To Do Retrieve lists
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - userId: me
+                    - displayName: '{{$Trigger.rowData.D}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftToDoRetrievelists
+                  $ref: >-
+                    #/node-output/Microsoft To Do Retrieve
+                    lists/response/payload
+                - variable: MicrosoftToDoRetrievelistsMetadata
+                  $ref: '#/node-output/Microsoft To Do Retrieve lists/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MicrosoftToDoRetrievelistsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Microsoft To Do Create list
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: postUsersByUserIdTodoLists
+                        map:
+                          mappings:
+                            - displayName:
+                                template: '{{$Trigger.rowData.D}}'
+                            - userId:
+                                template: me
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoRetrievelists
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response/payload
+                            - variable: MicrosoftToDoRetrievelistsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Microsoft To Do Create task
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: '{{$Trigger.rowData.B}}'
+                            - dueDateTimeRequest:
+                                template: '{{$Trigger.rowData.C}}'
+                            - title:
+                                template: '{{$Trigger.rowData.A}}'
+                            - todoTaskListId:
+                                template: '{{$MicrosoftToDoCreatelist.id}}'
+                            - userId:
+                                template: me
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoCreatelist
+                              $ref: >-
+                                #/block/If/node-output/Microsoft To Do Create
+                                list/response/payload
+                            - variable: MicrosoftToDoRetrievelists
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response/payload
+                            - variable: MicrosoftToDoRetrievelistsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  task created with id
+                                  {{$MicrosoftToDoCreatetask.id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoCreatelist
+                              $ref: >-
+                                #/block/If/node-output/Microsoft To Do Create
+                                list/response/payload
+                            - variable: MicrosoftToDoCreatetask
+                              $ref: >-
+                                #/block/If/node-output/Microsoft To Do Create
+                                task/response/payload
+                            - variable: MicrosoftToDoRetrievelists
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response/payload
+                            - variable: MicrosoftToDoRetrievelistsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$MicrosoftToDoRetrievelistsMetadata."status-code"}}': '200'
+                  execute:
+                    - custom-action:
+                        name: Microsoft To Do Create task 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: '{{$Trigger.rowData.B}}'
+                                  - contentType:
+                                      template: text
+                            - dueDateTimeRequest:
+                                template: '{{$Trigger.rowData.C}}'
+                            - title:
+                                template: '{{$Trigger.rowData.A}}'
+                            - todoTaskListId:
+                                template: '{{$MicrosoftToDoRetrievelists[0].id}}'
+                            - userId:
+                                template: me
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoRetrievelists
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response/payload
+                            - variable: MicrosoftToDoRetrievelistsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  task is created with task id
+                                  {{$MicrosoftToDoCreatetask2.id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoCreatetask2
+                              $ref: >-
+                                #/block/If/node-output/Microsoft To Do Create
+                                task 2/response/payload
+                            - variable: MicrosoftToDoRetrievelists
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response/payload
+                            - variable: MicrosoftToDoRetrievelistsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a task in a list in Microsoft To Do based on the information retrieved from Microsoft Excel Online
+models: {}
