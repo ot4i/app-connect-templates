@@ -1,0 +1,307 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Messages
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdDateTime
+              updatedField: lastModifiedDateTime
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+      connector-type: msexchange
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: Attachments
+      connector-type: msexchange
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Attachments
+      connector-type: msexchange
+      actions:
+        DOWNLOADATTACHMENT: {}
+    action-interface-9:
+      type: api-action
+      business-object: postUsersByIdOnenoteSectionsByIdPages_model
+      connector-type: msonenote
+      actions:
+        postUsersByIdOnenoteSectionsByIdPages: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackSendmessage3
+                  $ref: '#/node-output/Slack Send message 3/response/payload'
+                - variable: GmailSendemail
+                  $ref: '#/node-output/Gmail Send email/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.hasAttachments}}': 'true'
+                  execute:
+                    - retrieve-action:
+                        name: Microsoft Exchange Retrieve attachments 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            and:
+                              - AttachmentHolderType: Messages
+                              - AttachmentOwnerId: '{{$Trigger.id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage3
+                              $ref: >-
+                                #/node-output/Slack Send message
+                                3/response/payload
+                            - variable: GmailSendemail
+                              $ref: '#/node-output/Gmail Send email/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - for-each:
+                        name: For each
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-2'
+                        source:
+                          expression: '$MicrosoftExchangeRetrieveattachments2 '
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExchangeRetrieveattachments2
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Retrieve attachments 2/response/payload
+                            - variable: MicrosoftExchangeRetrieveattachments2Metadata
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Retrieve attachments 2/response
+                            - variable: SlackSendmessage2
+                              $ref: >-
+                                #/block/If/node-output/Slack Send message
+                                2/response/payload
+                            - variable: SlackSendmessage3
+                              $ref: >-
+                                #/node-output/Slack Send message
+                                3/response/payload
+                            - variable: GmailSendemail
+                              $ref: '#/node-output/Gmail Send email/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        display-name: Microsoft Exchange Attachments
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C05AY19GTQE
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                This email with {{$Trigger.subject}}  has no
+                                attachments
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SlackSendmessage3
+                            $ref: >-
+                              #/node-output/Slack Send message
+                              3/response/payload
+                          - variable: GmailSendemail
+                            $ref: '#/node-output/Gmail Send email/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Exchange Download attachment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADATTACHMENT
+              map:
+                mappings:
+                  - AttachmentHolderType:
+                      template: Messages
+                  - AttachmentOwnerId:
+                      template: '{{$Trigger.id}}'
+                  - fileType:
+                      template: Binary
+                  - id:
+                      template: '{{$Foreachitem.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage5
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      5/response/payload
+                  - variable: MicrosoftExchangeRetrieveattachments2
+                    $ref: >-
+                      #/block/If/node-output/Microsoft Exchange Retrieve
+                      attachments 2/response/payload
+                  - variable: MicrosoftExchangeRetrieveattachments2Metadata
+                    $ref: >-
+                      #/block/If/node-output/Microsoft Exchange Retrieve
+                      attachments 2/response
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/If/node-output/Slack Send message
+                      2/response/payload
+                  - variable: SlackSendmessage3
+                    $ref: '#/node-output/Slack Send message 3/response/payload'
+                  - variable: GmailSendemail
+                    $ref: '#/node-output/Gmail Send email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Microsoft OneNote Create embedded content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-9'
+              action: postUsersByIdOnenoteSectionsByIdPages
+              map:
+                mappings:
+                  - images:
+                      foreach:
+                        input: '[1]'
+                        iterator: imagesItem
+                        mappings:
+                          - base64content:
+                              template: '{{$MicrosoftExchangeDownloadattachment.content}}'
+                          - contenttype:
+                              template: application/pdf
+                          - filename:
+                              template: '{{$Foreachitem.name}}'
+                          - imagetag:
+                              template: mypdf
+                  - presentation:
+                      template: >-
+                        <html><head><title>Page with PDF</title><meta
+                        name='created'
+                        value='2015-11-11T12:45:00.000-8:00'/></head><body><p>This
+                        page displays the uploaded pdf.</p><object
+                        data-attachment='mypdf.pdf' data='name:mypdf'
+                        type='application/pdf' /></body><html>
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage5
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      5/response/payload
+                  - variable: MicrosoftExchangeDownloadattachment
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Exchange Download
+                      attachment/response/payload
+                  - variable: SlackSendmessage4
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      4/response/payload
+                  - variable: MicrosoftExchangeRetrieveattachments2
+                    $ref: >-
+                      #/block/If/node-output/Microsoft Exchange Retrieve
+                      attachments 2/response/payload
+                  - variable: MicrosoftExchangeRetrieveattachments2Metadata
+                    $ref: >-
+                      #/block/If/node-output/Microsoft Exchange Retrieve
+                      attachments 2/response
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/If/node-output/Slack Send message
+                      2/response/payload
+                  - variable: SlackSendmessage3
+                    $ref: '#/node-output/Slack Send message 3/response/payload'
+                  - variable: GmailSendemail
+                    $ref: '#/node-output/Gmail Send email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - section_id: 1-b4caaa49-effb-4a49-8994-1e09d78a6840
+                    - user_id: me
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage5
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      5/response/payload
+                  - variable: MicrosoftExchangeDownloadattachment
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Exchange Download
+                      attachment/response/payload
+                  - variable: SlackSendmessage4
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      4/response/payload
+                  - variable: MicrosoftExchangeRetrieveattachments2
+                    $ref: >-
+                      #/block/If/node-output/Microsoft Exchange Retrieve
+                      attachments 2/response/payload
+                  - variable: MicrosoftExchangeRetrieveattachments2Metadata
+                    $ref: >-
+                      #/block/If/node-output/Microsoft Exchange Retrieve
+                      attachments 2/response
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/If/node-output/Slack Send message
+                      2/response/payload
+                  - variable: SlackSendmessage3
+                    $ref: '#/node-output/Slack Send message 3/response/payload'
+                  - variable: GmailSendemail
+                    $ref: '#/node-output/Gmail Send email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+  name: Create a page with embedded content for each new email received with attachments from Microsoft Exchange
+  description: Use this template to create a page with embedded content for each new email received with attachments from Microsoft Exchange. Otherwise, a slack notification is sent, notifying that the email has no attachment.
+models: {}
