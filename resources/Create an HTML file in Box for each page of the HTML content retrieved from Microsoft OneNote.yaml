@@ -1,0 +1,164 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getUsersByUserIdOnenotePagesByPageIdContent_model
+      connector-type: msonenote
+      actions:
+        getUsersByUserIdOnenotePagesByPageIdContent: {}
+    action-interface-2:
+      type: api-action
+      business-object: getUsersByUserIdOnenotePages_model
+      connector-type: msonenote
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft One Note Retrieve pages
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - user_id: me
+                    - createdDateTime:
+                        gte: '{{$now() }}'
+                    - custom_id: 1-b1d1bccf-ad40-48cd-868b-248a75787c59
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftOneNoteRetrievepages '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftOneNoteRetrievepages
+                    $ref: >-
+                      #/node-output/Microsoft One Note Retrieve
+                      pages/response/payload
+                  - variable: MicrosoftOneNoteRetrievepagesMetadata
+                    $ref: '#/node-output/Microsoft One Note Retrieve pages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Microsoft One Note Pages
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft One Note Download page content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: getUsersByUserIdOnenotePagesByPageIdContent
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftOneNoteRetrievepages
+                    $ref: >-
+                      #/node-output/Microsoft One Note Retrieve
+                      pages/response/payload
+                  - variable: MicrosoftOneNoteRetrievepagesMetadata
+                    $ref: '#/node-output/Microsoft One Note Retrieve pages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  and:
+                    - page_id: '{{$Foreachitem.id}}'
+                    - user_id: me
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftOneNoteRetrievepages
+                    $ref: >-
+                      #/node-output/Microsoft One Note Retrieve
+                      pages/response/payload
+                  - variable: MicrosoftOneNoteRetrievepagesMetadata
+                    $ref: '#/node-output/Microsoft One Note Retrieve pages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+          - create-action:
+              name: Box Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - content:
+                      template: '{{$MicrosoftOneNoteDownloadpagecontent.content}}'
+                  - fileType:
+                      template: Binary
+                  - name:
+                      template: '{{$Foreachitem.title}}'
+                  - parent_id:
+                      template: '216911298723'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftOneNoteDownloadpagecontent
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft One Note Download
+                      page content/response/payload
+                  - variable: MicrosoftOneNoteRetrievepages
+                    $ref: >-
+                      #/node-output/Microsoft One Note Retrieve
+                      pages/response/payload
+                  - variable: MicrosoftOneNoteRetrievepagesMetadata
+                    $ref: '#/node-output/Microsoft One Note Retrieve pages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an HTML file in Box for each page of the HTML content retrieved from Microsoft OneNote
+models: {}
