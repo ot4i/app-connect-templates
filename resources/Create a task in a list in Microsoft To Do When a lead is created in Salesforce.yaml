@@ -1,0 +1,185 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+    action-interface-2:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+    action-interface-3:
+      type: api-action
+      business-object: getUsersByUserIdTodoLists_model
+      connector-type: mstodo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Rating}}': Hot
+                  execute:
+                    - custom-action:
+                        name: Microsoft To Do Create task
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Company:{{$Trigger.Company}}, Title:
+                                        {{$Trigger.Title}}, Address:
+                                        {{$Trigger.Street}}, {{$Trigger.City}},
+                                        {{$Trigger.State}},
+                                        {{$Trigger.PostalCode}}. Prod Interest:
+                                        {{$Trigger.ProductInterest__c}},
+                                        Email:{{$Trigger.Email}}, Phone:
+                                        {{$Trigger.MobilePhone}}, LeadSource:
+                                        {{$Trigger.LeadSource}}, 
+                            - title:
+                                template: '{{$Trigger.Id}} - {{$Trigger.Name}}'
+                            - todoTaskListId:
+                                template: >-
+                                  AQMkADAwATM0MDAAMS01ZGYxLTVjNjAtMDACLTAwCgAuAAADb6Br_fReF0eJHdfnsTuOtwEAwTENmbj21UuVxu2pWxeurQAAAAsCcg8AAAA=
+                            - userId:
+                                template: me
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - retrieve-action:
+                        name: Microsoft To Do Retrieve lists
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            userId: me
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoCreatetask
+                              $ref: >-
+                                #/block/If/node-output/Microsoft To Do Create
+                                task/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: false
+                - condition:
+                    '{{$Trigger.Rating}}': Warm
+                  execute:
+                    - custom-action:
+                        name: Microsoft To Do Create task 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Company:{{$Trigger.Company}}, Title:
+                                        {{$Trigger.Title}}, Address:
+                                        {{$Trigger.Street}}, {{$Trigger.City}},
+                                        {{$Trigger.State}},
+                                        {{$Trigger.PostalCode}}. Prod Interest:
+                                        {{$Trigger.ProductInterest__c}},
+                                        Email:{{$Trigger.Email}}, Phone:
+                                        {{$Trigger.MobilePhone}}, LeadSource:
+                                        {{$Trigger.LeadSource}}, 
+                                  - contentType:
+                                      template: text
+                            - title:
+                                template: '{{$Trigger.Id}} - {{$Trigger.Name}}'
+                            - todoTaskListId:
+                                template: >-
+                                  AQMkADAwATM0MDAAMS01ZGYxLTVjNjAtMDACLTAwCgAuAAADb6Br_fReF0eJHdfnsTuOtwEAwTENmbj21UuVxu2pWxeurQAAAAjmZ8wAAAA=
+                            - userId:
+                                template: me
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: Microsoft To Do Create task 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+                      map:
+                        mappings:
+                          - body:
+                              mappings:
+                                - content:
+                                    template: >-
+                                      Company:{{$Trigger.Company}}, Title:
+                                      {{$Trigger.Title}}, Address:
+                                      {{$Trigger.Street}}, {{$Trigger.City}},
+                                      {{$Trigger.State}},
+                                      {{$Trigger.PostalCode}}. Prod Interest:
+                                      {{$Trigger.ProductInterest__c}},
+                                      Email:{{$Trigger.Email}}, Phone:
+                                      {{$Trigger.MobilePhone}}, LeadSource:
+                                      {{$Trigger.LeadSource}}.
+                                - contentType:
+                                    template: text
+                          - title:
+                              template: '{{$Trigger.Id}} - {{$Trigger.Name}}'
+                          - todoTaskListId:
+                              template: >-
+                                AQMkADAwATM0MDAAMS01ZGYxLTVjNjAtMDACLTAwCgAuAAADb6Br_fReF0eJHdfnsTuOtwEAwTENmbj21UuVxu2pWxeurQAAAgESAAAA
+                          - userId:
+                              template: me
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a task in a list in Microsoft To Do When a lead is created in Salesforce
+models: {}
