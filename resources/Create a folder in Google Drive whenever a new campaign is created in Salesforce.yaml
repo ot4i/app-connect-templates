@@ -1,0 +1,41 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Campaign
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: googledrive
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Drive Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Trigger.Name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a folder in Google Drive whenever a new campaign is created in Salesforce
+models: {}
