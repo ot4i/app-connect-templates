@@ -1,0 +1,122 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 14 * * FRI
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: week
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: ActivityLog
+      connector-type: mondaydotcom
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        APPENDROW: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: monday.com Retrieve activity logs
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  board_id: '5029365543'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 100
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$mondaycomRetrieveactivitylogs '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: mondaycomRetrieveactivitylogs
+                    $ref: >-
+                      #/node-output/monday.com Retrieve activity
+                      logs/response/payload
+                  - variable: mondaycomRetrieveactivitylogsMetadata
+                    $ref: '#/node-output/monday.com Retrieve activity logs/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Excel Online Append row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: APPENDROW
+              map:
+                mappings:
+                  - DriveId:
+                      template: >-
+                        b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                  - WorkbookId:
+                      template: 01NODPFIXLC3LB7I2ENZAK7YG3NRXL45XV
+                  - WorksheetId:
+                      template: '{00000000-0001-0000-0000-000000000000}'
+                  - rowData:
+                      mappings:
+                        - A:
+                            template: '{{$Foreachitem.account_id}}'
+                        - B:
+                            template: '{{$Foreachitem.entity}}'
+                        - C:
+                            template: '{{$Foreachitem.event}}'
+                        - D:
+                            template: '{{$Foreachitem.created_at}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: mondaycomRetrieveactivitylogs
+                    $ref: >-
+                      #/node-output/monday.com Retrieve activity
+                      logs/response/payload
+                  - variable: mondaycomRetrieveactivitylogsMetadata
+                    $ref: '#/node-output/monday.com Retrieve activity logs/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Append a row in Microsoft Excel Online for each activity log retrieved from Mondaydotcom
+  description: Use this template to append a row of information in Microsoft Excel Online for each activity log retrieved from a board in Monday.com. For example, the activity logs contain time tracking data stored in Monday.com. This information is retrieved and added to the Microsoft Excel Online worksheet periodically. This integration simplifies time tracking and reporting processes.
+models: {}
