@@ -1,0 +1,109 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: zendeskservice
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: created_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.ticket_fields.id__21959434346521}}': 'true'
+                  execute:
+                    - create-action:
+                        name: Google Calendar Create event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - allDayEvent:
+                                expression: 'false'
+                            - attendees:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: attendeesItem
+                                  mappings:
+                                    - email:
+                                        template: >-
+                                          {{$Trigger.ticket_fields.id__21959543171737}}
+                            - description:
+                                template: '{{$Trigger.description}}'
+                            - endTime:
+                                template: '2023-08-19T09:00:00'
+                            - id:
+                                template: >-
+                                  tbp52a61ab1teqs5lpo1qte2lk@group.calendar.google.com
+                            - startTime:
+                                template: '2023-08-19T08:00:00'
+                            - summary:
+                                template: '{{$Trigger.subject}}'
+                            - timeZone:
+                                template: Asia/Kolkata
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C05AY19GTQE
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                ticket with {{$Trigger.subject}} is not an
+                                offboarding request
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk
+models: {}

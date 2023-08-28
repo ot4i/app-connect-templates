@@ -1,0 +1,240 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: metricalarms
+      connector-type: amazoncloudwatch
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Instance
+      connector-type: amazonec2
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: Instance
+      connector-type: amazonec2
+      actions:
+        LAUNCHINSTANCES: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Amazon CloudWatch Retrieve metric alarms
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  AlarmName: Adis Alarm
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$AmazonCloudWatchRetrievemetricalarms '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonCloudWatchRetrievemetrics
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve
+                      metrics/response/payload
+                  - variable: AmazonCloudWatchRetrievemetricsMetadata
+                    $ref: '#/node-output/Amazon CloudWatch Retrieve metrics/response'
+                  - variable: AmazonCloudWatchRetrievemetricalarms
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve metric
+                      alarms/response/payload
+                  - variable: AmazonCloudWatchRetrievemetricalarmsMetadata
+                    $ref: >-
+                      #/node-output/Amazon CloudWatch Retrieve metric
+                      alarms/response
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Amazon CloudWatch metricalarms
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: AmazonCloudWatchRetrievemetricalarms
+                  $ref: >-
+                    #/node-output/Amazon CloudWatch Retrieve metric
+                    alarms/response/payload
+                - variable: AmazonCloudWatchRetrievemetricalarmsMetadata
+                  $ref: >-
+                    #/node-output/Amazon CloudWatch Retrieve metric
+                    alarms/response
+                - variable: SlackSendmessage
+                  $ref: '#/node-output/Slack Send message/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.StateValue}}': ALARM
+                  execute:
+                    - retrieve-action:
+                        name: Amazon EC2 Retrieve instances
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            instance-id: '{{$Foreachitem.Metrics.Dimensions[0].Value}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AmazonCloudWatchRetrievemetricalarms
+                              $ref: >-
+                                #/node-output/Amazon CloudWatch Retrieve metric
+                                alarms/response/payload
+                            - variable: AmazonCloudWatchRetrievemetricalarmsMetadata
+                              $ref: >-
+                                #/node-output/Amazon CloudWatch Retrieve metric
+                                alarms/response
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+                    - custom-action:
+                        name: Amazon EC2 Launch instances
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: LAUNCHINSTANCES
+                        map:
+                          mappings:
+                            - ImageId:
+                                template: '{{$AmazonEC2Retrieveinstances[0].ImageId}}'
+                            - InstanceType:
+                                template: >-
+                                  {{$AmazonEC2Retrieveinstances[0].InstanceType}}
+                            - KeyName:
+                                template: '{{$AmazonEC2Retrieveinstances[0].KeyName}}'
+                            - LaunchTemplateId:
+                                template: lt-0b5d50e8377f4a886
+                            - MaxCount:
+                                expression: '1'
+                            - MinCount:
+                                expression: '1'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AmazonEC2Retrieveinstances
+                              $ref: >-
+                                #/block/If/node-output/Amazon EC2 Retrieve
+                                instances/response/payload
+                            - variable: AmazonEC2RetrieveinstancesMetadata
+                              $ref: >-
+                                #/block/If/node-output/Amazon EC2 Retrieve
+                                instances/response
+                            - variable: AmazonCloudWatchRetrievemetricalarms
+                              $ref: >-
+                                #/node-output/Amazon CloudWatch Retrieve metric
+                                alarms/response/payload
+                            - variable: AmazonCloudWatchRetrievemetricalarmsMetadata
+                              $ref: >-
+                                #/node-output/Amazon CloudWatch Retrieve metric
+                                alarms/response
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C0436FB797X
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                {{$Foreachitem.AlarmName}} is in
+                                {{$Foreachitem.StateValue}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: AmazonCloudWatchRetrievemetricalarms
+                            $ref: >-
+                              #/node-output/Amazon CloudWatch Retrieve metric
+                              alarms/response/payload
+                          - variable: AmazonCloudWatchRetrievemetricalarmsMetadata
+                            $ref: >-
+                              #/node-output/Amazon CloudWatch Retrieve metric
+                              alarms/response
+                          - variable: SlackSendmessage
+                            $ref: '#/node-output/Slack Send message/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Launch an Amazon EC2 instance for each retrieved alarm from Amazon CloudWatch
+models: {}

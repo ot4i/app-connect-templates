@@ -1,0 +1,284 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: postLocationsGlobaldetectLanguage_model
+      connector-type: googletranslate
+      actions:
+        postLocationsGlobaldetectLanguage: {}
+    action-interface-3:
+      type: api-action
+      business-object: postLocationsUsCentral1translateText_model
+      connector-type: googletranslate
+      actions:
+        postLocationsUsCentral1translateText: {}
+    action-interface-4:
+      type: api-action
+      business-object: object
+      connector-type: ibmcoss3
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        DOWNLOADFILE: {}
+    action-interface-6:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C05AY19GTQE
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: '{{$Trigger}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Box Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - content:
+                      template: >-
+                        case number---{{$Trigger.CaseNumber}}case
+                        subject---{{$Trigger.Subject}}case
+                        type---{{$Trigger.Type}}case reason----
+                        {{$Trigger.Reason}}email---- {{$Trigger.SuppliedEmail}}
+                  - fileType:
+                      template: Text
+                  - name:
+                      template: '{{$Trigger.SuppliedName}}'
+                  - parent_id:
+                      template: '216911298723'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Box Retrieve file content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - fileType:
+                      template: Text
+                  - id:
+                      template: '{{$BoxCreatefile.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: BoxCreatefile
+                    $ref: '#/node-output/Box Create file/response/payload'
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Google Translate Detect language
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postLocationsGlobaldetectLanguage
+              map:
+                mappings:
+                  - content:
+                      template: '{{$BoxRetrievefilecontent.content}}'
+                  - locationName:
+                      template: global
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: BoxCreatefile
+                    $ref: '#/node-output/Box Create file/response/payload'
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackSendmessage
+                  $ref: '#/node-output/Slack Send message/response/payload'
+                - variable: GoogleTranslateDetectlanguage
+                  $ref: >-
+                    #/node-output/Google Translate Detect
+                    language/response/payload
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$GoogleTranslateDetectlanguage.languages.languageCode[0]}}':
+                      neq: en
+                  execute:
+                    - custom-action:
+                        name: Google Translate Translate text
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postLocationsUsCentral1translateText
+                        map:
+                          mappings:
+                            - contents:
+                                expression: '$BoxRetrievefilecontent.content '
+                            - locationName:
+                                template: global
+                            - sourceLanguageCode:
+                                template: >-
+                                  {{$GoogleTranslateDetectlanguage.languages.languageCode}}
+                            - targetLanguageCode:
+                                template: en
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: BoxCreatefile
+                              $ref: '#/node-output/Box Create file/response/payload'
+                            - variable: BoxRetrievefilecontent
+                              $ref: >-
+                                #/node-output/Box Retrieve file
+                                content/response/payload
+                            - variable: GoogleTranslateDetectlanguage
+                              $ref: >-
+                                #/node-output/Google Translate Detect
+                                language/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: IBM Cloud Object Storage S3 Create object
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Key:
+                                template: '{{$Trigger.SuppliedName}}'
+                            - bucketName:
+                                template: sp-test
+                            - content:
+                                template: >-
+                                  {{$GoogleTranslateTranslatetext.translations.translatedText}}
+                            - contentType:
+                                template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleTranslateTranslatetext
+                              $ref: >-
+                                #/block/If/node-output/Google Translate
+                                Translate text/response/payload
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: BoxCreatefile
+                              $ref: '#/node-output/Box Create file/response/payload'
+                            - variable: BoxRetrievefilecontent
+                              $ref: >-
+                                #/node-output/Box Retrieve file
+                                content/response/payload
+                            - variable: GoogleTranslateDetectlanguage
+                              $ref: >-
+                                #/node-output/Google Translate Detect
+                                language/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-6'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C05AY19GTQE
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                {{$Trigger.SuppliedName}}   ---  the content is
+                                already in english
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SlackSendmessage
+                            $ref: '#/node-output/Slack Send message/response/payload'
+                          - variable: BoxCreatefile
+                            $ref: '#/node-output/Box Create file/response/payload'
+                          - variable: BoxRetrievefilecontent
+                            $ref: >-
+                              #/node-output/Box Retrieve file
+                              content/response/payload
+                          - variable: GoogleTranslateDetectlanguage
+                            $ref: >-
+                              #/node-output/Google Translate Detect
+                              language/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a case file in IBM Cloud Object Storage S3 for any non-English file content when a new case is created in Salesforce
+  description: Use this template to create a case file in IBM Cloud Object Storage S3 for non-English file content whenever a new case is created in Salesforce. When a new case is created in Salefroce, the file is created in Box. If the file content is non-English, the case file will be created in IBM Cloud Object Storage S3. Otherwise, a Slack message gets sent to the intended channel, notifying that the file for the case ID already exists in English.
+models: {}
