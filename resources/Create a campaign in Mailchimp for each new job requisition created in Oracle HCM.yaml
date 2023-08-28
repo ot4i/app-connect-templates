@@ -1,0 +1,139 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 30 09 * * MON
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: week
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: jobRequisition
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Campaigns
+      connector-type: mailchimp
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve job requisitions
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrievejobrequisitions '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrievejobrequisitions
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve job
+                      requisitions/response/payload
+                  - variable: >-
+                      OracleHumanCapitalManagementRetrievejobrequisitionsMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve job
+                      requisitions/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management jobRequisition
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: OracleHumanCapitalManagementRetrievejobrequisitions
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve job
+                    requisitions/response/payload
+                - variable: OracleHumanCapitalManagementRetrievejobrequisitionsMetadata
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve job
+                    requisitions/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$OracleHumanCapitalManagementRetrieveworkerassignments.AdditionalProperties.CreationDate}}':
+                      gte: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - create-action:
+                        name: MailChimp Create campaign
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - list_id:
+                                template: 6fc8383307
+                            - settings:
+                                mappings:
+                                  - subject_line:
+                                      template: >-
+                                        Job Requisition Campaign -
+                                        {{$Foreachitem.Title}} - Req. No.:
+                                        {{$Foreachitem.RequisitionNumber}} 
+                            - type:
+                                template: regular
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrievejobrequisitions
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve job requisitions/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrievejobrequisitionsMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve job requisitions/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a campaign in Mailchimp for each new job requisition created in Oracle HCM
+  description: Use this template to create a campaign in Mailchimp for each new job requisition created in Oracle HCM.
+models: {}
