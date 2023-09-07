@@ -1,0 +1,188 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCustomer:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Customer
+          output-context:
+            data: Customer
+        retrieveCustomer:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+          input-context:
+            data: Customer
+          output-context:
+            data: Customer
+      options:
+        resources:
+          - business-object: Customer
+            model:
+              $ref: '#/models/Customer'
+            triggers:
+              create: createCustomer
+              retrieve: retrieveCustomer
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: customer
+      connector-type: shopify
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: customer
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: customers
+      connector-type: square
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Shopify Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - email:
+                      template: '{{$Request.email}}'
+                  - first_name:
+                      template: '{{$Request.first_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Customer successfully created
+                  status-code: '200'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: ShopifyCreatecustomer
+                        $ref: '#/node-output/Shopify Create customer/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - id:
+                          expression: '$ShopifyCreatecustomer.id '
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: ShopifyCreatecustomer
+                      $ref: '#/node-output/Shopify Create customer/response/payload'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve customers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  id: '{{$api.id}}'
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: Square Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - email_address:
+                      template: '{{$ShopifyRetrievecustomers.email}}'
+                  - given_name:
+                      template: '{{$ShopifyRetrievecustomers.first_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Customer successfully retrieved
+                  status-code: '$ShopifyRetrievecustomersMetadata."status-code" '
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: ShopifyRetrievecustomers
+                        $ref: >-
+                          #/node-output/Shopify Retrieve
+                          customers/response/payload
+                      - variable: ShopifyRetrievecustomersMetadata
+                        $ref: '#/node-output/Shopify Retrieve customers/response'
+                      - variable: SquareCreatecustomer
+                        $ref: '#/node-output/Square Create customer/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - id:
+                          expression: '$SquareCreatecustomer.customer_id '
+                  input:
+                    - variable: api
+                      $ref: '#/trigger/api/parameters'
+                    - variable: ShopifyRetrievecustomers
+                      $ref: >-
+                        #/node-output/Shopify Retrieve
+                        customers/response/payload
+                    - variable: ShopifyRetrievecustomersMetadata
+                      $ref: '#/node-output/Shopify Retrieve customers/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+  name: Create a customer in square when a customer created in shopify
+models:
+  Customer:
+    name: Customer
+    properties:
+      first_name:
+        required: false
+        id: false
+        type: string
+      id:
+        required: false
+        id: true
+        type: number
+      email:
+        required: false
+        id: false
+        type: string
+    plural: Customer
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+      retrieve: '#/integration/assemblies/assembly-2'
+    methods: {}
