@@ -1,0 +1,154 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Messages
+      connector-type: msexchange
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: FormEntry
+      connector-type: wufoo
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Exchange Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  subject: Request
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftExchangeRetrieveemails '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExchangeRetrieveemails
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve
+                      emails/response/payload
+                  - variable: MicrosoftExchangeRetrieveemailsMetadata
+                    $ref: '#/node-output/Microsoft Exchange Retrieve emails/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: create entry
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Wufoo Create form entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Field15:
+                      template: '{{$Foreachitem.toRecipients.name}}'
+                  - Field9:
+                      template: '{{$Foreachitem.toRecipients.address}}'
+                  - Hash:
+                      template: q1z0scqf0z2bi37
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExchangeRetrieveemails
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve
+                      emails/response/payload
+                  - variable: MicrosoftExchangeRetrieveemailsMetadata
+                    $ref: '#/node-output/Microsoft Exchange Retrieve emails/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Form entry created under wufoo with key word
+                        {{$MicrosoftExchangeRetrieveemails.subject}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: WufooCreateformentry
+                    $ref: >-
+                      #/block/For each/node-output/Wufoo Create form
+                      entry/response/payload
+                  - variable: MicrosoftExchangeRetrieveemails
+                    $ref: >-
+                      #/node-output/Microsoft Exchange Retrieve
+                      emails/response/payload
+                  - variable: MicrosoftExchangeRetrieveemailsMetadata
+                    $ref: '#/node-output/Microsoft Exchange Retrieve emails/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Retrieve emails by subject from Microsoft Exchange and upload the details to the Wufoo
+models: {}

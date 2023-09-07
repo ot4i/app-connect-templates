@@ -1,0 +1,322 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: blob
+      connector-type: azureblobstorage
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: blob
+      connector-type: azureblobstorage
+      actions:
+        DOWNLOADBLOBCONTENT: {}
+    action-interface-1:
+      type: api-action
+      business-object: deliveryStream
+      connector-type: amazonkinesis
+      actions:
+        PUTRECORDS: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Azure Blob storage Retrieve blobs
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  and:
+                    - containerName: 0testcontainer
+                    - name: 2MB.txt
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - set-variable:
+              name: Set variable 3
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      chukCounter:
+                        type: number
+                mappings:
+                  - variable:
+                      mappings:
+                        - chukCounter:
+                            expression: >-
+                              $ceil($MicrosoftAzureBlobstorageRetrieveblobs.properties.contentLength/500000)
+                              -1
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Iterator:
+                        type: array
+                        items:
+                          type: number
+                mappings:
+                  - variable:
+                      mappings:
+                        - Iterator:
+                            expression: '[0..$Setvariable3.variable.chukCounter  ]'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Setvariable2.variable.Iterator '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageDownloadblobcontent
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Azure Blob storage
+                      Download blob content/response/payload
+                  - variable: AmazonS3Createobject
+                    $ref: >-
+                      #/block/For each/node-output/Amazon S3 Create
+                      object/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      offset:
+                        type: number
+                mappings:
+                  - output:
+                      mappings:
+                        - offset:
+                            expression: $Foreachitem *10485760
+              display-name: Iterator
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Azure Blob storage Download blob content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADBLOBCONTENT
+              map:
+                mappings:
+                  - containerName:
+                      template: 0testcontainer
+                  - contentType:
+                      template: Text
+                  - count:
+                      expression: '500000'
+                  - name:
+                      template: '{{$MicrosoftAzureBlobstorageRetrieveblobs.name}}'
+                  - offset:
+                      expression: $Foreachitem *500000
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Amazon Kinesis Add multiple records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: PUTRECORDS
+              map:
+                mappings:
+                  - DeliveryStreamName:
+                      template: usecasedelivery
+                  - Records:
+                      foreach:
+                        input: '[1]'
+                        iterator: RecordsItem
+                        mappings:
+                          - Data:
+                              template: >-
+                                {{$MicrosoftAzureBlobstorageDownloadblobcontent.body}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageDownloadblobcontent
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Azure Blob storage
+                      Download blob content/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        {{$Foreachitem}}.{{$AmazonKinesisAddmultiplerecords.RequestResponses.RecordId}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureBlobstorageDownloadblobcontent
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Azure Blob storage
+                      Download blob content/response/payload
+                  - variable: AmazonKinesisAddmultiplerecords
+                    $ref: >-
+                      #/block/For each/node-output/Amazon Kinesis Add multiple
+                      records/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobs
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response/payload
+                  - variable: MicrosoftAzureBlobstorageRetrieveblobsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Azure Blob storage Retrieve
+                      blobs/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Integrate data between Microsoft Azure Blob storage and Amazon Kinesis
+models: {}

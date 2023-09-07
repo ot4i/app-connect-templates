@@ -4,6 +4,6 @@ To refer to these instructions while editing the flow, open [the github page](Re
 2.	Connect to the following accounts by using your credentials:
     - **Microsoft Dynamics 365 for Sales**
 	- **Dropbox**
-3.	To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3.	To start the flow, in the banner click **Start flow**.
 
 The flow is scheduled to trigger once a day at 00:00 UTC.  

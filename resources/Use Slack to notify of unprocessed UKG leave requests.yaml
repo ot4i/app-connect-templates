@@ -1,0 +1,173 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 08 * * MON
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: week
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leave
+      connector-type: kronos
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: UKG Retrieve employee leave records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - idsFilter: '3444'
+                    - endDateFilter: '2019-01-01'
+                    - startDateFilter: '2018-01-01'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$UKGRetrieveemployeeleaverecords '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: UKGRetrieveemployeeleaverecords
+                    $ref: >-
+                      #/node-output/UKG Retrieve employee leave
+                      records/response/payload
+                  - variable: UKGRetrieveemployeeleaverecordsMetadata
+                    $ref: '#/node-output/UKG Retrieve employee leave records/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: false
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas: {}
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: UKGRetrieveemployeeleaverecords
+                    $ref: >-
+                      #/node-output/UKG Retrieve employee leave
+                      records/response/payload
+                  - variable: UKGRetrieveemployeeleaverecordsMetadata
+                    $ref: '#/node-output/UKG Retrieve employee leave records/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              display-name: UKG leave
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: UKGRetrieveemployeeleaverecords
+                  $ref: >-
+                    #/node-output/UKG Retrieve employee leave
+                    records/response/payload
+                - variable: UKGRetrieveemployeeleaverecordsMetadata
+                  $ref: '#/node-output/UKG Retrieve employee leave records/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.approvalStatus.qualifier}}': Pending
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C017RD2PHU7
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Leave request ID: {{$Foreachitem.id}} for
+                                  employee {{$Foreachitem.employee.id}} : 
+                                  {{$Foreachitem.employee.fullName}} needs to be
+                                  processed.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: UKGRetrieveemployeeleaverecords
+                              $ref: >-
+                                #/node-output/UKG Retrieve employee leave
+                                records/response/payload
+                            - variable: UKGRetrieveemployeeleaverecordsMetadata
+                              $ref: >-
+                                #/node-output/UKG Retrieve employee leave
+                                records/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Foreachitem
+                          $ref: '#/block/For each/current-item'
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: UKGRetrieveemployeeleaverecords
+                          $ref: >-
+                            #/node-output/UKG Retrieve employee leave
+                            records/response/payload
+                        - variable: UKGRetrieveemployeeleaverecordsMetadata
+                          $ref: >-
+                            #/node-output/UKG Retrieve employee leave
+                            records/response
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: There are no pending leave requests.
+                      status-code: 200
+              output-schema: {}
+  name: Use Slack to notify of unprocessed UKG leave requests
+models: {}

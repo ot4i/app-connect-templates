@@ -5,7 +5,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
    - **Couchbase** 
    - **Amazon DynamoDB**
    - **Slack**
-3. To start the flow, in the banner, open the options menu [⋮] and click **Start flow**.
+3. To start the flow, in the banner click **Start flow**.
 
 This flow is a scheduler-based flow that retrieves documents containing the employee records in Couchbase.
 

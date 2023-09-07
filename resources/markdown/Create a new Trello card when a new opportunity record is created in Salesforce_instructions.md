@@ -2,9 +2,9 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 1. Click **Create flow** to create an event-driven flow from the template.
 2. Click Salesforce / **New opportunity**
-3. Connect to your [Salesforce account](https://ibm.biz/ach2salesforce).
+3. Connect to your [Salesforce account](https://ibm.biz/aassalesforce).
 4. Click Trello / **Add card to list**
-5. Connect to your [Trello account](https://ibm.biz/actrello) and then select the board and list in which cards are to be added when a new opportunity record is created in Salesforce.
+5. Connect to your [Trello account](https://ibm.biz/aastrello) and then select the board and list in which cards are to be added when a new opportunity record is created in Salesforce.
 6. To start the flow, click **Start flow**.
 
 ## Testing the Flow

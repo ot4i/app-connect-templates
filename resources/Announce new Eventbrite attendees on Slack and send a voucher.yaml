@@ -1,0 +1,99 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: eventbrite
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '5311719572'
+            parentFilter:
+              organizationID: '5311719572'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - channel:
+                      template: C03E73MGV9N
+                  - text:
+                      template: >-
+                        We have a new attendee {{$Trigger.profile.first_name}}
+                        {{$Trigger.profile.last_name}} - they work for
+                        {{$Trigger.profile.company}}!
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackCreatemessage
+                  $ref: '#/node-output/Slack Create message/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$contains($string($Trigger.answers), "Walking")}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Well done for walking
+                                  {{$Trigger.profile.first_name}}
+
+                                  Drink voucher:
+                                  {{$Trigger.event_id}}-{{$Trigger.id}}
+                            - Subject:
+                                template: Have a drink on us!
+                            - To:
+                                template: '{{$Trigger.profile.email}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackCreatemessage
+                              $ref: >-
+                                #/node-output/Slack Create
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Announce new Eventbrite attendees on Slack and send a voucher
+models: {}

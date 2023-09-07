@@ -1,0 +1,86 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: OE_INBOUND_INT_Service___PROCESS_ORDER
+      connector-type: oracleebs
+      actions:
+        CREATE_ORDER: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Oracle E-Business Suite Create order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CREATE_ORDER
+              map:
+                mappings:
+                  - P_HEADER_REC:
+                      mappings:
+                        - ORDER_TYPE_ID:
+                            template: ' {{$Trigger.Type}}'
+                  - SOAHeader:
+                      mappings:
+                        - NLSLanguage:
+                            template: '{{$Trigger.AccountId}}'
+                        - OrgId:
+                            template: ' {{$Trigger.Id}}'
+                        - RespApplication:
+                            template: '{{$Trigger.OwnerId}}'
+                        - Responsibility:
+                            template: '{{$Trigger.CampaignId}}'
+                        - SecurityGroup:
+                            template: '{{$Trigger.TotalOpportunityQuantity}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Order created
+                        :{{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ORDER_NUMBER}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleEBusinessSuiteCreateorder
+                    $ref: >-
+                      #/node-output/Oracle E-Business Suite Create
+                      order/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an order in Oracle E-Business Suite when a new opportunity is created in Salesforce
+models: {}

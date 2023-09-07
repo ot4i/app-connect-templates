@@ -16,9 +16,9 @@ The first line in your CSV file should look like this:
 
 1. Click **Create flow** to start using the template.
 1. Click **Operations**, then **Edit flow** for the _Create leads_ operation.
-1. Click on the **Box** node, and if you're not already connected, connect to your [Box account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-box/).
-1. Click on the **Salesforce node**, and if you're not already connected, connect to your [Salesforce account](https://developer.ibm.com/integration/docs/app-connect/how-to-guides-for-apps/use-ibm-app-connect-salesforce/).
+1. Click on the **Box** node, and if you're not already connected, connect to your [Box account](https://ibm.biz/aas_box).
+1. Click on the **Salesforce node**, and if you're not already connected, connect to your [Salesforce account](https://ibm.biz/aassalesforce).
 1. Click **Done**.
-1. To start the flow, in the banner open the options menu [&#8942;] then click **Start flow**.
+1. To start the flow, in the banner click **Start flow**.
 
 Want to see if working? Click **Manage** in the API flow, then follow the instructions on getting started. Once you're in the API portal, use the Try it link and then **Generate** some test data. Replace the value for `file_url` with the URL for the CSV file you want to use. Replace the value for `event_name` with the event name you want to match in your file, and then click **Call operation**.

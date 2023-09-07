@@ -1,0 +1,129 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: shard
+      connector-type: amazonkinesis
+      actions:
+        GETSHARDITERATOR: {}
+    action-interface-2:
+      type: api-action
+      business-object: dataStreamRecord
+      connector-type: amazonkinesis
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon Kinesis Get shard iterator
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: GETSHARDITERATOR
+              map:
+                mappings:
+                  - ShardId:
+                      template: shardId-000000000000
+                  - ShardIteratorType:
+                      template: LATEST
+                  - StreamARN:
+                      template: >-
+                        arn:aws:kinesis:us-west-2:288919529935:stream/DNTusecases
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Amazon Kinesis Retrieve data stream records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - ShardIterator: '{{$AmazonKinesisGetsharditerator.ShardIterator}}'
+                    - StreamARN: >-
+                        arn:aws:kinesis:us-west-2:288919529935:stream/DNTusecases
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonKinesisGetsharditerator
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Get shard
+                      iterator/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 3
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04100PVAH3
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Retrieved records :
+                        {{$AmazonKinesisRetrievedatastreamrecords}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonKinesisGetsharditerator
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Get shard
+                      iterator/response/payload
+                  - variable: AmazonKinesisRetrievedatastreamrecords
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Retrieve data stream
+                      records/response/payload
+                  - variable: AmazonKinesisRetrievedatastreamrecordsMetadata
+                    $ref: >-
+                      #/node-output/Amazon Kinesis Retrieve data stream
+                      records/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Get Amazon Kinesis data stream records 
+models: {}

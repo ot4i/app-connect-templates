@@ -1,0 +1,81 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: magento
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: SalesOrder
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: 81a4469b-dcaf-5117-8311-79734c82e597
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Order
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Salesforce Create order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - AccountId:
+                      template: 0012v00002JGoOq
+                  - BillingCity:
+                      template: '{{$Trigger.billing_address.city}}'
+                  - BillingPostalCode:
+                      template: '{{$Trigger.billing_address.postcode}}'
+                  - BillingState:
+                      template: '{{$Trigger.state}}'
+                  - EffectiveDate:
+                      template: '{{$Trigger.created_at}}'
+                  - OrderReferenceNumber:
+                      template: '{{$Trigger.entity_id}}'
+                  - ShippingState:
+                      template: '{{$Trigger.state}}'
+                  - Status:
+                      template: Draft
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Gmail Create email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        New sales order ID created by
+                        Customer-{{$Trigger.customer_firstname}}--is
+                        --{{$Trigger.entity_id}}
+                  - Subject:
+                      template: NewSalesOrder
+                  - To:
+                      template: user1@email.com
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceCreateorder
+                    $ref: '#/node-output/Salesforce Create order/response/payload'
+  name: Create an order in Salesforce whenever a new customer order is created in Magento
+models: {}

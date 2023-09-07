@@ -1,0 +1,242 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: OE_INBOUND_INT_Service___GET_ORDER
+      connector-type: oracleebs
+      actions:
+        GET_ORDER: {}
+    action-interface-2:
+      type: api-action
+      business-object: AR_INVOICE_API_PUB_Service___CREATE_SINGLE_INVOICE
+      connector-type: oracleebs
+      actions:
+        CREATE_SINGLE_INVOICE: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Oracle E-Business Suite Get order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: GET_ORDER
+              map:
+                mappings:
+                  - P_ORDER_NUMBER:
+                      template: '48382'
+                  - SOAHeader:
+                      mappings:
+                        - NLSLanguage:
+                            template: AMERICAN
+                        - OrgId:
+                            template: '121'
+                        - RespApplication:
+                            template: AR
+                        - Responsibility:
+                            template: ISL_RECEIVABLES_MANAGER
+                        - SecurityGroup:
+                            template: STANDARD
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: OracleEBusinessSuiteGetorder
+                  $ref: >-
+                    #/node-output/Oracle E-Business Suite Get
+                    order/response/payload
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$OracleEBusinessSuiteGetorder.X_LINE_TBL.X_LINE_TBL_ITEM[0].FLOW_STATUS_CODE}}': CLOSED
+                  execute:
+                    - custom-action:
+                        name: Oracle E-Business Suite Create single invoice
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: CREATE_SINGLE_INVOICE
+                        map:
+                          mappings:
+                            - P_BATCH_SOURCE_REC:
+                                mappings:
+                                  - BATCH_SOURCE_ID:
+                                      template: '1002'
+                            - P_TRX_HEADER_TBL:
+                                mappings:
+                                  - P_TRX_HEADER_TBL_ITEM:
+                                      foreach:
+                                        input: '[1]'
+                                        iterator: P_TRX_HEADER_TBL_ITEMItem
+                                        mappings:
+                                          - CUST_TRX_TYPE_ID:
+                                              template: '1000'
+                                          - REFERENCE_NUMBER:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.ORDER_NUMBER}}
+                                          - SHIP_TO_CUSTOMER_ID:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.INVOICE_TO_ORG_ID}}
+                                          - TERM_ID:
+                                              template: '5'
+                                          - TRX_HEADER_ID:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.HEADER_ID}}
+                            - P_TRX_LINES_TBL:
+                                mappings:
+                                  - P_TRX_LINES_TBL_ITEM:
+                                      foreach:
+                                        input: '[1]'
+                                        iterator: P_TRX_LINES_TBL_ITEMItem
+                                        mappings:
+                                          - INVENTORY_ITEM_ID:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_LINE_TBL.X_LINE_TBL_ITEM[0].INVENTORY_ITEM_ID}}
+                                          - LINE_NUMBER:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_LINE_TBL.X_LINE_TBL_ITEM[0].LINE_NUMBER}}
+                                          - LINE_TYPE:
+                                              template: LINE
+                                          - QUANTITY_INVOICED:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_LINE_TBL.X_LINE_TBL_ITEM[0].ORDERED_QUANTITY}}
+                                          - SALES_ORDER:
+                                              template: ' {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.ORDER_NUMBER}}'
+                                          - TRX_HEADER_ID:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.HEADER_ID}}
+                                          - TRX_LINE_ID:
+                                              template: >-
+                                                {{$OracleEBusinessSuiteGetorder.X_LINE_TBL.X_LINE_TBL_ITEM[0].LINE_ID}}
+                                          - UNIT_SELLING_PRICE:
+                                              template: '100'
+                            - SOAHeader:
+                                mappings:
+                                  - NLSLanguage:
+                                      template: AMERICAN
+                                  - OrgId:
+                                      template: '121'
+                                  - RespApplication:
+                                      template: AR
+                                  - Responsibility:
+                                      template: ISL_RECEIVABLES_MANAGER
+                                  - SecurityGroup:
+                                      template: STANDARD
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleEBusinessSuiteGetorder
+                              $ref: >-
+                                #/node-output/Oracle E-Business Suite Get
+                                order/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Create email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  The invoice has been created with
+                                  {{$OracleEBusinessSuiteCreatesingleinvoice}}
+                            - Subject:
+                                template: >-
+                                  Invoice for an order
+                                  {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.ORDER_NUMBER}}
+                            - To:
+                                template: user1@mycompany.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleEBusinessSuiteCreatesingleinvoice
+                              $ref: >-
+                                #/block/If/node-output/Oracle E-Business Suite
+                                Create single invoice/response/payload
+                            - variable: OracleEBusinessSuiteGetorder
+                              $ref: >-
+                                #/node-output/Oracle E-Business Suite Get
+                                order/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Create email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - Body:
+                              template: >-
+                                The invoice can be generated only for a CLOSED
+                                order.
+                          - Subject:
+                              template: >-
+                                Invoice is not created for order
+                                {{$OracleEBusinessSuiteGetorder.X_HEADER_REC.ORDER_NUMBER}}
+                          - To:
+                              template: user1@mycompany.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: OracleEBusinessSuiteGetorder
+                            $ref: >-
+                              #/node-output/Oracle E-Business Suite Get
+                              order/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a single invoice in Oracle E-Business Suite when an order is closed
+models: {}
