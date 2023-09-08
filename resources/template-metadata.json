@@ -1942,6 +1942,15 @@
    "targetApps": ["asana"],
    "tags": ["surveymonkey", "asana"],
    "offerings": ["app connect professional"]
-  }
+  },
+  {
+    "name": "Create a customer in Square when a customer is created in Shopify",
+    "description": "Use this template to create a new customer in Square when a new customer is created in Shopify.",
+    "summary": "2 flows using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["shopify", "square"],
+    "tags": ["api", "shopify", "square"],
+    "offerings": ["app connect professional"]
+   }
 ]
 }
