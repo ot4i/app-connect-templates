@@ -163,7 +163,7 @@ integration:
                       $ref: '#/node-output/Shopify Retrieve customers/response'
                     - variable: flowDetails
                       $ref: '#/flowDetails'
-  name: Create a customer in square when a customer created in shopify
+  name: Create a customer in Square when a customer is created in Shopify
 models:
   Customer:
     name: Customer
