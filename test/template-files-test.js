@@ -15,6 +15,8 @@ const expect = chai.expect
 const jsonata = require('jsonata')
 const jsyaml = require('js-yaml')
 
+const MAX_TEMPLATE_COUNT = 350 // Current practical limit for rendering template gallery
+
 const markdownDirectoryName = 'markdown'
 const templateMetadataFilename = 'template-metadata.json'
 const templateMetadata = require('../resources/' + templateMetadataFilename)
@@ -25,6 +27,10 @@ describe('Template files', function () {
       const fileName = `./resources/${template.name}.yaml`
       expect(fs.existsSync(fileName), `Missing file ${fileName}`).equals(true)
     }
+  })
+
+  it('template count must be within agreed threshold', function () {
+    expect(templateMetadata.templates.length).lessThanOrEqual(MAX_TEMPLATE_COUNT)
   })
 
   it('must not contain account-name in action or trigger interfaces', function () {

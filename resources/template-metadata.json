@@ -1951,15 +1951,6 @@
     "targetApps": ["shopify", "square"],
     "tags": ["api", "shopify", "square"],
     "offerings": ["app connect professional"]
-   },
-   {
-    "name": "Create a contact in HubSpot CRM and associate the contact with a company whenever a contact is created in Salesforce",
-    "description": "Use this template to create a contact in HubSpot CRM with the contact details whenever a contact is created in Salesforce. If the Salesforce contact has the company’s details, then the company will be associated with the contact in HubSpot CRM.",
-    "summary": "Salesforce to 2 applications",
-    "sourceApp": "salesforce",
-    "targetApps": ["hubspotcrm", "salesforce"],
-    "tags": ["salesforce", "hubspotcrm", "if"],
-    "offerings": ["app connect professional"]
    }
 ]
 }
