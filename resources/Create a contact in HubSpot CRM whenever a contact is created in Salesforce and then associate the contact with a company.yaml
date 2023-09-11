@@ -336,5 +336,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Create a contact in HubSpot CRM and associate the contact with a company whenever a contact is created in Salesforce
+  name: Create a contact in HubSpot CRM whenever a contact is created in Salesforce and then associate the contact with a company
 models: {}
