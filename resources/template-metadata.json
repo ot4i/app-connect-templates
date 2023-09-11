@@ -1960,6 +1960,15 @@
       "targetApps": ["hubspotcrm", "salesforce"],
       "tags": ["salesforce", "hubspotcrm", "if"],
       "offerings": ["app connect professional"]
+  },
+  {
+      "name": "Transfer customer between Square and Shopify",
+      "description": "Use this template to transfer customer between square and shopify.",
+      "summary": "Square to 1 applications",
+      "sourceApp": "square",
+      "targetApps": ["square", "shopify"],
+      "tags": ["salesforce", "shopify"],
+      "offerings": ["app connect professional"]
   }
 ]
 }
