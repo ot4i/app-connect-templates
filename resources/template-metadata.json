@@ -1951,8 +1951,8 @@
     "targetApps": ["shopify", "square"],
     "tags": ["api", "shopify", "square"],
     "offerings": ["app connect professional"]
-   },
-   {
+  },
+  {
       "name": "Create a contact in HubSpot CRM when a contact is created in Salesforce and then associate the contact with a company",
       "description": "Use this template to create a contact in HubSpot CRM with the contact details whenever a contact is created in Salesforce. If the Salesforce contact has the company’s details, then the company will be associated with the contact in HubSpot CRM.",
       "summary": "Salesforce to 2 applications",
@@ -1960,6 +1960,15 @@
       "targetApps": ["hubspotcrm", "salesforce"],
       "tags": ["salesforce", "hubspotcrm", "if"],
       "offerings": ["app connect professional"]
-  }
+  },
+  {
+    "name": "Create an order in Oracle E-Business Suite when a new order is received in Microsoft Dynamics 365",
+    "description": "Use this template to create an order in Oracle E-Business Suite when a new order is received in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 for Sales to Oracle E-Business Suite",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["msdynamicscrmrest", "oracleebs"],
+    "tags": ["msdynamicscrmrest", "oracleebs"],
+    "offerings": ["app connect professional"]
+ }
 ]
 }
