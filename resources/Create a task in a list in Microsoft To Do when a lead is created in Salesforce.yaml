@@ -181,5 +181,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Create a task in a list in Microsoft To Do When a lead is created in Salesforce
+  name: Create a task in a list in Microsoft To Do when a lead is created in Salesforce
 models: {}
