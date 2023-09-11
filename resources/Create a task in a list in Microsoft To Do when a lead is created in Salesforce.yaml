@@ -181,6 +181,6 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Create a task in a list in Microsoft To Do When a lead is created in Salesforce
+  name: Create a task in a list in Microsoft To Do when a lead is created in Salesforce
   description: Use this template to create a new task in a list in Microsoft To Do whenever a new lead is created in Salesforce. The task is created and added to the Microsoft To Do list based on the lead rating of the new Salesforce lead.
 models: {}
