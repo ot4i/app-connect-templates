@@ -1966,7 +1966,7 @@
     "description": "Use this template to create an order in Oracle E-Business Suite when a new order is received in Microsoft Dynamics 365 for Sales.",
     "summary": "Microsoft Dynamics 365 for Sales to Oracle E-Business Suite",
     "sourceApp": "msdynamicscrmrest",
-    "targetApps": ["msdynamicscrmrest", "oracleebs"],
+    "targetApps": ["oracleebs"],
     "tags": ["msdynamicscrmrest", "oracleebs"],
     "offerings": ["app connect professional"]
  }
