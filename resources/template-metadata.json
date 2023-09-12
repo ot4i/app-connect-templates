@@ -122,7 +122,7 @@
    "summary": "Slack to 3 applications",
    "sourceApp": "slack",
    "targetApps": ["googlesheet", "marketo", "slack"],
-   "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "contact", "lead", "leadcapturing"],
+   "tags": ["slack", "marketo", "googlesheet", "spreadsheet", "marketing", "contact", "lead", "leadcapturing"],
    "offerings": ["app connect professional"]
   },
   {
@@ -248,7 +248,7 @@
    "summary": "1 flow using 2 applications",
    "sourceApp": "api",
    "targetApps": ["googlesheet", "salesforce"],
-   "tags": ["api", "salesforce", "googlesheets"],
+   "tags": ["api", "salesforce", "googlesheet"],
    "offerings": ["app connect professional"]
   },
   {
@@ -869,7 +869,7 @@
    "summary": "Google Sheets to Trello",
    "sourceApp": "googlesheet",
    "targetApps": ["trello"],
-   "tags": ["trello", "googlesheets", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
+   "tags": ["trello", "googlesheet", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
    "offerings": ["app connect professional"]
   },
   {
@@ -1821,8 +1821,8 @@
    "name": "Create a folder in Box whenever a new incident is created in ServiceNow",
    "description": "Use this template to create a folder in Box whenever a new incident is created in ServiceNow.",
    "summary": "ServiceNow to Box",
-   "sourceApp": "",
-   "targetApps": ["servicenow", "box"],
+   "sourceApp": "servicenow",
+   "targetApps": ["box"],
    "tags": ["servicenow", "box"],
    "offerings": ["app connect professional"]
   },  
@@ -1866,9 +1866,9 @@
    "name": "Create a folder in Google Drive whenever a new row is appended in Google Sheets",
    "description": "Use this template to create a folder in Google Drive whenever a new row is appended in a Google Sheets spreadsheet.",
    "summary": "Google Sheets to Google Drive",
-   "sourceApp": "googlesheets",
+   "sourceApp": "googlesheet",
    "targetApps": ["googledrive"],
-   "tags": ["googlesheets", "googledrive"],
+   "tags": ["googlesheet", "googledrive"],
    "offerings": ["app connect professional"]
   },
   {
@@ -1893,9 +1893,9 @@
    "name": "Create a task in Asana whenever a new row is appended in Google Sheets",
    "description": "Use this template to create a task in Asana whenever a new row is appended to a Google Sheets spreadsheet. A Slack notification is then posted in the intended channel.",
    "summary": "Google Sheets to 2 applications",
-   "sourceApp": "googlesheets",
+   "sourceApp": "googlesheet",
    "targetApps": ["asana", "slack"],
-   "tags": ["googlesheets", "asana", "slack"],
+   "tags": ["googlesheet", "asana", "slack"],
    "offerings": ["app connect professional"]
   },
   {
@@ -1903,8 +1903,8 @@
    "description": "Use this template to create a row in a Google Sheets spreadsheet whenever a new task is created in Asana. A Slack notification is then posted in the intended channel.",
    "summary": "Asana to 2 applications",
    "sourceApp": "asana",
-   "targetApps": ["googlesheets", "slack"],
-   "tags": ["asana", "googlesheets", "slack"],
+   "targetApps": ["googlesheet", "slack"],
+   "tags": ["asana", "googlesheet", "slack"],
    "offerings": ["app connect professional"]
   },
   {
@@ -1972,3 +1972,4 @@
  }
 ]
 }
+
