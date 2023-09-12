@@ -1,0 +1,178 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: Etc/UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: employees
+      connector-type: bamboohr
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: employees
+      connector-type: freshteam
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Freshteam Retrieve employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - deleted: 'false'
+                    - updated_at:
+                        gt: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 50000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$FreshteamRetrieveemployees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FreshteamRetrieveemployees
+                    $ref: >-
+                      #/node-output/Freshteam Retrieve
+                      employees/response/payload
+                  - variable: FreshteamRetrieveemployeesMetadata
+                    $ref: '#/node-output/Freshteam Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRCreateemployee
+                    $ref: >-
+                      #/block/For each/node-output/bambooHR Create
+                      employee/response/payload
+                  - variable: GreenhouseRetrievecandidates2
+                    $ref: >-
+                      #/node-output/Greenhouse Retrieve candidates
+                      2/response/payload
+                  - variable: GreenhouseRetrievecandidates2Metadata
+                    $ref: '#/node-output/Greenhouse Retrieve candidates 2/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - firstName:
+                            template: '{{$Foreachitem.first_name}}'
+                        - lastName:
+                            template: '{{$Foreachitem.last_name}}'
+              display-name: Freshteam candidates
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: bambooHR Create employee
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - employmentHistoryStatus:
+                      template: Full-Time
+                  - firstName:
+                      template: '{{$Foreachitem.first_name}}'
+                  - lastName:
+                      template: '{{$Foreachitem.last_name}}'
+                  - workEmail:
+                      template: '{{$Foreachitem.official_email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FreshteamRetrieveemployees
+                    $ref: >-
+                      #/node-output/Freshteam Retrieve
+                      employees/response/payload
+                  - variable: FreshteamRetrieveemployeesMetadata
+                    $ref: '#/node-output/Freshteam Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: Employee_Created=>{{$bambooHRCreateemployee.id}}
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRCreateemployee
+                    $ref: >-
+                      #/block/For each/node-output/bambooHR Create
+                      employee/response/payload
+                  - variable: GreenhouseRetrievecandidates2
+                    $ref: >-
+                      #/node-output/Greenhouse Retrieve candidates
+                      2/response/payload
+                  - variable: GreenhouseRetrievecandidates2Metadata
+                    $ref: '#/node-output/Greenhouse Retrieve candidates 2/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an employee in BambooHR on creating an employee in Freshteam
+models: {}
