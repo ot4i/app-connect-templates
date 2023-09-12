@@ -1969,6 +1969,15 @@
     "targetApps": ["oracleebs"],
     "tags": ["msdynamicscrmrest", "oracleebs"],
     "offerings": ["app connect professional"]
+ },
+ {
+      "name": "Create an order in Square, retrieve order from Square and create expense report in the Expensify",
+      "description": "Use this template to create an order in square, retrieve order from Square and create expense report in the Expensify",
+      "summary": "Square to 2 applications",
+      "sourceApp": "square",
+      "targetApps": ["square", "expensify"],
+      "tags": ["square", "expensify"],
+      "offerings": ["app connect professional"]
  }
 ]
 }
