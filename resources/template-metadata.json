@@ -1969,6 +1969,33 @@
     "targetApps": ["oracleebs"],
     "tags": ["msdynamicscrmrest", "oracleebs"],
     "offerings": ["app connect professional"]
+ },
+ {
+    "name": "Send an email notification to user/employee on Gmail on adding new employee in BambooHR",
+    "description": "Use this template to send an email notification to user/employee on Gmail on adding new employee in BambooHR.",
+    "summary": "Scheduler using 2 applications",
+    "sourceApp": "event scheduler",
+    "targetApps": ["BambooHR", "Gmail"],
+    "tags": ["scheduler","BambooHR", "Gmail"],
+    "offerings": ["app connect professional"]
+   },
+  {
+    "name": "Create a customer in BambooHR when an employee is created in Freshteam",
+    "description": "Use this template to create a new employee in BambooHR when a new employee is created in Freshteam.",
+    "summary": "Scheduler using 2 applications",
+    "sourceApp": "event scheduler",
+    "targetApps": ["BambooHR","Freshteam"],
+    "tags": ["scheduler","Freshteam" , "BambooHR"],
+    "offerings": ["app connect professional"]
+   },
+  {
+    "name": "Create a new employee entry in Wufoo from BambooHR",
+    "description": "Use this template to create a new employee entry in Wufoo from BambooHR",
+    "summary": "1 flows using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["BambooHR","Wufoo"],
+    "tags": ["api","BambooHR", "Wufoo"],
+    "offerings": ["app connect professional"] 
  }
 ]
 }
