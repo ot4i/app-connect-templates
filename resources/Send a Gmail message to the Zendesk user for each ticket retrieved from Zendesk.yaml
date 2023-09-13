@@ -1,0 +1,185 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 30 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: User
+      connector-type: zendeskservice
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zendesk Service Retrieve tickets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  status: pending
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ZendeskServiceRetrievetickets '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceRetrievetickets
+                    $ref: >-
+                      #/node-output/Zendesk Service Retrieve
+                      tickets/response/payload
+                  - variable: ZendeskServiceRetrieveticketsMetadata
+                    $ref: '#/node-output/Zendesk Service Retrieve tickets/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Zendesk Service Ticket
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZendeskServiceRetrievetickets
+                  $ref: >-
+                    #/node-output/Zendesk Service Retrieve
+                    tickets/response/payload
+                - variable: ZendeskServiceRetrieveticketsMetadata
+                  $ref: '#/node-output/Zendesk Service Retrieve tickets/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.ticket_fields.id__22172871394713}}':
+                      '=': 'true'
+                  execute:
+                    - retrieve-action:
+                        name: Zendesk Service Retrieve users
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            id: '{{$Foreachitem.requester_id}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZendeskServiceRetrievetickets
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response/payload
+                            - variable: ZendeskServiceRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Dear {{$ZendeskServiceRetrieveusers[0].name}},
+
+                                  Gentle reminder to update on the ticket
+                                  {{$Foreachitem.id}} which you can access here
+                                  - {{$Foreachitem.url}} to expedite the
+                                  closure.
+
+                                  Thanks,
+
+                                  Support Team
+                            - Subject:
+                                template: >-
+                                  Reminder on the Zendesk Ticket -
+                                  {{$Foreachitem.id}} - {{$Foreachitem.subject}}
+                            - To:
+                                template: '{{$ZendeskServiceRetrieveusers[0].email}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZendeskServiceRetrieveusers
+                              $ref: >-
+                                #/block/If/node-output/Zendesk Service Retrieve
+                                users/response/payload
+                            - variable: ZendeskServiceRetrieveusersMetadata
+                              $ref: >-
+                                #/block/If/node-output/Zendesk Service Retrieve
+                                users/response
+                            - variable: ZendeskServiceRetrievetickets
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response/payload
+                            - variable: ZendeskServiceRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Gmail message to the Zendesk user for each ticket retrieved from Zendesk 
+models: {}
