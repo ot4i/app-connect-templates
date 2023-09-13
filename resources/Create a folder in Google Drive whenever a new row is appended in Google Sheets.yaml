@@ -1,0 +1,46 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlesheet
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 10QFV6FZyCCTXEmC9h2OtPhwR6Grr3C-wHArA-5PJEBg
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 10QFV6FZyCCTXEmC9h2OtPhwR6Grr3C-wHArA-5PJEBg
+              worksheetID: Sheet1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: googledrive
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Drive Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Trigger.fields."1"}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a folder in Google Drive whenever a new row is appended in Google Sheets
+models: {}
