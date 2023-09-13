@@ -1,0 +1,262 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            OwnerName: non-ibm-primary
+            RepoName: pratiktest
+            parentFilter:
+              OwnerName: non-ibm-primary
+              RepoName: pratiktest
+            subscription:
+              createdField: updated_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: github
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: kb_knowledge
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Comment
+      connector-type: github
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.milestone1.created_at}}': '{{$Trigger.milestone1.updated_at}}'
+                  execute:
+                    - set-variable:
+                        name: Set variable
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas:
+                            properties.`variable`:
+                              type: object
+                              properties:
+                                Labels:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      Name:
+                                        type: string
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - variable:
+                                mappings:
+                                  - Labels:
+                                      foreach:
+                                        input: '$Trigger.labels1 '
+                                        iterator: LabelsItem
+                                        mappings:
+                                          - Name:
+                                              template: '{{$LabelsItem.name}}'
+                    - for-each:
+                        name: For each
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-2'
+                        source:
+                          expression: '$Setvariable.variable.Labels '
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/If/node-output/Set
+                                variable/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        display-name: Issue Labels
+              else:
+                execute: []
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ServiceNow Retrieve knowledge
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  short_description:
+                    contains: '{{$Foreachitem.Name}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/If/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 2
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      KB_Article:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            ShortDescription:
+                              type: string
+                            Description:
+                              type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ServiceNowRetrieveknowledge
+                    $ref: >-
+                      #/block/For each/node-output/ServiceNow Retrieve
+                      knowledge/response/payload
+                  - variable: ServiceNowRetrieveknowledgeMetadata
+                    $ref: >-
+                      #/block/For each/node-output/ServiceNow Retrieve
+                      knowledge/response
+                  - variable: Setvariable
+                    $ref: '#/block/If/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - KB_Article:
+                            foreach:
+                              input: '$ServiceNowRetrieveknowledge '
+                              iterator: KB_ArticleItem
+                              mappings:
+                                - Description:
+                                    template: '{{$KB_ArticleItem.description}}'
+                                - ShortDescription:
+                                    template: '{{$KB_ArticleItem.short_description}}'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04KMH8MALT
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: Response ----> {{$Setvariable2.variable.KB_Article[0]}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ServiceNowRetrieveknowledge
+                    $ref: >-
+                      #/block/For each/node-output/ServiceNow Retrieve
+                      knowledge/response/payload
+                  - variable: ServiceNowRetrieveknowledgeMetadata
+                    $ref: >-
+                      #/block/For each/node-output/ServiceNow Retrieve
+                      knowledge/response
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/If/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: GitHub Create comment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - IssueNumber:
+                      template: '{{$Trigger.title}}'
+                  - OwnerName:
+                      template: non-ibm-primary
+                  - RepoName:
+                      template: pratiktest
+                  - body:
+                      template: >-
+                        Kindly refer the below knowledge article/s
+                        --------------------------
+                        {{$Setvariable2.variable.KB_Article[0]}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ServiceNowRetrieveknowledge
+                    $ref: >-
+                      #/block/For each/node-output/ServiceNow Retrieve
+                      knowledge/response/payload
+                  - variable: ServiceNowRetrieveknowledgeMetadata
+                    $ref: >-
+                      #/block/For each/node-output/ServiceNow Retrieve
+                      knowledge/response
+                  - variable: Setvariable2
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      2/response/payload
+                  - variable: SlackSendmessage
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send
+                      message/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/If/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a comment in GitHub with a knowledge article from ServiceNow when an issue is created or updated in GitHub 
+models: {}
