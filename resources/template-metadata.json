@@ -2014,6 +2014,42 @@
    "targetApps": ["mailchimp", "salesforceae"],
    "tags": ["mailchimp", "salesforceae", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a contact and add the contact to a Google Contacts group based on the product interest of the new Salesforce lead",
+   "description": "Use this template to create a contact and add the contact to a contact group in Google Contacts whenever a new lead is created in Salesforce. The contacts created and are added to Google Contacts group based on the product interest of the new Salesforce lead.",
+   "summary": "Salesforce to Google Contacts",
+   "sourceApp": "salesforce ",
+   "targetApps": ["googlecontacts"],
+   "tags": ["googlecontacts", "salesforceae",  "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a contact in Google Contacts when a new row in Google Sheets containing contact information is appended",
+   "description": "Use this template to create a contact in Google Contacts whenever a new complete row containing contact information is appended in Google Sheets.",
+   "summary": "Google Sheets to Google Contacts",
+   "sourceApp": "googlesheets",
+   "targetApps": ["googlecontacts"],
+   "tags": ["googlesheets", "googlecontacts", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add subscribers to a list in MailChimp for each other contact retrieved from Google Contacts",
+   "description": "Use this template to add subscribers to a list in MailChimp for each other contact retrieved from Google Contacts. This use case retrieves the other contacts from Google Contacts by using a search string.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["googlecontacts", "mailchimp"],
+   "tags": ["scheduler", "googlecontacts", "mailchimp", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a contact in Google Contacts for each HubSpot CRM contact who qualifies as a customer",
+   "description": "Use this template to create a contact in Google Contacts for each contact retrieved from HubSpot CRM. If the HubSpot CRM contact type is a customer, the contact is created in Google Contacts with the customer information.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["hubspotcrm", "googlecontacts", "slack"],
+   "tags": ["scheduler", "googlecontacts", "hubspotcrm", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
