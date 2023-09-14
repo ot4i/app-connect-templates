@@ -2070,15 +2070,6 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a task in Microsoft To Do when a new ticket is created in Zendesk Service",
-   "description": "Use this template to create a new task in Microsoft To Do whenever a new ticket is created in Zendesk Service. The task is created in a Microsoft default list based on the Zendesk Service ticket type.",
-   "summary": "Zendesk Service to Microsoft To Do",
-   "sourceApp": "zendesk",
-   "targetApps": ["mstodo"],
-   "tags": ["zendesk", "mstodo", "if"],
-   "offerings": ["app connect professional"]
-  },
-  {
    "name": "Create a task in Microsoft To Do when a new event is created in Google Calendar",
    "description": "Use this template to create a new task in Microsoft To Do whenever a new event is created in Google Calendar.",
    "summary": "Google Calendar to Microsoft To Do",
