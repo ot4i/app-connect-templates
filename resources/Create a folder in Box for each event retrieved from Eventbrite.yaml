@@ -1,0 +1,112 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Event
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - status: New
+                    - organizationID: '344797520005'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EventbriteRetrieveevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveevents
+                    $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                  - variable: EventbriteRetrieveeventsMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Eventbrite Event
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Box Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Foreachitem.name.html}}'
+                  - parent_id:
+                      template: '0'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveevents
+                    $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                  - variable: EventbriteRetrieveeventsMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a folder in Box for each event retrieved from Eventbrite 
+models: {}

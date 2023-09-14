@@ -1,0 +1,182 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: employees
+      connector-type: bamboohr
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: employees
+      connector-type: bamboohr
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: bambooHR Retrieve employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - type: inserted
+                    - since: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$bambooHRRetrieveemployees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRRetrieveemployees
+                    $ref: '#/node-output/bambooHR Retrieve employees/response/payload'
+                  - variable: bambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/bambooHR Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      firstName:
+                        type: string
+                      lastName:
+                        type: string
+                      id:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: bambooHRRetrieveemployees
+                    $ref: '#/node-output/bambooHR Retrieve employees/response/payload'
+                  - variable: bambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/bambooHR Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - id:
+                            template: '{{$Foreachitem.id}}'
+              display-name: bambooHR employees
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: bambooHR Retrieve employees 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  id: '{{$Foreachitem.id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRRetrieveemployees
+                    $ref: '#/node-output/bambooHR Retrieve employees/response/payload'
+                  - variable: bambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/bambooHR Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - Body:
+                      template: |-
+                        Hi,
+                        Please find the employee details created in BambooHR:
+                        EmployeeID:  {{$bambooHRRetrieveemployees2.id}}
+                        FirstName :  {{$bambooHRRetrieveemployees2.firstName}} 
+                        LastName : {{$bambooHRRetrieveemployees2.lastName}}
+                  - CC:
+                      template: test@email.com
+                  - Subject:
+                      template: '{{$Foreachitem.id}} -  Created In BambooHR Portal'
+                  - To:
+                      template: test@email.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRRetrieveemployees2
+                    $ref: >-
+                      #/block/For each/node-output/bambooHR Retrieve employees
+                      2/response/payload
+                  - variable: bambooHRRetrieveemployees2Metadata
+                    $ref: >-
+                      #/block/For each/node-output/bambooHR Retrieve employees
+                      2/response
+                  - variable: bambooHRRetrieveemployees
+                    $ref: '#/node-output/bambooHR Retrieve employees/response/payload'
+                  - variable: bambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/bambooHR Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send an email notification on creating an employee in BambooHR
+models: {}

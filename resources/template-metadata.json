@@ -2051,7 +2051,7 @@
    "tags": ["scheduler", "googlecontacts", "hubspotcrm", "slack", "foreach", "if"],
    "offerings": ["app connect professional"]
   },
-    {
+  {
    "name": "Create a task in Microsoft To Do when a new task is created in Asana",
    "description": "Use this template to create a new task in the default list in Microsoft To Do whenever a new task is created in Asana.",
    "summary": "Asana to Microsoft To Do",
