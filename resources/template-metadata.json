@@ -1969,6 +1969,24 @@
     "targetApps": ["oracleebs"],
     "tags": ["msdynamicscrmrest", "oracleebs"],
     "offerings": ["app connect professional"]
+ },
+ {
+    "name": "Send an email notification on creating an employee in BambooHR",
+    "description": "Use this template to send an email notification to a user or employee on Gmail on adding a new employee in BambooHR.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["bamboohr", "gmail"],
+    "tags": ["scheduler","bamboohr", "gmail"],
+    "offerings": ["app connect professional"]
+   },
+  {
+    "name": "Create a new form entry in Wufoo from BambooHR",
+    "description": "Use this template to create a new employee entry in Wufoo from BambooHR",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["bamboohr", "wufoo"],
+    "tags": ["api", "bamboohr", "wufoo"],
+    "offerings": ["app connect professional"] 
  }
 ]
 }
