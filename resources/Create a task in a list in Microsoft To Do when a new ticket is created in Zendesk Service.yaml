@@ -195,5 +195,4 @@ integration:
                             $ref: '#/flowDetails'
               output-schema: {}
   name: Create a task in a list in Microsoft To Do when a new ticket is created in Zendesk Service
-  description: Use this template to create a new task in a specific list in Microsoft To Do whenever a new ticket is created in Zendesk Service. The task is created in the specified list in Microsoft To Do based on the Zendesk Service ticket type.
 models: {}
