@@ -1,0 +1,54 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: surveymonkey
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Responses
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            survey_id: '512752227'
+            collector_id: '451440817'
+            parentFilter:
+              survey_id: '512752227'
+              collector_id: '451440817'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tasks
+      connector-type: asana
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Asana Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: >-
+                        New response with response ID {{$Trigger.id}} received
+                        for survey  {{$Trigger.survey_id}} 
+                  - project:
+                      template: '1204205585687152'
+                  - team-id:
+                      template: '1204205586130693'
+                  - workspace-id:
+                      template: '1204205574829453'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a task in Asana whenever a new response is added in SurveyMonkey
+models: {}

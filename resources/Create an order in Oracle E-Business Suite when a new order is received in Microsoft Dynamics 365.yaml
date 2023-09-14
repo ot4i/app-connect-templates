@@ -1,0 +1,123 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msdynamicscrmrest
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: SalesOrder
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: createdon
+              updatedField: modifiedon
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: '5'
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: OE_INBOUND_INT_Service___PROCESS_ORDER
+      connector-type: oracleebs
+      actions:
+        CREATE_ORDER: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.shipto_stateorprovince}}': not empty
+                  execute:
+                    - custom-action:
+                        name: Oracle E-Business Suite Create order
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: CREATE_ORDER
+                        map:
+                          mappings:
+                            - P_HEADER_REC:
+                                mappings:
+                                  - CREATION_DATE:
+                                      template: '{{$Trigger.datefulfilled}}'
+                                  - FREIGHT_TERMS_CODE:
+                                      template: '{{$Trigger.shipto_freighttermscode}}'
+                                  - ORDER_TYPE_ID:
+                                      template: '{{$Trigger.ordernumber}}'
+                                  - PRICE_LIST_ID:
+                                      template: '{{$Trigger.pricelevelid}}'
+                                  - SHIP_TO_ADDRESS_ID:
+                                      template: '{{$Trigger.shipto_addressid}}'
+                                  - SHIP_TO_ADDRESS_REF:
+                                      template: '{{$Trigger.shipto_composite}}'
+                            - P_HEADER_VAL_REC:
+                                mappings:
+                                  - DELIVER_TO_ZIP:
+                                      template: '{{$Trigger.shipto_postalcode}}'
+                                  - PRICE_LIST:
+                                      template: '{{$Trigger.skippricecalculation}}'
+                                  - SHIP_FROM_POSTAL_CODE:
+                                      template: '{{$Trigger.shipto_postalcode}}'
+                                  - SHIP_TO_ADDRESS3:
+                                      template: '{{$Trigger.shipto_line3}}'
+                                  - SHIP_TO_CITY:
+                                      template: '{{$Trigger.shipto_city}}'
+                                  - SHIP_TO_CONTACT_FIRST_NAME:
+                                      template: '{{$Trigger.shipto_contactname}}'
+                                  - SHIP_TO_COUNTRY:
+                                      template: '{{$Trigger.shipto_country}}'
+                                  - SOLD_TO_LOCATION_STATE:
+                                      template: '{{$Trigger.shipto_stateorprovince}}'
+                            - SOAHeader:
+                                mappings:
+                                  - NLSLanguage:
+                                      template: US
+                                  - OrgId:
+                                      template: '{{$Trigger.ordernumber}}'
+                                  - RespApplication:
+                                      template: '{{$Trigger.processid}}'
+                                  - Responsibility:
+                                      template: '{{$Trigger.ordernumber}}'
+                                  - SecurityGroup:
+                                      template: '{{$Trigger.owningteam}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  completion-action:
+                    terminate:
+                      info:
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        message: Send order
+                        status-code: 200
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: Order needs manual review.
+                      status-code: 200
+              output-schema: {}
+  name: Create an order in Oracle E-Business Suite when a new order is received in Microsoft Dynamics 365
+models: {}

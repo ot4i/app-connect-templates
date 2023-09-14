@@ -1,0 +1,56 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '1204205574829453'
+            team-id: '1204205586130693'
+            project: '1204205585687152'
+            parentFilter:
+              workspace-id: '1204205574829453'
+              team-id: '1204205586130693'
+              project: '1204205585687152'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Trello Add card to list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - desc:
+                      template: '{{$Trigger.notes}}'
+                  - idBoard:
+                      template: 629d96c76766c513b0e82f66
+                  - idList:
+                      template: 629d96c76766c513b0e82f6d
+                  - idOrganization:
+                      template: 6087b4630e5b124b38c75386
+                  - name:
+                      template: '{{$Trigger.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Add a card to a list in Trello whenever a new task is created in Asana
+models: {}

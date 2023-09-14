@@ -1,0 +1,226 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-7:
+      type: api-action
+      business-object: getApiV5ObjectsVisits_model
+      connector-type: salesforceae
+      actions:
+        RETRIEVEALL: {}
+    action-interface-10:
+      type: api-action
+      business-object: patchApiV5ObjectsProspectsById_model
+      connector-type: salesforceae
+      actions:
+        patchApiV5ObjectsProspectsById: {}
+    action-interface-9:
+      type: api-action
+      business-object: patchApiV5ObjectsProspectsById_model
+      connector-type: salesforceae
+      actions:
+        patchApiV5ObjectsProspectsById: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Account Engagement Retrieve visits
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              filter:
+                where:
+                  and:
+                    - Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                    - createdAt: '{{$Trigger.currentEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceAccountEngagementRetrievevisits '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceAccountEngagementRetrievevisits
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visits/response/payload
+                  - variable: SalesforceAccountEngagementRetrievevisitsMetadata
+                    $ref: >-
+                      #/node-output/Salesforce Account Engagement Retrieve
+                      visits/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Salesforce Account Engagement Visits
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceAccountEngagementRetrievevisits
+                  $ref: >-
+                    #/node-output/Salesforce Account Engagement Retrieve
+                    visits/response/payload
+                - variable: SalesforceAccountEngagementRetrievevisitsMetadata
+                  $ref: >-
+                    #/node-output/Salesforce Account Engagement Retrieve
+                    visits/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$SalesforceAccountEngagementRetrievevisits.prospectId}}':
+                          neq: ''
+                      - '{{$SalesforceAccountEngagementRetrievevisits.durationInSeconds}}':
+                          gt: '500'
+                        hashKey: object:737
+                      - '{{$SalesforceAccountEngagementRetrievevisits.visitorPageViewCount}}':
+                          gt: '20'
+                        hashKey: object:970
+                  execute:
+                    - custom-action:
+                        name: Salesforce Account Engagement Update prospect
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-10'
+                        action: patchApiV5ObjectsProspectsById
+                        map:
+                          mappings:
+                            - score:
+                                expression: '5'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceAccountEngagementRetrievevisits
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve visits/response/payload
+                            - variable: >-
+                                SalesforceAccountEngagementRetrievevisitsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve visits/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                              - id: '{{$Foreachitem.prospectId}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceAccountEngagementRetrievevisits
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve visits/response/payload
+                            - variable: >-
+                                SalesforceAccountEngagementRetrievevisitsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Account Engagement
+                                Retrieve visits/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+              else:
+                execute:
+                  - custom-action:
+                      name: Salesforce Account Engagement Update prospect 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-9'
+                      action: patchApiV5ObjectsProspectsById
+                      map:
+                        mappings:
+                          - score:
+                              expression: '3'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceAccountEngagementRetrievevisits
+                            $ref: >-
+                              #/node-output/Salesforce Account Engagement
+                              Retrieve visits/response/payload
+                          - variable: SalesforceAccountEngagementRetrievevisitsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Account Engagement
+                              Retrieve visits/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      filter:
+                        where:
+                          and:
+                            - Pardot-Business-Unit-Id: 0Uv4L000000blJTSAY
+                            - id: '{{$Foreachitem.prospectId}}'
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceAccountEngagementRetrievevisits
+                            $ref: >-
+                              #/node-output/Salesforce Account Engagement
+                              Retrieve visits/response/payload
+                          - variable: SalesforceAccountEngagementRetrievevisitsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Account Engagement
+                              Retrieve visits/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        limit: 10
+              output-schema: {}
+  name: Update a prospect score in Salesforce Account Engagement for each visit retrieved from Salesforce Account Engagement
+models: {}
