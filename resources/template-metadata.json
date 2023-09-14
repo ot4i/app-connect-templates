@@ -2011,7 +2011,7 @@
    "description": "Use this template to associate a newly created prospect to a list in Salesforce Account Engagement from a MailChimp list whenever a new subscriber is created in MailChimp. If the list exists, based on the new subscriber, a prospect is created, and the prospect is then associated with the existing list. If the list does not exist, a list is created along with the prospect details, and it will be associated with the newly created list in Salesforce Account Engagement.",
    "summary": "MailChimp to Salesforce Account Engagement",
    "sourceApp": "mailchimp",
-   "targetApps": ["salesforceae"],
+   "targetApps": ["mailchimp", "salesforceae"],
    "tags": ["mailchimp", "salesforceae", "if"],
    "offerings": ["app connect professional"]
   }
