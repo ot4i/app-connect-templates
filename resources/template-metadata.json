@@ -2019,18 +2019,18 @@
    "name": "Create a contact and add the contact to a Google Contacts group based on the product interest of the new Salesforce lead",
    "description": "Use this template to create a contact and add the contact to a contact group in Google Contacts whenever a new lead is created in Salesforce. The contacts created are then added to Google Contacts group based on the product interest of the new Salesforce lead.",
    "summary": "Salesforce to Google Contacts",
-   "sourceApp": "salesforce ",
+   "sourceApp": "salesforce",
    "targetApps": ["googlecontacts"],
-   "tags": ["googlecontacts", "salesforceae",  "if"],
+   "tags": ["googlecontacts", "salesforceae", "if"],
    "offerings": ["app connect professional"]
   },
   {
    "name": "Create a contact in Google Contacts when a new row in Google Sheets containing contact information is appended",
    "description": "Use this template to create a contact in Google Contacts whenever a new complete row containing contact information is appended in Google Sheets.",
    "summary": "Google Sheets to Google Contacts",
-   "sourceApp": "googlesheets",
+   "sourceApp": "googlesheet",
    "targetApps": ["googlecontacts"],
-   "tags": ["googlesheets", "googlecontacts", "foreach"],
+   "tags": ["googlesheet", "googlecontacts", "foreach"],
    "offerings": ["app connect professional"]
   },
   {
