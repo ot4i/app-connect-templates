@@ -1,0 +1,184 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createEmployeeReports:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: EmployeeReports
+          output-context:
+            data: EmployeeReports
+      options:
+        resources:
+          - business-object: EmployeeReports
+            model:
+              $ref: '#/models/EmployeeReports'
+            triggers:
+              create: createEmployeeReports
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: reports
+      connector-type: bamboohr
+      actions:
+        CREATEREPORT: {}
+    action-interface-2:
+      type: api-action
+      business-object: FormEntry
+      connector-type: wufoo
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: bambooHR Request a custom report
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CREATEREPORT
+              map:
+                mappings:
+                  - format:
+                      template: '{{$Request.format}}'
+                  - inputfields:
+                      expression: '$Request.fields '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$bambooHRRequestacustomreport.employees '
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRRequestacustomreport
+                    $ref: >-
+                      #/node-output/bambooHR Request a custom
+                      report/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      firstName:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRRequestacustomreport
+                    $ref: >-
+                      #/node-output/bambooHR Request a custom
+                      report/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - firstName:
+                            template: '{{$Foreachitem.firstName}}'
+              display-name: bambooHR employees
+          - response:
+              name: response-1
+              reply-maps:
+                - title: EmployeeReports successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: bambooHRRequestacustomreport
+                        $ref: >-
+                          #/node-output/bambooHR Request a custom
+                          report/response/payload
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - result:
+                          template: '{{$Foreach.output}}'
+                  input: []
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Wufoo Create form entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Field1:
+                      template: '{{$Foreachitem.firstName}}'
+                  - Field16:
+                      template: '{{$Foreachitem.employeeNumber}}'
+                  - Field17:
+                      template: '{{$Foreachitem.middleName}}'
+                  - Field18:
+                      template: '{{$Foreachitem.maritalStatus}}'
+                  - Field2:
+                      template: '{{$Foreachitem.lastName}}'
+                  - Field22:
+                      template: '{{$Foreachitem.workPhone}}'
+                  - Field24:
+                      template: '{{$Foreachitem.gender}}'
+                  - Field26:
+                      template: '{{$Foreachitem.employmentHistoryStatus}}'
+                  - Field27:
+                      template: '{{$Foreachitem.workEmail}}'
+                  - Field29:
+                      template: '{{$Foreachitem.supervisorId}}'
+                  - Hash:
+                      template: q1h28nis04w3mqu
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: bambooHRRequestacustomreport
+                    $ref: >-
+                      #/node-output/bambooHR Request a custom
+                      report/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a new form entry in Wufoo from BambooHR
+models:
+  EmployeeReports:
+    name: EmployeeReports
+    properties:
+      result:
+        required: false
+        id: true
+        type: string
+      fields:
+        required: false
+        id: false
+        type:
+          - string
+      format:
+        required: false
+        id: false
+        type: string
+    plural: EmployeeReports
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
