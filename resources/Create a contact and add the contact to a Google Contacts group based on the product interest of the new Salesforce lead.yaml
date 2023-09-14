@@ -1,0 +1,250 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postPeoplecreateContact_model
+      connector-type: googlecontacts
+      actions:
+        postPeoplecreateContact: {}
+    action-interface-3:
+      type: api-action
+      business-object: postContactGroupsByResourceNameMembersmodify_model
+      connector-type: googlecontacts
+      actions:
+        postContactGroupsByResourceNameMembersmodify: {}
+    action-interface-4:
+      type: api-action
+      business-object: postPeoplecreateContact_model
+      connector-type: googlecontacts
+      actions:
+        postPeoplecreateContact: {}
+    action-interface-5:
+      type: api-action
+      business-object: postContactGroupsByResourceNameMembersmodify_model
+      connector-type: googlecontacts
+      actions:
+        postContactGroupsByResourceNameMembersmodify: {}
+    action-interface-6:
+      type: api-action
+      business-object: postPeoplecreateContact_model
+      connector-type: googlecontacts
+      actions:
+        postPeoplecreateContact: {}
+    action-interface-7:
+      type: api-action
+      business-object: postContactGroupsByResourceNameMembersmodify_model
+      connector-type: googlecontacts
+      actions:
+        postContactGroupsByResourceNameMembersmodify: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackSendmessage
+                  $ref: '#/node-output/Slack Send message/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.ProductInterest__c}}': GC1000 series
+                  execute:
+                    - custom-action:
+                        name: Google Contacts Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postPeoplecreateContact
+                        map:
+                          mappings:
+                            - company:
+                                template: '{{$Trigger.Company}}'
+                            - emailAddresses:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: emailAddressesItem
+                                  mappings:
+                                    - value:
+                                        template: '{{$Trigger.Email}}'
+                            - firstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - jobTitle:
+                                template: '{{$Trigger.Title}}'
+                            - lastName:
+                                template: '{{$Trigger.LastName}}'
+                            - phoneNumbers:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: phoneNumbersItem
+                                  mappings:
+                                    - value:
+                                        template: '{{$Trigger.MobilePhone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Google Contacts Add contacts to contact group
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postContactGroupsByResourceNameMembersmodify
+                        map:
+                          mappings:
+                            - resourceName:
+                                template: 221b64360f273175
+                            - resourceNamesToAdd:
+                                expression: '[$GoogleContactsCreatecontact.resourceName ]'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleContactsCreatecontact
+                              $ref: >-
+                                #/block/If/node-output/Google Contacts Create
+                                contact/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.ProductInterest__c}}': GC3000 series
+                  execute:
+                    - custom-action:
+                        name: Google Contacts Create contact 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        action: postPeoplecreateContact
+                        map:
+                          mappings:
+                            - company:
+                                template: '{{$Trigger.Company}}'
+                            - emailAddresses:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: emailAddressesItem
+                                  mappings:
+                                    - value:
+                                        template: '{{$Trigger.Email}}'
+                            - firstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - jobTitle:
+                                template: '{{$Trigger.Title}}'
+                            - lastName:
+                                template: '{{$Trigger.LastName}}'
+                            - phoneNumbers:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: phoneNumbersItem
+                                  mappings:
+                                    - value:
+                                        template: '{{$Trigger.MobilePhone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Google Contacts Add contacts to contact group 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        action: postContactGroupsByResourceNameMembersmodify
+                        map:
+                          mappings:
+                            - resourceName:
+                                template: 4e912e170d935fce
+                            - resourceNamesToAdd:
+                                expression: '[$GoogleContactsCreatecontact3.resourceName ]'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleContactsCreatecontact3
+                              $ref: >-
+                                #/block/If/node-output/Google Contacts Create
+                                contact 3/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: Google Contacts Create contact 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      action: postPeoplecreateContact
+                      map:
+                        mappings:
+                          - company:
+                              template: '{{$Trigger.Company}}'
+                          - emailAddresses:
+                              foreach:
+                                input: '[1]'
+                                iterator: emailAddressesItem
+                                mappings:
+                                  - value:
+                                      template: '{{$Trigger.Email}}'
+                          - firstName:
+                              template: '{{$Trigger.FirstName}}'
+                          - jobTitle:
+                              template: '{{$Trigger.Title}}'
+                          - lastName:
+                              template: '{{$Trigger.LastName}}'
+                          - phoneNumbers:
+                              foreach:
+                                input: '[1]'
+                                iterator: phoneNumbersItem
+                                mappings:
+                                  - value:
+                                      template: '{{$Trigger.MobilePhone}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SlackSendmessage
+                            $ref: '#/node-output/Slack Send message/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - custom-action:
+                      name: Google Contacts Add contacts to contact group 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      action: postContactGroupsByResourceNameMembersmodify
+                      map:
+                        mappings:
+                          - resourceName:
+                              template: 20e3c3f708d9a7d5
+                          - resourceNamesToAdd:
+                              expression: '[$GoogleContactsCreatecontact2.resourceName ]'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleContactsCreatecontact2
+                            $ref: >-
+                              #/block/If/node-output/Google Contacts Create
+                              contact 2/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a contact and add the contact to a Google Contacts group based on the product interest of the new Salesforce lead
+models: {}
