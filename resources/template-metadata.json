@@ -10,7 +10,7 @@
   },
   {
    "name": "Open a ticket on ServiceNow from an identified issue in Slack and send an email using Gmail",
-   "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow will send you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
+   "description": "Use this template to open a ticket in ServiceNow directly from Slack using a simple slash command. The flow sends you an email using Gmail with the ticket ID number and creation date in the subject, and the description of the issue in the body of the email.",
    "summary": "Slack to 2 applications",
    "sourceApp": "slack",
    "targetApps": ["servicenow", "gmail"],
@@ -19,7 +19,7 @@
   },
   {
    "name": "Create a Slack translation bot",
-   "description": "Configure a /translate Slack slash command and use this template to translate messages from English to French, and French to English. Use /translate before a message for the bot to identify the language and translate the message. A message then appears in the channel in both languages, allowing for real time multilingual chat.",
+   "description": "Configure a /translate Slack slash command and use this template to translate messages from English to French, and French to English. Use /translate before a message for the bot to identify the language and translate the message. A message then appears in the channel in both languages, allowing for real-time multilingual chat.",
    "summary": "Slack to 2 applications",
    "sourceApp": "slack",
    "targetApps": ["watsonlt", "slack"],
@@ -122,7 +122,7 @@
    "summary": "Slack to 3 applications",
    "sourceApp": "slack",
    "targetApps": ["googlesheet", "marketo", "slack"],
-   "tags": ["slack", "marketo", "googlesheets", "spreadsheet", "marketing", "contact", "lead", "leadcapturing"],
+   "tags": ["slack", "marketo", "googlesheet", "spreadsheet", "marketing", "contact", "lead", "leadcapturing"],
    "offerings": ["app connect professional"]
   },
   {
@@ -248,7 +248,7 @@
    "summary": "1 flow using 2 applications",
    "sourceApp": "api",
    "targetApps": ["googlesheet", "salesforce"],
-   "tags": ["api", "salesforce", "googlesheets"],
+   "tags": ["api", "salesforce", "googlesheet"],
    "offerings": ["app connect professional"]
   },
   {
@@ -869,7 +869,7 @@
    "summary": "Google Sheets to Trello",
    "sourceApp": "googlesheet",
    "targetApps": ["trello"],
-   "tags": ["trello", "googlesheets", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
+   "tags": ["trello", "googlesheet", "spreadsheet", "record", "card", "event-driven flow", "row","metadata"],
    "offerings": ["app connect professional"]
   },
   {
@@ -1781,7 +1781,7 @@
     "tags": ["jira", "db2"],
     "offerings": ["app connect professional"]
   },
-    {
+  {
       "name": "Create an incident in ServiceNow whenever a new customer issue record is added to IBM Db2",
       "description": "Use this template to create an incident in ServiceNow whenever a new customer issue record is added to IBM Db2.",
       "summary": "IBM Db2 to ServiceNow",
@@ -1789,6 +1789,231 @@
       "targetApps": ["servicenow"],
       "tags": ["db2", "servicenow"],
       "offerings": ["app connect professional"]
-    }
+  },
+ {
+   "name": "Create a folder in Box whenever a new case is created in Salesforce",
+   "description": "Use this template to create a folder in Box whenever a new case is created in Salesforce.",
+   "summary": "Salesforce to Box",
+   "sourceApp": "salesforce",
+   "targetApps": ["box"],
+   "tags": ["salesforce", "box"],
+   "offerings": ["app connect professional"]
+  },
+{
+   "name": "Create a folder in Box whenever a new opportunity is created in Salesforce",
+   "description": "Use this template to create a folder in Box whenever a new opportunity is created in Salesforce.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["gmail", "box"],
+   "tags": ["salesforce", "box", "gmail"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a folder in Box whenever a new account is created in Salesforce",
+   "description": "Use this template to create a folder in Box whenever a new account is created in Salesforce.",
+   "summary": "Salesforce to Box",
+   "sourceApp": "salesforce",
+   "targetApps": ["box"],
+   "tags": ["salesforce", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box whenever a new incident is created in ServiceNow",
+   "description": "Use this template to create a folder in Box whenever a new incident is created in ServiceNow.",
+   "summary": "ServiceNow to Box",
+   "sourceApp": "servicenow",
+   "targetApps": ["box"],
+   "tags": ["servicenow", "box"],
+   "offerings": ["app connect professional"]
+  },  
+  {
+   "name": "Create a folder in Box for each event retrieved from Eventbrite",
+   "description": "Use this template to create a folder in Box for each event retrieved from Eventbrite.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "box"],
+   "tags": ["scheduler", "eventbrite", "box", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box whenever a new form entry is created in Wufoo",
+   "description": "Use this template to create a folder in Box whenever a new form entry is created in Wufoo.",
+   "summary": "Wufoo to Box",
+   "sourceApp": "wufoo",
+   "targetApps": ["box"],
+   "tags": ["wufoo", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box whenever a new campaign is created in MailChimp",
+   "description": "Use this template to create a folder in Box whenever a new campaign is created in MailChimp.",
+   "summary": "MailChimp to Box",
+   "sourceApp": "mailchimp",
+   "targetApps": ["box"],
+   "tags": ["mailchimp", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive for each event retrieved from Eventbrite",
+   "description": "Use this template to create a folder in Google Drive for each event retrieved from Eventbrite.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "googledrive"],
+   "tags": ["scheduler", "googledrive", "eventbrite", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive whenever a new row is appended in Google Sheets",
+   "description": "Use this template to create a folder in Google Drive whenever a new row is appended in a Google Sheets spreadsheet.",
+   "summary": "Google Sheets to Google Drive",
+   "sourceApp": "googlesheet",
+   "targetApps": ["googledrive"],
+   "tags": ["googlesheet", "googledrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive whenever a new campaign is created in Salesforce",
+   "description": "Use this template to create a folder in Google Drive whenever a new campaign is created in Salesforce.",
+   "summary": "Salesforce to Google Drive",
+   "sourceApp": "salesforce",
+   "targetApps": ["googledrive"],
+   "tags": ["salesforce", "googledrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Slack message whenever a new task is created in Asana",
+   "description": "Use this template to send a Slack message to the intended channel whenever a new task is created in Asana.",
+   "summary": "Asana to Slack",
+   "sourceApp": "asana",
+   "targetApps": ["slack"],
+   "tags": ["asana", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in Asana whenever a new row is appended in Google Sheets",
+   "description": "Use this template to create a task in Asana whenever a new row is appended to a Google Sheets spreadsheet. A Slack notification is then posted in the intended channel.",
+   "summary": "Google Sheets to 2 applications",
+   "sourceApp": "googlesheet",
+   "targetApps": ["asana", "slack"],
+   "tags": ["googlesheet", "asana", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a row in Google Sheets whenever a new task is created in Asana",
+   "description": "Use this template to create a row in a Google Sheets spreadsheet whenever a new task is created in Asana. A Slack notification is then posted in the intended channel.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["googlesheet", "slack"],
+   "tags": ["asana", "googlesheet", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in Asana whenever a new subscriber is added to MailChimp",
+   "description": "Use this template to create a task in Asana whenever a new subscriber is added in MailChimp.",
+   "summary": "MailChimp to Asana ",
+   "sourceApp": "mailchimp",
+   "targetApps": ["asana"],
+   "tags": ["mailchimp", "asana"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Gmail message whenever a new task is created in Asana",
+   "description": "Use this template to send a Gmail message to the intended recipients whenever a new task is created in Asana.",
+   "summary": "Asana to Gmail",
+   "sourceApp": "asana",
+   "targetApps": ["gmail"],
+   "tags": ["asana", "gmail"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add a card to a list in Trello whenever a new task is created in Asana",
+   "description": "Use this template to add a card to a list in Trello whenever a new task is created in Asana.",
+   "summary": "Asana to Trello",
+   "sourceApp": "asana",
+   "targetApps": ["trello"],
+   "tags": ["asana", "trello"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in Asana whenever a new response is added in SurveyMonkey",
+   "description": "Use this template to create a task in Asana whenever a new response is added in SurveyMonkey.",
+   "summary": "SurveyMonkey to Asana",
+   "sourceApp": "surveymonkey",
+   "targetApps": ["asana"],
+   "tags": ["surveymonkey", "asana"],
+   "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create a customer in Square when a customer is created in Shopify",
+    "description": "Use this template to create a new customer in Square when a new customer is created in Shopify.",
+    "summary": "2 flows using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["shopify", "square"],
+    "tags": ["api", "shopify", "square"],
+    "offerings": ["app connect professional"]
+  },
+  {
+      "name": "Create a contact in HubSpot CRM when a contact is created in Salesforce and then associate the contact with a company",
+      "description": "Use this template to create a contact in HubSpot CRM with the contact details whenever a contact is created in Salesforce. If the Salesforce contact has the company’s details, then the company will be associated with the contact in HubSpot CRM.",
+      "summary": "Salesforce to 2 applications",
+      "sourceApp": "salesforce",
+      "targetApps": ["hubspotcrm", "salesforce"],
+      "tags": ["salesforce", "hubspotcrm", "if"],
+      "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create an order in Oracle E-Business Suite when a new order is received in Microsoft Dynamics 365",
+    "description": "Use this template to create an order in Oracle E-Business Suite when a new order is received in Microsoft Dynamics 365 for Sales.",
+    "summary": "Microsoft Dynamics 365 for Sales to Oracle E-Business Suite",
+    "sourceApp": "msdynamicscrmrest",
+    "targetApps": ["oracleebs"],
+    "tags": ["msdynamicscrmrest", "oracleebs"],
+    "offerings": ["app connect professional"]
+ },
+ {
+    "name": "Send an email notification on creating an employee in BambooHR",
+    "description": "Use this template to send an email notification to a user or employee on Gmail on adding a new employee in BambooHR.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["bamboohr", "gmail"],
+    "tags": ["scheduler","bamboohr", "gmail"],
+    "offerings": ["app connect professional"]
+   },
+  {
+    "name": "Create a new form entry in Wufoo from BambooHR",
+    "description": "Use this template to create a new employee entry in Wufoo from BambooHR",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["bamboohr", "wufoo"],
+    "tags": ["api", "bamboohr", "wufoo"],
+    "offerings": ["app connect professional"] 
+  },
+  {
+   "name": "Send an email using a template from Salesforce Account Engagement for each Salesforce Account Engagement prospect",
+   "description": "Use this template to send an email by using a template from Salesforce Account Engagement for each prospect retrieved from Salesforce Account Engagement that has opted out of phone or voice calls.",
+   "summary": "Scheduler to Salesforce Account Engagement",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforceae"],
+   "tags": ["scheduler", "salesforceae", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update a prospect score in Salesforce Account Engagement for each visit retrieved from Salesforce Account Engagement",
+   "description": "Use this template to update a prospect score in Salesforce Account Engagement based on the each visit retrieved from Salesforce Account Engagement. The flow checks if the prospect has visited the site for a certain amount of time and the number of page views.",
+   "summary": "Scheduler to Salesforce Account Engagement",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforceae"],
+   "tags": ["scheduler", "salesforceae", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Associate a new prospect to a list in Salesforce Account Engagement when a new subscriber is created in MailChimp",
+   "description": "Use this template to associate a newly created prospect to a list in Salesforce Account Engagement from a MailChimp list whenever a new subscriber is created in MailChimp. If the list exists, based on the new subscriber, a prospect is created, and the prospect is then associated with the existing list. If the list does not exist, a list is created along with the prospect details, and it will be associated with the newly created list in Salesforce Account Engagement.",
+   "summary": "MailChimp to Salesforce Account Engagement",
+   "sourceApp": "mailchimp",
+   "targetApps": ["mailchimp", "salesforceae"],
+   "tags": ["mailchimp", "salesforceae", "if"],
+   "offerings": ["app connect professional"]
+  }
 ]
 }
