@@ -1,0 +1,195 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postMarketingV3MarketingEventsEvents_model
+      connector-type: hubspotmarketing
+      actions:
+        postMarketingV3MarketingEventsEvents: {}
+    action-interface-3:
+      type: api-action
+      business-object: Event
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  and:
+                    - organizer_id: '44787441763'
+                    - organizationID: '344797520005'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 100
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$EventbriteRetrieveevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveevents
+                    $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                  - variable: EventbriteRetrieveeventsMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Eventbrite Event
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailSendemail2
+                  $ref: >-
+                    #/block/For each 2/node-output/Gmail Send email
+                    2/response/payload
+                - variable: EventbriteRetrieveevents
+                  $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                - variable: EventbriteRetrieveeventsMetadata
+                  $ref: '#/node-output/Eventbrite Retrieve events/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreach2item.created}}':
+                      gt: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - custom-action:
+                        name: HubSpot Marketing Create marketing event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postMarketingV3MarketingEventsEvents
+                        map:
+                          mappings:
+                            - endDateTime:
+                                template: '{{$Foreach2item.end.utc}}'
+                            - eventName:
+                                template: '{{$Foreach2item.name.html}}'
+                            - eventOrganizer:
+                                template: trying
+                            - eventType:
+                                template: WEBINAR
+                            - externalAccountId:
+                                template: '{{$Foreach2item.organizer_id}}'
+                            - externalEventId:
+                                template: '{{$Foreach2item.id}}_Eventbrite'
+                            - startDateTime:
+                                template: '{{$Foreach2item.start.utc}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailSendemail2
+                              $ref: >-
+                                #/block/For each 2/node-output/Gmail Send email
+                                2/response/payload
+                            - variable: EventbriteRetrieveevents
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                events/response/payload
+                            - variable: EventbriteRetrieveeventsMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                events/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$HubSpotMarketingCreatemarketingevent}}'
+                            - Subject:
+                                template: '{{$Trigger.lastEventTime}}'
+                            - To:
+                                template: user1@email.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: HubSpotMarketingCreatemarketingevent
+                              $ref: >-
+                                #/block/If/node-output/HubSpot Marketing Create
+                                marketing event/response/payload
+                            - variable: EventbriteRetrieveevents
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                events/response/payload
+                            - variable: EventbriteRetrieveeventsMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                events/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a marketing event in HubSpot Marketing with event details emailed through Gmail for each retrieved Eventbrite event
+  description: Use this template to create a marketing event in HubSpot Marketing for each event retrieved from Eventbrite. In this example, for each Eventbrite event that has been newly created, a HubSpot Marketing event is created. A Gmail message is then sent to the intended recipient, containing the details of the event.
+models: {}
