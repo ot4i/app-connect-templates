@@ -1,0 +1,223 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: wufoo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: p11ni0rf0aqmhy6
+            parentFilter:
+              Hash: p11ni0rf0aqmhy6
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getContactsV1Lists_model
+      connector-type: hubspotmarketing
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postCrmV3ObjectsContacts_model
+      connector-type: hubspotmarketing
+      actions:
+        postCrmV3ObjectsContacts: {}
+    action-interface-3:
+      type: api-action
+      business-object: postContactsV1Lists_model
+      connector-type: hubspotmarketing
+      actions:
+        postContactsV1Lists: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot Marketing Retrieve contact lists
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailSendemail
+                  $ref: '#/node-output/Gmail Send email/response/payload'
+                - variable: HubSpotMarketingRetrievecontactlists
+                  $ref: >-
+                    #/node-output/HubSpot Marketing Retrieve contact
+                    lists/response/payload
+                - variable: HubSpotMarketingRetrievecontactlistsMetadata
+                  $ref: >-
+                    #/node-output/HubSpot Marketing Retrieve contact
+                    lists/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Field13 in $HubSpotMarketingRetrievecontactlists .Name}}':
+                      '=': 'true'
+                  execute: []
+              else:
+                execute:
+                  - custom-action:
+                      name: HubSpot Marketing Create contact list
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      action: postContactsV1Lists
+                      map:
+                        mappings:
+                          - dynamic:
+                              expression: 'true'
+                          - filters:
+                              mappings:
+                                - Group1:
+                                    foreach:
+                                      input: '[0]'
+                                      iterator: Group1Item
+                                      mappings:
+                                        - ___type:
+                                            template: string
+                                        - operator:
+                                            template: EQ
+                                        - property:
+                                            template: gender
+                                        - value:
+                                            template: F
+                                - Group2:
+                                    foreach:
+                                      input: '[0]'
+                                      iterator: Group2Item
+                                      mappings:
+                                        - ___type:
+                                            template: string
+                                        - operator:
+                                            template: CONTAINS
+                                        - property:
+                                            template: message
+                                        - value:
+                                            template: Women's Leadership
+                          - name:
+                              template: '{{$Trigger.Field13}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GmailSendemail
+                            $ref: '#/node-output/Gmail Send email/response/payload'
+                          - variable: HubSpotMarketingRetrievecontactlists
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve contact
+                              lists/response/payload
+                          - variable: HubSpotMarketingRetrievecontactlistsMetadata
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve contact
+                              lists/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailSendemail
+                  $ref: '#/node-output/Gmail Send email/response/payload'
+                - variable: HubSpotMarketingRetrievecontactlists
+                  $ref: >-
+                    #/node-output/HubSpot Marketing Retrieve contact
+                    lists/response/payload
+                - variable: HubSpotMarketingRetrievecontactlistsMetadata
+                  $ref: >-
+                    #/node-output/HubSpot Marketing Retrieve contact
+                    lists/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Field17}}':
+                      neq: F
+                  execute:
+                    - create-action:
+                        name: Gmail Send email 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Body:
+                                template: Event is only for Women
+                            - Subject:
+                                template: Message
+                            - To:
+                                template: '{{$Trigger.Field8}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailSendemail
+                              $ref: '#/node-output/Gmail Send email/response/payload'
+                            - variable: HubSpotMarketingRetrievecontactlists
+                              $ref: >-
+                                #/node-output/HubSpot Marketing Retrieve contact
+                                lists/response/payload
+                            - variable: HubSpotMarketingRetrievecontactlistsMetadata
+                              $ref: >-
+                                #/node-output/HubSpot Marketing Retrieve contact
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: HubSpot Marketing Create contact
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      action: postCrmV3ObjectsContacts
+                      map:
+                        mappings:
+                          - email:
+                              template: '{{$Trigger.Field8}}'
+                          - firstname:
+                              template: '{{$Trigger.Field1}}'
+                          - gender:
+                              template: '{{$Trigger.Field17}}'
+                          - lastname:
+                              template: '{{$Trigger.Field2}}'
+                          - message:
+                              template: 'Women''s Leadership '
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GmailSendemail
+                            $ref: '#/node-output/Gmail Send email/response/payload'
+                          - variable: HubSpotMarketingRetrievecontactlists
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve contact
+                              lists/response/payload
+                          - variable: HubSpotMarketingRetrievecontactlistsMetadata
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve contact
+                              lists/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a contact list or a contact in HubSpot Marketing when a new form entry is created in Wufoo
+models: {}
