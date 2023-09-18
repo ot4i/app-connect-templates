@@ -2091,9 +2091,9 @@
    "name": "Create a task in Microsoft To Do when a new ticket is created in Zendesk Service",
    "description": "Use this template to create a new task in Microsoft To Do whenever a new ticket is created in Zendesk Service. The task is created in a Microsoft default list based on the Zendesk Service ticket type.",
    "summary": "Zendesk Service to Microsoft To Do",
-   "sourceApp": "zendesk",
+   "sourceApp": "zendeskservice",
    "targetApps": ["mstodo"],
-   "tags": ["zendesk", "mstodo", "if"],
+   "tags": ["zendeskservice", "mstodo", "if"],
    "offerings": ["app connect professional"]
   }
 ]
