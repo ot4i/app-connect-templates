@@ -2095,6 +2095,42 @@
    "targetApps": ["mstodo"],
    "tags": ["zendeskservice", "mstodo", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Append a note in Microsoft OneNote when a task is created in Asana",
+   "description": "Use this template to append a note to a Microsoft OneNote page whenever a new task is created in Asana. The note is added based on the Asana assignee status.",
+   "summary": "Asana to Microsoft OneNote",
+   "sourceApp": "asana",
+   "targetApps": ["msonenote"],
+   "tags": ["asana", "msonenote", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Append a note to the Microsoft OneNote page for each file downloaded from Google Drive",
+   "description": "Use this template to append a note to the Microsoft OneNote page for each new file downloaded from Google Drive. Google Drive retrieves and downloads the files periodically. For each new file, OneNote creates the file and adds a note to it.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["googledrive", "msonenote", "slack"],
+   "tags": ["scheduler", "googledrive", "msonenote", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create an HTML file in Box for each page of the HTML content retrieved from Microsoft OneNote",
+   "description": "Use this template to create an HTML file in Box for each page of the content downloaded from Microsoft OneNote. An HTML file is created in Box based on the downloaded HTML content from the retrieved OneNote pages.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msonenote", "box"],
+   "tags": ["scheduler", "msonenote", "box", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a page with embedded content for each new email received with attachments from Microsoft Exchange",
+   "description": "Use this template to create a page with embedded content for each new email received with attachments from Microsoft Exchange. Otherwise, a slack notification is sent, notifying that the email has no attachment.",
+   "summary": "Microsoft Exchange to 2 applications",
+   "sourceApp": "msexchange",
+   "targetApps": ["msonenote", "slack"],
+   "tags": ["msexchange", "msonenote", "slack", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
