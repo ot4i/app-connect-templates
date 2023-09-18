@@ -2079,7 +2079,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a task in a list in Microsoft To Do based on the information retrieved from Microsoft Excel Online",
+   "name": "Create a task on the Microsoft To Do list using information retrieved from Microsoft Excel Online",
    "description": "Use this template to create a new task in a list in Microsoft To Do whenever a new row is appended in Microsoft Excel Online. A new list is created if the list doesn’t exist in To Do based on the information retrieved from the Microsoft Excel Online worksheet. A task is then added to the newly created list. Otherwise, if the list already exists in To Do, the task will be added to that list.",
    "summary": "Microsoft Excel Online to 2 applications",
    "sourceApp": "msexcel",
