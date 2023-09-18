@@ -2131,6 +2131,6 @@
    "targetApps": ["msonenote", "slack"],
    "tags": ["msexchange", "msonenote", "slack", "if"],
    "offerings": ["app connect professional"]
-  },
+  }
 ]
 }
