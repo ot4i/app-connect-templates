@@ -2050,6 +2050,51 @@
    "targetApps": ["hubspotcrm", "googlecontacts", "slack"],
    "tags": ["scheduler", "googlecontacts", "hubspotcrm", "slack", "foreach", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in Microsoft To Do when a new task is created in Asana",
+   "description": "Use this template to create a new task in the default list in Microsoft To Do whenever a new task is created in Asana.",
+   "summary": "Asana to Microsoft To Do",
+   "sourceApp": "asana",
+   "targetApps": ["mstodo"],
+   "tags": ["asana", "mstodo"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in a list in Microsoft To Do when a lead is created in Salesforce",
+   "description": "Use this template to create a new task in a list in Microsoft To Do whenever a new lead is created in Salesforce. The task is created and added to the Microsoft To Do list based on the lead rating of the new Salesforce lead.",
+   "summary": "Salesforce to Microsoft To Do",
+   "sourceApp": "salesforce",
+   "targetApps": ["mstodo"],
+   "tags": ["salesforce", "mstodo"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in Microsoft To Do when a new event is created in Google Calendar",
+   "description": "Use this template to create a new task in Microsoft To Do whenever a new event is created in Google Calendar.",
+   "summary": "Google Calendar to Microsoft To Do",
+   "sourceApp": "googlecalendar",
+   "targetApps": ["mstodo"],
+   "tags": ["googlecalendar", "mstodo"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task on the Microsoft To Do list using information retrieved from Microsoft Excel Online",
+   "description": "Use this template to create a new task in a list in Microsoft To Do whenever a new row is appended in Microsoft Excel Online. A new list is created if the list doesn’t exist in To Do based on the information retrieved from the Microsoft Excel Online worksheet. A task is then added to the newly created list. Otherwise, if the list already exists in To Do, the task will be added to that list.",
+   "summary": "Microsoft Excel Online to 2 applications",
+   "sourceApp": "msexcel",
+   "targetApps": ["mstodo", "slack"],
+   "tags": ["msexcel", "mstodo", "slack", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in Microsoft To Do when a new ticket is created in Zendesk Service",
+   "description": "Use this template to create a new task in Microsoft To Do whenever a new ticket is created in Zendesk Service. The task is created in a Microsoft default list based on the Zendesk Service ticket type.",
+   "summary": "Zendesk Service to Microsoft To Do",
+   "sourceApp": "zendesk",
+   "targetApps": ["mstodo"],
+   "tags": ["zendesk", "mstodo", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }

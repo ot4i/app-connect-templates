@@ -1,0 +1,65 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlecalendar
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: events
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            id: abc123@gmail.com
+            parentFilter:
+              id: abc123@gmail.com
+            subscription:
+              createdField: updated
+              updatedField: updated
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postUsersByUserIdTodoListsByTodoTaskListIdTasks_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoListsByTodoTaskListIdTasks: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft To Do Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postUsersByUserIdTodoListsByTodoTaskListIdTasks
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: '{{$Trigger.summary}}'
+                        - contentType:
+                            template: text
+                  - dueDateTimeRequest:
+                      template: '{{$Trigger.startTime}}'
+                  - title:
+                      template: '{{$Trigger.eventId}} - {{$Trigger.description}}'
+                  - todoTaskListId:
+                      template: >-
+                        AQMkADAwATMwMAItNjMwZC1lMzUzLTAwAi0wMAoALgAAA-iqddhCOYFIqbBYzmYMREEBAM-2hQL9SExJhAVapIRU3isAAAANLvZ6AAAA
+                  - userId:
+                      template: me
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a task in Microsoft To Do when a new event is created in Google Calendar
+  description: Use this template to create a new task in Microsoft To Do whenever a new event is created in Google Calendar.
+models: {}
