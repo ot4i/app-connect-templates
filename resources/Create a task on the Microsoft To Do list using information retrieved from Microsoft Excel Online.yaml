@@ -267,5 +267,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Create a task in a list in Microsoft To Do based on the information retrieved from Microsoft Excel Online
+  name: Create a task on the Microsoft To Do list using information retrieved from Microsoft Excel Online
 models: {}
