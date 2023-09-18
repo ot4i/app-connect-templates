@@ -1,0 +1,267 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: patchUsersByUserIdOnenotePagesByPageIdContent_model
+      connector-type: msonenote
+      actions:
+        patchUsersByUserIdOnenotePagesByPageIdContent: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        RETRIEVEALL: {}
+    action-interface-7:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        DOWNLOADCONTENT: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Drive Retrieve files metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              filter:
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleDriveRetrievefilesmetadata '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: GoogleDriveRetrievefilesmetadata
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve files
+                      metadata/response/payload
+                  - variable: GoogleDriveRetrievefilesmetadataMetadata
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve files
+                      metadata/response
+                  - variable: BoxRetrievefolders
+                    $ref: '#/node-output/Box Retrieve folders/response/payload'
+                  - variable: BoxRetrievefoldersMetadata
+                    $ref: '#/node-output/Box Retrieve folders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Box File
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Drive Download file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              action: DOWNLOADCONTENT
+              map:
+                mappings:
+                  - id:
+                      template: '{{$Foreachitem.id}}'
+                  - type:
+                      template: PDF
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: GoogleDriveRetrievefilesmetadata
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve files
+                      metadata/response/payload
+                  - variable: GoogleDriveRetrievefilesmetadataMetadata
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve files
+                      metadata/response
+                  - variable: BoxRetrievefolders
+                    $ref: '#/node-output/Box Retrieve folders/response/payload'
+                  - variable: BoxRetrievefoldersMetadata
+                    $ref: '#/node-output/Box Retrieve folders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If 2
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleDriveDownloadfile
+                  $ref: >-
+                    #/block/For each/node-output/Google Drive Download
+                    file/response/payload
+                - variable: BoxRetrievefilemetadata
+                  $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                - variable: BoxRetrievefilemetadataMetadata
+                  $ref: '#/node-output/Box Retrieve file metadata/response'
+                - variable: GoogleDriveRetrievefilesmetadata
+                  $ref: >-
+                    #/node-output/Google Drive Retrieve files
+                    metadata/response/payload
+                - variable: GoogleDriveRetrievefilesmetadataMetadata
+                  $ref: '#/node-output/Google Drive Retrieve files metadata/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.createdTime}}':
+                      lte: '{{$now()}}'
+                  execute:
+                    - custom-action:
+                        name: Microsoft OneNote Append note
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: patchUsersByUserIdOnenotePagesByPageIdContent
+                        map:
+                          mappings:
+                            - content:
+                                template: >-
+                                  <p>This page displays the uploaded
+                                  pdf.</p><object data-attachment='mypdf.pdf'
+                                  data='name:mypdf' type='application/pdf' />
+                            - images:
+                                foreach:
+                                  input: '[0]'
+                                  iterator: imagesItem
+                                  mappings:
+                                    - base64content:
+                                        template: '{{$GoogleDriveDownloadfile.content}}'
+                                    - contenttype:
+                                        template: application/pdf
+                                    - filename:
+                                        template: '{{$Foreachitem.name}}'
+                                    - imagetag:
+                                        template: mypdf
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleDriveDownloadfile
+                              $ref: >-
+                                #/block/For each/node-output/Google Drive
+                                Download file/response/payload
+                            - variable: GoogleDriveRetrievefilesmetadata
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve files
+                                metadata/response/payload
+                            - variable: GoogleDriveRetrievefilesmetadataMetadata
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve files
+                                metadata/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - page_id: >-
+                                  1-b02aff463b7f46eca396cf05b01e665b!111-1114bacf-56d3-46b7-a765-5db25936dbec​Created
+                                  date​2023-08-14T10:27:25Z
+                              - user_id: me
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleDriveDownloadfile
+                              $ref: >-
+                                #/block/For each/node-output/Google Drive
+                                Download file/response/payload
+                            - variable: GoogleDriveRetrievefilesmetadata
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve files
+                                metadata/response/payload
+                            - variable: GoogleDriveRetrievefilesmetadataMetadata
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve files
+                                metadata/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04UR5KMWQN
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                {{$Foreachitem.name}} ---- is in  different
+                                format 
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxRetrievefilecontent
+                            $ref: >-
+                              #/block/For each/node-output/Box Retrieve file
+                              content/response/payload
+                          - variable: BoxRetrievefilemetadata
+                            $ref: >-
+                              #/node-output/Box Retrieve file
+                              metadata/response/payload
+                          - variable: BoxRetrievefilemetadataMetadata
+                            $ref: '#/node-output/Box Retrieve file metadata/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Append a note to the Microsoft OneNote page for each file downloaded from Google Drive
+  description: Use this template to append a note to the Microsoft OneNote page for each new file downloaded from Google Drive. Google Drive retrieves and downloads the files periodically. For each new file, OneNote creates the file and adds a note to it.
+models: {}
