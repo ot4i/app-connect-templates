@@ -302,5 +302,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Create a page with embedded content for each new email received with attachments from Microsoft Exchange
+  name: Create a page with embedded content in Microsoft OneNote for the email received with attachments from Microsoft Exchange
 models: {}
