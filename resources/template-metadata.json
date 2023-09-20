@@ -2124,8 +2124,8 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a page with embedded content for each new email received with attachments from Microsoft Exchange",
-   "description": "Use this template to create a page with embedded content for each new email received with attachments from Microsoft Exchange. Otherwise, a slack notification is sent, notifying that the email has no attachment.",
+   "name": "Create a page with embedded content in Microsoft OneNote for the email received with attachments from Microsoft Exchange",
+   "description": "Use this template to create a page with embedded content in Microsoft OneNote for each new email received with attachments from Microsoft Exchange. Otherwise, a slack notification is sent, notifying that the email has no attachment.",
    "summary": "Microsoft Exchange to 2 applications",
    "sourceApp": "msexchange",
    "targetApps": ["msonenote", "slack"],
