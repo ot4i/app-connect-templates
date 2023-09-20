@@ -7,4 +7,4 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [Slack](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-slack)
 3. To start the flow, in the banner, click **Start flow**.
 
-Use this template to create a page with embedded content for each new email received with attachments from Microsoft Exchange. Otherwise, a slack notification is sent, notifying that the email has no attachment.
+Use this template to create a page with embedded content in Microsoft OneNote for each new email received with attachments from Microsoft Exchange. Otherwise, a slack notification is sent, notifying that the email has no attachment.
