@@ -43,5 +43,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send a Slack notification when a new topic is created in Yammer
+  name: Send a Slack message when a new topic is created in Yammer
 models: {}
