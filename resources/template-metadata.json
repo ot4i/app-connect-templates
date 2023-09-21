@@ -2268,7 +2268,7 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create a row in a Google Sheets spreadsheet when an issue is created or updated in GitHub ",
+   "name": "Create a row in a Google Sheets spreadsheet when an issue is created or updated in GitHub",
    "description": "Use this template to create a row in a Google Sheets spreadsheet whenever an issue is newly created or updated in GitHub.",
    "summary": "GitHub toGoogle Sheets",
    "sourceApp": "github",
