@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Monday.com](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-mondaydotcom) 
-   - [Google Calendar](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-googlecalendar)
+   - [Monday.com](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-mondaydotcom) 
+   - [Google Calendar](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-googlecalendar)
 3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to create a calendar in Google Calendar whenever a new item is created in Monday.com.
