@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [MailChimp](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-mailchimp) 
-   - [Google Calendar](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-googlecalendar)
+   - [MailChimp](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-mailchimp) 
+   - [Google Calendar](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-googlecalendar)
 3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to create a quick event in Google Calendar whenever a new subscriber is created in MailChimp.
