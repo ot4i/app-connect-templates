@@ -2232,7 +2232,7 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Send a Slack message for published posts in WordPress ",
+   "name": "Send a Slack message for published posts in WordPress",
    "description": "Use this template to send a Slack message to the intended channel for posts that are in publish status in WordPress.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
