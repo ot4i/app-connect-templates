@@ -95,5 +95,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Create quick event in Google Calendar when a new task is created in Asana
+  name: Create a quick event in Google Calendar when a new task is created in Asana.yaml
 models: {}
