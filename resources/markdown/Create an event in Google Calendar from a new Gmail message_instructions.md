@@ -6,7 +6,8 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [Google Calendar](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-googlecalendar)
 3. To start the flow, in the banner, click **Start flow**.
 
-Use this template to create an eventin Google Calendar whenever a new Gmail message is received.
+Use this template to create an event in Google Calendar whenever a new Gmail message is received.
+
 
 
 
