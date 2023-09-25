@@ -2131,6 +2131,195 @@
    "targetApps": ["msonenote", "slack"],
    "tags": ["msexchange", "msonenote", "slack", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a quick event in Google Calendar when a new task is created in Asana",
+   "description": "Use this template to create a quick event in Google Calendar when a new task is created in Asana. If the task is completed, a Slack notification is sent to the intended channel.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["googlecalendar", "slack"],
+   "tags": ["asana", "googlecalendar", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a quick event in Google Calendar when a new subscriber is created in MailChimp",
+   "description": "Use this template to create a quick event in Google Calendar whenever a new subscriber is created in MailChimp.",
+   "summary": "MailChimp to Google Calendar",
+   "sourceApp": "mailchimp",
+   "targetApps": ["googlecalendar"],
+   "tags": ["mailchimp", "googlecalendar"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create an event in Google Calendar when a new form entry is created in Wufoo",
+   "description": "Use this template to create an event in Google Calendar whenever a new form entry is created in Wufoo.",
+   "summary": "Wufoo to Google Calendar",
+   "sourceApp": "wufoo",
+   "targetApps": ["googlecalendar"],
+   "tags": ["wufoo", "googlecalendar"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a calendar in Google Calendar when a new item is created in mondaydotcom",
+   "description": "Use this template to create a calendar in Google Calendar whenever a new item is created in mondayd.com",
+   "summary": "monday.com to Google Calendar",
+   "sourceApp": "mondaydotcom",
+   "targetApps": ["googlecalendar"],
+   "tags": ["mondaydotcom", "googlecalendar"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create an event in Google Calendar when a new campaign is created in MailChimp",
+   "description": "Use this template to create an event in Google Calendar whenever a new campaign is created in MailChimp. If the campaign type is regular, an event is sent to each of the MailChimp members; otherwise, a Slack notification is sent to the intended channel notifying that the new campaign created is not regular.",
+   "summary": "MailChimp to 2 applications",
+   "sourceApp": "mailchimp",
+   "targetApps": ["googlecalendar", "slack"],
+   "tags": ["mailchimp", "googlecalendar", "slack"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create an event in Google Calendar from a new Gmail message",
+   "description": "Use this template to create an event whenever a new Gmail message is received.",
+   "summary": "Gmail to Google Calendar",
+   "sourceApp": "gmail",
+   "targetApps": ["googlecalendar"],
+   "tags": ["gmail", "googlecalendar"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a message in Yammer when a new response is received in SurveyMonkey",
+   "description": "Use this template to create a message in Yammer whenever a new response is received in SurveyMonkey.",
+   "summary": "SurveyMonkey to Yammer",
+   "sourceApp": "surveymonkey",
+   "targetApps": ["yammer"],
+   "tags": ["surveymonkey", "yammer"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a message in Yammer when a new task is created in Asana",
+   "description": "Use this template to create a message whenever a new task is created in Asana.",
+   "summary": "Asana to Yammer",
+   "sourceApp": "asana",
+   "targetApps": ["yammer"],
+   "tags": ["asana", "yammer"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Send a Slack message when a new topic is created in Yammer",
+   "description": "Use this template to send a Slack message to the intended channel whenever a new topic is created in Yammer.",
+   "summary": "Yammer to Slack",
+   "sourceApp": "yammer",
+   "targetApps": ["slack"],
+   "tags": ["yammer", "slack"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Send a Gmail message when a new message is created in Yammer",
+   "description": "Use this template to send a Gmail message to the intended recipients whenever a new message is created in Yammer.",
+   "summary": "Yammer to Gmail",
+   "sourceApp": "yammer",
+   "targetApps": ["gmail"],
+   "tags": ["yammer", "gmail"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a post in a category in WordPress when a new campaign is created in MailChimp",
+   "description": "Use this template to create a post in a category in WordPress whenever a new campaign is created in MailChimp.",
+   "summary": "MailChimp to WordPress",
+   "sourceApp": "mailchimp",
+   "targetApps": ["wordpress"],
+   "tags": ["mailchimp", "wordpress"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Send a Slack message for published posts in WordPress",
+   "description": "Use this template to send a Slack message to the intended channel for posts that are in publish status in WordPress.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["wordpress", "slack"],
+   "tags": ["scheduler", "wordpress", "slack"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a post in WordPress when a new complete row is appended in Google Sheets",
+   "description": "Use this template to create a post in WordPress whenever a new complete row is appended to a spreadsheet in Google Sheets.",
+   "summary": "Google Sheets to WordPress",
+   "sourceApp": "googlesheets",
+   "targetApps": ["wordpress"],
+   "tags": ["googlesheets", "wordpress"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a post in WordPress for each Eventbrite event",
+   "description": "Use this template to create a post in WordPress for each event retrieved from Eventbrite.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "wordpress"],
+   "tags": ["scheduler", "eventbrite", "wordpress"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create an opportunity in Insightly when an issue is created or updated in GitHub",
+   "description": "Use this template to create an opportunity in Insightly whenever an issue is newly created or updated in GitHub.",
+   "summary": "GitHub to Insightly",
+   "sourceApp": "github",
+   "targetApps": ["insightly"],
+   "tags": ["github", "insightly", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a row in a Google Sheets spreadsheet when an issue is created or updated on GitHub",
+   "description": "Use this template to create a row in a Google Sheets spreadsheet whenever an issue is newly created or updated in GitHub.",
+   "summary": "GitHub to Google Sheets",
+   "sourceApp": "github",
+   "targetApps": ["googlesheets"],
+   "tags": ["github", "googlesheets"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a task in Asana when an issue is created or updated in GitHub",
+   "description": "Use this template to create a task in Asana whenever an issue is newly created or updated in GitHub.",
+   "summary": "GitHub to Asana",
+   "sourceApp": "github",
+   "targetApps": ["asana"],
+   "tags": ["github", "asana", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create an issue in GitHub from a new Gmail message",
+   "description": "Use this template to create an issue in GitHub from a new Gmail message.",
+   "summary": "Gmail to GitHub",
+   "sourceApp": "gmail",
+   "targetApps": ["github"],
+   "tags": ["gmail", "github"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create an issue in GitHub when a new campaign is created in Salesforce",
+   "description": "Use this template to create an issue in GitHub when a new campaign is created in Salesforce.",
+   "summary": "Salesforce to GitHub",
+   "sourceApp": "salesforce",
+   "targetApps": ["github"],
+   "tags": ["salesforce", "github"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create an issue in GitHub when a new complete row is appended in Google Sheets",
+   "description": "Use this template to create an issue in GitHub whenever a new complete row is appended to a spreadsheet in Google Sheets.",
+   "summary": "Google Sheets to GitHub",
+   "sourceApp": "googlesheets",
+   "targetApps": ["github"],
+   "tags": ["googlesheets", "github"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Send a Slack message when an issue is created or updated on GitHub",
+   "description": "Use this template to send a Slack message  whenever an issue is newly created or updated in GitHub.",
+   "summary": "GitHub to Slack",
+   "sourceApp": "github",
+   "targetApps": ["slack"],
+   "tags": ["github", "slack", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
