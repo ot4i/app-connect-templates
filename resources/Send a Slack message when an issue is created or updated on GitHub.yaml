@@ -69,5 +69,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Send a Slack message when an issue is created or updated in GitHub
+  name: Send a Slack message when an issue is created or updated on GitHub
 models: {}

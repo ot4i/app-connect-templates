@@ -2160,9 +2160,9 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create a calendar in Google Calendar when a new item is created in Mondaydotcom",
-   "description": " ",
-   "summary": "Mondaydotcom to Google Calendar",
+   "name": "Create a calendar in Google Calendar when a new item is created in mondaydotcom",
+   "description": "Use this template to create a calendar in Google Calendar whenever a new item is created in mondaydotcom",
+   "summary": "monday.com to Google Calendar",
    "sourceApp": "mondaydotcom",
    "targetApps": ["googlecalendar"],
    "tags": ["mondaydotcom", "googlecalendar"],
@@ -2268,9 +2268,9 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create a row in a Google Sheets spreadsheet when an issue is created or updated in GitHub",
+   "name": "Create a row in a Google Sheets spreadsheet when an issue is created or updated on GitHub",
    "description": "Use this template to create a row in a Google Sheets spreadsheet whenever an issue is newly created or updated in GitHub.",
-   "summary": "GitHub toGoogle Sheets",
+   "summary": "GitHub to Google Sheets",
    "sourceApp": "github",
    "targetApps": ["googlesheets"],
    "tags": ["github", "googlesheets"],
@@ -2313,7 +2313,7 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Send a Slack message when an issue is created or updated in GitHub",
+   "name": "Send a Slack message when an issue is created or updated on GitHub",
    "description": "Use this template to send a Slack message  whenever an issue is newly created or updated in GitHub.",
    "summary": "GitHub to Slack",
    "sourceApp": "github",

@@ -47,5 +47,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a calendar in Google Calendar when a new item is created in Mondaydotcom
+  name: Create a calendar in Google Calendar when a new item is created in mondaydotcom
 models: {}
