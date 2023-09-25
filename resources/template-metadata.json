@@ -2320,6 +2320,96 @@
    "targetApps": ["slack"],
    "tags": ["github", "slack", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Gmail message to new employees retrieved from Oracle HCM for an organization",
+   "description": "Use this template to send a Gmail message with a file attachment to new employees who are part of an organization. The email is sent to a specific type of employee who joined after a specified date. These workers details are retrieved from Oracle HCM. For instance, share welcome document from google drive via email to all the new joiners created in Oracle HCM. ",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "googledrive", "gmail"],
+   "tags": ["scheduler", "oraclehcm", "googledrive", "gmail", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a system user in ServiceNow for new employees of a specific work type that is created in Oracle HCM",
+   "description": "Use this template to create a system user in ServiceNow based on the worker details retrieved from Oracle HCM. If it’s an employee of a specific work group who joined after a specified date, a new system user account is created in ServiceNow for the worker. Otherwise, a Slack message is posted on the intended channel, notifying the worker that they are not from a specific work group.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "servicenow", "slack"],
+   "tags": ["scheduler", "oraclehcm", "servicenow", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Slack notification for the new employees retrieved from Oracle HCM",
+   "description": "Use this template to send a Slack notification for the new employees retrieved from Oracle HCM. These workers details are retrieved from Oracle HCM.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "slack"],
+   "tags": ["scheduler", "oraclehcm", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a candidate in Oracle HCM for each candidate who has a unique email address from Workday",
+   "description": "Use this template to create a candidate in Oracle Human Capital Management for each Workday candidate. The flow periodically checks for new candidates and creates the candidate with a unique email address in Oracle Human Capital Management. If the candidate already exists in Oracle Human Capital Management, a Slack notification is sent to the specified channel.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["workday", "oraclehcm", "slack"],
+   "tags": ["scheduler", "workday", "oraclehcm", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create or update a campaign member in Salesforce when a new sales order is created in Magento",
+   "description": "Use this template to create or update campaign members for each new sales order created in Magento. For each new sales order for a specific product type in Magento, a campaign, contact, and campaign member details are either created or updated in Salesforce.",
+   "summary": "Magento to Salesforce",
+   "sourceApp": "magento",
+   "targetApps": ["salesforce"],
+   "tags": ["magento", "salesforce", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Send a Gmail message to a contact whenever a case is updated to a closed status in Salesforce",
+   "description": "Use this template to send a Gmail message to a Salesforce contact with the case details whenever a case status is updated to 'Closed' in Salesforce.",
+   "summary": "Salesforce to Gmail",
+   "sourceApp": "salesforce",
+   "targetApps": ["gmail"],
+   "tags": ["salesforce", "gmail", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a file in a specific folder in Box with Salesforce opportunity details",
+   "description": "Use this template to create a file in a specific folder in Box with Salesforce opportunity details. The opportunity details are periodically retrieved from Salesforce. This use case helps you to extract and upload Salesforce opportunity details to a Box file with CSV output at a regular interval.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "box"],
+   "tags": ["scheduler", "salesforce", "box"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Send a Gmail message for new leads created in Salesforce based on the lead rating",
+   "description": "Use this template to send a Gmail message to the intended team members whenever a new lead is created in Salesforce. If the lead's rating is 'Hot', an email is sent with the lead's details. If the lead's rating is 'Warm', an email is sent to notify Salesforce that a lead has been created.",
+   "summary": "Salesforce to Gmail",
+   "sourceApp": "salesforce",
+   "targetApps": ["gmail"],
+   "tags": ["salesforce", "gmail", "if"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Create a case in Salesforce whenever a new issue is created in Jira",
+   "description": "Use this template to create a case in Salesforce whenever a new issue is created in Jira.",
+   "summary": "Jira to Salesforce",
+   "sourceApp": "jira",
+   "targetApps": ["salesforce"],
+   "tags": ["jira", "salesforce"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
+   "name": "Update the price book entry in Salesforce whenever a product is updated in Magento",
+   "description": "Use this template to update the price of a product in Salesforce whenever a product price has been updated in Magento.",
+   "summary": "Magento to Salesforce",
+   "sourceApp": "magento",
+    "targetApps": ["salesforce"],
+   "tags": ["magento", "salesforce", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
