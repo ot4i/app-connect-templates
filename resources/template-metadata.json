@@ -2160,6 +2160,15 @@
    "offerings": ["app connect professional"]
   }, 
   {
+   "name": "Create a calendar in Google Calendar when a new item is created in mondaydotcom",
+   "description": "Use this template to create a calendar in Google Calendar whenever a new item is created in mondayd.com",
+   "summary": "monday.com to Google Calendar",
+   "sourceApp": "mondaydotcom",
+   "targetApps": ["googlecalendar"],
+   "tags": ["mondaydotcom", "googlecalendar"],
+   "offerings": ["app connect professional"]
+  }, 
+  {
    "name": "Create an event in Google Calendar when a new campaign is created in MailChimp",
    "description": "Use this template to create an event in Google Calendar whenever a new campaign is created in MailChimp. If the campaign type is regular, an event is sent to each of the MailChimp members; otherwise, a Slack notification is sent to the intended channel notifying that the new campaign created is not regular.",
    "summary": "MailChimp to 2 applications",
