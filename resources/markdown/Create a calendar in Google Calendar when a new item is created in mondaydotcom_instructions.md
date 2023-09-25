@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [Google Calendar](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-googlecalendar)
 3. To start the flow, in the banner, click **Start flow**.
 
-Use this template to create a calendar in Google Calendar whenever a new item is created in monday.com.
+Use this template to create a calendar in Google Calendar whenever a new item is created in mondaydotcom.
 
 
 
