@@ -1,0 +1,58 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: GitHub Create issue
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - OwnerName:
+                      template: non-ibm-primary
+                  - RepoName:
+                      template: pratiktest
+                  - body:
+                      template: >-
+                        CaseID: {{$Trigger.Id}}, CaseNumber:
+                        {{$Trigger.CaseNumber}}, CaseType: {{$Trigger.Type}},
+                        CaseReason: {{$Trigger.Reason}}, CaseOrigin:
+                        {{$Trigger.Origin}}, Name: {{$Trigger.SuppliedName}},
+                        Email: {{$Trigger.SuppliedEmail}}, Phone:
+                        {{$Trigger.SuppliedPhone}}, Company:
+                        {{$Trigger.SuppliedCompany}}, Product:
+                        {{$Trigger.Product__c}}, Potential Liability:
+                        {{$Trigger.PotentialLiability__c}}
+                  - labels:
+                      expression: '["Salesforce Case"]'
+                  - title:
+                      template: '{{$Trigger.Subject}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an issue in GitHub when a case is created in Salesforce
+models: {}

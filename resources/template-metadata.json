@@ -1216,7 +1216,7 @@
   },
   {
    "name": "Create a file in Microsoft OneDrive for Business and a Zendesk ticket whenever a Gmail message is received",
-   "description": "Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk whenever an email is received from a Gmail account. ",
+   "description": "Use this template to create a file in Microsoft OneDrive for Business, and a ticket in Zendesk Service whenever an email is received from a Gmail account. ",
    "summary": "Gmail to 2 applications",
    "sourceApp": "gmail",
    "targetApps": ["msonedrive", "msonedrive", "zendeskservice"],
@@ -2490,6 +2490,96 @@
    "sourceApp": "zendeskservice",
    "targetApps": ["googlecalendar", "slack"],
    "tags": ["zendeskservice", "googlecalendar", "slack", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a Google Calendar when a campaign is created in Salesforce for members who have completed the registration",
+   "description": "Use this template to create an event in Google Calendar whenever a new campaign is created in Salesforce. In this example, for each Salesforce campaign member, if the registration is completed, a Google Calendar invite gets sent to the registered campaign member for the event.",
+   "summary": "Salesforce to Google Calendar",
+   "sourceApp": "salesforce",
+   "targetApps": ["salesforce", "googlecalendar"],
+   "tags": ["salesforce", "googlecalendar", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create an incident in ServiceNow for each worker retrieved from Oracle HCM based on their joining date",
+   "description": "Use this template to create a user in Microsoft Azure Active Directory and an incident in ServiceNow for each worker retrieved from Oracle Human Capital Management. In this example, when a worker is created in Oracle HCM with a start date that is 7 days prior to the joining date, a new user is created in Microsoft Azure Active Directory based on the worker's details. An incident is also created in ServiceNow requesting a new procurement laptop for the worker.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "azuread", "servicenow"],
+   "tags": ["scheduler", "oraclehcm", "azuread", "servicenow", "setVariable", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Delete a user from Microsoft Azure AD when an offboarding request is created for the user in Zendesk Service",
+   "description": "Use this template to delete an existing user from Microsoft Azure Active Directory when an offboarding request is created in Zendesk Service. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Azure Active Directory.",
+   "summary": "Zendesk Service to Microsoft Azure AD",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["azuread", "azuread"],
+   "tags": ["zendeskservice", "azuread", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Launch an Amazon EC2 instance and send a Gmail message to the attendees of the Amazon EC2 event with instance details",
+   "description": "Use this template to launch an Amazon EC2 instance and send a Gmail message to the attendees of the Amazon EC2 event with the instance details. In this example, Google Calendar event details are retrieved. If the Google Calendar event summary is Amazon EC2 event, an Amazon EC2 instance is launched, and a Gmail message is sent to the Amazon EC2 event attendees with the instance details.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["googlecalendar", "amazonec2", "gmail"],
+   "tags": ["scheduler", "googlecalendar", "amazonec2", "gmail", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a new employee in IBM Db2 for each worker retrieved from Oracle HCM and sync any existing employee to IBM Db2",
+   "description": "Use this template to create a new employee record in the IBM Db2 table for each worker retrieved from Oracle Human Capital Management (HCM). If the Oracle HCM employee work relationship data already exists in IBM Db2, create this record in another IBM Db2 table.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "ibmdb2"],
+   "tags": ["scheduler", "oraclehcm", "ibmdb2", "setVariable", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Gmail message to the Zendesk Service user for each ticket retrieved from Zendesk Service",
+   "description": "Use this template to send a Gmail message to the Zendesk Service users as a reminder of the Zendesk Service tickets that are awaiting the user's response.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["zendeskservice", "gmail"],
+   "tags": ["scheduler", "zendeskservice", "gmail", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update a ticket status in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days",
+   "description": "Use this template to update the ticket status to closed in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days. A Slack message is posted on the intended channel to notify the recipients that the ticket is closed.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["zendeskservice", "slack"],
+   "tags": ["scheduler", "zendeskservice", "slack", "setVariable", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create an issue in GitHub when a case is created in Salesforce",
+   "description": "Use this template to create a new issue in GitHub whenever a new case is created in Salesforce.",
+   "summary": "Salesforce to GitHub",
+   "sourceApp": "salesforce",
+   "targetApps": ["github"],
+   "tags": ["salesforce", "github"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Sync new Salesforce cases with GitHub issues",
+   "description": "Use this template to update a GitHub issue when a case is updated in Salesforce. If the GitHub title and the Salesforce subject match, the GitHub issue is then updated with the Salesforce case details.",
+   "summary": "Salesforce to GitHub",
+   "sourceApp": "salesforce",
+   "targetApps": ["github", "github"],
+   "tags": ["salesforce", "github", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a comment in GitHub with a knowledge article from ServiceNow when an issue is created or updated in GitHub",
+   "description": "Use this template to create a comment in GitHub with the ServiceNow knowledge article reference when an issue is created or updated in GitHub. For each GitHub issue, if the GitHub issue label matches the knowledge article in ServiceNow, a comment is created in GitHub stating the reference to the knowledge article.",
+   "summary": "GitHub to 2 applications",
+   "sourceApp": "github",
+   "targetApps": ["servicenow", "slack", "github"],
+   "tags": ["github", "servicenow", "slack", "github", "setVariable", "foreach", "if"],
    "offerings": ["app connect professional"]
   }
 ]

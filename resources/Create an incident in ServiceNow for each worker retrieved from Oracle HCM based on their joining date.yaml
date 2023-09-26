@@ -1,0 +1,283 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worker
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Users
+      connector-type: azuread
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve workers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrieveworkers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management worker
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Projected_start_date:
+                        type: number
+                      Current_time_converted:
+                        type: number
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Current_time_converted:
+                            expression: $number($toMillis($Trigger.currentEventTime))
+                        - Projected_start_date:
+                            expression: >-
+                              $number($toMillis($Foreachitem.AdditionalProperties.Projectedstartdate)) 
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Sub_7days_before_joining:
+                        type: number
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Sub_7days_before_joining:
+                            expression: >-
+                              $number(604800000-$Setvariable.variable.Current_time_converted
+                              ) 
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Setvariable
+                  $ref: '#/block/For each/node-output/Set variable/response/payload'
+                - variable: Setvariable2
+                  $ref: '#/block/For each/node-output/Set variable 2/response/payload'
+                - variable: OracleHumanCapitalManagementRetrieveworkers
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response/payload
+                - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Setvariable.variable.Current_time_converted}}':
+                      gte: '{{$Setvariable2.variable.Sub_7days_before_joining}}'
+                  execute:
+                    - create-action:
+                        name: Microsoft Azure Active Directory Create user
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - accountEnabled:
+                                expression: 'true'
+                            - displayName:
+                                template: '{{$Foreachitem.DisplayName}}'
+                            - givenName:
+                                template: '{{$Foreachitem.names.FirstName[0]}}'
+                            - mailNickname:
+                                template: xyz.com
+                            - passwordProfile:
+                                mappings:
+                                  - forceChangePasswordNextSignIn:
+                                      expression: 'true'
+                                  - forceChangePasswordNextSignInWithMfa:
+                                      expression: 'false'
+                                  - password:
+                                      template: '{{$Foreachitem.DisplayName}}'
+                            - surname:
+                                template: '{{$Foreachitem.names.LastName[0]}}'
+                            - userPrincipalName:
+                                template: >-
+                                  {{$Foreachitem.names.FirstName[0]}}_{{$Foreachitem.names.LastName[0]}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/For each/node-output/Set
+                                variable/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                2/response/payload
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: ServiceNow Create incident
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - approval:
+                                template: approved
+                            - category:
+                                template: hardware
+                            - route_reason:
+                                expression: '1'
+                            - severity:
+                                expression: '1'
+                            - short_description:
+                                template: >-
+                                  please allocate space for
+                                  {{$Foreachitem.names.FirstName[0]}} and
+                                  {{$Foreachitem.names.LastName[0]}}
+                            - state:
+                                expression: '7'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftAzureActiveDirectoryCreateuser
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Azure Active
+                                Directory Create user/response/payload
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/For each/node-output/Set
+                                variable/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                2/response/payload
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create an incident in ServiceNow for each worker retrieved from Oracle HCM based on their joining date
+models: {}

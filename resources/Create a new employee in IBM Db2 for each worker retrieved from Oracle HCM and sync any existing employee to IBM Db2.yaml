@@ -1,0 +1,213 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 30 09 * * *
+                  runOnceOncheck: false
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worker
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: CCTTEST_EMPLOYEE
+      connector-type: db2
+      actions:
+        CREATE: {}
+      account-info:
+        dbType: IBM Db2 Linux, UNIX, or Windows (LUW) - client managed
+    action-interface-4:
+      type: api-action
+      business-object: CCTTEST_WORK_RELATIONSHIPS
+      connector-type: db2
+      actions:
+        CREATE: {}
+      account-info:
+        dbType: IBM Db2 Linux, UNIX, or Windows (LUW) - client managed
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve workers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 100
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrieveworkers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management worker
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$OracleHumanCapitalManagementRetrieveworkerassignments.AdditionalProperties.CreationDate}}':
+                      gte: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - create-action:
+                        name: IBM Db2 Create EMPLOYEE record 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - DOB:
+                                template: '{{$Foreachitem.DateOfBirth}}'
+                            - EMAIL:
+                                template: >-
+                                  {{$Foreachitem.AdditionalProperties.emails.EmailAddress}}
+                            - EMPLOYER:
+                                template: >-
+                                  {{$Foreachitem.workRelationships[0].LegalEmployerName}}
+                            - EMP_ID:
+                                template: '{{$Foreachitem.WorkerUniqueId}}'
+                            - FIRST_NAME:
+                                template: '{{$Foreachitem.FullName}}'
+                            - PERSON_ID:
+                                expression: '$Foreachitem.PersonId '
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - if:
+                        name: If 2
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$Foreachitem.AdditionalProperties}}':
+                                neq: ''
+                            execute:
+                              - create-action:
+                                  name: IBM Db2 Create WORK_RELATIONSHIPS record
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-4
+                                  map:
+                                    mappings:
+                                      - CREATEDBY:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.StartDate}}
+                                      - EMP_ID:
+                                          template: '{{$Foreachitem.WorkerUniqueId}}'
+                                      - ENTERPRISESENIORITYDATE:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.EnterpriseSeniorityDate}}
+                                      - LEGALEMPLOYERNAME:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.LegalEmployerName}}
+                                      - LEGALENTITYID:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.LegalEntityId}}
+                                      - LEGISLATIONCODE:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.LegislationCode}}
+                                      - STARTDATE:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.StartDate}}
+                                      - WORKTYPE:
+                                          template: >-
+                                            {{$Foreachitem.AdditionalProperties.workRelationships.WorkerType}}
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: IBMDb2CreateEMPLOYEErecord2
+                                        $ref: >-
+                                          #/block/If/node-output/IBM Db2 Create
+                                          EMPLOYEE record 2/response/payload
+                                      - variable: >-
+                                          OracleHumanCapitalManagementRetrieveworkers
+                                        $ref: >-
+                                          #/node-output/Oracle Human Capital
+                                          Management Retrieve
+                                          workers/response/payload
+                                      - variable: >-
+                                          OracleHumanCapitalManagementRetrieveworkersMetadata
+                                        $ref: >-
+                                          #/node-output/Oracle Human Capital
+                                          Management Retrieve workers/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute: []
+                        output-schema: {}
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a new employee in IBM Db2 for each worker retrieved from Oracle HCM and sync any existing employee to IBM Db2
+models: {}
