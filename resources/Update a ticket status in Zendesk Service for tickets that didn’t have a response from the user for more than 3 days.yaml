@@ -338,5 +338,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Update a ticket to closed status in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days
+  name: Update a ticket status in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days
 models: {}
