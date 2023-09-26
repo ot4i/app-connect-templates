@@ -102,5 +102,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Delete a user from Microsoft Azure Active Directory when an offboarding request is created for the user in Zendesk
+  name: Delete a user from Microsoft Azure Active Directory when an offboarding request is created for the user in Zendesk Service
 models: {}
