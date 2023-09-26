@@ -181,6 +181,6 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Send a Gmail message to the Zendesk user for each ticket retrieved from Zendesk
+  name: Send a Gmail message to the Zendesk Suser for each ticket retrieved from Zendesk
   description: Use this template to send a Gmail message to the Zendesk users as a reminder of the Zendesk tickets that are awaiting the user's response. 
 models: {}
