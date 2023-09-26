@@ -117,6 +117,6 @@ integration:
                     $ref: '#/node-output/monday.com Retrieve activity logs/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Append a row in Microsoft Excel Online for each activity log retrieved from Mondaydotcom
-  description: Use this template to append a row of information in Microsoft Excel Online for each activity log retrieved from a board in Monday.com. For example, the activity logs contain time tracking data stored in Monday.com. This information is retrieved and added to the Microsoft Excel Online worksheet periodically. This integration simplifies time tracking and reporting processes.
+  name: Append a row in Microsoft Excel Online for each activity log retrieved from mondaydotcom
+  description: Use this template to append a row of information in Microsoft Excel Online for each activity log retrieved from a board in monday.com. For example, the activity logs contain time tracking data stored in monday.com. This information is retrieved and added to the Microsoft Excel Online worksheet periodically. This integration simplifies time tracking and reporting processes.
 models: {}
