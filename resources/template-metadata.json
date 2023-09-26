@@ -2574,7 +2574,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a comment in GitHub with a knowledge article from ServiceNow when an issue is created or updated in GitHub ",
+   "name": "Create a comment in GitHub with a knowledge article from ServiceNow when an issue is created or updated in GitHub",
    "description": "Use this template to create a comment in GitHub with the ServiceNow knowledge article reference when an issue is created or updated in GitHub. For each GitHub issue, if the GitHub issue label matches the knowledge article in ServiceNow, a comment is created in GitHub stating the reference to the knowledge article.",
    "summary": "GitHub to 2 applications",
    "sourceApp": "github",
