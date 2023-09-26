@@ -258,5 +258,5 @@ integration:
                     $ref: '#/block/If/node-output/Set variable/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a comment in GitHub with a knowledge article from ServiceNow when an issue is created or updated in GitHub 
+  name: Create a comment in GitHub with a knowledge article from ServiceNow when an issue is created or updated in GitHub
 models: {}
