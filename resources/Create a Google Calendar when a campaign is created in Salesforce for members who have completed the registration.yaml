@@ -12,13 +12,11 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: salesforce
-
   action-interfaces:
     action-interface-3:
       type: api-action
       business-object: CampaignMember
       connector-type: salesforce
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-1:
