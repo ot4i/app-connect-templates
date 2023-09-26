@@ -6,5 +6,5 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [IBM Db2](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-db2) 
 3. To start the flow, in the banner, click **Start flow**.
 
-Use this template to create a new employee record in the IBM Db2 table for each worker retrieved from Oracle Human Capital Management (HCM). If the Oracle HCM employee work relationship data already exists in IBM Db2, create this record in another IBM Db2 table.
+Use this template to create a new employee record in the IBM Db2 table for each worker retrieved from Oracle Human Capital Management (HCM). If the Oracle HCM employee work relationship data already exists in IBM Db2, create this record in another IBM Db2 table. 
  
