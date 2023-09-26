@@ -279,6 +279,6 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Create a case file in IBM Cloud Object Storage S3 for any non-English file content when a new case is created in Salesforce
+  name: Create a case file in IBM Cloud Object Storage S3 for any non-English file content when a case is created in Salesforce
   description: Use this template to create a case file in IBM Cloud Object Storage S3 for non-English file content whenever a new case is created in Salesforce. When a new case is created in Salefroce, the file is created in Box. If the file content is non-English, the case file will be created in IBM Cloud Object Storage S3. Otherwise, a Slack message gets sent to the intended channel, notifying that the file for the case ID already exists in English.
 models: {}
