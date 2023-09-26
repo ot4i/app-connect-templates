@@ -1,0 +1,146 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '182723897938599'
+            team-id: '182723898008235'
+            project: '747865922507849'
+            parentFilter:
+              workspace-id: '182723897938599'
+              team-id: '182723898008235'
+              project: '747865922507849'
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: patchUsersByUserIdOnenotePagesByPageIdContent_model
+      connector-type: msonenote
+      actions:
+        patchUsersByUserIdOnenotePagesByPageIdContent: {}
+    action-interface-3:
+      type: api-action
+      business-object: patchUsersByUserIdOnenotePagesByPageIdContent_model
+      connector-type: msonenote
+      actions:
+        patchUsersByUserIdOnenotePagesByPageIdContent: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C05AY19GTQE
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: '{{$Trigger}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackSendmessage
+                  $ref: '#/node-output/Slack Send message/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.assignee_status}}': upcoming
+                  execute:
+                    - custom-action:
+                        name: Microsoft OneNote Append note
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: patchUsersByUserIdOnenotePagesByPageIdContent
+                        map:
+                          mappings:
+                            - content:
+                                template: '{{$Trigger.name}}  needs to be Assigned'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - page_id: >-
+                                  1-334f4b8694f44545912bc52d0664b70a!59-ccf3b9c3-8c79-4515-a355-be19f77408d9
+                              - user_id: me
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+              else:
+                execute:
+                  - custom-action:
+                      name: Microsoft OneNote Append note 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      action: patchUsersByUserIdOnenotePagesByPageIdContent
+                      map:
+                        mappings:
+                          - content:
+                              template: '{{$Trigger.name}}  is already assigned'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SlackSendmessage
+                            $ref: '#/node-output/Slack Send message/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      filter:
+                        where:
+                          and:
+                            - page_id: >-
+                                1-334f4b8694f44545912bc52d0664b70a!14-ca5664ce-680c-4a1f-b481-0b1c66591bb9
+                            - user_id: me
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SlackSendmessage
+                            $ref: '#/node-output/Slack Send message/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        limit: 10
+              output-schema: {}
+  name: Append a note in Microsoft OneNote when a task is created in Asana
+models: {}

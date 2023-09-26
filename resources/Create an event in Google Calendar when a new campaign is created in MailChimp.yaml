@@ -1,0 +1,165 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Campaigns
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            list_id: 40277bc9bf
+            parentFilter:
+              list_id: 40277bc9bf
+      connector-type: mailchimp
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: MailChimp Retrieve members
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  list_id: 40277bc9bf
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MailChimpRetrievemembers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MailChimpRetrievemembers
+                    $ref: '#/node-output/MailChimp Retrieve members/response/payload'
+                  - variable: MailChimpRetrievemembersMetadata
+                    $ref: '#/node-output/MailChimp Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: MailChimp Members
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MailChimpRetrievemembers
+                  $ref: '#/node-output/MailChimp Retrieve members/response/payload'
+                - variable: MailChimpRetrievemembersMetadata
+                  $ref: '#/node-output/MailChimp Retrieve members/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.type}}': Regular
+                  execute:
+                    - create-action:
+                        name: Google Calendar Create event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - attendees:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: attendeesItem
+                                  mappings:
+                                    - email:
+                                        template: '{{$Foreachitem.email_address}}'
+                            - endTime:
+                                template: '2023-07-20T10:00:00'
+                            - id:
+                                template: ffbld01@ibmappcon.com
+                            - startTime:
+                                template: '2023-07-20T09:00:00'
+                            - summary:
+                                template: '{{$Trigger.settings.title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MailChimpRetrievemembers
+                              $ref: >-
+                                #/node-output/MailChimp Retrieve
+                                members/response/payload
+                            - variable: MailChimpRetrievemembersMetadata
+                              $ref: >-
+                                #/node-output/MailChimp Retrieve
+                                members/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04FRCNTLLX
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: '{{$Trigger.type}}  --- --- -- is not regular'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: MailChimpRetrievemembers
+                            $ref: >-
+                              #/node-output/MailChimp Retrieve
+                              members/response/payload
+                          - variable: MailChimpRetrievemembersMetadata
+                            $ref: '#/node-output/MailChimp Retrieve members/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create an event in Google Calendar when a new campaign is created in MailChimp
+models: {}
