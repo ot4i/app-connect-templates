@@ -181,5 +181,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Send a Gmail message to the Zendesk user for each ticket retrieved from Zendesk Service
+  name: Send a Gmail message to the Zendesk Service user for each ticket retrieved from Zendesk Service
 models: {}
