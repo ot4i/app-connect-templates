@@ -102,6 +102,6 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Delete a user from Microsoft Azure Active Directory when an offboarding request is created for the user in Zendesk
-  description: Use this template to delete an existing user from Microsoft Azure Active Directory when an offboarding request is created in Zendesk. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Azure Active Directory. 
+  name: Delete a user from Microsoft Azure AD when an offboarding request is created for the user in Zendesk Service
+  description: Use this template to delete an existing user from Microsoft Azure Active Directory when an offboarding request is created in Zendesk Service. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Azure Active Directory. 
 models: {}
