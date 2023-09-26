@@ -287,5 +287,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Make a voice call to the component owner using Twilio when a new ticket is created in Zendesk
+  name: Make a voice call to the component owner using Twilio when a new ticket is created in Zendesk Service
 models: {}
