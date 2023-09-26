@@ -2410,6 +2410,87 @@
     "targetApps": ["salesforce"],
    "tags": ["magento", "salesforce", "if"],
    "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Append a row in Microsoft Excel Online for each activity log retrieved from mondaydotcom",
+   "description": "Use this template to append a row of information in Microsoft Excel Online for each activity log retrieved from a board in monday.com. For example, the activity logs contain time tracking data stored in monday.com. This information is retrieved and added to the Microsoft Excel Online worksheet periodically. This integration simplifies time tracking and reporting processes. ",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["mondaydotcom", "msexcel"],
+   "tags": ["scheduler", "mondaydotcom", "msexcel", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a campaign in Mailchimp for each new job requisition created in Oracle HCM",
+   "description": "Use this template to create a campaign in Mailchimp for each new job requisition created in Oracle HCM. ",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["oraclehcm", "mailchimp"],
+   "tags": ["scheduler", "oraclehcm", "mailchimp", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a candidate in Oracle HCM for all new Mailchimp subscribers",
+   "description": "Use this template to create a candidate in Oracle HCM for any new subscribers who have expressed interest in a MailChimp campaign. ",
+   "summary": "MailChimp to Oracle HCM",
+   "sourceApp": "mailchimp",
+   "targetApps": ["oraclehcm"],
+   "tags": ["mailchimp", "oraclehcm"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Save a candidate attachment in Workday for each new email received with attachments from Microsoft Exchange",
+   "description": "Use this template to save a candidate attachment in Workday for each new email received with attachments from Microsoft Exchange.",
+   "summary": "Microsoft Exchange to Workday",
+   "sourceApp": "msexchange",
+   "targetApps": ["workday"],
+   "tags": ["msexchange", "workday", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Make a voice call to the component owner using Twilio when a new ticket is created in Zendesk Service",
+   "description": "Use this template to make a voice call to the component owner using Twilio when a new ticket with an urgent priority is created in Zendesk Service. If the priority is urgent, a Twilio voice call is made to the saved component owner, whose information was retrieved from a saved Microsoft Excel Online worksheet based on the component details. A Slack message is posted on the intended channel, detailing the worksheet row's information.",
+   "summary": "Zendesk Service to 3 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["msexcel", "slack", "twilio"],
+   "tags": ["zendeskservice", "msexcel", "slack", "twilio", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Launch an Amazon EC2 instance for each retrieved alarm from Amazon CloudWatch",
+   "description": "Use this template to launch an Amazon EC2 instance for each retrieved alarm from Amazon CloudWatch. If the alarm state is equal to 'Alarm' from the alarm metrics retrieved from Amazon CloudWatch,an instance in Amazon EC2 is launched. In this flow, the Amazon CloudWatch CPU usage metrics are monitored periodically. If the alarm is triggered for breaching the threshold, a new instance is launched in Amazon EC2.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["amazoncloudwatch", "amazonec2", "slack"],
+   "tags": ["scheduler", "foreach", "if", "amazoncloudwatch", "amazonec2", "slack"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a case file in IBM Cloud Object Storage S3 for any non-English file content when a case is created in Salesforce",
+   "description": "Use this template to create a case file in IBM Cloud Object Storage S3 for non-English file content whenever a new case is created in Salesforce. When a new case is created in Salefroce, the file is created in Box. If the file content is non-English, the case file will be created in IBM Cloud Object Storage S3. Otherwise, a Slack message gets sent to the intended channel, notifying that the file for the case ID already exists in English.",
+   "summary": "Salesforce to 4 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["slack", "box", "googletranslate", "ibmcoss3"],
+   "tags": ["salesforce", "slack", "box", "googletranslate", "ibmcoss3", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Append a row in Microsoft Excel Online for each new response retrieved from SurveyMonkey surveys",
+   "description": "Use this template to append a row in a Microsoft Excel Online worksheet for each response retrieved from SurveyMonkey surveys. In this flow, all new employee exit interview response surveys from SurveyMonkey are retrieved and saved in a Microsoft Excel Online worksheet with the employee ID.",
+   "summary": "SurveyMonkey to 2 applications",
+   "sourceApp": "surveymonkey",
+   "targetApps": ["msexcel", "slack"],
+   "tags": ["surveymonkey", "msexcel", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk Service",
+   "description": "Use this template to schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk Service.",
+   "summary": "Zendesk Service to 2 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["googlecalendar", "slack"],
+   "tags": ["zendeskservice", "googlecalendar", "slack", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
