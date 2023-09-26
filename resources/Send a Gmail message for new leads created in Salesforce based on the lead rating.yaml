@@ -1,0 +1,99 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Rating}}': hot
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Name: {{$Trigger.Name}}, Company: 
+                                  {{$Trigger.Company}}, Title:
+                                  {{$Trigger.Title}}, Mobile:
+                                  {{$Trigger.MobilePhone}}, Email:
+                                  {{$Trigger.Email}}, Address:
+                                  {{$Trigger.Street}} {{$Trigger.City}}
+                                  {{$Trigger.State}} {{$Trigger.PostalCode}},
+                                  Product Interest:
+                                  {{$Trigger.ProductInterest__c}}, Annual
+                                  Revenue: {{$Trigger.AnnualRevenue}},
+                                  LeadSource: {{$Trigger.LeadSource}}
+                            - Subject:
+                                template: >-
+                                  New 'Hot' lead generated in Salesforce -
+                                  {{$Trigger.Id}}
+                            - To:
+                                template: johndoe@example.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.Rating}}': warm
+                  execute:
+                    - create-action:
+                        name: Gmail Send email 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Subject:
+                                template: >-
+                                  New 'Warm' lead generated in Salesforce -
+                                  {{$Trigger.Id}}
+                            - To:
+                                template: Jenna@example.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Gmail message for new leads created in Salesforce based on the lead rating
+models: {}

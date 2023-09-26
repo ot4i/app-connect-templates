@@ -1,0 +1,171 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: worker
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: sys_user
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve workers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrieveworkers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management worker
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: OracleHumanCapitalManagementRetrieveworkers
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response/payload
+                - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Foreachitem.workRelationships.WorkerType}}': E
+                      - '{{$OracleHumanCapitalManagementRetrieveworkers.AdditionalProperties.CreationDate}} ':
+                          gte: '{{$Trigger.lastEventTime}}'
+                        hashKey: object:926
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create system user
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - first_name:
+                                template: '{{$Foreachitem.names.FirstName}}'
+                            - last_name:
+                                template: '{{$Foreachitem.names.LastName}}'
+                            - user_name:
+                                template: '{{$Foreachitem.PersonNumber}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04UR5KMWQN
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                worker is not an emp--
+                                {{$Foreachitem.workRelationships.WorkerType}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: OracleHumanCapitalManagementRetrieveworkers
+                            $ref: >-
+                              #/node-output/Oracle Human Capital Management
+                              Retrieve workers/response/payload
+                          - variable: >-
+                              OracleHumanCapitalManagementRetrieveworkersMetadata
+                            $ref: >-
+                              #/node-output/Oracle Human Capital Management
+                              Retrieve workers/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a system user in ServiceNow for new employees of a specific work type which is created in Oracle HCM
+models: {}

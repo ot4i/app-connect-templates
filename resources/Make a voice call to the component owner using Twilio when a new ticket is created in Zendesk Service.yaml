@@ -1,0 +1,291 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: zendeskservice
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: created_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: '5'
+              isCreatedQueryable: false
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: postCallsjsonByFromphone_model
+      connector-type: twilio
+      actions:
+        postCallsjsonByFromphone: {}
+    action-interface-4:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: postCallsjsonByFromphone_model
+      connector-type: twilio
+      actions:
+        postCallsjsonByFromphone: {}
+    action-interface-6:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-7:
+      type: api-action
+      business-object: postCallsjsonByFromphone_model
+      connector-type: twilio
+      actions:
+        postCallsjsonByFromphone: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.priority}}': urgent
+                      - '{{$Trigger.ticket_fields.id__21583935524761}}': core_item
+                        hashKey: object:726
+                  execute:
+                    - retrieve-action:
+                        name: Microsoft Excel Online Retrieve rows
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          where:
+                            and:
+                              - rowIndex: '2'
+                              - DriveId: >-
+                                  b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                              - WorkbookId: 01NODPFISH6HADAMC5QFBZWRB5SD5CJRLR
+                              - WorksheetId: '{EDC47BD8-C6FE-4360-8872-C00A1E4F1A2D}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Row_Input:
+                                  {{$MicrosoftExcelOnlineRetrieverows.rowData.A}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Twilio Make a voice call
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postCallsjsonByFromphone
+                        map:
+                          mappings:
+                            - From:
+                                template: '+12765660288'
+                            - To:
+                                template: >-
+                                  {{$MicrosoftExcelOnlineRetrieverows.rowData.A}}
+                            - Twiml:
+                                template: >-
+                                  <Response><Say>Dear Executive, this call is a
+                                  notification alert for the new ticket reported
+                                  in Zendesk with URGENT priority. Ticket number
+                                  is {{$Trigger.id}}. Component is Core Item.
+                                  The subject is - {{$Trigger.subject}}. Kindly
+                                  look into the issue on
+                                  priority</Say></Response>
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Excel Online
+                                Retrieve rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Excel Online
+                                Retrieve rows/response
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/block/If/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    and:
+                      - '{{$Trigger.priority}}': urgent
+                      - '{{$Trigger.ticket_fields.id__21583935524761}}': accessories
+                        hashKey: object:499
+                  execute:
+                    - retrieve-action:
+                        name: Microsoft Excel Online Retrieve rows 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            and:
+                              - rowIndex: '2'
+                              - DriveId: >-
+                                  b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                              - WorkbookId: 01NODPFISH6HADAMC5QFBZWRB5SD5CJRLR
+                              - WorksheetId: '{EDC47BD8-C6FE-4360-8872-C00A1E4F1A2D}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: true
+                    - custom-action:
+                        name: Twilio Make a voice call 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        action: postCallsjsonByFromphone
+                        map:
+                          mappings:
+                            - From:
+                                template: '+12765660288'
+                            - To:
+                                template: >-
+                                  {{$MicrosoftExcelOnlineRetrieverows2.rowData.B}}
+                            - Twiml:
+                                template: >-
+                                  <Response><Say>Dear Executive, this call is a
+                                  notification alert for the new ticket reported
+                                  in Zendesk with URGENT priority. Ticket number
+                                  is {{$Trigger.id}}. Component is Accessories.
+                                  The subject is - {{$Trigger.subject}}. Kindly
+                                  look into the issue on
+                                  priority</Say></Response>
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExcelOnlineRetrieverows2
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Excel Online
+                                Retrieve rows 2/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverows2Metadata
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Excel Online
+                                Retrieve rows 2/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - retrieve-action:
+                      name: Microsoft Excel Online Retrieve rows 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-6'
+                      filter:
+                        where:
+                          and:
+                            - rowIndex: '2'
+                            - DriveId: >-
+                                b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                            - WorkbookId: 01NODPFISH6HADAMC5QFBZWRB5SD5CJRLR
+                            - WorksheetId: '{EDC47BD8-C6FE-4360-8872-C00A1E4F1A2D}'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        limit: 1
+                      allow-truncation: true
+                      pagination-type: TOKEN
+                      allow-empty-output: true
+                  - custom-action:
+                      name: Twilio Make a voice call 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-7'
+                      action: postCallsjsonByFromphone
+                      map:
+                        mappings:
+                          - From:
+                              template: '+12765660288'
+                          - To:
+                              template: '{{$MicrosoftExcelOnlineRetrieverows3.rowData.C}}'
+                          - Twiml:
+                              template: >-
+                                <Response><Say>Dear Executive, this call is a
+                                notification alert for the new ticket reported
+                                in Zendesk with URGENT priority. Ticket number
+                                is {{$Trigger.id}}. Component is Warranties. The
+                                subject is - {{$Trigger.subject}}. Kindly look
+                                into the issue on priority</Say></Response>
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: MicrosoftExcelOnlineRetrieverows3
+                            $ref: >-
+                              #/block/If/node-output/Microsoft Excel Online
+                              Retrieve rows 3/response/payload
+                          - variable: MicrosoftExcelOnlineRetrieverows3Metadata
+                            $ref: >-
+                              #/block/If/node-output/Microsoft Excel Online
+                              Retrieve rows 3/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Make a voice call to the component owner using Twilio when a new ticket is created in Zendesk Service
+models: {}

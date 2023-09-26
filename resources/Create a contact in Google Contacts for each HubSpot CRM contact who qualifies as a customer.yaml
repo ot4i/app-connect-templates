@@ -1,0 +1,192 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getCrmV3ObjectsContacts_model
+      connector-type: hubspotcrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postPeoplecreateContact_model
+      connector-type: googlecontacts
+      actions:
+        postPeoplecreateContact: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot CRM Retrieve all contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 1200
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$HubSpotCRMRetrieveallcontacts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotCRMRetrieveallcontacts
+                    $ref: >-
+                      #/node-output/HubSpot CRM Retrieve all
+                      contacts/response/payload
+                  - variable: HubSpotCRMRetrieveallcontactsMetadata
+                    $ref: '#/node-output/HubSpot CRM Retrieve all contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: HubSpot CRM Contacts
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: HubSpotCRMRetrieveallcontacts
+                  $ref: >-
+                    #/node-output/HubSpot CRM Retrieve all
+                    contacts/response/payload
+                - variable: HubSpotCRMRetrieveallcontactsMetadata
+                  $ref: '#/node-output/HubSpot CRM Retrieve all contacts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.properties.lifecyclestage}}': customer
+                  execute:
+                    - custom-action:
+                        name: Google Contacts Create contact 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postPeoplecreateContact
+                        map:
+                          mappings:
+                            - company:
+                                template: '{{$Foreachitem.properties.company}}'
+                            - emailAddresses:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: emailAddressesItem
+                                  mappings:
+                                    - value:
+                                        template: '{{$Foreachitem.properties.email}}'
+                            - firstName:
+                                template: '{{$Foreachitem.properties.firstname}}'
+                            - jobTitle:
+                                template: '{{$Foreachitem.properties.jobtitle}}'
+                            - lastName:
+                                template: '{{$Foreachitem.properties.lastname}}'
+                            - phoneNumbers:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: phoneNumbersItem
+                                  mappings:
+                                    - ___type:
+                                        template: '{{$Foreachitem.properties.phone}}'
+                                    - value:
+                                        template: '[1]'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: HubSpotCRMRetrieveallcontacts
+                              $ref: >-
+                                #/node-output/HubSpot CRM Retrieve all
+                                contacts/response/payload
+                            - variable: HubSpotCRMRetrieveallcontactsMetadata
+                              $ref: >-
+                                #/node-output/HubSpot CRM Retrieve all
+                                contacts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Google contactt created with resrc_name:: 
+                                  {{$GoogleContactsCreatecontact2.resourceName}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleContactsCreatecontact2
+                              $ref: >-
+                                #/block/If/node-output/Google Contacts Create
+                                contact 2/response/payload
+                            - variable: HubSpotCRMRetrieveallcontacts
+                              $ref: >-
+                                #/node-output/HubSpot CRM Retrieve all
+                                contacts/response/payload
+                            - variable: HubSpotCRMRetrieveallcontactsMetadata
+                              $ref: >-
+                                #/node-output/HubSpot CRM Retrieve all
+                                contacts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a contact in Google Contacts for each HubSpot CRM contact who qualifies as a customer
+models: {}

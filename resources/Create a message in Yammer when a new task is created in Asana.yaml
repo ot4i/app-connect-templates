@@ -1,0 +1,50 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '182726432864867'
+            team-id: '182726434927590'
+            project: '428262580509970'
+            parentFilter:
+              workspace-id: '182726432864867'
+              team-id: '182726434927590'
+              project: '428262580509970'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Message
+      connector-type: yammer
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Yammer Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - message_body:
+                      template: '{{$Trigger.response.name}} created'
+                  - message_type:
+                      template: Update
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a message in Yammer when a new task is created in Asana
+models: {}
