@@ -105,6 +105,6 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk
-  description: Use this template to schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk.
+  name: Schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk Service
+  description: Use this template to schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk Service.
 models: {}
