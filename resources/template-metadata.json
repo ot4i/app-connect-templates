@@ -2413,7 +2413,7 @@
   },
   {
    "name": "Append a row in Microsoft Excel Online for each activity log retrieved from mondaydotcom",
-   "description": "Use this template to append a row of information in Microsoft Excel Online for each activity log retrieved from a board in monday.com. For example, the activity logs contain time tracking data stored in Monday.com. This information is retrieved and added to the Microsoft Excel Online worksheet periodically. This integration simplifies time tracking and reporting processes. ",
+   "description": "Use this template to append a row of information in Microsoft Excel Online for each activity log retrieved from a board in monday.com. For example, the activity logs contain time tracking data stored in monday.com. This information is retrieved and added to the Microsoft Excel Online worksheet periodically. This integration simplifies time tracking and reporting processes. ",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["mondaydotcom", "msexcel"],
