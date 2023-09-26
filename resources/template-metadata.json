@@ -2448,12 +2448,12 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Make a voice call to the component owner using Twilio when a new ticket is created in Zendesk",
-   "description": "Use this template to make a voice call to the component owner using Twilio when a new ticket with an urgent priority is created in Zendesk. If the priority is urgent, a Twilio voice call is made to the saved component owner, whose information was retrieved from a saved Microsoft Excel Online worksheet based on the component details. A Slack message is posted on the intended channel, detailing the worksheet row's information.",
-   "summary": "Zendesk to 3 applications",
-   "sourceApp": "zendesk",
+   "name": "Make a voice call to the component owner using Twilio when a new ticket is created in Zendesk Service",
+   "description": "Use this template to make a voice call to the component owner using Twilio when a new ticket with an urgent priority is created in Zendesk Service. If the priority is urgent, a Twilio voice call is made to the saved component owner, whose information was retrieved from a saved Microsoft Excel Online worksheet based on the component details. A Slack message is posted on the intended channel, detailing the worksheet row's information.",
+   "summary": "Zendesk Service to 3 applications",
+   "sourceApp": "zendeskservice",
    "targetApps": ["msexcel", "slack", "twilio"],
-   "tags": ["zendesk", "msexcel", "slack", "twilio", "if"],
+   "tags": ["zendeskservice", "msexcel", "slack", "twilio", "if"],
    "offerings": ["app connect professional"]
   },
   {
@@ -2484,12 +2484,12 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk",
-   "description": "Use this template to schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk.",
-   "summary": "Zendesk to 2 applications",
-   "sourceApp": "zendesk",
+   "name": "Schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk Service",
+   "description": "Use this template to schedule an exit interview via Google Calendar for a new offboarding ticket created in Zendesk Service.",
+   "summary": "Zendesk Service to 2 applications",
+   "sourceApp": "zendeskservice",
    "targetApps": ["googlecalendar", "slack"],
-   "tags": ["zendesk", "googlecalendar", "slack", "if"],
+   "tags": ["zendeskservice", "googlecalendar", "slack", "if"],
    "offerings": ["app connect professional"]
   }
 ]
