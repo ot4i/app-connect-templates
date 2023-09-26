@@ -117,5 +117,5 @@ integration:
                     $ref: '#/node-output/monday.com Retrieve activity logs/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Append a row in Microsoft Excel Online for each activity log retrieved from Mondaydotcom
+  name: Append a row in Microsoft Excel Online for each activity log retrieved from mondaydotcom
 models: {}
