@@ -50,5 +50,4 @@ integration:
                     $ref: '#/flowDetails'
   name: Create a ticket in Zendesk Service when a new form entry is created in Wufoo
   description: Use this template to create a ticket in Zendesk Service when a new form entry is created in Wufoo. In this example, whenever a new form entry is created, a Zendesk Service ticket is created as a task.
-
 models: {}
