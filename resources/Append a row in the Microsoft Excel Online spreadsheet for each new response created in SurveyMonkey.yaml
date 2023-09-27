@@ -1,0 +1,83 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Responses
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            survey_id: '409030411'
+            collector_id: '427486607'
+            parentFilter:
+              survey_id: '409030411'
+              collector_id: '427486607'
+      connector-type: surveymonkey
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        APPENDROW: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Trigger.pages.questions.answers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: SurveyMonkey answers
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Excel Online Append row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: APPENDROW
+              map:
+                mappings:
+                  - DriveId:
+                      template: >-
+                        b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                  - WorkbookId:
+                      template: 01NODPFIRWOBYHEJ3TB5BZ7H6RB5LSQXGG
+                  - WorksheetId:
+                      template: '{00000000-0001-0000-0000-000000000000}'
+                  - rowData:
+                      mappings:
+                        - A:
+                            template: '{{$Foreachitem.text}}'
+                        - B:
+                            template: '{{$Foreachitem.choice_title}}'
+                        - C:
+                            template: '{{$Foreachitem.choice_weight}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Append a row in the Microsoft Excel Online spreadsheet for each new response created in SurveyMonkey
+  description: Use this template to append a row in the Microsoft Excel Online spreadsheet for each new response created in SurveyMonkey. In this example, for each SurveyMonkey's answer, the responses are added to a spreadsheet in Microsoft Excel Online.
+models: {}
