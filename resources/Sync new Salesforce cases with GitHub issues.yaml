@@ -1,0 +1,161 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: GitHub Retrieve issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - labels2: Salesforce Case
+                    - OwnerName: non-ibm-primary
+                    - RepoName: pratiktest
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GitHubRetrieveissues '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GitHubRetrieveissues
+                    $ref: '#/node-output/GitHub Retrieve issues/response/payload'
+                  - variable: GitHubRetrieveissuesMetadata
+                    $ref: '#/node-output/GitHub Retrieve issues/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: GitHub Issue
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GitHubRetrieveissues
+                  $ref: '#/node-output/GitHub Retrieve issues/response/payload'
+                - variable: GitHubRetrieveissuesMetadata
+                  $ref: '#/node-output/GitHub Retrieve issues/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.title}}': '{{$Trigger.Subject}}'
+                  execute:
+                    - update-action:
+                        name: GitHub Update issue 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - OwnerName:
+                                template: non-ibm-primary
+                            - RepoName:
+                                template: pratiktest
+                            - body:
+                                template: >-
+                                  CaseID: {{$Trigger.Id}}, CaseNumber:
+                                  {{$Trigger.CaseNumber}}, CaseType:
+                                  {{$Trigger.Type}}, CaseReason:
+                                  {{$Trigger.Reason}}, CaseOrigin:
+                                  {{$Trigger.Origin}}, Name:
+                                  {{$Trigger.SuppliedName}}, Email:
+                                  {{$Trigger.SuppliedEmail}}, Phone:
+                                  {{$Trigger.SuppliedPhone}}, Company:
+                                  {{$Trigger.SuppliedCompany}}, Product:
+                                  {{$Trigger.Product__c}}, Potential Liability:
+                                  {{$Trigger.PotentialLiability__c}},
+                                  LastModifiedDate:
+                                  {{$Trigger.LastModifiedDate}}
+                            - title:
+                                template: '{{$Foreachitem.title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GitHubRetrieveissues
+                              $ref: >-
+                                #/node-output/GitHub Retrieve
+                                issues/response/payload
+                            - variable: GitHubRetrieveissuesMetadata
+                              $ref: '#/node-output/GitHub Retrieve issues/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - number: '{{$Foreachitem.id}}'
+                              - OwnerName: non-ibm-primary
+                              - RepoName: pratiktest
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GitHubRetrieveissues
+                              $ref: >-
+                                #/node-output/GitHub Retrieve
+                                issues/response/payload
+                            - variable: GitHubRetrieveissuesMetadata
+                              $ref: '#/node-output/GitHub Retrieve issues/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-empty-output: true
+              else:
+                execute: []
+              output-schema: {}
+  name: Sync new Salesforce cases with GitHub issues
+  description: Use this template to update a GitHub issue when a case is updated in Salesforce. If the GitHub title and the Salesforce subject match, the GitHub issue is then updated with the Salesforce case details. 
+models: {}

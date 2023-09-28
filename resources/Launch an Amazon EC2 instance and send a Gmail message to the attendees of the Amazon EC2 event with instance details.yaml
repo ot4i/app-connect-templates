@@ -1,0 +1,263 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Instance
+      connector-type: amazonec2
+      actions:
+        LAUNCHINSTANCES: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Calendar Retrieve events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - fromDate: '{{$Trigger.currentEventTime}}'
+                    - id: appconnectpsl999@gmail.com
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleCalendarRetrieveevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleCalendarRetrieveevents
+                    $ref: >-
+                      #/node-output/Google Calendar Retrieve
+                      events/response/payload
+                  - variable: GoogleCalendarRetrieveeventsMetadata
+                    $ref: '#/node-output/Google Calendar Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Calendar events
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleCalendarRetrieveevents
+                  $ref: >-
+                    #/node-output/Google Calendar Retrieve
+                    events/response/payload
+                - variable: GoogleCalendarRetrieveeventsMetadata
+                  $ref: '#/node-output/Google Calendar Retrieve events/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.summary}}': Amazon EC2 Event
+                  execute:
+                    - set-variable:
+                        name: Set variable
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas:
+                            properties.`variable`:
+                              type: object
+                              properties:
+                                Attendees:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      Name:
+                                        type: string
+                                      Email:
+                                        type: string
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleCalendarRetrieveevents
+                              $ref: >-
+                                #/node-output/Google Calendar Retrieve
+                                events/response/payload
+                            - variable: GoogleCalendarRetrieveeventsMetadata
+                              $ref: >-
+                                #/node-output/Google Calendar Retrieve
+                                events/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - variable:
+                                mappings:
+                                  - Attendees:
+                                      foreach:
+                                        input: '$Foreachitem.attendees '
+                                        iterator: AttendeesItem
+                                        mappings:
+                                          - Email:
+                                              template: '{{$AttendeesItem.email}}'
+                                          - Name:
+                                              template: '{{$AttendeesItem.displayName}}'
+                    - for-each:
+                        name: For each 2
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-3'
+                        source:
+                          expression: '$Setvariable.variable.Attendees '
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/If/node-output/Set
+                                variable/response/payload
+                            - variable: GoogleCalendarRetrieveevents
+                              $ref: >-
+                                #/node-output/Google Calendar Retrieve
+                                events/response/payload
+                            - variable: GoogleCalendarRetrieveeventsMetadata
+                              $ref: >-
+                                #/node-output/Google Calendar Retrieve
+                                events/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        display-name: Set variable Attendees
+              else:
+                execute: []
+              output-schema: {}
+    assembly-3:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon EC2 Launch instances
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: LAUNCHINSTANCES
+              map:
+                mappings:
+                  - ImageId:
+                      template: ami-0efc96a4e17e7b048
+                  - LaunchTemplateId:
+                      template: lt-0b5d50e8377f4a886
+                  - MaxCount:
+                      expression: '1'
+                  - MinCount:
+                      expression: '1'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/If/node-output/Set variable/response/payload'
+                  - variable: GoogleCalendarRetrieveevents
+                    $ref: >-
+                      #/node-output/Google Calendar Retrieve
+                      events/response/payload
+                  - variable: GoogleCalendarRetrieveeventsMetadata
+                    $ref: '#/node-output/Google Calendar Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Hi {{$Foreach2item.Name}},
+
+
+                        The Amazon EC2 instance with instance id
+                        {{$AmazonEC2Launchinstances.Instance[0].InstanceId}} is
+                        launched.
+                  - Subject:
+                      template: EC2 instance launched
+                  - To:
+                      template: '{{$Foreach2item.Email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonEC2Launchinstances
+                    $ref: >-
+                      #/block/For each 2/node-output/Amazon EC2 Launch
+                      instances/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/If/node-output/Set variable/response/payload'
+                  - variable: GoogleCalendarRetrieveevents
+                    $ref: >-
+                      #/node-output/Google Calendar Retrieve
+                      events/response/payload
+                  - variable: GoogleCalendarRetrieveeventsMetadata
+                    $ref: '#/node-output/Google Calendar Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Launch an Amazon EC2 instance and send a Gmail message to the attendees of the Amazon EC2 event with instance details
+  description: Use this template to launch an Amazon EC2 instance and send a Gmail message to the attendees of the Amazon EC2 event with the instance details. In this example, Google Calendar event details are retrieved. If the Google Calendar event summary is Amazon EC2 event, an Amazon EC2 instance is launched, and a Gmail message is sent to the Amazon EC2 event attendees with the instance details. 
+models: {}
