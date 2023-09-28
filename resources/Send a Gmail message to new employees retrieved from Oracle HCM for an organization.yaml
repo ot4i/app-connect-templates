@@ -1,0 +1,183 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 00 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-8:
+      type: api-action
+      business-object: worker
+      connector-type: oraclehcm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-10:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        DOWNLOADCONTENT: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Human Capital Management Retrieve workers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - custom-action:
+              name: Google Drive Download file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADCONTENT
+              map:
+                mappings:
+                  - id:
+                      template: 1HD9uc1n_tr6M-JimGLPuF7WyJ_LLORTO
+                  - type:
+                      template: Binary
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$OracleHumanCapitalManagementRetrieveworkers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleHumanCapitalManagementRetrieveworkers
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response/payload
+                  - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                    $ref: >-
+                      #/node-output/Oracle Human Capital Management Retrieve
+                      workers/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: parallel
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Oracle Human Capital Management worker
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: OracleHumanCapitalManagementRetrieveworkers
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response/payload
+                - variable: OracleHumanCapitalManagementRetrieveworkersMetadata
+                  $ref: >-
+                    #/node-output/Oracle Human Capital Management Retrieve
+                    workers/response
+                - variable: GoogleDriveDownloadfile
+                  $ref: '#/node-output/Google Drive Download file/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$OracleHumanCapitalManagementRetrieveworkers.AdditionalProperties.CreationDate}} ':
+                          gte: '{{$Trigger.lastEventTime}}'
+                      - '{{$Foreachitem.workRelationships.WorkerType}}': E
+                        hashKey: object:449
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-10'
+                        map:
+                          mappings:
+                            - Attachments:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: AttachmentsItem
+                                  mappings:
+                                    - content:
+                                        template: '{{$GoogleDriveDownloadfile.content}}'
+                                    - fileName:
+                                        template: '{{$GoogleDriveDownloadfile.name}}'
+                            - Body:
+                                template: >-
+                                  Hi  {{$Foreachitem.names.FirstName}}  glad to
+                                  welcome you to our organization
+                            - Subject:
+                                template: Welcome to Organization
+                            - To:
+                                template: adityapandit@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: OracleHumanCapitalManagementRetrieveworkers
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response/payload
+                            - variable: >-
+                                OracleHumanCapitalManagementRetrieveworkersMetadata
+                              $ref: >-
+                                #/node-output/Oracle Human Capital Management
+                                Retrieve workers/response
+                            - variable: GoogleDriveDownloadfile
+                              $ref: >-
+                                #/node-output/Google Drive Download
+                                file/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Gmail message to new employees retrieved from Oracle HCM for an organization
+  description: Use this template to send a Gmail message with a file attachment to new employees who are part of an organization. The email is sent to a specific type of employee who joined after a specified date. These workers details are retrieved from Oracle HCM. For instance, share welcome document from google drive via email to all the new joiners created in Oracle HCM.
+models: {}

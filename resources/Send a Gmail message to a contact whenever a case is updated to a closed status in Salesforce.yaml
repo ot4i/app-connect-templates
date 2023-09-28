@@ -1,0 +1,68 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.Status}}': '{{$Trigger.IsClosed}}'
+                      - '{{$Trigger.ClosedDate}}': '{{$Trigger.LastModifiedDate}}'
+                        hashKey: object:908
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  The Salesforce case number
+                                  {{$Trigger.CaseNumber}}is closed dated
+                                  {{$Trigger.ClosedDate}}. 
+                            - CC:
+                                template: '{{$Trigger.SuppliedEmail}}'
+                            - Subject:
+                                template: 'Case: {{$Trigger.CaseNumber}} is closed'
+                            - To:
+                                template: '{{$Trigger.ContactEmail}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Gmail message to a contact whenever a case is updated to a closed status in Salesforce
+  description: Use this template to send a Gmail message to a Salesforce contact with the case details whenever a case status is updated to 'Closed' in   Salesforce.
+models: {}

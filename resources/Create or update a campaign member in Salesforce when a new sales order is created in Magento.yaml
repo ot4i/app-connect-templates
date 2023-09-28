@@ -1,0 +1,239 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: SalesOrder
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: arwc2spWz2KqQLYQLuAZFuCI9B8LPgEB9TseCFbP0Tq8CVDzvK7I2b-6Om33lyZe
+      connector-type: magento
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: CampaignMember
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Campaign
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Trigger.items '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MagentoRetrievesalesorders
+                    $ref: >-
+                      #/node-output/Magento Retrieve sales
+                      orders/response/payload
+                  - variable: MagentoRetrievesalesordersMetadata
+                    $ref: '#/node-output/Magento Retrieve sales orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Magento items
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.product_type}}': configurable
+                  execute:
+                    - upsert-action:
+                        name: Salesforce Update or create campaign
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MagentoRetrievesalesorders
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response/payload
+                            - variable: MagentoRetrievesalesordersMetadata
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings: []
+                        filter:
+                          where:
+                            Name: '{{$Foreachitem.product_type}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MagentoRetrievesalesorders
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response/payload
+                            - variable: MagentoRetrievesalesordersMetadata
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                    - upsert-action:
+                        name: Salesforce Update or create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Birthdate:
+                                template: '{{$Trigger.customer_dob}}'
+                            - FirstName:
+                                template: '{{$Trigger.customer_firstname}}'
+                            - LastName:
+                                template: '{{$Trigger.customer_lastname}}'
+                            - MailingCity:
+                                template: '{{$Trigger.response.billing_address.city}}'
+                            - MailingStreet:
+                                template: '{{$Trigger.response.billing_address.street}}'
+                            - MobilePhone:
+                                template: >-
+                                  {{$Trigger.response.billing_address.telephone}}
+                            - Phone:
+                                template: '{{$Trigger.billing_address.telephone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            Email: '{{$Trigger.customer_email}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                    - upsert-action:
+                        name: Salesforce Update or create campaign member
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - ContactId:
+                                template: '{{$SalesforceUpdateorcreatecontact.Id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceUpdateorcreatecampaign
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create campaign/response/payload
+                            - variable: SalesforceUpdateorcreatecampaignMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create campaign/response
+                            - variable: SalesforceUpdateorcreatecontact
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create contact/response/payload
+                            - variable: SalesforceUpdateorcreatecontactMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create contact/response
+                            - variable: MagentoRetrievesalesorders
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response/payload
+                            - variable: MagentoRetrievesalesordersMetadata
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            CampaignId: Preprod-cf{{$SalesforceUpdateorcreatecampaign.Id}}
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceUpdateorcreatecampaign
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create campaign/response/payload
+                            - variable: SalesforceUpdateorcreatecampaignMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create campaign/response
+                            - variable: SalesforceUpdateorcreatecontact
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create contact/response/payload
+                            - variable: SalesforceUpdateorcreatecontactMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Update or
+                                create contact/response
+                            - variable: MagentoRetrievesalesorders
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response/payload
+                            - variable: MagentoRetrievesalesordersMetadata
+                              $ref: >-
+                                #/node-output/Magento Retrieve sales
+                                orders/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+              else:
+                execute: []
+              output-schema: {}
+  name: Create or update a campaign member in Salesforce when a new sales order is created in Magento 
+  description: Use this template to create or update campaign members for each new sales order created in Magento. For each new sales order for a specific product type in Magento, a campaign, contact, and campaign member details are either created or updated in Salesforce.
+models: {}
