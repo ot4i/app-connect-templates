@@ -1,0 +1,73 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: github
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            OwnerName: non-ibm
+            RepoName: multicct
+            parentFilter:
+              OwnerName: non-ibm
+              RepoName: multicct
+            subscription:
+              createdField: updated_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.created_at}}': '{{$Trigger.updated_at}}'
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04FRCNTLLX
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  New  Issue Alert: '{{$Trigger.number}}
+                                  {{$Trigger.title}}'  Description:
+                                  {{$Trigger.body}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Slack message when an issue is created or updated in GitHub
+models: {}
