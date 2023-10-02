@@ -1,0 +1,68 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: zendeskservice
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.priority}}': Urgent
+                      - '{{$Trigger.type}}': Incident
+                        hashKey: object:174
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04FRCNTLLX
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  ticket with  {{$Trigger.subject}} subject is
+                                  created
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Slack message when a new incident ticket with urgent priority is created in Zendesk Service
+  description: Use this template to send a Slack message when a new ticket is created in Zendesk Service. In this example, a Slack message is posted to the intended group to notify them that an incident ticket has been created with urgent priority in Zendesk Service.
+models: {}

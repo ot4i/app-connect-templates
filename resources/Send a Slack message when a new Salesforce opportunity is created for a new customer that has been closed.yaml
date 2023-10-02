@@ -1,0 +1,66 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.IsClosed}}': 'True'
+                        hashKey: object:465
+                      - '{{$Trigger.Type}}': New Customer
+                        hashKey: object:807
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C0436FB797X
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  New Oppotunity with {{$Trigger.Name}} has been
+                                  created in Salesforce
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Slack message when a new Salesforce opportunity is created for a new customer that has been closed
+  description: Use this template to send a Slack message to an intended group whenever a new opportunity is created in Salesforce. The Slack message is posted in a channel if the opportunity is created for a new customer and the opportunity status is closed.
+models: {}
