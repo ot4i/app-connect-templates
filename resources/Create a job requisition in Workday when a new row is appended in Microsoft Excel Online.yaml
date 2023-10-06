@@ -1,0 +1,109 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msexcel
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Row
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            DriveId: b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+            WorkbookId: 01NODPFIV6WLNK4RVUGJG2VTFRHU7FRBVM
+            WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+            parentFilter:
+              DriveId: >-
+                b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+              WorkbookId: 01NODPFIV6WLNK4RVUGJG2VTFRHU7FRBVM
+              WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: request
+      connector-type: http
+      actions:
+        INVOKE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      topobject:
+                        type: object
+                        properties:
+                          eventresponse:
+                            type: object
+                            properties:
+                              budget:
+                                type: number
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - topobject:
+                            mappings:
+                              - eventresponse:
+                                  expression: '$Trigger '
+                                  mappings:
+                                    - budget:
+                                        expression: '100000'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.rowData.Q}}':
+                      lte: '{{$Setvariable.variable.topobject.eventresponse.budget}}'
+                  execute:
+                    - custom-action:
+                        name: HTTP Invoke method
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: INVOKE
+                        map:
+                          mappings:
+                            - method:
+                                template: POST
+                            - requestBody:
+                                template: '{{$Setvariable.variable.topobject}}'
+                            - url:
+                                template: >-
+                                  https://instance-name/Create a job requisition in Workday/createJob_requisitions
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: RedisGetvalueofstring
+                              $ref: >-
+                                #/node-output/Redis Get value of
+                                string/response/payload
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a job requisition in Workday when a new row is appended in Microsoft Excel Online
+models: {}
