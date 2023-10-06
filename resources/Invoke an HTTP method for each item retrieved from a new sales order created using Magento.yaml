@@ -1,0 +1,120 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: SalesOrder
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: arwc2spWz2KqQLYQLuAZFuCI9B8LPgEB9TseCFbP0Tq8CVDzvK7I2b-6Om33lyZe
+      connector-type: magento
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: request
+      connector-type: http
+      actions:
+        INVOKE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Trigger.items '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MagentoRetrievesalesorders
+                    $ref: >-
+                      #/node-output/Magento Retrieve sales
+                      orders/response/payload
+                  - variable: MagentoRetrievesalesordersMetadata
+                    $ref: '#/node-output/Magento Retrieve sales orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Magento items
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.product_type}}': configurable
+                  execute:
+                    - set-variable:
+                        name: Set variable
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas:
+                            properties.`variable`:
+                              type: object
+                              properties:
+                                customer_id:
+                                  type: string
+                                customer_email:
+                                  type: string
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - variable:
+                                mappings:
+                                  - customer_email:
+                                      template: '{{$Foreachitem.customerEmail}}'
+                                  - customer_id:
+                                      template: '{{$Foreachitem.customerId}}'
+                    - custom-action:
+                        name: HTTP Invoke method
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: INVOKE
+                        map:
+                          mappings:
+                            - method:
+                                template: POST
+                            - requestBody:
+                                template: '{{$Setvariable.variable.customer_email}}'
+                            - url:
+                                template: sdsd
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/If/node-output/Set
+                                variable/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Invoke an HTTP method for each item retrieved from a new sales order created using Magento
+  description: Use this template to invoke a method for each item retrieved from a new sales order created using Magento. In this example, when a new sales order is created, an HTTP method is invoked, which sends a request to a client URL to get the customer email details. This scenario helps identify the customers who have recently bought items through a sales order created in Magento. 
+models: {}

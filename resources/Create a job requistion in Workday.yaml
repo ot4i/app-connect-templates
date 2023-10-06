@@ -1,0 +1,163 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createJob_requisitions:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: job_requisitions
+          output-context:
+            data: job_requisitions
+      options:
+        resources:
+          - business-object: job_requisitions
+            model:
+              $ref: '#/models/job_requisitions'
+            triggers:
+              create: createJob_requisitions
+      type: api-trigger
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Recruiting___Create_Job_Requisition
+      connector-type: workday
+      actions:
+        Create_Job_Requisition: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Workday Create Job Requisition
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: Create_Job_Requisition
+              map:
+                mappings:
+                  - Create_Job_Requisition_Data:
+                      mappings:
+                        - Create_Job_Requisition_Reason_Reference:
+                            mappings:
+                              - ID__NORMALIZED:
+                                  mappings:
+                                    - Event_Classification_Subcategory_ID:
+                                        template: >-
+                                          {{$MicrosoftExcelOnlineAppendrow.rowData.B}}
+                        - Job_Requisition_Data:
+                            mappings:
+                              - Job_Description:
+                                  template: '{{$MicrosoftExcelOnlineAppendrow.rowData.F}}'
+                              - Job_Description_Summary:
+                                  template: '{{$MicrosoftExcelOnlineAppendrow.rowData.E}}'
+                              - Job_Posting_Title:
+                                  template: '{{$MicrosoftExcelOnlineAppendrow.rowData.D}}'
+                              - Job_Profile_Reference:
+                                  mappings:
+                                    - ID__NORMALIZED:
+                                        mappings:
+                                          - Job_Profile_ID:
+                                              template: >-
+                                                {{$MicrosoftExcelOnlineAppendrow.rowData.G}}
+                              - Position_Time_Type_Reference:
+                                  mappings:
+                                    - ID__NORMALIZED:
+                                        mappings:
+                                          - Position_Time_Type_ID:
+                                              template: >-
+                                                {{$MicrosoftExcelOnlineAppendrow.rowData.L}}
+                              - Primary_Job_Posting_Location_Reference:
+                                  mappings:
+                                    - ID__NORMALIZED:
+                                        mappings:
+                                          - Location_ID:
+                                              template: >-
+                                                {{$MicrosoftExcelOnlineAppendrow.rowData.K}}
+                              - Primary_Location_Reference:
+                                  mappings:
+                                    - ID__NORMALIZED:
+                                        mappings:
+                                          - Location_ID:
+                                              template: >-
+                                                {{$MicrosoftExcelOnlineAppendrow.rowData.J}}
+                              - Recruiting_Start_Date___Date:
+                                  template: '{{$MicrosoftExcelOnlineAppendrow.rowData.N}}'
+                              - Scheduled_Weekly_Hours:
+                                  expression: '$MicrosoftExcelOnlineAppendrow.rowData.M '
+                              - Target_End_Date___Date:
+                                  template: '{{$MicrosoftExcelOnlineAppendrow.rowData.P}}'
+                              - Target_Hire_Date___Date:
+                                  template: '{{$MicrosoftExcelOnlineAppendrow.rowData.O}}'
+                              - Worker_Sub-Type_Reference:
+                                  mappings:
+                                    - ID__NORMALIZED:
+                                        mappings:
+                                          - Employee_Type_ID:
+                                              template: >-
+                                                {{$MicrosoftExcelOnlineAppendrow.rowData.I}}
+                              - Worker_Type_Reference:
+                                  mappings:
+                                    - ID__NORMALIZED:
+                                        mappings:
+                                          - Worker_Type_ID:
+                                              template: >-
+                                                {{$MicrosoftExcelOnlineAppendrow.rowData.H}}
+                        - Number_of_Openings:
+                            expression: '$MicrosoftExcelOnlineAppendrow.rowData.C '
+                        - Supervisory_Organization_Reference:
+                            mappings:
+                              - ID__NORMALIZED:
+                                  mappings:
+                                    - Organization_Reference_ID:
+                                        template: >-
+                                          {{$MicrosoftExcelOnlineAppendrow.rowData.A}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: job_requisitions successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: WorkdayCreateJobRequisition
+                        $ref: >-
+                          #/node-output/Workday Create Job
+                          Requisition/response/payload
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - budgetvalue:
+                          expression: '$Request.budgetvalue '
+                      - eventresponse:
+                          expression: '$WorkdayCreateJobRequisition '
+                  input: []
+        tags:
+          - incomplete
+  name: Create a job requistion in Workday
+  description: Use this API template to create a job requistion in Workday.
+models:
+  job_requisitions:
+    name: job_requisitions
+    properties:
+      budgetvalue:
+        required: false
+        id: true
+        type: number
+      eventresponse:
+        required: false
+        id: false
+        type: {}
+    plural: job_requisitions
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'

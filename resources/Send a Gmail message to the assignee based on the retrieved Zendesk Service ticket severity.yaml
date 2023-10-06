@@ -1,0 +1,93 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: request
+      connector-type: http
+      actions:
+        INVOKE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: HTTP Invoke method
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: INVOKE
+              map:
+                customSchemas:
+                  properties.`requestHeaders`:
+                    type: object
+                    properties:
+                      Username:
+                        type: string
+                      Password:
+                        type: string
+                      rejectUnauthorized:
+                        type: boolean
+                mappings:
+                  - continue2xx:
+                      expression: 'true'
+                  - method:
+                      template: GET
+                  - requestHeaders:
+                      mappings:
+                        - Password:
+                            template: 0bfaIZcF73MmJ5uPkCzW1UqD9l64GdBO
+                        - Username:
+                            template: rg7wvK6u
+                        - rejectUnauthorized:
+                            expression: 'false'
+                  - url:
+                      template: >-
+                        https://instance-name/Retrieve a ticket from Zendesk Service based on the ticket severity/triage?priority=urgent
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+        tags:
+          - incomplete
+  name: Send a Gmail message to the assignee based on the retrieved Zendesk Service ticket severity
+  description: Use this template to invoke an HTTP method to get the retrieved Zendesk Service tickets and send a Gmail message to the assignee to inform them of the status of the ticket. This is a sequel flow for 'Retrieve a ticket from Zendesk Service based on the ticket severity' template. Ensure that you specify the complete URL path of the Retrieve a ticket from Zendesk Service based on the ticket severity template. 
+models: {}
