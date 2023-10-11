@@ -425,7 +425,7 @@
   {
    "name": "Record Microsoft Dynamics 365 campaign to Google Sheets",
    "description": "This template creates a new row in Google Sheets whenever a campaign is added in Microsoft Dynamics 365 for Sales.",
-   "summary": "Microsoft Dynamics 365 to Google Sheet",
+   "summary": "Microsoft Dynamics 365 to Google Sheets",
    "sourceApp": "msdynamicscrmrest",
    "targetApps": ["googlesheet"],
    "tags": ["msdynamicscrmrest", "googlesheet"],
@@ -2580,6 +2580,42 @@
    "sourceApp": "github",
    "targetApps": ["servicenow", "slack", "github"],
    "tags": ["github", "servicenow", "slack", "github", "setVariable", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a contact list or a contact in HubSpot Marketing when a new form entry is created in Wufoo",
+   "description": "Use this template to create a contact list or a contact in HubSpot Marketing when a new form entry is created in Wufoo. In this example, consider that an event is being organized only for women. When a new Wufoo form entry is created, HubSpot Marketing retrieves its contact list. A contact list will be created based on the company details provided in the form. If the company doesn't exist in HubSpot Marketing, a new contact list is created. If the company already exists, a contact is directly created in HubSpot Marketing. A contact is created in HubSpot Marketing only if the contact is female. Otherwise, a Gmail message gets sent to the recipient, notifying them that the event is only for women.",
+   "summary": "Wufoo to 2 applications",
+   "sourceApp": "wufoo",
+   "targetApps": ["hubspotmarketing", "hubspotmarketing", "gmail", "hubspotmarketing"],
+   "tags": ["wufoo", "hubspotmarketing", "gmail", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Gmail message to the marketing team for each marketing campaign data retrieved from HubSpot Marketing",
+   "description": "Use this template to send a Gmail message to the marketing team for each marketing campaign data retrieved from HubSpot Marketing.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["hubspotmarketing", "hubspotmarketing", "gmail"],
+   "tags": ["scheduler", "hubspotmarketing", "gmail"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a marketing event in HubSpot Marketing and send event details through Gmail for each Eventbrite event",
+   "description": "Use this template to create a marketing event in HubSpot Marketing for each event retrieved from Eventbrite. In this example, for each Eventbrite event that has been newly created, a HubSpot Marketing event is created. A Gmail message is then sent to the intended recipient, containing the details of the event.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "hubspotmarketing", "gmail"],
+   "tags": ["scheduler", "hubspotmarketing", "gmail", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Record event attendance for each Eventbrite attendee by syncing Eventbrite events with HubSpot Marketing events",
+   "description": "Use this template to Record event attendance for each Eventbrite attendee by syncing Eventbrite events with HubSpot Marketing events. In this example, the marketing events that were created earlier are being retrieved. The attendance of each Eventbrite attendee is being recorded together with the attendee's contact email ID and the attendance date in HubSpot Marketing.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["hubspotmarketing", "hubspotmarketing", "eventbrite", "hubspotmarketing", "gmail"],
+   "tags": ["scheduler", "hubspotmarketing", "gmail", "foreach", "eventbrite"],
    "offerings": ["app connect professional"]
   }
 ]

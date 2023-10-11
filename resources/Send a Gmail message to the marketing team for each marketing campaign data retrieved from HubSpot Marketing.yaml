@@ -1,0 +1,167 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getEmailPublicV1Campaigns_model
+      connector-type: hubspotmarketing
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getEmailPublicV1CampaignsByCampaignsid_model
+      connector-type: hubspotmarketing
+      actions:
+        getEmailPublicV1CampaignsByCampaignsid: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot Marketing Retrieve email campaigns data
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$HubSpotMarketingRetrieveemailcampaignsdata '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response/payload
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdataMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: HubSpot Marketing Email Campaigns
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: HubSpot Marketing Retrieve email campaigns data by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: getEmailPublicV1CampaignsByCampaignsid
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response/payload
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdataMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  campaignsid: '{{$Foreachitem.id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response/payload
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdataMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$HubSpotMarketingRetrieveemailcampaignsdatabyID}}'
+                  - Subject:
+                      template: >-
+                        Email Campaign Data
+                        {{$HubSpotMarketingRetrieveemailcampaignsdatabyID.id}}
+                  - To:
+                      template: user3@email.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdatabyID
+                    $ref: >-
+                      #/block/For each/node-output/HubSpot Marketing Retrieve
+                      email campaigns data by ID/response/payload
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response/payload
+                  - variable: HubSpotMarketingRetrieveemailcampaignsdataMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve email campaigns
+                      data/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a Gmail message to the marketing team for each marketing campaign data retrieved from HubSpot Marketing
+models: {}
