@@ -2610,8 +2610,8 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Sync Eventbrite events with HubSpot Marketing events and record event attendance for each Eventbrite attendee",
-   "description": "Use this template to sync Eventbrite events with HubSpot Marketing events and record event attendance for each Eventbrite attendee. In this example, the marketing events that were created earlier are being retrieved. The attendance of each Eventbrite attendee is being recorded together with the attendee's contact email ID and the attendance date in HubSpot Marketing.",
+   "name": "Record event attendance for each Eventbrite attendee by syncing Eventbrite events with HubSpot Marketing events",
+   "description": "Use this template to Record event attendance for each Eventbrite attendee by syncing Eventbrite events with HubSpot Marketing events. In this example, the marketing events that were created earlier are being retrieved. The attendance of each Eventbrite attendee is being recorded together with the attendee's contact email ID and the attendance date in HubSpot Marketing.",
    "summary": "Scheduler to 3 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["hubspotmarketing", "hubspotmarketing", "eventbrite", "hubspotmarketing", "gmail"],
