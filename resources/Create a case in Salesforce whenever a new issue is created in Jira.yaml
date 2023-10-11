@@ -1,0 +1,56 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            key: WOR
+            parentFilter:
+              key: WOR
+            subscription:
+              createdField: dateCreated
+              updatedField: dateModified
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: '5'
+      connector-type: jira
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Salesforce Create case
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Description:
+                      template: JIRA Reference - {{$Trigger.id}}
+                  - Subject:
+                      template: JIRA Reference - {{$Trigger.id}}
+                  - SuppliedEmail:
+                      template: '{{$Trigger.fields.creator.emailAddress}}'
+                  - SuppliedName:
+                      template: '{{$Trigger.fields.creator.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a case in Salesforce whenever a new issue is created in Jira
+models: {}

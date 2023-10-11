@@ -1,0 +1,342 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 30 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        UPDATEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zendesk Service Retrieve tickets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  status: pending
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ZendeskServiceRetrievetickets '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceRetrievetickets
+                    $ref: >-
+                      #/node-output/Zendesk Service Retrieve
+                      tickets/response/payload
+                  - variable: ZendeskServiceRetrieveticketsMetadata
+                    $ref: '#/node-output/Zendesk Service Retrieve tickets/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Zendesk Service Ticket
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable 3
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      last_updated_converted:
+                        type: number
+                      current_time_converted:
+                        type: number
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceRetrievetickets
+                    $ref: >-
+                      #/node-output/Zendesk Service Retrieve
+                      tickets/response/payload
+                  - variable: ZendeskServiceRetrieveticketsMetadata
+                    $ref: '#/node-output/Zendesk Service Retrieve tickets/response'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - current_time_converted:
+                            expression: $number($toMillis($Trigger.currentEventTime))
+                        - last_updated_converted:
+                            expression: '$number($toMillis($Foreachitem.updated_at)) '
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Sum_3days_post_last_updated:
+                        type: number
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable3
+                    $ref: >-
+                      #/block/For each/node-output/Set variable
+                      3/response/payload
+                  - variable: ZendeskServiceRetrievetickets
+                    $ref: >-
+                      #/node-output/Zendesk Service Retrieve
+                      tickets/response/payload
+                  - variable: ZendeskServiceRetrieveticketsMetadata
+                    $ref: '#/node-output/Zendesk Service Retrieve tickets/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Sum_3days_post_last_updated:
+                            expression: >-
+                              $number(259200000+$Setvariable3.variable.last_updated_converted) 
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Setvariable3
+                  $ref: '#/block/For each/node-output/Set variable 3/response/payload'
+                - variable: Setvariable2
+                  $ref: '#/block/For each/node-output/Set variable 2/response/payload'
+                - variable: ZendeskServiceRetrievetickets
+                  $ref: >-
+                    #/node-output/Zendesk Service Retrieve
+                    tickets/response/payload
+                - variable: ZendeskServiceRetrieveticketsMetadata
+                  $ref: '#/node-output/Zendesk Service Retrieve tickets/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Setvariable3.variable.current_time_converted}}':
+                          gte: >-
+                            {{$Setvariable2.variable.Sum_3days_post_last_updated}}
+                      - '{{$Foreachitem.ticket_fields.id__22172871394713}}':
+                          '=': 'true'
+                        hashKey: object:86
+                  execute:
+                    - update-action:
+                        name: Zendesk Service Update ticket
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - comment:
+                                mappings:
+                                  - body:
+                                      template: >-
+                                        Closing the ticket as no response
+                                        received from the customer.
+                            - status:
+                                template: closed
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable3
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                3/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                2/response/payload
+                            - variable: ZendeskServiceRetrievetickets
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response/payload
+                            - variable: ZendeskServiceRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            id: '{{$Foreachitem.id}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable3
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                3/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                2/response/payload
+                            - variable: ZendeskServiceRetrievetickets
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response/payload
+                            - variable: ZendeskServiceRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-empty-output: true
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Ticket No.  {{$ZendeskServiceUpdateticket.id}}
+                                  is closed as no response received from the
+                                  customer.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZendeskServiceUpdateticket
+                              $ref: >-
+                                #/block/If/node-output/Zendesk Service Update
+                                ticket/response/payload
+                            - variable: ZendeskServiceUpdateticketMetadata
+                              $ref: >-
+                                #/block/If/node-output/Zendesk Service Update
+                                ticket/response
+                            - variable: Setvariable3
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                3/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                2/response/payload
+                            - variable: ZendeskServiceRetrievetickets
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response/payload
+                            - variable: ZendeskServiceRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04KMH8MALT
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: No tickets updated.
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Setvariable3
+                            $ref: >-
+                              #/block/For each/node-output/Set variable
+                              3/response/payload
+                          - variable: Setvariable2
+                            $ref: >-
+                              #/block/For each/node-output/Set variable
+                              2/response/payload
+                          - variable: ZendeskServiceRetrievetickets
+                            $ref: >-
+                              #/node-output/Zendesk Service Retrieve
+                              tickets/response/payload
+                          - variable: ZendeskServiceRetrieveticketsMetadata
+                            $ref: >-
+                              #/node-output/Zendesk Service Retrieve
+                              tickets/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Update a ticket status in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days
+models: {}

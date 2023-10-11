@@ -1,0 +1,54 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1B0ZIEeUEoybdmdPQk9BXeYyw94yXh5lfpOGhAsnfyZE
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1B0ZIEeUEoybdmdPQk9BXeYyw94yXh5lfpOGhAsnfyZE
+              worksheetID: Sheet1
+      connector-type: googlesheet
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: GitHub Create issue
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - OwnerName:
+                      template: non-ibm
+                  - RepoName:
+                      template: multicct
+                  - body:
+                      template: '{{$Trigger.fields."2"}}'
+                  - labels:
+                      expression: '$Trigger.fields."3" '
+                  - title:
+                      template: '{{$Trigger.fields."1"}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an issue in GitHub when a new complete row is appended in Google Sheets
+models: {}

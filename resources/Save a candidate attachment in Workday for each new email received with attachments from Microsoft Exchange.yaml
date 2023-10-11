@@ -1,0 +1,192 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: msexchange
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Messages
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            parentFolderId: >-
+              AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwAuAAAAAACA6ugh45R4QKPbS5lwvph5AQD4gXnEhMN7Tr04V9vM_2_9AAL-YKaxAAA=
+            parentFilter:
+              parentFolderId: >-
+                AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwAuAAAAAACA6ugh45R4QKPbS5lwvph5AQD4gXnEhMN7Tr04V9vM_2_9AAL-YKaxAAA=
+            subscription:
+              createdField: createdDateTime
+              updatedField: lastModifiedDateTime
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Recruiting___Put_Candidate_Attachment
+      connector-type: workday
+      actions:
+        Put_Candidate_Attachment: {}
+    action-interface-2:
+      type: api-action
+      business-object: Attachments
+      connector-type: msexchange
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Attachments
+      connector-type: msexchange
+      actions:
+        DOWNLOADATTACHMENT: {}
+    action-interface-4:
+      type: api-action
+      business-object: Recruiting___Get_Candidates
+      connector-type: workday
+      actions:
+        Get_Candidates: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.hasAttachments}}': 'true'
+                  execute:
+                    - custom-action:
+                        name: Workday Get Candidates
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: Get_Candidates
+                        map:
+                          mappings:
+                            - Request_Criteria:
+                                mappings:
+                                  - Candidate_Email_Address:
+                                      template: '{{$Trigger.toRecipients[0].address}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - retrieve-action:
+                        name: Microsoft Exchange Retrieve attachments
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            and:
+                              - id: '{{$Trigger.id}}'
+                              - AttachmentHolderType: Messages
+                              - AttachmentOwnerId: >-
+                                  AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwBGAAAAAACA6ugh45R4QKPbS5lwvph5BwD4gXnEhMN7Tr04V9vM_2_9AAAAAAEMAAD4gXnEhMN7Tr04V9vM_2_9AAMFtrlAAAA=
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WorkdayGetCandidates
+                              $ref: >-
+                                #/node-output/Workday Get
+                                Candidates/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - custom-action:
+                        name: Microsoft Exchange Download attachment
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: DOWNLOADATTACHMENT
+                        map:
+                          mappings:
+                            - AttachmentHolderType:
+                                template: Messages
+                            - AttachmentOwnerId:
+                                template: >-
+                                  AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwBGAAAAAACA6ugh45R4QKPbS5lwvph5BwD4gXnEhMN7Tr04V9vM_2_9AAAAAAEJAAD4gXnEhMN7Tr04V9vM_2_9AAMFtq2nAAA=
+                            - id:
+                                template: >-
+                                  {{$MicrosoftExchangeRetrieveattachments[0].id}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WorkdayGetCandidates
+                              $ref: >-
+                                #/block/If/node-output/Workday Get
+                                Candidates/response/payload
+                            - variable: MicrosoftExchangeRetrieveattachments
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Retrieve attachments/response/payload
+                            - variable: MicrosoftExchangeRetrieveattachmentsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Retrieve attachments/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Workday Put Candidate Attachment
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: Put_Candidate_Attachment
+                        map:
+                          mappings:
+                            - Candidate_Reference:
+                                mappings:
+                                  - ID__NORMALIZED:
+                                      mappings:
+                                        - Candidate_ID:
+                                            template: >-
+                                              {{$WorkdayGetCandidates.Request_References.Candidate_Reference[0].ID__NORMALIZED.Candidate_ID}}
+                            - Job_Application_Attachment_Data:
+                                foreach:
+                                  mappings:
+                                    - Attachment_Data:
+                                        mappings:
+                                          - File_Content:
+                                              template: sample file content
+                                          - Filename:
+                                              template: >-
+                                                {{$MicrosoftExchangeRetrieveattachments.name}}
+                                  input: '[1]'
+                                  iterator: Job_Application_Attachment_DataItem
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WorkdayGetCandidates
+                              $ref: >-
+                                #/block/If/node-output/Workday Get
+                                Candidates/response/payload
+                            - variable: MicrosoftExchangeRetrieveattachments
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Retrieve attachments/response/payload
+                            - variable: MicrosoftExchangeRetrieveattachmentsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Retrieve attachments/response
+                            - variable: MicrosoftExchangeDownloadattachment
+                              $ref: >-
+                                #/block/If/node-output/Microsoft Exchange
+                                Download attachment/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Save a candidate attachment in Workday for each new email received with attachments from Microsoft Exchange
+models: {}

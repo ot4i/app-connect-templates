@@ -1,0 +1,99 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '182726432864867'
+            parentFilter:
+              workspace-id: '182726432864867'
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATEQUICKEVENT: {}
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: AsanaCreatetask
+                  $ref: '#/node-output/Asana Create task/response/payload'
+                - variable: AsanaRetrievetasks
+                  $ref: '#/node-output/Asana Retrieve tasks/response/payload'
+                - variable: AsanaRetrievetasksMetadata
+                  $ref: '#/node-output/Asana Retrieve tasks/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.completed}}': 'False'
+                  execute:
+                    - custom-action:
+                        name: Google Calendar Create quick event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: CREATEQUICKEVENT
+                        map:
+                          mappings:
+                            - id:
+                                template: ffbld01@ibmappcon.com
+                            - text:
+                                template: '{{$Trigger.name}} --- disucssion'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AsanaCreatetask
+                              $ref: '#/node-output/Asana Create task/response/payload'
+                            - variable: AsanaRetrievetasks
+                              $ref: >-
+                                #/node-output/Asana Retrieve
+                                tasks/response/payload
+                            - variable: AsanaRetrievetasksMetadata
+                              $ref: '#/node-output/Asana Retrieve tasks/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04FRCNTLLX
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: '{{$Trigger.name}} is complete'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a quick event in Google Calendar when a new task is created in Asana
+models: {}
