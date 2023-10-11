@@ -190,5 +190,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Create a marketing event in HubSpot Marketing with event details emailed through Gmail for each retrieved Eventbrite event
+  name: Create a marketing event in HubSpot Marketing and send event details through Gmail for each Eventbrite event
 models: {}
