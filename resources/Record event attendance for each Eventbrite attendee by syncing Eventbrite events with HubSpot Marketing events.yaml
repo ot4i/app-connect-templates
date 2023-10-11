@@ -368,6 +368,6 @@ integration:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
               display-name: Eventbrite attendees
-  name: Sync Eventbrite events with HubSpot Marketing events and record event attendance for each Eventbrite attendee
+  name: Record event attendance for each Eventbrite attendee by syncing Eventbrite events with HubSpot Marketing events
 description: Use this template to sync Eventbrite events with HubSpot Marketing events and record event attendance for each Eventbrite attendee. In this example, the marketing events that were created earlier are being retrieved. The attendance of each Eventbrite attendee is being recorded together with the attendee's contact email ID and the attendance date in HubSpot Marketing.
 models: {}
