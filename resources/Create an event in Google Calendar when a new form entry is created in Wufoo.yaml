@@ -1,0 +1,63 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: wufoo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: q1z0scqf0z2bi37
+            parentFilter:
+              Hash: q1z0scqf0z2bi37
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Calendar Create event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - attendees:
+                      foreach:
+                        input: '[1]'
+                        iterator: attendeesItem
+                        mappings:
+                          - email:
+                              template: '{{$Trigger.Field9}}'
+                  - description:
+                      template: >-
+                        Hi {{$Trigger.Field15}} Thank you for filling the form
+                        scheduling this meeting for further discussion
+                  - endTime:
+                      template: '2023-07-23T10:00:00'
+                  - id:
+                      template: ffbld01@ibmappcon.com
+                  - startTime:
+                      template: '2023-07-23T09:00:00'
+                  - summary:
+                      template: Invitation for {{$Trigger.Field15}}
+                  - timeZone:
+                      template: Asia/Kolkata
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an event in Google Calendar when a new form entry is created in Wufoo
+models: {}

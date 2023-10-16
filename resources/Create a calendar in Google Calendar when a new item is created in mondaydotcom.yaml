@@ -1,0 +1,51 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Item
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            board_id: '1805789002'
+            parentFilter:
+              board_id: '1805789002'
+            subscription: {}
+      connector-type: mondaydotcom
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: calendars
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Calendar Create calendar
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - conferenceProperties:
+                      mappings:
+                        - allowedConferenceSolutionTypes:
+                            expression: hangoutsMeet
+                  - summary:
+                      template: '{{$Trigger.item_name}}'
+                  - timeZone:
+                      template: Asia/Kolkata
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a calendar in Google Calendar when a new item is created in mondaydotcom
+models: {}

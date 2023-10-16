@@ -1,0 +1,63 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            OwnerName: non-ibm
+            RepoName: multicct
+            parentFilter:
+              OwnerName: non-ibm
+              RepoName: multicct
+            subscription:
+              createdField: updated_at
+              updatedField: updated_at
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.number}}'
+                        - '2':
+                            template: '{{$Trigger.title}}'
+                        - '3':
+                            template: '{{$Trigger.body}}'
+                        - '4':
+                            template: '{{$Trigger.state}}'
+                  - spreadsheetID:
+                      template: 1mjRDjSAhhSUChGiAtFGTI_gy86H42PFwdLWlp-1_pYw
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a row in a Google Sheets spreadsheet when an issue is created or updated on GitHub
+models: {}

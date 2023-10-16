@@ -1,0 +1,54 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1vesDuEO05jVOPQOnwAVP5XMqHGJzCRX-Pjh8Q6MxBLU
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1vesDuEO05jVOPQOnwAVP5XMqHGJzCRX-Pjh8Q6MxBLU
+              worksheetID: Sheet1
+      connector-type: googlesheet
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Post
+      connector-type: wordpress
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: WordPress Create post
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - content:
+                      template: '{{$Trigger.fields."2"}}'
+                  - site_ID:
+                      template: '136907143'
+                  - status:
+                      template: publish
+                  - title:
+                      template: '{{$Trigger.fields."1"}}'
+                  - type:
+                      template: post
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a post in WordPress when a new complete row is appended in Google Sheets
+models: {}
