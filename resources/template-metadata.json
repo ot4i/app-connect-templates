@@ -2617,6 +2617,15 @@
    "targetApps": ["hubspotmarketing", "hubspotmarketing", "eventbrite", "hubspotmarketing", "gmail"],
    "tags": ["scheduler", "hubspotmarketing", "gmail", "foreach", "eventbrite"],
    "offerings": ["app connect professional"]
+  },
+  {
+  "name": "Download expense report and send report to the manager for the approval via DocuSign",
+  "description": "Use this template to download expense report and send report to the manager for the approval via DocuSign",
+  "summary": "DocuSign to 2 applications",
+  "sourceApp": "docusign",
+  "targetApps": ["expensify", "docusign"],
+  "tags": ["expensify", "docusign"],
+  "offerings": ["app connect professional"]
   }
 ]
 }
