@@ -124,6 +124,6 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Create a contact in HubSpot Marketing when a new row is appended in Microsoft Excel Onlineg
+  name: Create a contact in HubSpot Marketing when a new row is appended in Microsoft Excel Online
   description: Use this template to create a contact in HubSpot Marketing whenever a new row is appended in Microsoft Excel Online. In this example, a contact is created in HubSpot Marketing for each row retrieved from the Microsoft Excel Online spreadsheet with a unique email address.
 models: {}
