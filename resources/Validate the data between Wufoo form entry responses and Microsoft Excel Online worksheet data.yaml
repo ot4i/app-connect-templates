@@ -1,0 +1,443 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: wufoo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: k1sjko9a0eit42h
+            parentFilter:
+              Hash: k1sjko9a0eit42h
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Column
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Excel Online Retrieve column data
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  and:
+                    - targetedColumn: A
+                    - DriveId: >-
+                        b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                    - WorkbookId: 01NODPFITDX4TNWOBKXFGKZZF7XFTQRVXJ
+                    - WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - set-variable:
+              name: Set variable 3
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      ExcelAnswers:
+                        type: array
+                        items:
+                          type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response
+                  - variable: MicrosoftExcelOnlineRetrievecolumndata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve column
+                      data/response/payload
+                  - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve column
+                      data/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - ExcelAnswers:
+                            expression: >-
+                              $MicrosoftExcelOnlineRetrievecolumndata.columnData 
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Questions:
+                        type: array
+                        items:
+                          type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Questions:
+                            expression: '$keys($Trigger) '
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$Setvariable.variable.Questions '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrievecolumndata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve column
+                      data/response/payload
+                  - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve column
+                      data/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Answer given
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftExcelOnlineRetrievecolumndata
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve column
+                    data/response/payload
+                - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve column
+                    data/response
+                - variable: Setvariable3
+                  $ref: '#/node-output/Set variable 3/response/payload'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$contains($Foreachitem, "Field")}}':
+                      '=': 'true'
+                  execute:
+                    - set-variable:
+                        name: Set variable 2
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas:
+                            properties.`variable`:
+                              type: object
+                              properties:
+                                Answer:
+                                  type: string
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - variable:
+                                mappings:
+                                  - Answer:
+                                      template: '{{$lookup($Trigger, $Foreachitem )}}'
+                    - for-each:
+                        name: For each 2
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-3'
+                        source:
+                          expression: '$Setvariable3.variable.ExcelAnswers '
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/If 2/node-output/Set variable
+                                2/response/payload
+                            - variable: MicrosoftExcelOnlineRetrievecolumndata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                column data/response/payload
+                            - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                column data/response
+                            - variable: Setvariable3
+                              $ref: '#/node-output/Set variable 3/response/payload'
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas: {}
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage4
+                              $ref: >-
+                                #/block/For each 2/node-output/Slack Send
+                                message 4/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/If 2/node-output/Set variable
+                                2/response/payload
+                            - variable: MicrosoftExcelOnlineRetrievecolumndata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                column data/response/payload
+                            - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                column data/response
+                            - variable: Setvariable3
+                              $ref: '#/node-output/Set variable 3/response/payload'
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings: []
+                        display-name: Correct Answer
+              else:
+                execute: []
+              output-schema: {}
+    assembly-3:
+      assembly:
+        execute:
+          - create-action:
+              name: Slack Send message 4
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04KMH8MALT
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        inner for loop -  answer given is  --- 
+                        {{$Setvariable2.variable.Answer}} and correct answer is
+                        ---{{$Foreach2item}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: '#/block/If 2/node-output/Set variable 2/response/payload'
+                  - variable: MicrosoftExcelOnlineRetrievecolumndata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve column
+                      data/response/payload
+                  - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve column
+                      data/response
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SlackSendmessage4
+                  $ref: >-
+                    #/block/For each 2/node-output/Slack Send message
+                    4/response/payload
+                - variable: Setvariable2
+                  $ref: '#/block/If 2/node-output/Set variable 2/response/payload'
+                - variable: MicrosoftExcelOnlineRetrievecolumndata
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve column
+                    data/response/payload
+                - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve column
+                    data/response
+                - variable: Setvariable3
+                  $ref: '#/node-output/Set variable 3/response/payload'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Setvariable2.variable.Answer}}': '{{$Foreach2item}}'
+                  execute:
+                    - create-action:
+                        name: Slack Send message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: Correct answer - 5 points
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage4
+                              $ref: >-
+                                #/block/For each 2/node-output/Slack Send
+                                message 4/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/If 2/node-output/Set variable
+                                2/response/payload
+                            - variable: MicrosoftExcelOnlineRetrievecolumndata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                column data/response/payload
+                            - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                column data/response
+                            - variable: Setvariable3
+                              $ref: '#/node-output/Set variable 3/response/payload'
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04KMH8MALT
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: Wrong answer, 0 point
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SlackSendmessage4
+                            $ref: >-
+                              #/block/For each 2/node-output/Slack Send message
+                              4/response/payload
+                          - variable: Setvariable2
+                            $ref: >-
+                              #/block/If 2/node-output/Set variable
+                              2/response/payload
+                          - variable: MicrosoftExcelOnlineRetrievecolumndata
+                            $ref: >-
+                              #/node-output/Microsoft Excel Online Retrieve
+                              column data/response/payload
+                          - variable: MicrosoftExcelOnlineRetrievecolumndataMetadata
+                            $ref: >-
+                              #/node-output/Microsoft Excel Online Retrieve
+                              column data/response
+                          - variable: Setvariable3
+                            $ref: '#/node-output/Set variable 3/response/payload'
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Validate the data between Wufoo form entry responses and Microsoft Excel Online worksheet data
+  description: Use this template to check and validate the data between Wufoo form entry responses and Microsoft Excel Online worksheet data, and send a Slack message for the validated responses. In this example, the responses from the Wufoo entry are validated across a Microsoft Excel Online worksheet that contains answers for a course. The responses are validated with the answers, and a Slack notification gets sent to the intended recipient, whether the answer is correct or incorrect.
+models: {}
