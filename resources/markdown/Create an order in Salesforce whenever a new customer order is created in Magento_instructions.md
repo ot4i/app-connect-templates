@@ -9,4 +9,3 @@ To refer to these instructions while editing the flow, open [the github page](ht
 
 Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by Gmail whenever a new customer order is created in Magento.
 
-For more information about this flow, see the tutorial [Using IBM App Connect to interact with Magento](https://community.ibm.com/community/user/integration/viewdocument/using-ibm-app-connect-to-interact-w-1).
