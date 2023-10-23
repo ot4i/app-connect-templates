@@ -1333,11 +1333,11 @@
   },
   {
    "name": "Create an order in Salesforce whenever a new customer order is created in Magento",
-   "description": "Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by Gmail whenever a new customer order is created in Magento.",
+   "description": "Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by using Slack whenever a new customer order is created in Magento.",
    "summary": "Magento to 2 applications",
    "sourceApp": "magento",
-   "targetApps": ["salesforce", "gmail"],
-   "tags": ["salesforce", "magento", "gmail"],
+   "targetApps": ["salesforce", "slack"],
+   "tags": ["salesforce", "magento", "slack", "if"],
    "offerings": ["app connect professional"] 
   },
   {
