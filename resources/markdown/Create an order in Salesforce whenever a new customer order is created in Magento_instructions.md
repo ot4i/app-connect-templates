@@ -2,9 +2,9 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - **Magento** 
-   - **Salesforce**
-   - **Slack**
+   - [Magento](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-magento) 
+   - [Salesforce](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-salesforce)
+   - [Slack](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-slack)
 3. To start the flow, in the banner click **Start flow**.
 
 Use this template to update the order details in an enterprise resource planning (ERP) system, for example, Salesforce and send the order confirmation number by Gmail whenever a new customer order is created in Magento.
