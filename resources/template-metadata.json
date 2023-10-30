@@ -2619,12 +2619,12 @@
    "offerings": ["app connect professional"]
   },
   {
-  "name": "Download expense report and send report to the manager for the approval via DocuSign",
-  "description": "Use this template to download expense report and send report to the manager for the approval via DocuSign",
-  "summary": "DocuSign to 2 applications",
-  "sourceApp": "docusign",
+  "name": "Download an expense report in Expensify and send the report to the manager for approval via DocuSign",
+  "description": "Use this template to download an expense report in Expensify and send the report to the manager for the approval via DocuSign.",
+  "summary": "1 flow using 2 applications",
+  "sourceApp": "api",
   "targetApps": ["expensify", "docusign"],
-  "tags": ["expensify", "docusign"],
+  "tags": ["api", "expensify", "docusign"],
   "offerings": ["app connect professional"]
   }
 ]
