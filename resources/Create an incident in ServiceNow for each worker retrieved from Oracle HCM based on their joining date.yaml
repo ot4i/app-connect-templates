@@ -26,16 +26,16 @@ integration:
       connector-type: oraclehcm
       actions:
         RETRIEVEALL: {}
-    action-interface-3:
-      type: api-action
-      business-object: Users
-      connector-type: azuread
-      actions:
-        CREATE: {}
     action-interface-2:
       type: api-action
       business-object: incident
       connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Users
+      connector-type: azuread
       actions:
         CREATE: {}
   assemblies:
@@ -76,6 +76,8 @@ integration:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
               display-name: Oracle Human Capital Management worker
+        tags:
+          - incomplete
     assembly-2:
       assembly:
         execute:
@@ -175,7 +177,7 @@ integration:
                       gte: '{{$Setvariable2.variable.Sub_7days_before_joining}}'
                   execute:
                     - create-action:
-                        name: Microsoft Azure Active Directory Create user
+                        name: Microsoft Entra ID Create user
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-3'
                         map:
@@ -253,10 +255,10 @@ integration:
                               $ref: '#/block/For each/current-item'
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: MicrosoftAzureActiveDirectoryCreateuser
+                            - variable: MicrosoftEntraIDCreateuser
                               $ref: >-
-                                #/block/If/node-output/Microsoft Azure Active
-                                Directory Create user/response/payload
+                                #/block/If/node-output/Microsoft Entra ID
+                                Create user/response/payload
                             - variable: Setvariable
                               $ref: >-
                                 #/block/For each/node-output/Set
