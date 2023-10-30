@@ -224,5 +224,5 @@ integration:
                     $ref: '#/flowDetails'
                 limit: 10
   name: Syncs Microsoft Active Directory computers to Microsoft Entra ID
-  description: Use this template to create or update the device in Microsoft Azure Active Directory whenever a new computer is created or updated in Microsoft Active Directory, helping you keep your devices information in sync.
+  description: Use this template to create or update the device in Microsoft Entra ID whenever a new computer is created or updated in Microsoft Active Directory, helping you keep your devices information in sync.
 models: {}
