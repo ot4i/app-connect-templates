@@ -1062,8 +1062,8 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Syncs Microsoft Active Directory computers to Microsoft Azure Active Directory",
-   "description": " ",
+   "name": "Syncs Microsoft Active Directory computers to Microsoft Entra ID",
+   "description": "Use this template to create or update the device in Microsoft Entra ID whenever a new computer is created or updated in Microsoft Active Directory, helping you keep your devices information in sync",
    "summary": "Scheduler to 3 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["slack", "msad", "azuread"],
@@ -1071,8 +1071,8 @@
    "offerings": ["app connect professional"]
   },  
   {
-   "name": "Syncs Microsoft Active Directory users to Microsoft Azure Active Directory",
-   "description": "Use this template to create or update the user in Microsoft Azure Active Directory whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync. ",
+   "name": "Syncs Microsoft Active Directory users to Microsoft Entra ID",
+   "description": "Use this template to create or update the user in Microsoft Entra ID whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync. ",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["msad", "azuread"],
@@ -2503,7 +2503,7 @@
   },
   {
    "name": "Create an incident in ServiceNow for each worker retrieved from Oracle HCM based on their joining date",
-   "description": "Use this template to create a user in Microsoft Azure Active Directory and an incident in ServiceNow for each worker retrieved from Oracle Human Capital Management. In this example, when a worker is created in Oracle HCM with a start date that is 7 days prior to the joining date, a new user is created in Microsoft Azure Active Directory based on the worker's details. An incident is also created in ServiceNow requesting a new procurement laptop for the worker.",
+   "description": "Use this template to create a user in Microsoft Entra ID and an incident in ServiceNow for each worker retrieved from Oracle Human Capital Management. In this example, when a worker is created in Oracle HCM with a start date that is 7 days prior to the joining date, a new user is created in Microsoft Entra ID based on the worker's details. An incident is also created in ServiceNow requesting a new procurement laptop for the worker.",
    "summary": "Scheduler to 3 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["oraclehcm", "azuread", "servicenow"],
@@ -2511,9 +2511,9 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Delete a user from Microsoft Azure AD when an offboarding request is created for the user in Zendesk Service",
-   "description": "Use this template to delete an existing user from Microsoft Azure Active Directory when an offboarding request is created in Zendesk Service. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Azure Active Directory.",
-   "summary": "Zendesk Service to Microsoft Azure AD",
+   "name": "Delete a user from Microsoft Entra ID when an offboarding request is created for the user in Zendesk Service",
+   "description": "Use this template to delete an existing user from Microsoft Entra ID when an offboarding request is created in Zendesk Service. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Entra ID.",
+   "summary": "Zendesk Service to Microsoft Entra ID",
    "sourceApp": "zendeskservice",
    "targetApps": ["azuread", "azuread"],
    "tags": ["zendeskservice", "azuread", "if"],
