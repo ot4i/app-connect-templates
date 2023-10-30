@@ -282,5 +282,5 @@ integration:
                 execute: []
               output-schema: {}
   name: Create an incident in ServiceNow for each worker retrieved from Oracle HCM based on their joining date
-  description: Use this template to create a user in Microsoft Azure Active Directory and an incident in ServiceNow for each worker retrieved from Oracle Human Capital Management. In this example, when a worker is created in Oracle HCM with a start date that is 7 days prior to the joining date, a new user is created in Microsoft Azure Active Directory based on the worker's details. An incident is also created in ServiceNow requesting a new procurement laptop for the worker. 
+  description: Use this template to create a user in Microsoft Entra ID and an incident in ServiceNow for each worker retrieved from Oracle Human Capital Management. In this example, when a worker is created in Oracle HCM with a start date that is 7 days prior to the joining date, a new user is created in Microsoft Entra ID based on the worker's details. An incident is also created in ServiceNow requesting a new procurement laptop for the worker. 
 models: {}
