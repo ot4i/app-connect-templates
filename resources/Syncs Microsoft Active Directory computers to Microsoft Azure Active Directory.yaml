@@ -56,7 +56,7 @@ integration:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
                 where:
-                  ou: OU=AdityaUC,DC=ibm,DC=msad,DC=com
+                  ou: OU=Domain Controllers,DC=msad,DC=ibm,DC=com
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -72,8 +72,10 @@ integration:
                 $ref: '#/integration/action-interfaces/action-interface-3'
               map:
                 mappings:
-                  - channel:
-                      template: CJR8WDG2X
+                  - OBJECT_ID:
+                      template: CHFJ57UAX
+                  - OBJECT_NAME:
+                      template: channel
                   - text:
                       template: >-
                         {{$MicrosoftActiveDirectoryRetrievecomputers.cn}}======azure
@@ -154,7 +156,7 @@ integration:
                         - StringVariable:
                             template: '{{$Foreachitem.cn}}_{{$random()}}'
           - upsert-action:
-              name: Microsoft Azure Active Directory Update or create device
+              name: Microsoft Entra ID Update or create device
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               map:
@@ -220,9 +222,7 @@ integration:
                     $ref: '#/node-output/Slack Send message/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Syncs Microsoft Active Directory computers to Microsoft Azure Active Directory
-  description: >-
-    Use this template to create or update the device in Microsoft Azure Active Directory 
-    whenever a new computer is created or updated in Microsoft Active Directory, 
-    helping you keep your devices information in sync.
+                limit: 10
+  name: Syncs Microsoft Active Directory computers to Microsoft Entra ID
+  description: Use this template to create or update the device in Microsoft Azure Active Directory whenever a new computer is created or updated in Microsoft Active Directory, helping you keep your devices information in sync.
 models: {}
