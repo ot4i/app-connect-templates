@@ -125,7 +125,7 @@ integration:
                       - variable: flowDetails
                         $ref: '#/flowDetails'
                   input: []
-  name: Usecase DocuSign
+  name: Download an expense report in Expensify and send the report to the manager for approval via DocuSign
 models:
   create_report_upload:
     name: create_report_upload
