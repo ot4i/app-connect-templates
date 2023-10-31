@@ -28,21 +28,15 @@ integration:
                     - SUN
                   timeZone: UTC
   action-interfaces:
-    action-interface-3:
-      type: api-action
-      business-object: message
-      connector-type: slack
-      actions:
-        CREATE: {}
     action-interface-1:
       type: api-action
-      business-object: Computer
+      business-object: User
       connector-type: msad
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
-      business-object: Devices
+      business-object: Users
       connector-type: azuread
       actions:
         UPSERTWITHWHERE: {}
@@ -51,12 +45,12 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Microsoft Active Directory Retrieve computers
+              name: Microsoft Active Directory Retrieve users
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
                 where:
-                  ou: OU=AdityaUC,DC=ibm,DC=msad,DC=com
+                  ou: OU=Domain Controllers,DC=msad,DC=ibm,DC=com
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -66,48 +60,23 @@ integration:
               allow-truncation: true
               pagination-type: TOKEN
               allow-empty-output: true
-          - create-action:
-              name: Slack Send message
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
-              map:
-                mappings:
-                  - channel:
-                      template: CJR8WDG2X
-                  - text:
-                      template: >-
-                        {{$MicrosoftActiveDirectoryRetrievecomputers.cn}}======azure
-                $map: http://ibm.com/appconnect/map/v1
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: MicrosoftActiveDirectoryRetrievecomputers
-                    $ref: >-
-                      #/node-output/Microsoft Active Directory Retrieve
-                      computers/response/payload
-                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
-                    $ref: >-
-                      #/node-output/Microsoft Active Directory Retrieve
-                      computers/response
-                  - variable: flowDetails
-                    $ref: '#/flowDetails'
           - for-each:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
               source:
-                expression: '$MicrosoftActiveDirectoryRetrievecomputers '
+                expression: '$MicrosoftActiveDirectoryRetrieveusers '
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response/payload
-                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response
+                      users/response
                   - variable: SlackSendmessage
                     $ref: '#/node-output/Slack Send message/response/payload'
                   - variable: flowDetails
@@ -117,7 +86,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Microsoft Active Directory Computer
+              display-name: Microsoft Active Directory User
     assembly-2:
       assembly:
         execute:
@@ -129,21 +98,21 @@ integration:
                   properties.`variable`:
                     type: object
                     properties:
-                      StringVariable:
+                      UserName:
                         type: string
                 input:
                   - variable: Foreachitem
                     $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response/payload
-                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response
+                      users/response
                   - variable: SlackSendmessage
                     $ref: '#/node-output/Slack Send message/response/payload'
                   - variable: flowDetails
@@ -151,33 +120,35 @@ integration:
                 mappings:
                   - variable:
                       mappings:
-                        - StringVariable:
-                            template: '{{$Foreachitem.cn}}_{{$random()}}'
+                        - UserName:
+                            template: >-
+                              {{$substringBefore($Foreachitem.userPrincipalName,
+                              "@")}}
           - upsert-action:
-              name: Microsoft Azure Active Directory Update or create device
+              name: Microsoft Entra ID Update or create user
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               map:
                 mappings:
                   - accountEnabled:
                       expression: 'true'
-                  - alternativeSecurityIds:
-                      foreach:
-                        input: '[0]'
-                        iterator: alternativeSecurityIdsItem
-                        mappings:
-                          - altsecIDType:
-                              expression: '2'
-                          - key:
-                              template: >-
-                                {{$base64encode(
-                                $Setvariable.variable.StringVariable, utf-8)}}
-                  - displayName:
-                      template: '{{$Foreachitem.cn}}'
-                  - operatingSystem:
-                      template: '{{$Foreachitem.operatingSystem}}'
-                  - operatingSystemVersion:
-                      template: '{{$Foreachitem.operatingSystemVersion}}'
+                  - givenName:
+                      template: '{{$Foreachitem.givenName}}'
+                  - mailNickname:
+                      template: '{{$Setvariable.variable.UserName}}_{{$millis()}}'
+                  - passwordProfile:
+                      mappings:
+                        - forceChangePasswordNextSignIn:
+                            expression: 'true'
+                        - forceChangePasswordNextSignInWithMfa:
+                            expression: 'true'
+                        - password:
+                            template: Password_{{$random()}}
+                  - surname:
+                      template: '{{$Foreachitem.sn}}'
+                  - userPrincipalName:
+                      template: >-
+                        {{$Setvariable.variable.UserName}}@ibmappcon.onmicrosoft.com
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Foreachitem
@@ -186,21 +157,19 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: Setvariable
                     $ref: '#/block/For each/node-output/Set variable/response/payload'
-                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response/payload
-                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response
-                  - variable: SlackSendmessage
-                    $ref: '#/node-output/Slack Send message/response/payload'
+                      users/response
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter:
                 where:
-                  deviceId: '{{$Foreachitem.cn}}'
+                  displayName: '{{$Setvariable.variable.UserName}}'
                 input:
                   - variable: Foreachitem
                     $ref: '#/block/For each/current-item'
@@ -208,21 +177,17 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: Setvariable
                     $ref: '#/block/For each/node-output/Set variable/response/payload'
-                  - variable: MicrosoftActiveDirectoryRetrievecomputers
+                  - variable: MicrosoftActiveDirectoryRetrieveusers
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response/payload
-                  - variable: MicrosoftActiveDirectoryRetrievecomputersMetadata
+                      users/response/payload
+                  - variable: MicrosoftActiveDirectoryRetrieveusersMetadata
                     $ref: >-
                       #/node-output/Microsoft Active Directory Retrieve
-                      computers/response
-                  - variable: SlackSendmessage
-                    $ref: '#/node-output/Slack Send message/response/payload'
+                      users/response
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Syncs Microsoft Active Directory computers to Microsoft Azure Active Directory
-  description: >-
-    Use this template to create or update the device in Microsoft Azure Active Directory 
-    whenever a new computer is created or updated in Microsoft Active Directory, 
-    helping you keep your devices information in sync.
+                limit: 10
+  name: Syncs Microsoft Active Directory users to Microsoft Entra ID
+  description: Use this template to create or update the user in Microsoft Entra ID whenever a new user is created or updated in Microsoft Active Directory, helping you keep your user information in sync.
 models: {}

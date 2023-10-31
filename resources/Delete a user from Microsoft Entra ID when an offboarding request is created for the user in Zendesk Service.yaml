@@ -12,32 +12,28 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options:
             subscription:
-              createdField: created_at
-              updatedField: updated_at
-              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
               timeZone: UTC
               pollingInterval: 1
-              isCreatedQueryable: true
       connector-type: zendeskservice
   action-interfaces:
-    action-interface-1:
-      type: api-action
-      business-object: Users
-      connector-type: azuread
-      actions:
-        RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: Users
       connector-type: azuread
       actions:
         DELETEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: Users
+      connector-type: azuread
+      actions:
+        RETRIEVEALL: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
           - retrieve-action:
-              name: Microsoft Azure Active Directory Retrieve users
+              name: Microsoft Entra ID Retrieve users
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
@@ -51,20 +47,18 @@ integration:
                 limit: 10
               allow-truncation: true
               pagination-type: TOKEN
-              allow-empty-output: true
+              allow-empty-output: false
           - if:
               name: If
               input:
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: MicrosoftAzureActiveDirectoryRetrieveusers
+                - variable: MicrosoftEntraIDRetrieveusers
                   $ref: >-
-                    #/node-output/Microsoft Azure Active Directory Retrieve
+                    #/node-output/Microsoft Entra ID Retrieve
                     users/response/payload
-                - variable: MicrosoftAzureActiveDirectoryRetrieveusersMetadata
-                  $ref: >-
-                    #/node-output/Microsoft Azure Active Directory Retrieve
-                    users/response
+                - variable: MicrosoftEntraIDRetrieveusersMetadata
+                  $ref: '#/node-output/Microsoft Entra ID Retrieve users/response'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
               branch:
@@ -72,29 +66,27 @@ integration:
                     and:
                       - '{{$Trigger.ticket_fields.id__21959434346521}}':
                           '=': 'true'
-                      - '{{$MicrosoftAzureActiveDirectoryRetrieveusersMetadata."status-code"}}': '200'
+                      - '{{$MicrosoftEntraIDRetrieveusersMetadata."status-code"}}': '200'
                         hashKey: object:883
                   execute:
                     - delete-action:
-                        name: Microsoft Azure Active Directory Delete user
+                        name: Microsoft Entra ID Delete user
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         filter:
                           where:
-                            id: >-
-                              {{$MicrosoftAzureActiveDirectoryRetrieveusers[0].id}}
+                            id: '{{$MicrosoftEntraIDRetrieveusers[0].id}}'
                           input:
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: MicrosoftAzureActiveDirectoryRetrieveusers
+                            - variable: MicrosoftEntraIDRetrieveusers
                               $ref: >-
-                                #/node-output/Microsoft Azure Active Directory
-                                Retrieve users/response/payload
-                            - variable: >-
-                                MicrosoftAzureActiveDirectoryRetrieveusersMetadata
+                                #/node-output/Microsoft Entra ID Retrieve
+                                users/response/payload
+                            - variable: MicrosoftEntraIDRetrieveusersMetadata
                               $ref: >-
-                                #/node-output/Microsoft Azure Active Directory
-                                Retrieve users/response
+                                #/node-output/Microsoft Entra ID Retrieve
+                                users/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
                           limit: 1
@@ -102,6 +94,6 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Delete a user from Microsoft Azure AD when an offboarding request is created for the user in Zendesk Service
-  description: Use this template to delete an existing user from Microsoft Azure Active Directory when an offboarding request is created in Zendesk Service. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Azure Active Directory. 
+  name: Delete a user from Microsoft Entra ID when an offboarding request is created for the user in Zendesk Service
+  description: Use this template to delete an existing user from Microsoft Entra ID when an offboarding request is created in Zendesk Service. In this example, when a new ticket is created for an employee that is leaving an organization, the employee record is retrieved and deleted from Microsoft Entra ID. 
 models: {}
