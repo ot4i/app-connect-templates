@@ -17,7 +17,6 @@ integration:
             parentFilter:
               survey_id: '512752227'
               collector_id: '451440817'
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -25,7 +24,6 @@ integration:
       connector-type: yammer
       actions:
         CREATE: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
@@ -46,7 +44,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: >-
-    Create a message in Microsoft Viva Engage when a new response is received in
-    SurveyMonkey
+  name: Create a message in Microsoft Viva Engage when a new response is received in SurveyMonkey
 models: {}
