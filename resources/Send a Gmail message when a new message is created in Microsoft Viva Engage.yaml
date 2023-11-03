@@ -1,0 +1,64 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Message
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: yammer
+      account-name: Account 1
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      account-name: Account 1
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.sender_email}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  {{$Trigger.id}} message is created in
+                                  Microsoft Viva Engage.
+                            - Subject:
+                                template: Microsoft Viva Engage alert
+                            - To:
+                                template: '{{$Trigger.sender_email}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Gmail message when a new message is created in Microsoft Viva Engage
+models: {}
