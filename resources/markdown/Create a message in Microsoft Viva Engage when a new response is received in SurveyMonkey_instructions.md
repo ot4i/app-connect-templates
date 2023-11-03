@@ -6,7 +6,7 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [Microsoft Viva Engage](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-yammer)
 3. To start the flow, in the banner, click **Start flow**.
 
-Use this template to create a message in Yammer whenever a new response is received in SurveyMonkey.
+Use this template to create a message in Microsoft Viva Engage whenever a new response is received in SurveyMonkey.
 
 
 
