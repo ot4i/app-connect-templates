@@ -44,5 +44,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a message in Yammer when a new response is received in SurveyMonkey
+  name: Create a message in Microsoft Viva Engage when a new response is received in SurveyMonkey
 models: {}

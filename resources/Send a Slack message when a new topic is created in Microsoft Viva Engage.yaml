@@ -30,7 +30,7 @@ integration:
               map:
                 mappings:
                   - OBJECT_ID:
-                      template: C04FRCNTLLX
+                      template: C04KLM31CMP
                   - OBJECT_NAME:
                       template: channel
                   - text:
@@ -43,5 +43,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send a Slack message when a new topic is created in Yammer
+  name: Send a Slack message when a new topic is created in Microsoft Viva Engage
 models: {}

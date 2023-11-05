@@ -46,5 +46,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a message in Yammer when a new task is created in Asana
+  name: Create a message in Microsoft Viva Engage when a new task is created in Asana
 models: {}

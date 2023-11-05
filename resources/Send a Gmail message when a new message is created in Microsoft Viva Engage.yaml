@@ -42,9 +42,11 @@ integration:
                         map:
                           mappings:
                             - Body:
-                                template: '{{$Trigger.id}} message is created in yammer.'
+                                template: >-
+                                  {{$Trigger.id}} message is created in
+                                  Microsoft Viva Engage.
                             - Subject:
-                                template: Yammer alert
+                                template: Microsoft Viva Engage alert
                             - To:
                                 template: '{{$Trigger.sender_email}}'
                           $map: http://ibm.com/appconnect/map/v1
@@ -56,5 +58,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Send a Gmail message when a new message is created in Yammer
+  name: Send a Gmail message when a new message is created in Microsoft Viva Engage
 models: {}

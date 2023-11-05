@@ -2187,36 +2187,36 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create a message in Yammer when a new response is received in SurveyMonkey",
-   "description": "Use this template to create a message in Yammer whenever a new response is received in SurveyMonkey.",
-   "summary": "SurveyMonkey to Yammer",
+   "name": "Create a message in Microsoft Viva Engage when a new response is received in SurveyMonkey",
+   "description": "Use this template to create a message in Microsoft Viva Engage whenever a new response is received in SurveyMonkey.",
+   "summary": "SurveyMonkey to Microsoft Viva Engage",
    "sourceApp": "surveymonkey",
    "targetApps": ["yammer"],
    "tags": ["surveymonkey", "yammer"],
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create a message in Yammer when a new task is created in Asana",
-   "description": "Use this template to create a message whenever a new task is created in Asana.",
-   "summary": "Asana to Yammer",
+   "name": "Create a message in Microsoft Viva Engage when a new task is created in Asana",
+   "description": "Use this template to create a message in Microsoft Viva Engage whenever a new task is created in Asana.",
+   "summary": "Asana to Microsoft Viva Engage",
    "sourceApp": "asana",
    "targetApps": ["yammer"],
    "tags": ["asana", "yammer"],
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Send a Slack message when a new topic is created in Yammer",
-   "description": "Use this template to send a Slack message to the intended channel whenever a new topic is created in Yammer.",
-   "summary": "Yammer to Slack",
+   "name": "Send a Slack message when a new topic is created in Microsoft Viva Engage",
+   "description": "Use this template to send a Slack message to the intended channel whenever a new topic is created in Microsoft Viva Engage.",
+   "summary": "Microsoft Viva Engage to Slack",
    "sourceApp": "yammer",
    "targetApps": ["slack"],
    "tags": ["yammer", "slack"],
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Send a Gmail message when a new message is created in Yammer",
-   "description": "Use this template to send a Gmail message to the intended recipients whenever a new message is created in Yammer.",
-   "summary": "Yammer to Gmail",
+   "name": "Send a Gmail message when a new message is created in Microsoft Viva Engage",
+   "description": "Use this template to send a Gmail message to the intended recipients whenever a new message is created in Microsoft Viva Engage.",
+   "summary": "Microsoft Viva Engage to Gmail",
    "sourceApp": "yammer",
    "targetApps": ["gmail"],
    "tags": ["yammer", "gmail"],
