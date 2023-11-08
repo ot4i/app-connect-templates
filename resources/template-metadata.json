@@ -18,15 +18,6 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a Slack translation bot",
-   "description": "Configure a /translate Slack slash command and use this template to translate messages from English to French, and French to English. Use /translate before a message for the bot to identify the language and translate the message. A message then appears in the channel in both languages, allowing for real-time multilingual chat.",
-   "summary": "Slack to 2 applications",
-   "sourceApp": "slack",
-   "targetApps": ["watsonlt", "slack"],
-   "tags": ["slack", "Watson Language Translator", "translate", "translation", "french", "english", "chat", "language"],
-   "offerings": ["app connect professional"]
-  },
-  {
    "name": "Create a case in Salesforce when a new incident is created in ServiceNow and alert team",
    "description": "This template creates a new case in Salesforce when a new incident is created in ServiceNow. If this is an urgent incident, the flow then sends an email via Gmail and a message on Slack to alert the team when a highly urgent incident comes in to ServiceNow. This helps you to act quickly on your urgent support incidents!",
    "summary": "ServiceNow to 3 applications",
@@ -96,15 +87,6 @@
    "sourceApp": "gmail",
    "targetApps": ["slack"],
    "tags": ["gmail", "slack", "email"],
-   "offerings": ["app connect professional"]
-  },
-  {
-   "name": "Assign ServiceNow incidents on Slack based on the language",
-   "description": "This template uses Watson Language Translator to detect the language of new ServiceNow incidents, then send messages to the appropriate Slack channels based on the language.  It also sends a message to a separate Slack channel for the most urgent incidents.",
-   "summary": "ServiceNow to 2 applications",
-   "sourceApp": "servicenow",
-   "targetApps": ["watsonlt", "slack"],
-   "tags": ["ServiceNow", "Watson Language Translator", "support", "cognitive", "Slack", "incident", "messaging", "language detection"],
    "offerings": ["app connect professional"]
   },
   {
@@ -213,15 +195,6 @@
    "sourceApp": "slack",
    "targetApps": ["slack"],
    "tags": ["slack", "channels", "message", "copy", "callback", "callback url"],
-   "offerings": ["app connect professional"]
-  },
-  {
-   "name": "Create a new contact in Acoustic Campaign when a new contact is added in Salesforce",
-   "description": "Use this template to create a new contact in Acoustic Campaign when a new contact is created in the Salesforce.",
-   "summary": "Salesforce to Acoustic Campaign",
-   "sourceApp": "salesforce",
-   "targetApps": ["silverpop"],
-   "tags": ["salesforce", "silverpop", "marketing", "email", "contact"],
    "offerings": ["app connect professional"]
   },
   {
@@ -970,16 +943,7 @@
    "targetApps": ["mondaydotcom", "slack"],
    "tags": ["zendeskservice", "mondaydotcom", "slack"],
    "offerings": ["app connect professional"]
-  },  
-  {
-   "name": "Create new contact in Acoustic Campaign when a new contact is added in Salesforce",
-   "description": "Use this template to create a new contact in Acoustic Campaign when a new contact is created in the Salesforce.",
-   "summary": "Salesforce to Acoustic Campaign",
-   "sourceApp": "salesforce",
-   "targetApps": ["silverpop"],
-   "tags": ["salesforce", "silverpop"],
-   "offerings": ["app connect professional"]
-  },  
+  },   
   {
    "name": "Create order in IBM Sterling Order Management System for orders created in Microsoft Dynamics 365 for Sales",
    "description": "Use this template to create orders by using the IBM Order Management System’s create order asynchronous operation whenever any new orders are created in Microsoft Dynamics 365 for Sales.",
