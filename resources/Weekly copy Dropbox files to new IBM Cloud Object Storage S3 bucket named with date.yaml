@@ -397,5 +397,5 @@ integration:
                               #/node-output/IBM Cloud Object Storage S3 Create
                               bucket/response/payload
               output-schema: {}
-  name: Weekly copy Dropbox files to new COS S3 bucket named with date
+  name: Weekly copy Dropbox files to new IBM Cloud Object Storage S3 bucket named with date
 models: {}
