@@ -22,6 +22,7 @@ integration:
               timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
               timeZone: UTC
               pollingInterval: 1
+      connector-type: github
   action-interfaces:
     action-interface-1:
       type: api-action
