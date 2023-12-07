@@ -233,7 +233,7 @@ integration:
                               #/node-output/Amazon DynamoDB Retrieve
                               items/response
               output-schema: {}
-  name: Synchronize data between Amazon DynamoDB and Google Big Query
+  name: Synchronize data between Amazon DynamoDB and Google Cloud BigQuery
 models:
   Employee1:
     name: Employee1

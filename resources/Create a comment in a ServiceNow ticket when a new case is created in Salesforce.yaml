@@ -213,5 +213,5 @@ integration:
                       comment/response/payload
                   - variable: SalesforceRetrievecasecommentMetadata
                     $ref: '#/node-output/Salesforce Retrieve case comment/response'
-  name: Sync new Salesforce cases and comments with ServiceNow
+  name: Create a comment in a ServiceNow ticket when a new case is created in Salesforce
 models: {}

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Weekly%20copy%20Dropbox%20files%20to%20new%20COS%20S3%20bucket%20named%20with%20date_instuctions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Weekly%20copy%20Dropbox%20files%20to%20new%20IBM%20Cloud%20Object%20Storage%20S3%20bucket%20named%20with%20date_instuctions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Connect to your Dropbox account.  You can use a Dropbox user ID and password or use a Google account.

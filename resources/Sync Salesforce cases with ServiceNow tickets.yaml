@@ -89,5 +89,5 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
                   - variable: SalesforceRetrieveAccountMetadata
                     $ref: '#/node-output/Salesforce Retrieve Account/response'
-  name: Sync Salesforce new cases with ServiceNow tickets
+  name: Sync Salesforce cases with ServiceNow tickets
 models: {}
