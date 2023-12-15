@@ -1,0 +1,114 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      account-name: Account 1
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.LEAD_RATING}}':
+                      gt: '3'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Name: {{$Trigger.FIRST_NAME}}, Company: 
+                                  {{$Trigger.ORGANISATION_NAME}} Title:
+                                  {{$Trigger.TITLE}}, Mobile:
+                                  {{$Trigger.MOBILE}}, Email:
+                                  {{$Trigger.EMAIL}}, Address:
+                                  {{$Trigger.ADDRESS_STREET}}{{$Trigger.ADDRESS_CITY}}{{$Trigger.ADDRESS_STATE}}{{$Trigger.ADDRESS_POSTCODE}}
+                            - Subject:
+                                template: >-
+                                  New 'Hot' lead generated in Insightly -
+                                  {{$Trigger.LEAD_ID}}
+                            - To:
+                                template: johndoe@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.LEAD_RATING}}':
+                      lte: '3'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Name: {{$Trigger.FIRST_NAME}}, Company: 
+                                  {{$Trigger.ORGANISATION_NAME}} Title:
+                                  {{$Trigger.TITLE}}, Mobile:
+                                  {{$Trigger.MOBILE}}, Email:
+                                  {{$Trigger.EMAIL}}, Address:
+                                  {{$Trigger.ADDRESS_STREET}}{{$Trigger.ADDRESS_CITY}}{{$Trigger.ADDRESS_STATE}}{{$Trigger.ADDRESS_POSTCODE}}
+                            - Subject:
+                                template: >-
+                                  New 'Warm' lead generated in Insightly -
+                                  {{$Trigger.LEAD_ID}}
+                            - To:
+                                template: johndoe@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Send a Gmail message for new leads created in Insightly based on the lead
+    rating
+  description: >-
+    Use this template to send a Gmail message to the intended team members
+    whenever a new lead is created in Salesforce. If the lead's rating is 'Hot',
+    an email is sent with the lead's details. If the lead's rating is 'Warm', an
+    email is sent to notify Salesforce that a lead has been created.
+models: {}
