@@ -1,0 +1,110 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      account-name: Account 2
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Post
+      connector-type: wordpress
+      actions:
+        CREATE: {}
+      account-name: Account 1
+    action-interface-1:
+      type: api-action
+      business-object: Event
+      connector-type: insightly
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Insightly Retrieve events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$InsightlyRetrieveevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveevents
+                    $ref: '#/node-output/Insightly Retrieve events/response/payload'
+                  - variable: InsightlyRetrieveeventsMetadata
+                    $ref: '#/node-output/Insightly Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Insightly Event
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: WordPress Create post
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - site_ID:
+                      template: '136907143'
+                  - status:
+                      template: publish
+                  - title:
+                      template: '{{$Foreachitem.TITLE}}'
+                  - type:
+                      template: post
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveevents
+                    $ref: '#/node-output/Insightly Retrieve events/response/payload'
+                  - variable: InsightlyRetrieveeventsMetadata
+                    $ref: '#/node-output/Insightly Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a post in WordPress for each Insightly event
+models: {}

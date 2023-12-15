@@ -1,0 +1,130 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Messages
+      connector-type: msexchange
+      account-name: Account 1
+      actions:
+        SENDEMAIL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Messages
+      connector-type: msexchange
+      account-name: Account 1
+      actions:
+        SENDEMAIL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Rating}}': hot
+                  execute:
+                    - custom-action:
+                        name: Microsoft Exchange Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: SENDEMAIL
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Name: {{$Trigger.Name}}, Company: 
+                                        {{$Trigger.Company}}, Title:
+                                        {{$Trigger.Title}}, Mobile:
+                                        {{$Trigger.MobilePhone}}, Email:
+                                        {{$Trigger.Email}}, Address:
+                                        {{$Trigger.Street}} {{$Trigger.City}}
+                                        {{$Trigger.State}}
+                                        {{$Trigger.PostalCode}}, Product
+                                        Interest:
+                                        {{$Trigger.ProductInterest__c}}, Annual
+                                        Revenue: {{$Trigger.AnnualRevenue}},
+                                        LeadSource: {{$Trigger.LeadSource}}
+                            - subject:
+                                template: >-
+                                  New 'Hot' lead generated in Salesforce -
+                                  {{$Trigger.Id}}
+                            - toRecipientsRequested:
+                                template: johndoe@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.Rating}}': warm
+                  execute:
+                    - custom-action:
+                        name: Microsoft Exchange Send email 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: SENDEMAIL
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Name: {{$Trigger.Name}}, Company: 
+                                        {{$Trigger.Company}}, Title:
+                                        {{$Trigger.Title}}, Mobile:
+                                        {{$Trigger.MobilePhone}}, Email:
+                                        {{$Trigger.Email}}, Address:
+                                        {{$Trigger.Street}} {{$Trigger.City}}
+                                        {{$Trigger.State}}
+                                        {{$Trigger.PostalCode}}, Product
+                                        Interest:
+                                        {{$Trigger.ProductInterest__c}}, Annual
+                                        Revenue: {{$Trigger.AnnualRevenue}},
+                                        LeadSource: {{$Trigger.LeadSource}}
+                            - subject:
+                                template: >-
+                                  New 'Warm' lead generated in Salesforce -
+                                  {{$Trigger.Id}}
+                            - toRecipientsRequested:
+                                template: johndoe@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Send a MS Exchange message for new leads created in Salesforce based on the
+    lead rating
+  description: >-
+    Use this template to send a Gmail message to the intended team members
+    whenever a new lead is created in Salesforce. If the lead's rating is 'Hot',
+    an email is sent with the lead's details. If the lead's rating is 'Warm', an
+    email is sent to notify Salesforce that a lead has been created.
+models: {}
