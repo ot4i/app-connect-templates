@@ -19,20 +19,17 @@ integration:
                   timeZone: UTC
                   every: day
       connector-type: streaming-connector-scheduler
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Opportunity
       connector-type: salesforce
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: message
       connector-type: slack
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

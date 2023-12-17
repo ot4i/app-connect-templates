@@ -19,7 +19,6 @@ integration:
               workspace-id: '1160305558369131'
               team-id: '1160305558369133'
               project: '1160915618874788'
-      account-name: Account 1
   action-interfaces:
     action-interface-4:
       type: api-action
@@ -27,12 +26,10 @@ integration:
       connector-type: googlecalendar
       actions:
         CREATEQUICKEVENT: {}
-      account-name: Account 1
     action-interface-1:
       type: api-action
       business-object: Message
       connector-type: yammer
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

@@ -16,13 +16,11 @@ integration:
               organizationID: '344797520005'
             webhookURLSuffix: bvoo1VVTSF1LAdOHpkoNyQOQnRj-9RLZOHfXF91_nmTneGAGiQITTljyxt1n5PMi
       connector-type: eventbrite
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: folders
       connector-type: dropbox
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

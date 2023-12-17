@@ -15,7 +15,6 @@ integration:
               timeZone: UTC
               pollingInterval: 1
       connector-type: salesforce
-      account-name: Account 1
   action-interfaces:
     action-interface-2:
       type: api-action
@@ -23,21 +22,18 @@ integration:
       connector-type: wordpress
       actions:
         CREATE: {}
-      account-name: Account 1
     action-interface-1:
       type: api-action
       business-object: Category
       connector-type: wordpress
       actions:
         RETRIEVEALL: {}
-      account-name: Account 1
     action-interface-3:
       type: api-action
       business-object: Category
       connector-type: wordpress
       actions:
         CREATE: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:

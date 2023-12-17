@@ -19,7 +19,6 @@ integration:
                   timeZone: UTC
                   every: day
       connector-type: streaming-connector-scheduler
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -27,12 +26,10 @@ integration:
       connector-type: insightly
       actions:
         RETRIEVEALL: {}
-      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: Message
       connector-type: yammer
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

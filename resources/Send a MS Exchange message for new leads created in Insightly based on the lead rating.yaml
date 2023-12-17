@@ -12,20 +12,17 @@ integration:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
       connector-type: insightly
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Messages
       connector-type: msexchange
-      account-name: Account 1
       actions:
         SENDEMAIL: {}
     action-interface-2:
       type: api-action
       business-object: Messages
       connector-type: msexchange
-      account-name: Account 1
       actions:
         SENDEMAIL: {}
   assemblies:

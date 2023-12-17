@@ -18,13 +18,11 @@ integration:
             subscription:
               updatedField: updated
               pollingInterval: 5
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Folder
       connector-type: msonedrive
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

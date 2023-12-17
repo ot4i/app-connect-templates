@@ -2907,8 +2907,8 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Update the price book entry in Salesforce whenever a product is updated in Salesforce Commerce Cloud.",
-   "description": "Update the price book entry in Salesforce whenever a product is updated in Salesforce Commerce Cloud.",
+   "name": "Update the price book entry in Salesforce whenever a product is updated in Salesforce Commerce Cloud",
+   "description": "Update the price book entry in Salesforce whenever a product is updated in Salesforce Commerce Cloud",
    "summary": "Salesforce Commerce Cloud to Salesforce",
    "sourceApp": "sfcommerceclouddata",
    "targetApps": ["salesforce"],
