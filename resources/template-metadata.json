@@ -2590,6 +2590,330 @@
   "targetApps": ["expensify", "docusign"],
   "tags": ["api", "expensify", "docusign"],
   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add a card to a list in Trello when a new task is created in Salesforce",
+   "description": "Use this template to create a new card in Trello when a new task is created in Salesforce. In this example, based on Salesforce task category ID and priotity, a new card gets added to a list in Trello.",
+   "summary": "Salesforce to Trello",
+   "sourceApp": "salesforce",
+   "targetApps": ["trello"],
+   "tags": ["salesforce", "trello", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box for new events created in Eventbrite",
+   "description": "Use this template to create a box folder for new events created in Eventbrite. This scenario helps the user upload files or documents before the Eventbrite event into a Box folder.",
+   "summary": "EventBrite to Box",
+   "sourceApp": "eventbrite",
+   "targetApps": ["box"],
+   "tags": ["eventbrite", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box for new events created in Insightly",
+   "description": "Use this template to create a box folder for new events created in Insightly. This scenario helps the user upload files or documents before the Insightly event into a Box folder.",
+   "summary": "Insightly to Box",
+   "sourceApp": "insightly",
+   "targetApps": ["box"],
+   "tags": ["insightly", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Box for new events created in Salesforce",
+   "description": "Use this template to create a box folder for new events created in Salesforce. This scenario helps the user upload files or documents before the Salesforce event into a Box folder.",
+   "summary": "Salesforce to Box",
+   "sourceApp": "salesforce",
+   "targetApps": ["box"],
+   "tags": ["salesforce", "box"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Dropbox for new events created in Eventbrite",
+   "description": "Use this template to create a Dropbox folder for new events created in Eventbrite. This scenario helps the user upload files or documents before the Eventbrite event into a Dropbox folder.",
+   "summary": "EventBrite to Dropbox",
+   "sourceApp": "eventbrite",
+   "targetApps": ["dropbox"],
+   "tags": ["eventbrite", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Dropbox for new events created in Google Calendar",
+   "description": "Use this template to create a Dropbox folder for new events created in Google Calendar. This scenario helps the user upload files or documents before the Google Calendar event into a Dropbox folder.",
+   "summary": "Google Calendar to Dropbox",
+   "sourceApp": "googlecalendar",
+   "targetApps": ["dropbox"],
+   "tags": ["googlecalendar", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Dropbox for new events created in Insightly",
+   "description": "Use this template to create a Dropbox folder for new events created in Insightly. This scenario helps the user upload files or documents before the Insightly event into a Dropbox folder.",
+   "summary": "Insightly to Dropbox",
+   "sourceApp": "insightly",
+   "targetApps": ["dropbox"],
+   "tags": ["insightly", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Dropbox for new events created in Salesforce",
+   "description": "Use this template to create a Dropbox folder for new events created in Salesforce. This scenario helps the user upload files or documents before the Salesforce event into a Dropbox folder.",
+   "summary": "Salesforce to Dropbox",
+   "sourceApp": "salesforce",
+   "targetApps": ["dropbox"],
+   "tags": ["salesforce", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive for new events created in Eventbrite",
+   "description": "Use this template to create a Google Drive folder for new events created in Eventbrite. This scenario helps the user upload files or documents before the Eventbrite event into a Google Drive folder.",
+   "summary": "EventBrite to Google Drive",
+   "sourceApp": "eventbrite",
+   "targetApps": ["googledrive"],
+   "tags": ["eventbrite", "googledrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive for new events created in Google Calendar",
+   "description": "Use this template to create a Google Drive folder for new events created in Google Calendar. This scenario helps the user upload files or documents before the Google Calendar event into a Google Drive folder.",
+   "summary": "Google Calendar to Google Drive",
+   "sourceApp": "googlecalendar",
+   "targetApps": ["googledrive"],
+   "tags": ["googlecalendar", "googledrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive for new events created in Insightly",
+   "description": "Use this template to create a Google Drive folder for new events created in Insightly. This scenario helps the user upload files or documents before the Insightly event into a Google Drive folder.",
+   "summary": "Insightly to Google Drive",
+   "sourceApp": "insightly",
+   "targetApps": ["googledrive"],
+   "tags": ["insightly", "googledrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Google Drive for new events created in Salesforce",
+   "description": "Use this template to create a Google Drive folder for new events created in Salesforce. This scenario helps the user upload files or documents before the Salesforce event into a Google Drive folder.",
+   "summary": "Salesforce to Google Drive",
+   "sourceApp": "salesforce",
+   "targetApps": ["googledrive"],
+   "tags": ["salesforce", "googledrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Microsoft Onedrive for Business for new events created in Eventbrite",
+   "description": "Use this template to create a Microsoft Onedrive for Business folder for new events created in Eventbrite. This scenario helps the user upload files or documents before the Eventbrite event into a Microsoft Onedrive for Business folder.",
+   "summary": "EventBrite to Microsoft Onedrive for Business",
+   "sourceApp": "eventbrite",
+   "targetApps": ["msonedrive"],
+   "tags": ["eventbrite", "msonedrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Microsoft Onedrive for Business for new events created in Google Calendar",
+   "description": "Use this template to create a Microsoft Onedrive for Business folder for new events created in Google Calendar. This scenario helps the user upload files or documents before the Google Calendar event into a Microsoft Onedrive for Business folder.",
+   "summary": "Google Calendar to Microsoft Onedrive for Business",
+   "sourceApp": "google-calendar",
+   "targetApps": ["msonedrive"],
+   "tags": ["googlecalendar", "msonedrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Microsoft Onedrive for Business for new events created in Insightly",
+   "description": "Use this template to create a Microsoft Onedrive for Business folder for new events created in Insightly. This scenario helps the user upload files or documents before the Insightly event into a Microsoft Onedrive for Business folder.",
+   "summary": "Insightly to Microsoft Onedrive for Business",
+   "sourceApp": "insightly",
+   "targetApps": ["msonedrive"],
+   "tags": ["insightly", "msonedrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in Microsoft Onedrive for Business for new events created in Salesforce",
+   "description": "Use this template to create a Microsoft Onedrive for Business folder for new events created in Salesforce. This scenario helps the user upload files or documents before the Salesforce event into a Microsoft Onedrive for Business folder.",
+   "summary": "Salesforce to Microsoft Onedrive for Business",
+   "sourceApp": "salesforce",
+   "targetApps": ["msonedrive"],
+   "tags": ["salesforce", "msonedrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a post in a category in WordPress when a new campaign is created in Salesforce",
+   "description": "This integration will create a new post in WordPress when you create a new category in WordPress. It will also retrieve the category name from WordPress. You can use this to add categories to your posts automatically. Then, you can use the same process to remove categories from your posts.",
+   "summary": "WordPress to Salesforce",
+   "sourceApp": "wordpress",
+   "targetApps": ["salesforce"],
+   "tags": ["wordpress", "salesforce", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a post in WordPress for each Insightly event",
+   "description": "Use this template to create a WordPress Post for new events created in Insightly. This scenario helps the user create WordPress Post before the Insightly event takes place.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["wordpress"],
+   "tags": ["insightly", "wordpress", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a quick event in Google Calendar when a new task is created in Asana respond in MS Viva",
+   "description": "This template creates a message in MS Viva Engage and a quick event in Google Calender when tasks are created in asana. The task name is used as the event title. You can use this to notify your team of new tasks or to remind them of due dates.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["googlecalendar", "yammer"],
+   "tags": ["asana", "googlecalendar", "yammer", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a quick event in Google Calendar when a new task is created in Insightly respond in MS Viva",
+   "description": "This template creates a message in MS Viva Engage and a quick event in Google Calender when tasks are created in Insightly. The task name is used as the event title. You can use this to notify your team of new tasks or to remind them of due dates.",
+   "summary": "Insightly to 2 applications",
+   "sourceApp": "insightly",
+   "targetApps": ["googlecalendar", "yammer"],
+   "tags": ["insightly", "googlecalendar", "yammer", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a quick event in Google Calendar when a new task is created in Insightly",
+   "description": "This template creates a message in Slack and a quick event in Google Calender when tasks are created in asana. The task name is used as the event title. You can use this to notify your team of new tasks or to remind them of due dates.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["googlecalendar", "slack"],
+   "tags": ["asana", "googlecalendar", "slack", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Gmail message for new leads created in Insightly based on the lead rating",
+   "description": "Use this template to send a Gmail message to the intended team members whenever a new lead is created in Insightly. If the lead's rating is greater than 3, an email is sent with the lead's details. If the lead's rating is less than or equal to 3, an email is sent to notify Insightly that a lead has been created.",
+   "summary": "Insightly to Gmail",
+   "sourceApp": "insightly",
+   "targetApps": ["gmail"],
+   "tags": ["insightly", "gmail", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Exchange message for new leads created in Insightly based on the lead rating",
+   "description": "Use this template to send a MS Exchange message to the intended team members whenever a new lead is created in Insightly. If the lead's rating is greater than 3, an email is sent with the lead's details. If the lead's rating is less than or equal to 3, an email is sent to notify Insightly that a lead has been created.",
+   "summary": "Insightly to MS Exchange",
+   "sourceApp": "insightly",
+   "targetApps": ["msexchange"],
+   "tags": ["insightly", "msexchange", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Exchange message for new leads created in Salesforce based on the lead rating",
+   "description": "Use this template to send a MS Exchange message to the intended team members whenever a new lead is created in Salesforce. If the lead's rating is 'Hot', an email is sent with the lead's details. If the lead's rating is 'Warm', an email is sent to notify Salesforce that a lead has been created.",
+   "summary": "Salesforce to MS Exchange",
+   "sourceApp": "salesforce",
+   "targetApps": ["msexchange"],
+   "tags": ["salesforce", "msexchange", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Exchange message to a contact whenever a case is updated to a closed status in Salesforce",
+   "description": "Use this template to send a Gmail message to a Salesforce contact with the case details whenever a case status is updated to 'Closed' in Salesforce.",
+   "summary": "Salesforce to MS Exchange",
+   "sourceApp": "salesforce",
+   "targetApps": ["msexchange"],
+   "tags": ["salesforce", "msexchange", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Viva message for each closed opportunity retrieved from Insightly",
+   "description": "Use this template to send a MS Viva Engage message for each opportunity that is retrieved from Insightly, which was recently closed. The MS Viva Engage message consists of the opportunity details.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["insightly", "yammer"],
+   "tags": ["scheduler", "insightly", "yammer", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Viva message for each closed opportunity retrieved from Salesforce",
+   "description": "Use this template to send a MS Viva Engage message for each opportunity that is retrieved from Salesforce, which was recently closed. The MS Viva Engage message consists of the opportunity details.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "yammer"],
+   "tags": ["scheduler", "salesforce", "yammer", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Viva message for each new form entry created in Wufoo",
+   "description": "Use this template to send a MS Viva Engage message for each new form entry created in Wufoo. In this example, for each Wufoo's new form entry that has a unique email address, a MS Viva Engage message is posted to the intended group to notify them that lead information has been created.",
+   "summary": "Wufoo to Yammer",
+   "sourceApp": "wufoo",
+   "targetApps": ["yammer"],
+   "tags": ["wufoo", "yammer", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Viva message for opportunities created in Insightly based on the opportunity value",
+   "description": "Use this template to send a MS Viva Engage message for new opportunities created in Insightly. In this example, a MS Viva Engage message is sent for high-bid opportunities created in Insightly. Whenever a new opportunity is created in Insightly with an opportunity value greater than $25,000, a MS Viva Engage message is sent to the intended recipient. The MS Viva Engage message consists of the opportunity details.",
+   "summary": "Insightly to MS Viva Engage",
+   "sourceApp": "insightly",
+   "targetApps": ["yammer"],
+   "tags": ["insightly", "yammer", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a MS Viva message for opportunities created in Salesforce based on the opportunity value",
+   "description": "Use this template to send a MS Viva Engage message for new opportunities created in Salesforce. In this example, a MS Viva Engage message is sent for high-bid opportunities created in Salesforce. Whenever a new opportunity is created in Salesforce with an opportunity value greater than $25,000, a MS Viva Engage message is sent to the intended recipient. The MS Viva Engage message consists of the opportunity details.",
+   "summary": "Salesforce to MS Viva Engage",
+   "sourceApp": "salesforce",
+   "targetApps": ["yammer"],
+   "tags": ["salesforce", "yammer", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Slack message for each closed opportunity retrieved from Salesforce",
+   "description": "Use this template to send a Slack message for each opportunity that is retrieved from Salesforce, which was recently closed. The Slack message consists of the opportunity details.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["salesforce", "slack"],
+   "tags": ["scheduler", "salesforce", "slack", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Slack message for opportunities created in Salesforce based on the opportunity value",
+   "description": "Use this template to send a Slack message for new opportunities created in Salesforce. In this example, a Slack message is sent for high-bid opportunities created in Salesforce. Whenever a new opportunity is created in Salesforce with an opportunity value greater than $25,000, a Slack message is sent to the intended recipient. The Slack message consists of the opportunity details.",
+   "summary": "Salesforce to Slack",
+   "sourceApp": "salesforce",
+   "targetApps": ["slack"],
+   "tags": ["salesforce", "slack", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send MS Viva message when new Insightly opportunity is created for a new customer has been closed",
+   "description": "Use this template to send a MS Viva Engage message to an intended group whenever a new opportunity is created in Insightly. The MS Viva Engage message is posted in a channel if the opportunity is created for a new customer and the opportunity status is closed.",
+   "summary": "Insightly to MS Viva Engage",
+   "sourceApp": "insightly",
+   "targetApps": ["yammer"],
+   "tags": ["insightly", "yammer", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send MS Viva message when new Salesforce opportunity is created for a new customer has been closed",
+   "description": "Use this template to send a MS Viva Engage message to an intended group whenever a new opportunity is created in Salesforce. The MS Viva Engage message is posted in a channel if the opportunity is created for a new customer and the opportunity status is closed.",
+   "summary": "Salesforce to MS Viva Engage",
+   "sourceApp": "salesforce",
+   "targetApps": ["yammer"],
+   "tags": ["salesforce", "yammer", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send Slack message when new Insightly opportunity is created for a new customer has been closed",
+   "description": "Use this template to send a Slack message to an intended group whenever a new opportunity is created in Insightly. The Slack message is posted in a channel if the opportunity is created for a new customer and the opportunity status is closed.",
+   "summary": "Insightly to Slack",
+   "sourceApp": "insightly",
+   "targetApps": ["slack"],
+   "tags": ["insightly", "slack", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update the price book entry in Salesforce whenever a product is updated in Salesforce Commerce Cloud.",
+   "description": "Update the price book entry in Salesforce whenever a product is updated in Salesforce Commerce Cloud.",
+   "summary": "Salesforce Commerce Cloud to Salesforce",
+   "sourceApp": "sfcommerceclouddata",
+   "targetApps": ["salesforce"],
+   "tags": ["sfcommerceclouddata", "salesforce", "if"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
