@@ -19,7 +19,6 @@ integration:
               pollingInterval: '5'
               isCreatedQueryable: true
       connector-type: salesforce
-      account-name: Account 1
   action-interfaces:
     action-interface-3:
       type: api-action
@@ -27,7 +26,6 @@ integration:
       connector-type: trello
       actions:
         CREATE: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:

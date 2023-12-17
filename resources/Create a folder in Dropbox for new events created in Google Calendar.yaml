@@ -18,13 +18,11 @@ integration:
             subscription:
               pollingInterval: 5
               updatedField: updated
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: folders
       connector-type: dropbox
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:

@@ -15,7 +15,6 @@ integration:
             Hash: q1z0scqf0z2bi37
             parentFilter:
               Hash: q1z0scqf0z2bi37
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -23,12 +22,10 @@ integration:
       connector-type: wufoo
       actions:
         RETRIEVEALL: {}
-      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: Message
       connector-type: yammer
-      account-name: Account 1
       actions:
         CREATE: {}
   assemblies:
