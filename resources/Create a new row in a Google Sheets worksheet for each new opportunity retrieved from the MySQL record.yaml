@@ -1,0 +1,209 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 15
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: ibmappconcustomsql
+      connector-type: mysql
+      actions:
+        EXECUTECUSTOMSQL: {}
+    action-interface-3:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      previousruntime:
+                        type: string
+                        format: date-time
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - previousruntime:
+                            template: '{{$Trigger.lastEventTime}}'
+          - custom-action:
+              name: MySQL Execute custom SQL
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: EXECUTECUSTOMSQL
+              map:
+                mappings:
+                  - customSql:
+                      format:
+                        type: sql
+                      template: >-
+                        SELECT * FROM demo.usecase1 where CloseDate>
+                        {{$Setvariable.variable.previousruntime}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MySQLExecutecustomSQL.data '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: MySQLExecutecustomSQL
+                    $ref: '#/node-output/MySQL Execute custom SQL/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Opportunity record in MySQL DB
+    assembly-2:
+      assembly:
+        execute:
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Foreachitem}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: MySQLExecutecustomSQL
+                    $ref: '#/node-output/MySQL Execute custom SQL/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: |-
+                {
+                  "Id": "0065j00001Ql47eAAB",
+                  "IsPrivate": true,
+                  "Name": "test1",
+                  "Description": "new",
+                  "StageName": "Prospecting",
+                  "Probability": 50,
+                  "CloseDate": "2023-11-29T17:23:29.269Z",
+                  "Type": "New Customer",
+                  "LeadSource": "Partner Referral"
+                }
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  Id:
+                    type: string
+                  IsPrivate:
+                    type: boolean
+                  Name:
+                    type: string
+                  Description:
+                    type: string
+                  StageName:
+                    type: string
+                  Probability:
+                    type: number
+                  CloseDate:
+                    type: string
+                  Type:
+                    type: string
+                  LeadSource:
+                    type: string
+                title: Parsed JSON
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$JSONParserParse.Id}}'
+                        - '2':
+                            template: '{{$JSONParserParse.IsPrivate}}'
+                        - '3':
+                            template: '{{$JSONParserParse.Name}}'
+                        - '4':
+                            template: '{{$JSONParserParse.StageName}}'
+                        - '5':
+                            template: '{{$JSONParserParse.Probability}}'
+                        - '6':
+                            template: '{{$JSONParserParse.CloseDate}}'
+                        - '7':
+                            template: '{{$JSONParserParse.Type}}'
+                        - '8':
+                            template: '{{$JSONParserParse.LeadSource}}'
+                  - spreadsheetID:
+                      template: 18lUeJoEDW_kGERj4ZzO7fVtay1A9EWE2Sbj-SJMwLwI
+                  - worksheetID:
+                      template: mysql
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/For each/node-output/JSON Parser
+                      Parse/response/payload
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: MySQLExecutecustomSQL
+                    $ref: '#/node-output/MySQL Execute custom SQL/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a new row in a Google Sheets worksheet for each new opportunity retrieved from the MySQL record
+models: {}
