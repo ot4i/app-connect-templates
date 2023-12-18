@@ -2590,6 +2590,150 @@
   "targetApps": ["expensify", "docusign"],
   "tags": ["api", "expensify", "docusign"],
   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Box when new opportunity created in Salesforce",
+   "description": "This template creates a folder in boxSend email and sends an email when a new opportunity is created in Salesforce.com. The folder will be named after the opportunity record. You can use this template to store any type of file you want, such as presentations, spreadsheets, etc.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["box", "email"],
+   "tags": ["salesforce", "box", "email"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Dropbox when new account is created in Salesforce",
+   "description": "This template creates a folder in dropbox when a new account is created in salesforce. You can use this to automatically share files with your new customers. It's the perfect way to welcome them to your company! Just set up this integration and you'll be all set.",
+   "summary": "Salesforce to Dropbox",
+   "sourceApp": "salesforce",
+   "targetApps": ["dropbox"],
+   "tags": ["salesforce", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Dropbox when new case is created in Salesforce",
+   "description": "This template creates a folder in dropbox when a new case is created in salesforce. The name of the folder will be the case number. You can use this to store any relevant information for the case. For example, you could use it to store all emails related to the case.",
+   "summary": "Salesforce to Dropbox",
+   "sourceApp": "salesforce",
+   "targetApps": ["dropbox"],
+   "tags": ["salesforce", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Dropbox when new opportunity created in Insightly",
+   "description": "This template creates a folder in Dropbox and sends an email when an opportunity is created in Insightly. The folder name is the same as the opportunity's name. You can use this template to store any type of file you want.",
+   "summary": "Insightly to 2 applications",
+   "sourceApp": "insightly",
+   "targetApps": ["dropbox", "email"],
+   "tags": ["insightly", "dropbox", "email"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Dropbox when new opportunity is created in Salesforce",
+   "description": "This template creates a folder in Dropbox and sends an email in Gmail when a new opportunity is created in Salesforce.com. The folder name is the Opportunity Name from Salesforce.com. You can use this template to automate your workflow by creating folders for each of your opportunities.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["dropbox", "gmail"],
+   "tags": ["salesforce", "dropbox", "gmail"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in IBM Open Pages with Watson when new case is created in Salesforce",
+   "description": "This template creates a folder in ibmopenpages when a case is created in salesforce.com. The name of the folder will be the case number. You can use this to store any documents related to the case.",
+   "summary": "Salesforce to IBM OpenPages with Watson",
+   "sourceApp": "salesforce",
+   "targetApps": ["ibmopenpages"],
+   "tags": ["salesforce", "ibmopenpages"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in IBM OpenPages with Watson when new incident is created in ServiceNow",
+   "description": "This template creates a folder in ibmopenpages when a new incident is created in servicenow. The name of the folder will be the incident number. You can use this to organize your tickets.",
+   "summary": "ServiceNow to IBM OpenPages with Watson",
+   "sourceApp": "servicenow",
+   "targetApps": ["ibmopenpages"],
+   "tags": ["servicenow", "ibmopenpages"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in IBM OpenPages with Watson when new opportunity created in Salesforce",
+   "description": "This template creates a folder in ibmopenpagesSend email and sends an email when a new opportunity is created in Salesforce.com. The folder will be named after the opportunity record. You can use this template to automate your sales process by creating opportunities in Salesforce.com and sending emails to customers from IBM OpenPages.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["ibmopenpages", "email"],
+   "tags": ["salesforce", "ibmopenpages", "email"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in IBM OpenPages with Watson when new opportunity is created in Insightly",
+   "description": "This integration will create a folder in ibmopenpagesSend email and send an email when an opportunity is created in insightly.com. The folder name will be the same as the opportunity title. You can use this integration to store any type of file you want, such as presentations, spreadsheets, etc.",
+   "summary": "Insightly to 2 applications",
+   "sourceApp": "insightly",
+   "targetApps": ["ibmopenpages", "gmail"],
+   "tags": ["insightly", "ibmopenpages", "gmail"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Microsoft OneDrive for Business when new case is created in Salesforce",
+   "description": "This template creates a folder in msonedrive when a case is created in salesforce. The name of the folder will be the case number. You can use this to store any relevant information for the case. For example, you could store meeting notes or documents related to the case.",
+   "summary": "Salesforce to Microsoft OneDrive for Business",
+   "sourceApp": "salesforce",
+   "targetApps": ["msonedrive"],
+   "tags": ["salesforce", "msonedrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Microsoft OneDrive for Business when new opportunity created in Insightly",
+   "description": "This template creates a folder in msonedrive and sends an email in the same folder when insightly creates an opportunity. The name of the folder is the name of the opportunity. You can use this template to store any type of file you want.",
+   "summary": "Insightly to 2 applications",
+   "sourceApp": "insightly",
+   "targetApps": ["msonedrive", "email"],
+   "tags": ["insightly", "msonedrive", "email"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Microsoft OneDrive for Business when new opportunity created in Salesforce",
+   "description": "This template creates a folder in msonedrive and sends an email in the same folder when a new opportunity is created in Salesforce.com. The folder name is the opportunity number. You can use this template to store any type of file you want.",
+   "summary": "Sallesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["msonedrive", "gmail"],
+   "tags": ["salesforce", "msonedrive", "gmail"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create row in Google Sheets when new task is created in Asana respond in MS Viva",
+   "description": "This template creates a row in googlesheet and a message in yammer when asana tasks are created. The task name is the same as the message title. You can use this to keep track of your tasks. For example, you could have a list of tasks for each day of the week.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["yammer", "googlesheet"],
+   "tags": ["asana", "yammer", "googlesheet"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create row in Google Sheets when new task is created in Asana respond in Slack",
+   "description": "This template creates a row in googlesheet and sends a message in slack when asana tasks are created. You can use this to keep track of your tasks. The task must be created in the last 30 days.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["slack", "googlesheet"],
+   "tags": ["asana", "slack", "googlesheet"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create task in Asana whenever a new row is appended in Google Sheets",
+   "description": "This template creates a task in Asana and sends a message to a channel in MS Teams when a new worksheet is created in Google Sheets. The name of the sheet is used as the task title. You can use this template with any spreadsheet app that supports creating sheets.",
+   "summary": "Google Sheets to 2 applications",
+   "sourceApp": "googlesheet",
+   "targetApps": ["asana", "msteams"],
+   "tags": ["googlesheet", "asana", "msteams"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create worksheet in MSexcel when new task is created in Asana",
+   "description": "This template creates a new message in yammer when a new task is created in asana. It also creates a new worksheet in msexcel. The name of the worksheet is the same as the task title.",
+   "summary": "Asana to 2 applications",
+   "sourceApp": "asana",
+   "targetApps": ["msexcel", "yammer"],
+   "tags": ["asana", "msexcel", "yammer"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
