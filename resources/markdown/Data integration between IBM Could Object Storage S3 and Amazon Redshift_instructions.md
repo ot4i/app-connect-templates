@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Google Cloud Storage](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-google-cloud-storage)
-   - [Amazon Redshift](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-amazon-redshift)\
+   - [IBM Cloud Object Storage S3](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-cloud-object-storage-s3)
+   - [Amazon Redshift](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-amazon-redshift)
    - [Gmail](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-gmail)
 3. To start the flow, in the banner, click **Start flow**.
 
