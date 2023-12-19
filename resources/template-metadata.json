@@ -2915,6 +2915,7 @@
    "tags": ["sfcommerceclouddata", "salesforce", "if"],
    "offerings": ["app connect professional"]
   },
+  {
    "name": "Send a Google Chat welcome message with a Dropbox link to all the attendees of a Google Calendar event",
    "description": "Use this template to send a welcome message to all the attendees in a Google Chat space with a Dropbox link whenever a Google Calendar event is created. A folder is created in Dropbox to store all the artifacts related to the Google Calendar event, and the link is shared with the event attendees.",
    "summary": "Google Calendar to 2 applications",
