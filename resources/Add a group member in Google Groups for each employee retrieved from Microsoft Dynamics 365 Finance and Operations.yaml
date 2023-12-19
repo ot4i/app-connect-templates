@@ -300,5 +300,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Add as a member to a group in Google Groups for employee retrieved from Microsoft Dynamics 365 Finance and Operations
+  name: Add a group member in Google Groups for each employee retrieved from Microsoft Dynamics 365 Finance and Operations
 models: {}
