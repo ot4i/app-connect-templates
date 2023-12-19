@@ -2914,6 +2914,77 @@
    "targetApps": ["salesforce"],
    "tags": ["sfcommerceclouddata", "salesforce", "if"],
    "offerings": ["app connect professional"]
+  },
+   "name": "Send a Google Chat welcome message with a Dropbox link to all the attendees of a Google Calendar event",
+   "description": "Use this template to send a welcome message to all the attendees in a Google Chat space with a Dropbox link whenever a Google Calendar event is created. A folder is created in Dropbox to store all the artifacts related to the Google Calendar event, and the link is shared with the event attendees.",
+   "summary": "Google Calendar to 2 applications",
+   "sourceApp": "googlecalendar",
+   "targetApps": ["googlechat", "dropbox", "googlechat"],
+   "tags": ["googlecalendar", "googlechat", "dropbox", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Google Chat message to the Zendesk Service ticket assignee with a Dropbox link for tickets with urgent priority",
+   "description": "Use this template to send a Google Chat message to the Zendesk Service ticket assignee in a Google Chat space with a Dropbox link whenever a ticket is created with urgent priority in Zendesk Service. A folder is created in Dropbox to store all the root cause analysis (RCA) documents related to the issue, and the link is shared with the ticket’s assignee.",
+   "summary": "Scheduler to 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["zendeskservice", "googlechat", "dropbox", "googlechat"],
+   "tags": ["scheduler", "zendeskservice", "dropbox", "googlechat", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add a group member in Google Groups for each employee retrieved from Microsoft Dynamics 365 Finance and Operations",
+   "description": "Use this template to add a member to a specific group in Google Groups for each employee retrieved from Microsoft Dynamics 365 Finance and Operations.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["msdynamicsfando", "googlegroups"],
+   "tags": ["scheduler", "msdynamicsfando", "googlegroups", "foreach", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add a subscriber to a specific list in MailChimp",
+   "description": "Use this template to add a subscriber to a specific list in MailChimp with the subscriber's email address. This is a prequel flow for ‘Add a member to a group in Google Groups when a new subscriber is added to a list’ and ‘Send a notification message via Gmail to a specific group in Google Groups’ templates. Ensure that you have started these template flows.",
+   "summary": "Scheduler to MailChimp",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["mailchimp"],
+   "tags": ["scheduler", "mailchimp"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Add a member to a group in Google Groups when a new subscriber is added to a list in MailChimp",
+   "description": "Use this template to add a member to a specific group in Google Groups when a new subscriber is added to a list. An HTTP method is invoked with a URL request to run the ‘Send a notification message via Gmail to a specific group in Google Groups’ flow. Ensure that you specify the complete URL path of the ‘Send a notification Gmail message to a specific Google Groups group’ template.",
+   "summary": "MailChimp to 2 applications",
+   "sourceApp": "mailchimp",
+   "targetApps": ["googlegroups", "http"],
+   "tags": ["mailchimp", "googlegroups", "http"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a notification message via Gmail to a specific group in Google Groups",
+   "description": "Use this API  template to send a notification message via Gmail to a specific group in Google Groups. This is a prequel flow for the ‘Add a member to a group in Google Groups when a new subscriber is added to a list’ template.",
+   "summary": " to 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["googlegroups", "gmail"],
+   "tags": ["api", "googlegroups", "gmail", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a task in a list in Google Tasks when a new ticket is created in Zendesk Service",
+   "description": "Use this template to  create a task in a list in Google Tasks when a new ticket is created in Zendesk Service. In this example, if the Google task title and task list id is not empty, create a task in the corresponding task list. Otherwise, a task list is created in Google Tasks and the task is added to the list.",
+   "summary": "Zendesk Service to 2 applications",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["googletasks", "slack"],
+   "tags": ["zendeskservice", "googletasks", "slack", "setVariable", "if"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Update a ticket in Zendesk Service for each completed task retrieved from Google Tasks",
+   "description": "Use this template to update the ticket status in Zendesk Service for each of the completed tasks retrieved from Google Tasks. In this example, the Zendesk Service ticket status is updated to closed for each of the completed tasks as of the end of the current day, which is retrieved from Google Tasks.",
+   "summary": "1 flow using 3 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["zendeskservice", "googletasks", "slack"],
+   "tags": ["scheduler", "zendeskservice", "googletasks", "slack", "foreach"],
+   "offerings": ["app connect professional"]
   }
 ]
 }
