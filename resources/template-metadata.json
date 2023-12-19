@@ -2734,6 +2734,69 @@
    "targetApps": ["msexcel", "yammer"],
    "tags": ["asana", "msexcel", "yammer"],
    "offerings": ["app connect professional"]
-  }
+  },
+  {
+   "name": "Create a folder in Dropbox for each event retrieved from Eventbrite",
+   "description": "Use this template to create a folder in Dropbox when streaming connectors scheduler SCH runs. Then, use the 'Retrieve Events' action to get events from Eventbrite. Finally, use the 'Create Folder' action to put the event details into the created folder.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "dropbox"],
+   "tags": ["scheduler", "eventbrite", "dropbox", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create a folder in IBM Open Pages For Watson for each event retrieved from Eventbrite",
+   "description": "Use this template to retrieve events in eventbriteCreate folder in ibmopenpages when streamingconnectorschedule. The folder is created by the stream connector. You can use this template to get all events from eventbrite or you can filter them by name, location or date.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["eventbrite", "ibmopenpages"],
+   "tags": ["scheduler", "eventbrite", "ibmopenpages", "foreach"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Box when a new opportunity is created in Insightly",
+   "description": "This integration will create a folder in boxSend email and send an email when an opportunity is created in insightly.com. The folder name will be the same as the opportunity's name. You can also choose to include the opportunity's description in the email.",
+   "summary": "Insightly to 2 applications",
+   "sourceApp": "insightly",
+   "targetApps": ["box", "email"],
+   "tags": ["insightly", "box", "email"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Dropbox when form entry is created in Wufoo",
+   "description": "This template creates a folder in Dropbox when a new form is created in Wufoo. The name of the folder will be the form's formentry. You can use this to automatically upload files from Wufoo to Dropbox.",
+   "summary": "Wufoo to Dropbox",
+   "sourceApp": "wufoo",
+   "targetApps": ["dropbox"],
+   "tags": ["wufoo", "dropbox"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in IBM Open Pages for Watson when new opportunity created in Salesforce",
+   "description": "This template creates a folder in ibmopenpages and sends an email in gmail when a new opportunity is created in Salesforce.com. The folder name is the same as the opportunity's title. You can use this template to automate your sales process by creating folders for each of your opportunities, then sending emails to those folders.",
+   "summary": "Salesforce to 2 applications",
+   "sourceApp": "salesforce",
+   "targetApps": ["ibmopenpages", "gmail"],
+   "tags": ["salesforce", "ibmopenpages", "gmail"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Create folder in Microsoft OneDrive for Business when new formentry is created in Wufoo",
+   "description": "This template creates a folder in msonedrive when a new formentry is created in wufoo. The name of the folder will be the same as the formentry's name. For example, if the formentry's name is 'Sales', the folder will be named 'Sales'.",
+   "summary": "Wufoo to Microsoft OneDrive for Business",
+   "sourceApp": "wufoo",
+   "targetApps": ["msonedrive"],
+   "tags": ["wufoo", "msonedrive"],
+   "offerings": ["app connect professional"]
+  },
+  {
+   "name": "Send a Slack message when new task is created in Insightly",
+   "description": "This template sends a message in slack when an insightly task is created. You can use this to notify your team of new tasks. To use this, you will need to create a custom integration between insightly and slack.",
+   "summary": "Insightly to Slack",
+   "sourceApp": "insightly",
+   "targetApps": ["slack"],
+   "tags": ["insightly", "slack"],
+   "offerings": ["app connect professional"]
+   }
 ]
 }
