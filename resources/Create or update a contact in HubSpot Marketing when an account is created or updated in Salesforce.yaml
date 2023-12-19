@@ -1,0 +1,186 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: Account
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 5
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: contacts
+      connector-type: hubspotmarketing
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: contacts
+      connector-type: hubspotmarketing
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: contacts
+      connector-type: hubspotmarketing
+      actions:
+        UPDATEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot Marketing Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  email: '{{$Trigger.Email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: HubSpotMarketingRetrievecontacts
+                  $ref: >-
+                    #/node-output/HubSpot Marketing Retrieve
+                    contacts/response/payload
+                - variable: HubSpotMarketingRetrievecontactsMetadata
+                  $ref: '#/node-output/HubSpot Marketing Retrieve contacts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$HubSpotMarketingRetrievecontactsMetadata."status-code"}}': '204'
+                  execute:
+                    - create-action:
+                        name: HubSpot Marketing Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - properties:
+                                mappings:
+                                  - address:
+                                      template: '{{$Trigger.ShippingStreet}}'
+                                  - annualRevenue:
+                                      template: '{{$Trigger.AnnualRevenue}}'
+                                  - city:
+                                      template: '{{$Trigger.ShippingCity}}'
+                                  - company_size:
+                                      template: '{{$Trigger.NumberOfEmployees}}'
+                                  - country:
+                                      template: '{{$Trigger.ShippingCountry}}'
+                                  - createdate:
+                                      template: '{{$Trigger.CreatedDate}}'
+                                  - email:
+                                      template: '{{$Trigger.Email}}'
+                                  - firstName:
+                                      template: '{{$Trigger.Name}}'
+                                  - state:
+                                      template: '{{$Trigger.ShippingState}}'
+                                  - website:
+                                      template: '{{$Trigger.Website}}'
+                                  - zip:
+                                      template: '{{$Trigger.ShippingPostalCode}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: HubSpotMarketingRetrievecontacts
+                              $ref: >-
+                                #/node-output/HubSpot Marketing Retrieve
+                                contacts/response/payload
+                            - variable: HubSpotMarketingRetrievecontactsMetadata
+                              $ref: >-
+                                #/node-output/HubSpot Marketing Retrieve
+                                contacts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - update-action:
+                      name: HubSpot Marketing Update contact
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - properties:
+                              mappings:
+                                - address:
+                                    template: '{{$Trigger.ShippingStreet}}'
+                                - annualRevenue:
+                                    template: '{{$Trigger.AnnualRevenue}}'
+                                - city:
+                                    template: '{{$Trigger.ShippingCity}}'
+                                - company_size:
+                                    template: '{{$Trigger.NumberOfEmployees}}'
+                                - country:
+                                    template: '{{$Trigger.ShippingCountry}}'
+                                - email:
+                                    template: '{{$Trigger.Email}}'
+                                - firstName:
+                                    template: '{{$Trigger.Name}}'
+                                - state:
+                                    template: '{{$Trigger.ShippingState}}'
+                                - website:
+                                    template: '{{$Trigger.Website}}'
+                                - zip:
+                                    template: '{{$Trigger.ShippingPostalCode}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: HubSpotMarketingRetrievecontacts
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve
+                              contacts/response/payload
+                          - variable: HubSpotMarketingRetrievecontactsMetadata
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve
+                              contacts/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      filter:
+                        where:
+                          vid: '{{$Trigger.Id}}'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: HubSpotMarketingRetrievecontacts
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve
+                              contacts/response/payload
+                          - variable: HubSpotMarketingRetrievecontactsMetadata
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve
+                              contacts/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      allow-empty-output: false
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Create or update a contact in HubSpot Marketing when an account is created or updated in Salesforce
+models: {}

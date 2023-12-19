@@ -1,0 +1,431 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Opportunity
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Attachment
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: Attachment
+      connector-type: salesforce
+      actions:
+        DOWNLOADCONTENT: {}
+    action-interface-7:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        RETRIEVEALL: {}
+    action-interface-8:
+      type: api-action
+      business-object: files
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve opportunities
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  CreatedDate:
+                    gt: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrieveopportunities '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveopportunities
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      opportunities/response/payload
+                  - variable: SalesforceRetrieveopportunitiesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunities/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas: {}
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveattachments
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve
+                      attachments/response/payload
+                  - variable: SalesforceRetrieveattachmentsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Salesforce Retrieve
+                      attachments/response
+                  - variable: SlackSendmessage
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send
+                      message/response/payload
+                  - variable: SalesforceRetrieveopportunities
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      opportunities/response/payload
+                  - variable: SalesforceRetrieveopportunitiesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunities/response'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              display-name: Salesforce Opportunity
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve attachments
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  ParentId: '{{$Foreachitem.Id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveopportunities
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      opportunities/response/payload
+                  - variable: SalesforceRetrieveopportunitiesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunities/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveattachments
+                  $ref: >-
+                    #/block/For each/node-output/Salesforce Retrieve
+                    attachments/response/payload
+                - variable: SalesforceRetrieveattachmentsMetadata
+                  $ref: >-
+                    #/block/For each/node-output/Salesforce Retrieve
+                    attachments/response
+                - variable: SalesforceRetrieveopportunities
+                  $ref: >-
+                    #/node-output/Salesforce Retrieve
+                    opportunities/response/payload
+                - variable: SalesforceRetrieveopportunitiesMetadata
+                  $ref: '#/node-output/Salesforce Retrieve opportunities/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$SalesforceRetrieveattachmentsMetadata."status-code"}}': '200'
+                  execute:
+                    - custom-action:
+                        name: Salesforce Retrieve contents of attachment
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        action: DOWNLOADCONTENT
+                        map:
+                          mappings:
+                            - ContentType:
+                                template: Binary
+                            - Id:
+                                template: '{{$SalesforceRetrieveattachments.Id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveattachments
+                              $ref: >-
+                                #/block/For each/node-output/Salesforce Retrieve
+                                attachments/response/payload
+                            - variable: SalesforceRetrieveattachmentsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Salesforce Retrieve
+                                attachments/response
+                            - variable: SalesforceRetrieveopportunities
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                opportunities/response/payload
+                            - variable: SalesforceRetrieveopportunitiesMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                opportunities/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - retrieve-action:
+                        name: Dropbox Retrieve files
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        filter:
+                          where:
+                            name: '{{$SalesforceRetrieveattachments.Name}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecontentsofattachment
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                contents of attachment/response/payload
+                            - variable: SalesforceRetrieveattachments
+                              $ref: >-
+                                #/block/For each/node-output/Salesforce Retrieve
+                                attachments/response/payload
+                            - variable: SalesforceRetrieveattachmentsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Salesforce Retrieve
+                                attachments/response
+                            - variable: SalesforceRetrieveopportunities
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                opportunities/response/payload
+                            - variable: SalesforceRetrieveopportunitiesMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                opportunities/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        allow-empty-output: true
+                    - if:
+                        name: If 2
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrievecontentsofattachment
+                            $ref: >-
+                              #/block/If/node-output/Salesforce Retrieve
+                              contents of attachment/response/payload
+                          - variable: DropboxRetrievefiles
+                            $ref: >-
+                              #/block/If/node-output/Dropbox Retrieve
+                              files/response/payload
+                          - variable: DropboxRetrievefilesMetadata
+                            $ref: >-
+                              #/block/If/node-output/Dropbox Retrieve
+                              files/response
+                          - variable: SalesforceRetrieveattachments
+                            $ref: >-
+                              #/block/For each/node-output/Salesforce Retrieve
+                              attachments/response/payload
+                          - variable: SalesforceRetrieveattachmentsMetadata
+                            $ref: >-
+                              #/block/For each/node-output/Salesforce Retrieve
+                              attachments/response
+                          - variable: SalesforceRetrieveopportunities
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              opportunities/response/payload
+                          - variable: SalesforceRetrieveopportunitiesMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              opportunities/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$DropboxRetrievefilesMetadata."status-code"}}':
+                                neq: '200'
+                            execute:
+                              - create-action:
+                                  name: Dropbox Create file
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-8
+                                  map:
+                                    mappings:
+                                      - fileContent:
+                                          template: >-
+                                            {{$SalesforceRetrievecontentsofattachment.content}}
+                                      - fileType:
+                                          template: Binary
+                                      - name:
+                                          template: '{{$SalesforceRetrieveattachments.Name}}'
+                                      - path:
+                                          template: '{{$DropboxRetrievefiles.path_display}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: SalesforceRetrievecontentsofattachment
+                                        $ref: >-
+                                          #/block/If/node-output/Salesforce
+                                          Retrieve contents of
+                                          attachment/response/payload
+                                      - variable: DropboxRetrievefiles
+                                        $ref: >-
+                                          #/block/If/node-output/Dropbox Retrieve
+                                          files/response/payload
+                                      - variable: DropboxRetrievefilesMetadata
+                                        $ref: >-
+                                          #/block/If/node-output/Dropbox Retrieve
+                                          files/response
+                                      - variable: SalesforceRetrieveattachments
+                                        $ref: >-
+                                          #/block/For each/node-output/Salesforce
+                                          Retrieve attachments/response/payload
+                                      - variable: SalesforceRetrieveattachmentsMetadata
+                                        $ref: >-
+                                          #/block/For each/node-output/Salesforce
+                                          Retrieve attachments/response
+                                      - variable: SalesforceRetrieveopportunities
+                                        $ref: >-
+                                          #/node-output/Salesforce Retrieve
+                                          opportunities/response/payload
+                                      - variable: SalesforceRetrieveopportunitiesMetadata
+                                        $ref: >-
+                                          #/node-output/Salesforce Retrieve
+                                          opportunities/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute: []
+                          completion-action:
+                            terminate:
+                              info:
+                                input:
+                                  - variable: Foreachitem
+                                    $ref: '#/block/For each/current-item'
+                                  - variable: Trigger
+                                    $ref: '#/trigger/payload'
+                                  - variable: SalesforceRetrievecontentsofattachment
+                                    $ref: >-
+                                      #/block/If/node-output/Salesforce Retrieve
+                                      contents of attachment/response/payload
+                                  - variable: DropboxRetrievefiles
+                                    $ref: >-
+                                      #/block/If/node-output/Dropbox Retrieve
+                                      files/response/payload
+                                  - variable: DropboxRetrievefilesMetadata
+                                    $ref: >-
+                                      #/block/If/node-output/Dropbox Retrieve
+                                      files/response
+                                  - variable: SalesforceRetrieveattachments
+                                    $ref: >-
+                                      #/block/For each/node-output/Salesforce
+                                      Retrieve attachments/response/payload
+                                  - variable: SalesforceRetrieveattachmentsMetadata
+                                    $ref: >-
+                                      #/block/For each/node-output/Salesforce
+                                      Retrieve attachments/response
+                                  - variable: SalesforceRetrieveopportunities
+                                    $ref: >-
+                                      #/node-output/Salesforce Retrieve
+                                      opportunities/response/payload
+                                  - variable: SalesforceRetrieveopportunitiesMetadata
+                                    $ref: >-
+                                      #/node-output/Salesforce Retrieve
+                                      opportunities/response
+                                  - variable: flowDetails
+                                    $ref: '#/flowDetails'
+                                message: >-
+                                  File name
+                                  {{$DropboxRetrievefiles.name}}already exist
+                                status-code: 200
+                        output-schema: {}
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Foreachitem
+                          $ref: '#/block/For each/current-item'
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: SalesforceRetrieveattachments
+                          $ref: >-
+                            #/block/For each/node-output/Salesforce Retrieve
+                            attachments/response/payload
+                        - variable: SalesforceRetrieveattachmentsMetadata
+                          $ref: >-
+                            #/block/For each/node-output/Salesforce Retrieve
+                            attachments/response
+                        - variable: SalesforceRetrieveopportunities
+                          $ref: >-
+                            #/node-output/Salesforce Retrieve
+                            opportunities/response/payload
+                        - variable: SalesforceRetrieveopportunitiesMetadata
+                          $ref: >-
+                            #/node-output/Salesforce Retrieve
+                            opportunities/response
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: opportunity does not contains any attachments
+                      status-code: 200
+              output-schema: {}
+  name: Create a file in a box for each new opportunity in Salesforce that has attachments
+models: {}
