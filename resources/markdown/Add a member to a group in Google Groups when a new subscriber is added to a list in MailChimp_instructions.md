@@ -7,11 +7,13 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [HTTP](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-http)
 3. To start the flow, in the banner, click **Start flow**.
 
-
+Ensure that the following template flows are running before starting this flow: </br>
+    a. Add a subscriber to a specific list in MailChimp </br>
+    b. Send a notification message via Gmail to a specific group in Google Groups
+  
 Use this template to add a member to a specific group in Google Groups when a new subscriber is added to a list in MailChimp. 
 An HTTP method is invoked with a URL request to run the ‘Send a notification message via Gmail to a specific group in Google Groups’ flow. 
-
-Ensure that you specify the complete URL path of the ‘Send a notification Gmail message to a specific Google Groups group’ template.
+Make sure that you specify the complete URL path of the ‘Send a notification Gmail message to a specific Google Groups group’ template.
 
 By running these template flows, it fulfills the scenario wherein, whenever a new member is added to a MailChimp list, a notification email is sent to the designated group members via Gmail."
 
