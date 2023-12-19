@@ -1,0 +1,108 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Members
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            list_id: 6fc8383307
+            parentFilter:
+              list_id: 6fc8383307
+      connector-type: mailchimp
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: request
+      connector-type: http
+      actions:
+        INVOKE: {}
+    action-interface-1:
+      type: api-action
+      business-object: postAdminDirectoryV1GroupsByGroupKeyMembers_model
+      connector-type: googlegroups
+      actions:
+        postAdminDirectoryV1GroupsByGroupKeyMembers: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Groups Add member to group
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postAdminDirectoryV1GroupsByGroupKeyMembers
+              map:
+                mappings:
+                  - ___type:
+                      template: EXTERNAL
+                  - email:
+                      template: '{{$Trigger.email_address}}'
+                  - groupKey:
+                      template: group1@ibmappcon.com
+                  - role:
+                      template: MEMBER
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: HTTP Invoke method
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: INVOKE
+              map:
+                customSchemas:
+                  properties.`requestHeaders`:
+                    type: object
+                    properties:
+                      Username:
+                        type: string
+                      Password:
+                        type: string
+                      Authorization:
+                        type: string
+                mappings:
+                  - continue2xx:
+                      expression: 'false'
+                  - method:
+                      template: POST
+                  - requestBody:
+                      template: |-
+                        {
+                        "groupid":"group1@ibmappcon.com",
+                        "memberid":"{{$GoogleGroupsAddmembertogroup.email}}"
+                        }
+                  - requestHeaders:
+                      mappings:
+                        - Authorization:
+                            template: >-
+                              Basic
+                              {{$base64encode("tP6GUqQ0:E9o6g7VCil1KFhdm5T3XS2vpbs0qWcyw",
+                              "UTF8")}}
+                        - Password:
+                            template: E9o6g7VCil1KFhdm5T3XS2vpbs0qWcyw
+                        - Username:
+                            template: tP6GUqQ0
+                  - url:
+                      template: >-
+                        https://<instance-name>/Send a notification message via Gmail to a specific group in Google Groups/Groups/post
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGroupsAddmembertogroup
+                    $ref: >-
+                      #/node-output/Google Groups Add member to
+                      group/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Add a member to a group in Google Groups when a new subscriber is added to a list in MailChimp
+models: {}

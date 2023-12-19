@@ -1,0 +1,328 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: events
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            id: c_lh01n4a28m3cpunfnojh87kdts@group.calendar.google.com
+            parentFilter:
+              id: c_lh01n4a28m3cpunfnojh87kdts@group.calendar.google.com
+            subscription:
+              updatedField: updated
+              pollingInterval: 1
+      connector-type: googlecalendar
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: getSpaces_model
+      connector-type: googlechat
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: postSpaces_model
+      connector-type: googlechat
+      actions:
+        postSpaces: {}
+    action-interface-5:
+      type: api-action
+      business-object: postSpacesBySpaceNameMembers_model
+      connector-type: googlechat
+      actions:
+        postSpacesBySpaceNameMembers: {}
+    action-interface-3:
+      type: api-action
+      business-object: folders
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: postSpacesBySpaceNameMessages_model
+      connector-type: googlechat
+      actions:
+        postSpacesBySpaceNameMessages: {}
+    action-interface-6:
+      type: api-action
+      business-object: postSpacesBySpaceNameMessages_model
+      connector-type: googlechat
+      actions:
+        postSpacesBySpaceNameMessages: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Chat Retrieve spaces
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 5
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleChatRetrievespaces
+                  $ref: '#/node-output/Google Chat Retrieve spaces/response/payload'
+                - variable: GoogleChatRetrievespacesMetadata
+                  $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.summary in $GoogleChatRetrievespaces.displayName}}':
+                      '=': 'true'
+                  execute:
+                    - custom-action:
+                        name: Google Chat Send message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        action: postSpacesBySpaceNameMessages
+                        map:
+                          mappings:
+                            - spaceName:
+                                template: _R4vzUAAAAE
+                            - text:
+                                template: Group you are trying to create already exist
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleChatRetrievespaces
+                              $ref: >-
+                                #/node-output/Google Chat Retrieve
+                                spaces/response/payload
+                            - variable: GoogleChatRetrievespacesMetadata
+                              $ref: >-
+                                #/node-output/Google Chat Retrieve
+                                spaces/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  completion-action:
+                    terminate:
+                      info:
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleChatRetrievespaces
+                            $ref: >-
+                              #/node-output/Google Chat Retrieve
+                              spaces/response/payload
+                          - variable: GoogleChatRetrievespacesMetadata
+                            $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        message: done
+                        status-code: 200
+              else:
+                execute:
+                  - custom-action:
+                      name: Google Chat Create space
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      action: postSpaces
+                      map:
+                        mappings:
+                          - displayName:
+                              template: '{{$Trigger.summary}}'
+                          - requestId:
+                              template: '{{$Trigger.summary}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleChatRetrievespaces
+                            $ref: >-
+                              #/node-output/Google Chat Retrieve
+                              spaces/response/payload
+                          - variable: GoogleChatRetrievespacesMetadata
+                            $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Dropbox Create folder
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - path:
+                              template: /new
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleChatCreatespace
+                            $ref: >-
+                              #/block/If/node-output/Google Chat Create
+                              space/response/payload
+                          - variable: GoogleChatRetrievespaces
+                            $ref: >-
+                              #/node-output/Google Chat Retrieve
+                              spaces/response/payload
+                          - variable: GoogleChatRetrievespacesMetadata
+                            $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - for-each:
+                      name: For each 3
+                      assembly:
+                        $ref: '#/integration/assemblies/assembly-4'
+                      source:
+                        expression: '$Trigger.attendees '
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleChatCreatespace
+                            $ref: >-
+                              #/block/If/node-output/Google Chat Create
+                              space/response/payload
+                          - variable: DropboxCreatefolder
+                            $ref: >-
+                              #/block/If/node-output/Dropbox Create
+                              folder/response/payload
+                          - variable: GoogleChatRetrievespaces
+                            $ref: >-
+                              #/node-output/Google Chat Retrieve
+                              spaces/response/payload
+                          - variable: GoogleChatRetrievespacesMetadata
+                            $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      mode: sequential
+                      continue-on-error: true
+                      map:
+                        $map: http://ibm.com/appconnect/map/v1
+                        customSchemas:
+                          properties.`output`:
+                            type: object
+                            properties:
+                              email:
+                                type: string
+                        input:
+                          - variable: Foreach3item
+                            $ref: '#/block/For each 3/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleChatAddmembertospace
+                            $ref: >-
+                              #/block/For each 3/node-output/Google Chat Add
+                              member to space/response/payload
+                          - variable: GoogleChatCreatespace
+                            $ref: >-
+                              #/block/If/node-output/Google Chat Create
+                              space/response/payload
+                          - variable: DropboxCreatefolder
+                            $ref: >-
+                              #/block/If/node-output/Dropbox Create
+                              folder/response/payload
+                          - variable: GoogleChatRetrievespaces
+                            $ref: >-
+                              #/node-output/Google Chat Retrieve
+                              spaces/response/payload
+                          - variable: GoogleChatRetrievespacesMetadata
+                            $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        mappings:
+                          - output:
+                              mappings:
+                                - email:
+                                    template: '{{$Foreach3item.email}}'
+                      display-name: Google Calendar attendees
+                  - custom-action:
+                      name: Google Chat Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      action: postSpacesBySpaceNameMessages
+                      map:
+                        mappings:
+                          - spaceName:
+                              template: '{{$GoogleChatCreatespace.spaceName}}'
+                          - text:
+                              template: >-
+                                Welcome to 
+                                '{{$GoogleChatCreatespace.displayName}}'  space.
+                                All your documentation to be tracked at
+                                https://www.dropbox.com/home{{$DropboxCreatefolder.path}}.
+                                also please go through EPIC
+                                {{$Trigger.description}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleChatCreatespace
+                            $ref: >-
+                              #/block/If/node-output/Google Chat Create
+                              space/response/payload
+                          - variable: DropboxCreatefolder
+                            $ref: >-
+                              #/block/If/node-output/Dropbox Create
+                              folder/response/payload
+                          - variable: Foreach3
+                            $ref: '#/block/If/node-output/For each 3/response/payload'
+                          - variable: GoogleChatRetrievespaces
+                            $ref: >-
+                              #/node-output/Google Chat Retrieve
+                              spaces/response/payload
+                          - variable: GoogleChatRetrievespacesMetadata
+                            $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+    assembly-4:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Chat Add member to space
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              action: postSpacesBySpaceNameMembers
+              map:
+                mappings:
+                  - ___type:
+                      template: HUMAN
+                  - name:
+                      template: '{{$Foreach3item.email}}'
+                  - spaceName:
+                      template: '{{$GoogleChatCreatespace.spaceName}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach3item
+                    $ref: '#/block/For each 3/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleChatCreatespace
+                    $ref: >-
+                      #/block/If/node-output/Google Chat Create
+                      space/response/payload
+                  - variable: GoogleChatRetrievespaces
+                    $ref: '#/node-output/Google Chat Retrieve spaces/response/payload'
+                  - variable: GoogleChatRetrievespacesMetadata
+                    $ref: '#/node-output/Google Chat Retrieve spaces/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a Google Chat welcome message with a Dropbox link to all the attendees of a Google Calendar event
+models: {}
