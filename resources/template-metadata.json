@@ -2610,7 +2610,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Add as a member to a group in Google Groups for employee retrieved from Microsoft Dynamics 365 Finance and Operations",
+   "name": "Add a group member in Google Groups for each employee retrieved from Microsoft Dynamics 365 Finance and Operations",
    "description": "Use this template to add a member to a specific group in Google Groups for each employee retrieved from Microsoft Dynamics 365 Finance and Operations.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
