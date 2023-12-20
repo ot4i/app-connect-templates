@@ -427,5 +427,5 @@ integration:
                       message: opportunity does not contains any attachments
                       status-code: 200
               output-schema: {}
-  name: Create a file in a box for each new opportunity in Salesforce that has attachments
+  name: Create a file in Dropbox for each new opportunity in Salesforce that has attachments
 models: {}
