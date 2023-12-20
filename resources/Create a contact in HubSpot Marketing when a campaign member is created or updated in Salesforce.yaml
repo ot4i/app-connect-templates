@@ -142,5 +142,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name:Create a contact in HubSpot Marketing when a campaign member is created or updated in Salesforce
+  name: Create a contact in HubSpot Marketing when a campaign member is created or updated in Salesforce
 models: {}
