@@ -1,0 +1,146 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: CampaignMember
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: getCrmV3ObjectsContactsSearch_model
+      connector-type: hubspotcrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: postCrmV3ObjectsContacts_model
+      connector-type: hubspotcrm
+      actions:
+        postCrmV3ObjectsContacts: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot CRM Retrieve contacts by filters
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  email: '{{$Trigger.Email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: HubSpotCRMRetrievecontactsbyfilters
+                  $ref: >-
+                    #/node-output/HubSpot CRM Retrieve contacts by
+                    filters/response/payload
+                - variable: HubSpotCRMRetrievecontactsbyfiltersMetadata
+                  $ref: >-
+                    #/node-output/HubSpot CRM Retrieve contacts by
+                    filters/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$HubSpotCRMRetrievecontactsbyfiltersMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: HubSpot CRM Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postCrmV3ObjectsContacts
+                        map:
+                          mappings:
+                            - properties:
+                                mappings:
+                                  - email:
+                                      template: '{{$Trigger.Email}}'
+                                  - firstname:
+                                      template: '{{$Trigger.FirstName}}'
+                                  - jobtitle:
+                                      template: '{{$Trigger.Title}}'
+                                  - lastname:
+                                      template: '{{$Trigger.LastName}}'
+                                  - phone:
+                                      template: '{{$Trigger.Phone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: HubSpotCRMRetrievecontactsbyfilters
+                              $ref: >-
+                                #/node-output/HubSpot CRM Retrieve contacts by
+                                filters/response/payload
+                            - variable: HubSpotCRMRetrievecontactsbyfiltersMetadata
+                              $ref: >-
+                                #/node-output/HubSpot CRM Retrieve contacts by
+                                filters/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: contact already exist
+                          - To:
+                              template: abhay_kumar@abc.com
+                          - richTextBody:
+                              mappings:
+                                - content:
+                                    template: contact already exist
+                                - contentType:
+                                    template: text/plain
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: HubSpotCRMRetrievecontactsbyfilters
+                            $ref: >-
+                              #/node-output/HubSpot CRM Retrieve contacts by
+                              filters/response/payload
+                          - variable: HubSpotCRMRetrievecontactsbyfiltersMetadata
+                            $ref: >-
+                              #/node-output/HubSpot CRM Retrieve contacts by
+                              filters/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name:Create a contact in HubSpot Marketing when a campaign member is created or updated in Salesforce
+models: {}

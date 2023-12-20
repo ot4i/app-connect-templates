@@ -1,0 +1,136 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Document
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Drive Retrieve files metadata 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              filter:
+                where:
+                  name: '{{$Trigger.Name}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleDriveRetrievefilesmetadata2
+                  $ref: >-
+                    #/node-output/Google Drive Retrieve files metadata
+                    2/response/payload
+                - variable: GoogleDriveRetrievefilesmetadata2Metadata
+                  $ref: >-
+                    #/node-output/Google Drive Retrieve files metadata
+                    2/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$GoogleDriveRetrievefilesmetadata2Metadata."status-code"}}':
+                      neq: '200'
+                  execute:
+                    - create-action:
+                        name: Google Drive Create file
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - content:
+                                template: '{{$Trigger.Body}}'
+                            - createdTime:
+                                template: '{{$Trigger.CreatedDate}}'
+                            - description:
+                                template: '{{$Trigger.Description}}'
+                            - isText:
+                                expression: 'true'
+                            - mimeType:
+                                template: '{{$Trigger.ContentType}}'
+                            - modifiedTime:
+                                template: '{{$Trigger.LastModifiedDate}}'
+                            - name:
+                                template: '{{$Trigger.Name}}'
+                            - starred:
+                                expression: 'false'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleDriveRetrievefilesmetadata2
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve files
+                                metadata 2/response/payload
+                            - variable: GoogleDriveRetrievefilesmetadata2Metadata
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve files
+                                metadata 2/response
+                            - variable: SlackSendmessage3
+                              $ref: >-
+                                #/node-output/Slack Send message
+                                3/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: GoogleDriveRetrievefilesmetadata2
+                          $ref: >-
+                            #/node-output/Google Drive Retrieve files metadata
+                            2/response/payload
+                        - variable: GoogleDriveRetrievefilesmetadata2Metadata
+                          $ref: >-
+                            #/node-output/Google Drive Retrieve files metadata
+                            2/response
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: File name  {{$Trigger.Name}} is already exist in GD.
+                      status-code: 200
+              output-schema: {}
+  name: Create a file in Google Drive for each new document created in Salesforce
+models: {}
