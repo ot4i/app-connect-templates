@@ -2880,7 +2880,7 @@
 	"offerings": ["app connect professional"]
    },
  {
-	"name": "Create a new contact in Google Contacts when a campaign member is created or updated in Saleforce",
+	"name": "Create a new contact in Google Contacts when a campaign member is created or updated in Salesforce",
 	"description": "Use this template to create a contact in Google Contacts whenever a new campaign member is either created or updated in Salesforce.",
 	"summary": "Salesforce to 2 applications",
 	"sourceApp": "salesforce",
