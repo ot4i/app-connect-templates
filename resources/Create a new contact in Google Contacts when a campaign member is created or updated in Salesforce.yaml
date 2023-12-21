@@ -150,5 +150,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Create a new contact in Google Contacts when a campaign member is created or updated in Saleforce
+  name: Create a new contact in Google Contacts when a campaign member is created or updated in Salesforce
 models: {}
