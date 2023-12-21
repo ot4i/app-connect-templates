@@ -2639,7 +2639,7 @@
   {
    "name": "Send a notification message via Gmail to a specific group in Google Groups",
    "description": "Use this API  template to send a notification message via Gmail to a specific group in Google Groups. This is a prequel flow for the ‘Add a member to a group in Google Groups when a new subscriber is added to a list’ template.",
-   "summary": " to 2 applications",
+   "summary": "1 flow using 2 applications",
    "sourceApp": "api",
    "targetApps": ["googlegroups", "gmail"],
    "tags": ["api", "googlegroups", "gmail", "foreach"],
