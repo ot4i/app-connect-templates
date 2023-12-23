@@ -2590,6 +2590,24 @@
   "targetApps": ["expensify", "docusign"],
   "tags": ["api", "expensify", "docusign"],
   "offerings": ["app connect professional"]
+  },
+  {
+  "name": "Create a new row in a Google Sheets spreadsheet for each new employee retrieved from the Amazon Redshift record",
+  "description": "Use this template to create a new row in a Google Sheets spreadsheet for each new employee retrieved from the Amazon Redshift record.",
+  "summary": "1 flow using 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["amazonredshift", "googlesheet"],
+  "tags": ["scheduler", "amazonredshift", "googlesheet", "setVariable", "foreach", "JSON parser"],
+  "offerings": ["app connect professional"]
+  },
+  {
+  "name": "Data integration between IBM Could Object Storage S3 and Amazon Redshift",
+  "description": "Use this template to create a scheduler-based flow that retrieves object files from a specified IBM Could Object Storage S3 (COSS3) bucket and downloads the object content. The content is then parsed using CSV Parser to convert the CSV text into a JSON object. Subsequently, the object details are either created or updated in the specified Amazon Redshift record.",
+  "summary": "1 flow using 3 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["ibmcoss3", "amazonredshift", "gmail"],
+  "tags": ["scheduler", "ibmcoss3", "amazonredshift", "gmail", "if", "foreach", "CSV parser"],
+  "offerings": ["app connect professional"]
   }
 ]
 }
