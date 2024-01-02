@@ -1,0 +1,84 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1P9VH21j78tzNa98WL6hh8KfylOkybs3AFcG3NuJzPEA
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1P9VH21j78tzNa98WL6hh8KfylOkybs3AFcG3NuJzPEA
+              worksheetID: Sheet1
+      connector-type: googlesheet
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Subject:
+                      template: worksheet
+                  - To:
+                      template: ashudeep_devari@abc.com
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: '{{$Trigger}}'
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '3':
+                            template: '{{$AWSLambdaInvokefunction.Payload}}'
+                  - spreadsheetID:
+                      template: 1P9VH21j78tzNa98WL6hh8KfylOkybs3AFcG3NuJzPEA
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailSendemail
+                    $ref: '#/node-output/Gmail Send email/response/payload'
+                  - variable: AWSLambdaInvokefunction
+                    $ref: '#/node-output/AWS Lambda Invoke function/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Invoke a function from AWS Lambda whenever a new row is appended in Google Sheets 
+models: {}

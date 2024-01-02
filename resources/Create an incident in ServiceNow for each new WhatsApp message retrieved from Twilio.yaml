@@ -1,0 +1,153 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getMessagesjson_model
+      connector-type: twilio
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Twilio Retrieve messages
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 50
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$TwilioRetrievemessages '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: TwilioRetrievemessages
+                    $ref: '#/node-output/Twilio Retrieve messages/response/payload'
+                  - variable: TwilioRetrievemessagesMetadata
+                    $ref: '#/node-output/Twilio Retrieve messages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: TwilioRetrievemessages
+                    $ref: '#/node-output/Twilio Retrieve messages/response/payload'
+                  - variable: TwilioRetrievemessagesMetadata
+                    $ref: '#/node-output/Twilio Retrieve messages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - body:
+                            template: '{{$Foreachitem}}'
+              display-name: Twilio Messages
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: TwilioRetrievemessages
+                  $ref: '#/node-output/Twilio Retrieve messages/response/payload'
+                - variable: TwilioRetrievemessagesMetadata
+                  $ref: '#/node-output/Twilio Retrieve messages/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$contains($Foreachitem._to_ , "whatsapp")}}':
+                          '=': 'true'
+                      - '{{$Foreachitem.date_created}}':
+                          gt: '{{$Trigger.currentEventTime}}'
+                        hashKey: object:304
+                  execute:
+                    - create-action:
+                        name: ServiceNow Create incident
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - number:
+                                template: '{{$Foreachitem.sid}}'
+                            - opened_at:
+                                template: '{{$Foreachitem.date_created}}'
+                            - short_description:
+                                template: '{{$Foreachitem.body}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TwilioRetrievemessages
+                              $ref: >-
+                                #/node-output/Twilio Retrieve
+                                messages/response/payload
+                            - variable: TwilioRetrievemessagesMetadata
+                              $ref: '#/node-output/Twilio Retrieve messages/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create an incident in ServiceNow for each new WhatsApp message retrieved from Twilio
+models: {}

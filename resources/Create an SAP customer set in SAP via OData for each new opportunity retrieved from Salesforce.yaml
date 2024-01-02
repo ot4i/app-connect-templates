@@ -1,0 +1,229 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: CustomerSet
+      connector-type: sapodata
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.AccountId}}':
+                          neq: ''
+                      - '{{$Trigger.Name}}':
+                          neq: ''
+                        hashKey: object:924
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve accounts
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            Id: 0010800003ILIOhAAP
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: false
+                    - for-each:
+                        name: For each
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-2'
+                        source:
+                          expression: '$SalesforceRetrieveaccounts '
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas:
+                            properties.`output`:
+                              type: object
+                              properties:
+                                output:
+                                  type: string
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - output:
+                                mappings:
+                                  - output:
+                                      template: '{{$SalesforceRetrieveaccounts}}'
+                        display-name: Salesforce Account
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  customerset
+                                  created==========={{$Foreach.output.output}}
+                            - Subject:
+                                template: customerset created
+                            - To:
+                                template: abhay_kumar@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: Foreach
+                              $ref: '#/block/If/node-output/For each/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - Body:
+                              template: customerset not created
+                          - Subject:
+                              template: customerset not created
+                          - To:
+                              template: abhay_kumar@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: SAP (via OData) Create CustomerSet
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - City:
+                      template: Burlingame
+                  - Country:
+                      template: US
+                  - Currency:
+                      template: USD
+                  - DistrChan:
+                      template: '01'
+                  - Division:
+                      template: '01'
+                  - FirstName:
+                      template: '{{$Foreachitem.Name}}'
+                  - Langu:
+                      template: EN
+                  - Name:
+                      template: '{{$Foreachitem.Name}}'
+                  - PostlCode:
+                      template: '94010'
+                  - RefCustmr:
+                      template: '3'
+                  - Region:
+                      template: CA
+                  - Salesorg:
+                      template: '0001'
+                  - Street:
+                      template: Cornwallis Rd
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/block/If/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: >-
+                      #/block/If/node-output/Salesforce Retrieve
+                      accounts/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an SAP customer set in SAP via OData for each new opportunity retrieved from Salesforce 
+models: {}
