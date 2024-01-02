@@ -1,0 +1,105 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Permission
+      connector-type: googledrive
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Id}}':
+                      neq: ''
+                  execute:
+                    - retrieve-action:
+                        name: Google Drive Retrieve files metadata
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          where:
+                            id: 1sORYnoQH2quZDYc2gSmvJuVqPHSbLf7y
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        allow-empty-output: false
+                    - create-action:
+                        name: Google Drive Create permission
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - allowFileDiscovery:
+                                expression: 'true'
+                            - emailAddress:
+                                template: '{{$Trigger.Email}}'
+                            - emailMessage:
+                                template: >-
+                                  Hi {{$Trigger.Name}}, you  are invited as a
+                                  file organizer for the file
+                                  {{$GoogleDriveRetrievefilesmetadata.name}}
+                            - fileId:
+                                template: 1sORYnoQH2quZDYc2gSmvJuVqPHSbLf7y
+                            - role:
+                                template: fileOrganizer
+                            - sendNotificationEmail:
+                                expression: 'true'
+                            - transferOwnership:
+                                expression: 'false'
+                            - type:
+                                template: user
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleDriveRetrievefilesmetadata
+                              $ref: >-
+                                #/block/If/node-output/Google Drive Retrieve
+                                files metadata/response/payload
+                            - variable: GoogleDriveRetrievefilesmetadataMetadata
+                              $ref: >-
+                                #/block/If/node-output/Google Drive Retrieve
+                                files metadata/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Invite a new Salesforce contact to access a file in Google Drive
+models: {}

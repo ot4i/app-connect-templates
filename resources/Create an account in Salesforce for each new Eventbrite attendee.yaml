@@ -1,0 +1,172 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Attendee
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve attendees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  event_id: '760246296137'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EventbriteRetrieveattendees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      attendee:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - attendee:
+                            template: '{{$Foreachitem}}'
+              display-name: Eventbrite Attendee
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: EventbriteRetrieveattendees
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response/payload'
+                - variable: EventbriteRetrieveattendeesMetadata
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.created}}':
+                      gt: '{{$Trigger.currentEventTime}}'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create account
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - BillingCity:
+                                template: '{{$Foreachitem.profile.addresses.ship.city}}'
+                            - Description:
+                                template: '{{$Foreachitem.profile.job_title}}'
+                            - Name:
+                                template: '{{$Foreachitem.profile.first_name}}'
+                            - Phone:
+                                template: '{{$Foreachitem.ticket_class_id}}'
+                            - ShippingPostalCode:
+                                template: '{{$Foreachitem.order_id}}'
+                            - Site:
+                                template: '{{$Foreachitem.resource_uri}}'
+                            - Type:
+                                template: Prospect
+                            - Website:
+                                template: '{{$Foreachitem.resource_uri}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: EventbriteRetrieveattendees
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response/payload
+                            - variable: EventbriteRetrieveattendeesMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create an account in Salesforce for each new Eventbrite attendee
+models: {}

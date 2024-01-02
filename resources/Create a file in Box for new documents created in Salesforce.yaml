@@ -1,0 +1,117 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Document
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Box Retrieve file metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: BoxRetrievefilemetadata
+                  $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                - variable: BoxRetrievefilemetadataMetadata
+                  $ref: '#/node-output/Box Retrieve file metadata/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$BoxRetrievefilemetadataMetadata."status-code"}}':
+                      neq: '200'
+                  execute:
+                    - create-action:
+                        name: Box Create file
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - fileType:
+                                template: Text
+                            - name:
+                                template: '{{$Trigger.Name}}'
+                            - parent_id:
+                                template: '186657742772'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BoxRetrievefilemetadata
+                              $ref: >-
+                                #/node-output/Box Retrieve file
+                                metadata/response/payload
+                            - variable: BoxRetrievefilemetadataMetadata
+                              $ref: >-
+                                #/node-output/Box Retrieve file
+                                metadata/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: BoxRetrievefilemetadata
+                          $ref: >-
+                            #/node-output/Box Retrieve file
+                            metadata/response/payload
+                        - variable: BoxRetrievefilemetadataMetadata
+                          $ref: '#/node-output/Box Retrieve file metadata/response'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: File name {{$Trigger.Id}} is already exist in Box.
+                      status-code: 200
+              output-schema: {}
+  name: Create a file in Box for new documents created in Salesforce
+models: {}

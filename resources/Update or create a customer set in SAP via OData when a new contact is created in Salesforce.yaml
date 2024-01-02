@@ -1,0 +1,153 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: CustomerSet
+      connector-type: sapodata
+      actions:
+        UPSERTWITHWHERE: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailSendemail3
+                  $ref: '#/node-output/Gmail Send email 3/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Id}}':
+                      neq: ''
+                  execute:
+                    - upsert-action:
+                        name: SAP (via OData) Update or create CustomerSet
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - City:
+                                template: '{{$Trigger.OtherCity}}'
+                            - Country:
+                                template: '{{$Trigger.OtherCountry}}'
+                            - Currency:
+                                template: '{{$Trigger.MailingCountry}}'
+                            - DistrChan:
+                                template: '{{$Trigger.MailingCity}}'
+                            - Division:
+                                template: '{{$Trigger.MailingState}}'
+                            - FirstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - Langu:
+                                template: '{{$Trigger.Languages__c}}'
+                            - Name:
+                                template: '{{$Trigger.LastName}}'
+                            - PostlCode:
+                                template: '{{$Trigger.OtherPostalCode}}'
+                            - RefCustmr:
+                                template: '{{$Trigger.MailingPostalCode}}'
+                            - Region:
+                                template: '{{$Trigger.OtherState}}'
+                            - Salesorg:
+                                template: '{{$Trigger.MailingStreet}}'
+                            - Street:
+                                template: '{{$Trigger.OtherStreet}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            Kunnr: '12345'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$SAPviaODataUpdateorcreateCustomerSet}}'
+                            - Subject:
+                                template: Customer is created
+                            - To:
+                                template: preprodtest94@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SAPviaODataUpdateorcreateCustomerSet
+                              $ref: >-
+                                #/block/If/node-output/SAP (via OData) Update or
+                                create CustomerSet/response/payload
+                            - variable: SAPviaODataUpdateorcreateCustomerSetMetadata
+                              $ref: >-
+                                #/block/If/node-output/SAP (via OData) Update or
+                                create CustomerSet/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: Customer is not created
+                          - To:
+                              template: preprodtest94@gmail.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SAPviaODataRetrieveCustomerSet
+                            $ref: >-
+                              #/node-output/SAP (via OData) Retrieve
+                              CustomerSet/response/payload
+                          - variable: SAPviaODataRetrieveCustomerSetMetadata
+                            $ref: >-
+                              #/node-output/SAP (via OData) Retrieve
+                              CustomerSet/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Update or create a customer set in SAP via OData when a new contact is created in Salesforce
+models: {}
