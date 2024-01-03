@@ -1,0 +1,60 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: FGlgq8GzUvN4IOsWzSoO2GVTe8l6wAQOpu_x0d2tGUOT_Be9lGJJ0vUrbAy1Vfe8
+      connector-type: marketo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.firstName}}'
+                        - '2':
+                            template: '{{$Trigger.middleName}}'
+                        - '3':
+                            template: '{{$Trigger.lastName}}'
+                        - '4':
+                            template: '{{$Trigger.company}}'
+                        - '5':
+                            template: '{{$Trigger.mktoName}}'
+                        - '6':
+                            template: '{{$Trigger.title}}'
+                        - '7':
+                            template: '{{$Trigger.mobilePhone}}'
+                  - spreadsheetID:
+                      template: 1VJQmf4WLM6ZVmxk6Sv94DOyuWUDBFO4uFhuWMD_TLJQ
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a row in Google Sheets worksheet when a new lead is created in Marketo	
+models: {}
