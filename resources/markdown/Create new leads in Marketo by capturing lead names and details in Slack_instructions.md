@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20new%20leads%20in%20Marketo%20by%20capturing%20lead%20names%20and%20details%20in%20Slack_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20new%20leads%20in%20Marketo%20by%20capturing%20lead%20names%20and%20details%20in%20Slack_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Connect to your [Slack account](http://ibm.biz/aasslack).

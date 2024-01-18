@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Record%20event%20attendance%20for%20each%20Eventbrite%20attendee%20by%20syncing%20Eventbrite%20events%20with%20HubSpot%20Marketing%20events_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Record%20event%20attendance%20for%20each%20Eventbrite%20attendee%20by%20syncing%20Eventbrite%20events%20with%20HubSpot%20Marketing%20events_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
