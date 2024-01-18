@@ -362,5 +362,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Integrate data between IBM Could Object Storage S3 and Amazon Redshift
+  name: Integrate data between IBM Cloud Object Storage S3 and Amazon Redshift
 models: {}
