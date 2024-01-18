@@ -2673,8 +2673,8 @@
    "offerings": ["app connect professional"]
  },
  {
-  "name": "Data integration between IBM Could Object Storage S3 and Amazon Redshift",
-  "description": "Use this template to create a scheduler-based flow that retrieves object files from a specified IBM Could Object Storage S3 (COSS3) bucket and downloads the object content. The content is then parsed using CSV Parser to convert the CSV text into a JSON object. Subsequently, the object details are either created or updated in the specified Amazon Redshift record.",
+  "name": "Integrate data between IBM Cloud Object Storage S3 and Amazon Redshift",
+  "description": "Use this template to create a scheduler-based flow that retrieves object files from a specified IBM Cloud Object Storage S3 (COSS3) bucket and downloads the object content. The content is then parsed using CSV Parser to convert the CSV text into a JSON object. Subsequently, the object details are either created or updated in the specified Amazon Redshift record.",
   "summary": "1 flow using 3 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["ibmcoss3", "amazonredshift", "gmail"],
