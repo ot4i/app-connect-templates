@@ -2747,7 +2747,7 @@
 {
 	"name": "Create an item in mondaydotcom when a new lead is created in Salesforce based on the Salesforce lead rating",
 	"description": "Use this template to create an item in monday.com when a new lead is created in Salesforce based on the Salesforce lead rating. In this example, the item is created with different group identifiers for rating, such as hot or warm.",
-	"summary": "Salesforce to mondy.com",
+	"summary": "Salesforce to monday.com",
 	"sourceApp": "salesforce",
 	"targetApps": ["mondaydotcom"],
 	"tags": ["salesforce", "mondaydotcom"],
