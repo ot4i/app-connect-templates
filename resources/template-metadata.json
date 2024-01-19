@@ -2880,76 +2880,76 @@
 	"offerings": ["app connect professional"]
  },
 {
-"name": "Create a job requisition in Workday when a new row is appended in Microsoft Excel Online",
-"description": "Use this template to create a job requisition in Workday whenever a new row is appended in Microsoft Excel Online. In this example, if the budget amount is less than a specific amount, an HTTP method is invoked to create a job requisition in Workday. This is a sequel flow for 'Create a job requisition in Workday' template.",
-"summary": "Microsoft Excel Online to HTTP",
-"sourceApp": "msexcel",
-"targetApps": ["http"],
-"tags": ["msexcel", "http"],
-"offerings": ["app connect professional"]
+  "name": "Create a job requisition in Workday when a new row is appended in Microsoft Excel Online",
+  "description": "Use this template to create a job requisition in Workday whenever a new row is appended in Microsoft Excel Online. In this example, if the budget amount is less than a specific amount, an HTTP method is invoked to create a job requisition in Workday. This is a sequel flow for 'Create a job requisition in Workday' template.",
+  "summary": "Microsoft Excel Online to HTTP",
+  "sourceApp": "msexcel",
+  "targetApps": ["http"],
+  "tags": ["msexcel", "http"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Create a job requistion in Workday",
-"description": "Use this API template to create a job requistion in Workday.",
-"summary": "API flow using 1 application",
-"sourceApp": "api",
-"targetApps": ["workday"],
-"tags": ["api", "workday"],
-"offerings": ["app connect professional"]
+  "name": "Create a job requistion in Workday",
+  "description": "Use this API template to create a job requistion in Workday.",
+  "summary": "API flow using 1 application",
+  "sourceApp": "api",
+  "targetApps": ["workday"],
+  "tags": ["api", "workday"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Create an event in Google Calendar for each registered Eventbrite event attendee",
-"description": "Use this template to create an event in Google Calendar for each registered Eventbrite event attendee. In this example, a Google Calendar event is sent to each of the newly registered Eventbrite attendees.",
-"summary": "Scheduler to 2 applications",
-"sourceApp": "streaming-connector-scheduler",
-"targetApps": ["eventbrite", "eventbrite", "googlecalendar"],
-"tags": ["scheduler", "eventbrite", "googlecalendar"],
-"offerings": ["app connect professional"]
+  "name": "Create an event in Google Calendar for each registered Eventbrite event attendee",
+  "description": "Use this template to create an event in Google Calendar for each registered Eventbrite event attendee. In this example, a Google Calendar event is sent to each of the newly registered Eventbrite attendees.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["eventbrite", "eventbrite", "googlecalendar"],
+  "tags": ["scheduler", "eventbrite", "googlecalendar"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Data integration between Box files and Microsoft Azure Blob storage",
-"description": "Use this template to create a scheduler-based flow that retrieves CSV-type file metadata from Box for a specified time. For each Box file, the file content is retrieved in text format, and the content is appended into a Microsoft Azure Blob storage container.",
-"summary": "Scheduler to 2 applications",
-"sourceApp": "streaming-connector-scheduler",
-"targetApps": ["box", "box", "azureblobstorage"],
-"tags": ["scheduler", "box", "azureblobstorage"],
-"offerings": ["app connect professional"]
+  "name": "Data integration between Box files and Microsoft Azure Blob storage",
+  "description": "Use this template to create a scheduler-based flow that retrieves CSV-type file metadata from Box for a specified time. For each Box file, the file content is retrieved in text format, and the content is appended into a Microsoft Azure Blob storage container.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["box", "box", "azureblobstorage"],
+  "tags": ["scheduler", "box", "azureblobstorage"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Invoke an HTTP method for each item retrieved from a new sales order created using Magento",
-"description": "Use this template to invoke a method for each item retrieved from a new sales order created using Magento. In this example, when a new sales order is created, an HTTP method is invoked, which sends a request to a client URL to get the customer email details.",
-"summary": "Magento to HTTP",
-"sourceApp": "magento",
-"targetApps": ["http"],
-"tags": ["magento", "http"],
-"offerings": ["app connect professional"]
+  "name": "Invoke an HTTP method for each item retrieved from a new sales order created using Magento",
+  "description": "Use this template to invoke a method for each item retrieved from a new sales order created using Magento. In this example, when a new sales order is created, an HTTP method is invoked, which sends a request to a client URL to get the customer email details.",
+  "summary": "Magento to HTTP",
+  "sourceApp": "magento",
+  "targetApps": ["http"],
+  "tags": ["magento", "http"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Retrieve a ticket from Zendesk Service based on the ticket severity",
-"description": "Use this API template to retrieve tickets from Zendesk Service at regular intervals based on the ticket severity.",
-"summary": "API flow using 1 application",
-"sourceApp": "api",
-"targetApps": ["zendeskservice"],
-"tags": ["api", "zendeskservice"],
-"offerings": ["app connect professional"]
+  "name": "Retrieve a ticket from Zendesk Service based on the ticket severity",
+  "description": "Use this API template to retrieve tickets from Zendesk Service at regular intervals based on the ticket severity.",
+  "summary": "API flow using 1 application",
+  "sourceApp": "api",
+  "targetApps": ["zendeskservice"],
+  "tags": ["api", "zendeskservice"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Send a Gmail message to the assignee based on the retrieved Zendesk Service ticket severity",
-"description": "Use this template to invoke an HTTP method to get the retrieved Zendesk Service tickets and send a Gmail message to the assignee to inform them of the status of the ticket. This is a sequel flow for 'Retrieve a ticket from Zendesk Service based on the ticket severity' template.",
-"summary": "Scheduler to 2 applications",
-"sourceApp": "streaming-connector-scheduler",
-"targetApps": ["http", "gmail"],
-"tags": ["scheduler", "http", "gmail"],
-"offerings": ["app connect professional"]
+  "name": "Send a Gmail message to the assignee based on the retrieved Zendesk Service ticket severity",
+  "description": "Use this template to invoke an HTTP method to get the retrieved Zendesk Service tickets and send a Gmail message to the assignee to inform them of the status of the ticket. This is a sequel flow for 'Retrieve a ticket from Zendesk Service based on the ticket severity' template.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["http", "gmail"],
+  "tags": ["scheduler", "http", "gmail"],
+  "offerings": ["app connect professional"]
 },
 {
-"name": "Send a Gmail message when a new sales rule coupon is created in Magento",
-"description": "Use this API template to create a new sales rule coupon in Magento and send the coupon details to the customer via Gmail message.",
-"summary": "API flow using 2 applications",
-"sourceApp": "api",
-"targetApps": ["magento", "gmail"],
-"tags": ["api", "magento", "gmail"],
-"offerings": ["app connect professional"]
-} 
+  "name": "Send a Gmail message when a new sales rule coupon is created in Magento",
+  "description": "Use this API template to create a new sales rule coupon in Magento and send the coupon details to the customer via Gmail message.",
+  "summary": "API flow using 2 applications",
+  "sourceApp": "api",
+  "targetApps": ["magento", "gmail"],
+  "tags": ["api", "magento", "gmail"],
+  "offerings": ["app connect professional"]
+ }
 ]
 }

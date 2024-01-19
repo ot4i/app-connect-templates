@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Create%20a%20job%20requisition%20in%20SAP%20SuccessFactors%20and%20send%20an%20email%20to%20the%20hiring%20manager%20about%20the%20job%20requisition_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20job%20requisition%20in%20SAP%20SuccessFactors%20and%20send%20an%20email%20to%20the%20hiring%20manager%20about%20the%20job%20requisition_instructions.md) (opens in a new window).
 
 
 1. Click **Create flow** to start using the template.

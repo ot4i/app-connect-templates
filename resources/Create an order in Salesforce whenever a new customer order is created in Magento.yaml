@@ -1,4 +1,4 @@
-$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -12,70 +12,183 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
           options:
-            webhookURLSuffix: 81a4469b-dcaf-5117-8311-79734c82e597
+            webhookURLSuffix: lQPlkDITqPz2p3HwwEi1gtB8Ar0Bl9zQIpqxMQXeNU_4gsvBv3KplLBckKN2XBxw
   action-interfaces:
-    action-interface-2:
-      type: api-action
-      business-object: mail
-      connector-type: gmail
-      actions:
-        CREATE: {}
     action-interface-1:
       type: api-action
       business-object: Order
       connector-type: salesforce
       actions:
         CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: Order
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
-          - create-action:
-              name: Salesforce Create order
+          - retrieve-action:
+              name: Salesforce Retrieve accounts
               target:
-                $ref: '#/integration/action-interfaces/action-interface-1'
-              map:
-                mappings:
-                  - AccountId:
-                      template: 0012v00002JGoOq
-                  - BillingCity:
-                      template: '{{$Trigger.billing_address.city}}'
-                  - BillingPostalCode:
-                      template: '{{$Trigger.billing_address.postcode}}'
-                  - BillingState:
-                      template: '{{$Trigger.state}}'
-                  - EffectiveDate:
-                      template: '{{$Trigger.created_at}}'
-                  - OrderReferenceNumber:
-                      template: '{{$Trigger.entity_id}}'
-                  - ShippingState:
-                      template: '{{$Trigger.state}}'
-                  - Status:
-                      template: Draft
-                $map: 'http://ibm.com/appconnect/map/v1'
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  ParentId: '{{$Trigger.customer_id}}'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveaccounts
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response/payload'
+                - variable: SalesforceRetrieveaccountsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$SalesforceRetrieveaccounts}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: Salesforce Create order
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - AccountId:
+                                template: '{{$SalesforceRetrieveaccounts.Id}}'
+                            - EffectiveDate:
+                                template: '{{$Trigger.created_at}}'
+                            - Status:
+                                template: Draft
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Salesforce Create account
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - Name:
+                              template: >-
+                                {{$Trigger.customer_firstname}}{{$Trigger.customer_lastname}}
+                          - ParentId:
+                              template: '{{$Trigger.customer_id}}'
+                          - Type:
+                              template: Other
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrieveaccounts
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              accounts/response/payload
+                          - variable: SalesforceRetrieveaccountsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              accounts/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Salesforce Create order 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - AccountId:
+                              template: '{{$SalesforceCreateaccount.Id}}'
+                          - EffectiveDate:
+                              template: '{{$Trigger.created_at}}'
+                          - Status:
+                              template: Draft
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceCreateaccount
+                            $ref: >-
+                              #/block/If/node-output/Salesforce Create
+                              account/response/payload
+                          - variable: SalesforceRetrieveaccounts
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              accounts/response/payload
+                          - variable: SalesforceRetrieveaccountsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              accounts/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
           - create-action:
-              name: Gmail Create email
+              name: Slack Send message
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               map:
                 mappings:
-                  - Body:
-                      template: >-
-                        New sales order ID created by
-                        Customer-{{$Trigger.customer_firstname}}--is
-                        --{{$Trigger.entity_id}}
-                  - Subject:
-                      template: NewSalesOrder
-                  - To:
-                      template: user1@email.com
-                $map: 'http://ibm.com/appconnect/map/v1'
+                  - OBJECT_ID:
+                      template: C04G6R92ZR7
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: 'Salesforce order id '
+                $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: SalesforceCreateorder
-                    $ref: '#/node-output/Salesforce Create order/response/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
   name: Create an order in Salesforce whenever a new customer order is created in Magento
 models: {}

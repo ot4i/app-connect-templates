@@ -1,0 +1,182 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCreate_report_upload:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: create_report_upload
+          output-context:
+            data: create_report_upload
+      options:
+        resources:
+          - business-object: create_report_upload
+            model:
+              $ref: '#/models/create_report_upload'
+            triggers:
+              create: createCreate_report_upload
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postDownload_model
+      connector-type: expensify
+      actions:
+        postDownload: {}
+    action-interface-2:
+      type: api-action
+      business-object: envelope
+      connector-type: docusign
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Expensify Download report
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postDownload
+              map:
+                mappings:
+                  - fileName:
+                      template: '{{$Request.fileName}}'
+                  - fileSystem:
+                      template: integrationServer
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: DocuSign Create envelope
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - accountId:
+                      template: ebedc701-8e28-4842-9f5c-279432384304
+                  - documents:
+                      foreach:
+                        input: '$Request.documents '
+                        iterator: documentsItem
+                        mappings:
+                          - documentBase64:
+                              template: '{{$ExpensifyDownloadreport.data}}'
+                          - documentId:
+                              template: '{{$documentsItem.document_id}}'
+                          - fileExtension:
+                              template: pdf
+                          - name:
+                              template: expensify_docs
+                  - emailSubject:
+                      template: Expensify
+                  - recipients:
+                      mappings:
+                        - signers:
+                            foreach:
+                              mappings:
+                                - email:
+                                    template: '{{$Request.recipients.recipient_email}}'
+                                - name:
+                                    template: '{{$Request.recipients.recipient_name}}'
+                                - recipientId:
+                                    template: '{{$Request.recipients.recipient_id}}'
+                                - routingOrder:
+                                    expression: '$Request.recipients.routing_order '
+                              input: '$Request.recipients '
+                              iterator: signersItem
+                  - status:
+                      template: sent
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: ExpensifyDownloadreport
+                    $ref: '#/node-output/Expensify Download report/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: create_report_upload successfully created
+                  status-code: 201
+                  map:
+                    mappings:
+                      - id:
+                          template: '{{$DocuSignCreateenvelope.envelopeId}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: ExpensifyDownloadreport
+                        $ref: >-
+                          #/node-output/Expensify Download
+                          report/response/payload
+                      - variable: DocuSignCreateenvelope
+                        $ref: >-
+                          #/node-output/DocuSign Create
+                          envelope/response/payload
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  input: []
+  name: Download an expense report in Expensify and send the report to the manager for approval via DocuSign
+models:
+  create_report_upload:
+    name: create_report_upload
+    properties:
+      id:
+        required: false
+        id: true
+        type: string
+      documents:
+        required: false
+        id: false
+        type:
+          - type:
+              document_id:
+                required: false
+                id: false
+                type: string
+              file_extension:
+                required: false
+                id: false
+                type: string
+              document_name:
+                required: false
+                id: false
+                type: string
+      recipients:
+        required: false
+        id: false
+        type:
+          - type:
+              recipient_name:
+                required: false
+                id: false
+                type: string
+              recipient_email:
+                required: false
+                id: false
+                type: string
+              routing_order:
+                required: false
+                id: false
+                type: string
+              recipient_id:
+                required: false
+                id: false
+                type: string
+      fileName:
+        required: false
+        id: false
+        type: string
+    plural: create_report_upload
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'

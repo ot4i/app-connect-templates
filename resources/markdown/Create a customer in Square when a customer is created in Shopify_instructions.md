@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20customer%20in%20Square%20when%20a%20customer%20is%20created%20in%20Shopify_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20customer%20in%20Square%20when%20a%20customer%20is%20created%20in%20Shopify_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Click **Operations**, then click **Edit flow** to edit the operations.

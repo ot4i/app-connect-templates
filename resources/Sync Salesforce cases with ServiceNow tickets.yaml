@@ -1,0 +1,93 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Case
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: ticket
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve Case
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1
+              allow-empty-output: false
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+          - retrieve-action:
+              name: Salesforce Retrieve Account
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  Id: '{{$Trigger.AccountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveCase
+                    $ref: '#/node-output/Salesforce Retrieve Case/response/payload'
+                  - variable: SalesforceRetrieveCaseMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Case/response'
+                limit: 1
+              allow-empty-output: false
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+          - create-action:
+              name: ServiceNow Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - company:
+                      template: '{{$SalesforceRetrieveAccount[0].Name}}'
+                  - short_description:
+                      template: '{{$SalesforceRetrieveCase[0].Description}}'
+                $map: 'http://ibm.com/appconnect/map/v1'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveCase
+                    $ref: '#/node-output/Salesforce Retrieve Case/response/payload'
+                  - variable: SalesforceRetrieveCaseMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Case/response'
+                  - variable: SalesforceRetrieveAccount
+                    $ref: '#/node-output/Salesforce Retrieve Account/response/payload'
+                  - variable: SalesforceRetrieveAccountMetadata
+                    $ref: '#/node-output/Salesforce Retrieve Account/response'
+  name: Sync Salesforce cases with ServiceNow tickets
+models: {}

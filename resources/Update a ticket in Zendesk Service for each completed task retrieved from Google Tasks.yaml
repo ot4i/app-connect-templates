@@ -1,0 +1,175 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getTasksV1ListsByTasklistTasks_model
+      connector-type: googletasks
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        UPDATEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Tasks Retrieve tasks
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - completed:
+                        lt: '{{$Trigger.currentEventTime}}'
+                    - completed:
+                        gte: '{{$Trigger.lastEventTime}}'
+                    - tasklist: RlN5Qk1iQnFzeGs4V3g0Yw
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleTasksRetrievetasks '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleTasksRetrievetasks
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response/payload'
+                  - variable: GoogleTasksRetrievetasksMetadata
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response'
+                  - variable: SlackSendmessage2
+                    $ref: '#/node-output/Slack Send message 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Tasks item
+    assembly-2:
+      assembly:
+        execute:
+          - update-action:
+              name: Zendesk Service Update ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - description:
+                      template: >-
+                        Zendesk ticket is updated to status as :-
+                        {{$Foreachitem.status}}
+                  - status:
+                      template: closed
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleTasksRetrievetasks
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response/payload'
+                  - variable: GoogleTasksRetrievetasksMetadata
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  id: '{{$substringBefore($Foreachitem.title, "_")}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleTasksRetrievetasks
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response/payload'
+                  - variable: GoogleTasksRetrievetasksMetadata
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-empty-output: false
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C27KK3BBL
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Status of zendesk ticket is updated to
+                        {{$Foreachitem.status}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZendeskServiceUpdateticket
+                    $ref: >-
+                      #/block/For each/node-output/Zendesk Service Update
+                      ticket/response/payload
+                  - variable: ZendeskServiceUpdateticketMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zendesk Service Update
+                      ticket/response
+                  - variable: GoogleTasksRetrievetasks
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response/payload'
+                  - variable: GoogleTasksRetrievetasksMetadata
+                    $ref: '#/node-output/Google Tasks Retrieve tasks/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Update a ticket in Zendesk Service for each completed task retrieved from Google Tasks
+models: {}

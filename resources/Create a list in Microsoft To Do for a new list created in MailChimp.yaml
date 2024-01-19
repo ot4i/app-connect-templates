@@ -1,0 +1,96 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: mailchimp
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lists
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: getUsersByUserIdTodoLists_model
+      connector-type: mstodo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: postUsersByUserIdTodoLists_model
+      connector-type: mstodo
+      actions:
+        postUsersByUserIdTodoLists: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft To Do Retrieve lists
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - userId: me
+                    - displayName: '{{$Trigger.name}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftToDoRetrievelists
+                  $ref: >-
+                    #/node-output/Microsoft To Do Retrieve
+                    lists/response/payload
+                - variable: MicrosoftToDoRetrievelistsMetadata
+                  $ref: '#/node-output/Microsoft To Do Retrieve lists/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MicrosoftToDoRetrievelistsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Microsoft To Do Create list
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postUsersByUserIdTodoLists
+                        map:
+                          mappings:
+                            - displayName:
+                                template: List {{$Trigger.name}}
+                            - userId:
+                                template: me
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftToDoRetrievelists
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response/payload
+                            - variable: MicrosoftToDoRetrievelistsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft To Do Retrieve
+                                lists/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a list in Microsoft To Do for a new list created in MailChimp
+models: {}

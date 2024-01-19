@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20setup%203%20-%20Delete%20flowers%20and%20order%20from%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20setup%203%20-%20Delete%20flowers%20and%20order%20from%20Salesforce_instructions.md) (opens in a new window).
 
 This template deletes the products and orders which were created by the following templates:
 * Welcome guide setup 1 - Add products to Salesforce.
