@@ -2806,7 +2806,7 @@
 	"targetApps": ["googlebigquery", "gmail"],
 	"tags": ["scheduler", "googlebigquery", "gmail", "foreach", "if"],
 	"offerings": ["app connect professional"]
-}
+},
 {
 	"name": "Add a card to a list in Trello for each new form entry created in Wufoo",
 	"description": "Use this template to add a card to a list in Trello for each new form entry created in Wufoo. In this example, for each Wufoo's new form entry that has a unique lead entry, the Wufoo lead details are added to a list in Trello.",
