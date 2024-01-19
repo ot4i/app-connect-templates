@@ -1,0 +1,52 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: z97pivb10lgosx
+            parentFilter:
+              Hash: z97pivb10lgosx
+      connector-type: wufoo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Zendesk Service Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - description:
+                      template: >-
+                        Entry details - First: {{$Trigger.Field1}}, Last:
+                        {{$Trigger.Field2}}, Created Date:
+                        {{$Trigger.DateCreated}}, Updated by:
+                        {{$Trigger.UpdatedBy}}
+                  - subject:
+                      template: New entry received for {{$Trigger.Field1}}
+                  - type:
+                      template: task
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a ticket in Zendesk Service when a new form entry is created in Wufoo
+models: {}

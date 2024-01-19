@@ -1,0 +1,135 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Dataset_dynamic
+      connector-type: googlebigquery
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Cloud BigQuery Retrieve Dataset records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleCloudBigQueryRetrieveDatasetrecords '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleCloudBigQueryRetrieveDatasetrecords
+                    $ref: >-
+                      #/node-output/Google Cloud BigQuery Retrieve Dataset
+                      records/response/payload
+                  - variable: GoogleCloudBigQueryRetrieveDatasetrecordsMetadata
+                    $ref: >-
+                      #/node-output/Google Cloud BigQuery Retrieve Dataset
+                      records/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Cloud BigQuery Dataset_dynamic
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleCloudBigQueryRetrieveDatasetrecords
+                  $ref: >-
+                    #/node-output/Google Cloud BigQuery Retrieve Dataset
+                    records/response/payload
+                - variable: GoogleCloudBigQueryRetrieveDatasetrecordsMetadata
+                  $ref: >-
+                    #/node-output/Google Cloud BigQuery Retrieve Dataset
+                    records/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.company_joined_on}}':
+                      lte: '{{$now()}}'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  The list of employees with details which
+                                  joined are
+                                  {{$Foreachitem.id}}{{$Foreachitem.name}}{{$Foreachitem.surname}}
+                                  {{$Foreachitem.company_joined_on}}
+                            - Subject:
+                                template: New Emplyoees List
+                            - To:
+                                template: aditya@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleCloudBigQueryRetrieveDatasetrecords
+                              $ref: >-
+                                #/node-output/Google Cloud BigQuery Retrieve
+                                Dataset records/response/payload
+                            - variable: >-
+                                GoogleCloudBigQueryRetrieveDatasetrecordsMetadata
+                              $ref: >-
+                                #/node-output/Google Cloud BigQuery Retrieve
+                                Dataset records/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Gmail message when a new employee record is retrieved from Google Cloud BigQuery
+models: {}
