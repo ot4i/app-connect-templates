@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Create%20a%20Google%20Calendar%20when%20a%20campaign%20is%20created%20in%20Salesforce%20for%20members%20who%20have%20completed%20the%20registration_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20Google%20Calendar%20when%20a%20campaign%20is%20created%20in%20Salesforce%20for%20members%20who%20have%20completed%20the%20registration_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:

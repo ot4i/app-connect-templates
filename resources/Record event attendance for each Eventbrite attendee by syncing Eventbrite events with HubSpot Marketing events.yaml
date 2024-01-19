@@ -1,0 +1,372 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: >-
+        postMarketingV3MarketingEventsAttendanceByExternalEventIdBySubscriberStateEmailCreate_model
+      connector-type: hubspotmarketing
+      actions:
+        postMarketingV3MarketingEventsAttendanceByExternalEventIdBySubscriberStateEmailCreate: {}
+    action-interface-4:
+      type: api-action
+      business-object: Attendee
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: getMarketingV3MarketingEventsEventsSearch_model
+      connector-type: hubspotmarketing
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getMarketingV3MarketingEventsEventsByExternalEventId_model
+      connector-type: hubspotmarketing
+      actions:
+        getMarketingV3MarketingEventsEventsByExternalEventId: {}
+    action-interface-6:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot Marketing Retrieve marketing events by search string
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  q: '*_Eventbrite'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              allow-empty-output: false
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$HubSpotMarketingRetrievemarketingeventsbysearchstring '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: HubSpot Marketing Marketing Events
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: HubSpot Marketing Record event attendance
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: >-
+                postMarketingV3MarketingEventsAttendanceByExternalEventIdBySubscriberStateEmailCreate
+              map:
+                mappings:
+                  - email:
+                      template: '{{$Foreachitem.profile.email}}'
+                  - interactionDateTime:
+                      template: '{{$Foreachitem.created}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/block/If/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: >-
+                      #/block/If/node-output/Eventbrite Retrieve
+                      attendees/response
+                  - variable: HubSpotMarketingRetrievemarketingeventbyID
+                    $ref: >-
+                      #/block/For each 2/node-output/HubSpot Marketing Retrieve
+                      marketing event by ID/response/payload
+                  - variable: GmailSendemail
+                    $ref: >-
+                      #/block/For each 2/node-output/Gmail Send
+                      email/response/payload
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - externalAccountId: '{{$Foreach2item.externalAccountId}}'
+                    - externalEventId: '{{$Foreach2item.externalEventId}}'
+                    - subscriberState: attend
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/block/If/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: >-
+                      #/block/If/node-output/Eventbrite Retrieve
+                      attendees/response
+                  - variable: HubSpotMarketingRetrievemarketingeventbyID
+                    $ref: >-
+                      #/block/For each 2/node-output/HubSpot Marketing Retrieve
+                      marketing event by ID/response/payload
+                  - variable: GmailSendemail
+                    $ref: >-
+                      #/block/For each 2/node-output/Gmail Send
+                      email/response/payload
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+          - create-action:
+              name: Gmail Send email 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$Foreachitem.id}}'
+                  - Subject:
+                      template: Attendance recorded
+                  - To:
+                      template: user3@email.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRecordeventattendance
+                    $ref: >-
+                      #/block/For each/node-output/HubSpot Marketing Record
+                      event attendance/response/payload
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/block/If/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: >-
+                      #/block/If/node-output/Eventbrite Retrieve
+                      attendees/response
+                  - variable: HubSpotMarketingRetrievemarketingeventbyID
+                    $ref: >-
+                      #/block/For each 2/node-output/HubSpot Marketing Retrieve
+                      marketing event by ID/response/payload
+                  - variable: GmailSendemail
+                    $ref: >-
+                      #/block/For each 2/node-output/Gmail Send
+                      email/response/payload
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+    assembly-3:
+      assembly:
+        execute:
+          - custom-action:
+              name: HubSpot Marketing Retrieve marketing event by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: getMarketingV3MarketingEventsEventsByExternalEventId
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  and:
+                    - externalAccountId: '{{$Foreach2item.externalAccountId}}'
+                    - externalEventId: '{{$Foreach2item.externalEventId}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+          - retrieve-action:
+              name: Eventbrite Retrieve attendees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  event_id: >-
+                    {{$substringBefore($HubSpotMarketingRetrievemarketingeventbyID."$_externalEventId"
+                    , "_Eventbrite")}}
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrievemarketingeventbyID
+                    $ref: >-
+                      #/block/For each 2/node-output/HubSpot Marketing Retrieve
+                      marketing event by ID/response/payload
+                  - variable: GmailSendemail
+                    $ref: >-
+                      #/block/For each 2/node-output/Gmail Send
+                      email/response/payload
+                  - variable: HubSpotMarketingRetrievemarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrievemarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EventbriteRetrieveattendees '
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/block/For each 2/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Eventbrite Retrieve
+                      attendees/response
+                  - variable: HubSpotMarketingRetrieveMarketingeventsbysearchstring
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve Marketing events
+                      by search string/response/payload
+                  - variable: >-
+                      HubSpotMarketingRetrieveMarketingeventsbysearchstringMetadata
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve Marketing events
+                      by search string/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Eventbrite attendees
+  name: Record event attendance for each Eventbrite attendee by syncing Eventbrite events with HubSpot Marketing events
+models: {}

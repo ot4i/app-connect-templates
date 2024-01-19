@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Update%20Eventbrite%20event%20based%20on%20IBM%20Weather%20forecast_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Update%20Eventbrite%20event%20based%20on%20IBM%20Weather%20forecast_instructions.md) (opens in a new window).
 
 This API takes as input the ID of an event in Eventbrite.  The API discovers the location of the event, then gets the weather forecast for that location.  The API then checks if the weather criteria are OK for the event and takes different actions depending on the weather forecast.
 

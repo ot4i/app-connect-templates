@@ -1,0 +1,98 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: zendeskservice
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Users
+      connector-type: azuread
+      actions:
+        DELETEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: Users
+      connector-type: azuread
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Entra ID Retrieve users
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  mail: '{{$Trigger.ticket_fields.id__21959543171737}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftEntraIDRetrieveusers
+                  $ref: >-
+                    #/node-output/Microsoft Entra ID Retrieve
+                    users/response/payload
+                - variable: MicrosoftEntraIDRetrieveusersMetadata
+                  $ref: '#/node-output/Microsoft Entra ID Retrieve users/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.ticket_fields.id__21959434346521}}':
+                          '=': 'true'
+                      - '{{$MicrosoftEntraIDRetrieveusersMetadata."status-code"}}': '200'
+                        hashKey: object:883
+                  execute:
+                    - delete-action:
+                        name: Microsoft Entra ID Delete user
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            id: '{{$MicrosoftEntraIDRetrieveusers[0].id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftEntraIDRetrieveusers
+                              $ref: >-
+                                #/node-output/Microsoft Entra ID Retrieve
+                                users/response/payload
+                            - variable: MicrosoftEntraIDRetrieveusersMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Entra ID Retrieve
+                                users/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-empty-output: true
+              else:
+                execute: []
+              output-schema: {}
+  name: Delete a user from Microsoft Entra ID when an offboarding request is created for the user in Zendesk Service
+models: {}

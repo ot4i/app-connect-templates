@@ -1,0 +1,306 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: zendeskservice
+  action-interfaces:
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: postTasksV1UsersMeLists_model
+      connector-type: googletasks
+      actions:
+        postTasksV1UsersMeLists: {}
+    action-interface-1:
+      type: api-action
+      business-object: postTasksV1ListsByTasklistTasks_model
+      connector-type: googletasks
+      actions:
+        postTasksV1ListsByTasklistTasks: {}
+    action-interface-10:
+      type: api-action
+      business-object: postTasksV1ListsByTasklistTasks_model
+      connector-type: googletasks
+      actions:
+        postTasksV1ListsByTasklistTasks: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: getTasksV1UsersMeLists_model
+      connector-type: googletasks
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Tasks Retrieve task lists
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                limit: 10000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      Tasklists:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            title:
+                              type: string
+                            id:
+                              type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleTasksRetrievetasklists
+                    $ref: >-
+                      #/node-output/Google Tasks Retrieve task
+                      lists/response/payload
+                  - variable: GoogleTasksRetrievetasklistsMetadata
+                    $ref: '#/node-output/Google Tasks Retrieve task lists/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - Tasklists:
+                            foreach:
+                              input: >-
+                                $GoogleTasksRetrievetasklists[title=$Trigger.type] 
+                              iterator: TasklistsItem
+                              mappings:
+                                - id:
+                                    template: '{{$TasklistsItem.id}}'
+                                - title:
+                                    template: '{{$TasklistsItem.title}}'
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleTasksRetrievetasklists
+                  $ref: >-
+                    #/node-output/Google Tasks Retrieve task
+                    lists/response/payload
+                - variable: GoogleTasksRetrievetasklistsMetadata
+                  $ref: '#/node-output/Google Tasks Retrieve task lists/response'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Setvariable.variable.Tasklists.title}}':
+                          neq: ''
+                      - '{{$Setvariable.variable.Tasklists.id}}':
+                          neq: ''
+                        hashKey: object:554
+                  execute:
+                    - custom-action:
+                        name: Google Tasks Create task 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-10'
+                        action: postTasksV1ListsByTasklistTasks
+                        map:
+                          mappings:
+                            - due:
+                                template: '{{$Trigger.due_at}}'
+                            - notes:
+                                template: ' Priority of zendesk ticket is :  {{$Trigger.priority}}'
+                            - status:
+                                template: needsAction
+                            - tasklist:
+                                template: '{{$Setvariable.variable.Tasklists.id}}'
+                            - title:
+                                template: '{{$Trigger.id}}_subject'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleTasksRetrievetasklists
+                              $ref: >-
+                                #/node-output/Google Tasks Retrieve task
+                                lists/response/payload
+                            - variable: GoogleTasksRetrievetasklistsMetadata
+                              $ref: >-
+                                #/node-output/Google Tasks Retrieve task
+                                lists/response
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C05AY19GTQE
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Google task is created in a existing tasklist 
+                                  as ticket type of zendesk is already present
+                                  in Google task
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleTasksCreatetask2
+                              $ref: >-
+                                #/block/If 2/node-output/Google Tasks Create
+                                task 2/response/payload
+                            - variable: GoogleTasksRetrievetasklists
+                              $ref: >-
+                                #/node-output/Google Tasks Retrieve task
+                                lists/response/payload
+                            - variable: GoogleTasksRetrievetasklistsMetadata
+                              $ref: >-
+                                #/node-output/Google Tasks Retrieve task
+                                lists/response
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: Google Tasks Create task list 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-7'
+                      action: postTasksV1UsersMeLists
+                      map:
+                        mappings:
+                          - title:
+                              template: '{{$Trigger.type}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleTasksRetrievetasklists
+                            $ref: >-
+                              #/node-output/Google Tasks Retrieve task
+                              lists/response/payload
+                          - variable: GoogleTasksRetrievetasklistsMetadata
+                            $ref: >-
+                              #/node-output/Google Tasks Retrieve task
+                              lists/response
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - custom-action:
+                      name: Google Tasks Create task
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      action: postTasksV1ListsByTasklistTasks
+                      map:
+                        mappings:
+                          - due:
+                              template: '{{$Trigger.due_at}}'
+                          - notes:
+                              template: ' Priority of zendesk ticket is :  {{$Trigger.priority}}'
+                          - status:
+                              template: needsAction
+                          - tasklist:
+                              template: '{{$GoogleTasksCreatetasklist2.id}}'
+                          - title:
+                              template: '{{$Trigger.id}}_subject'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleTasksCreatetasklist2
+                            $ref: >-
+                              #/block/If 2/node-output/Google Tasks Create task
+                              list 2/response/payload
+                          - variable: GoogleTasksRetrievetasklists
+                            $ref: >-
+                              #/node-output/Google Tasks Retrieve task
+                              lists/response/payload
+                          - variable: GoogleTasksRetrievetasklistsMetadata
+                            $ref: >-
+                              #/node-output/Google Tasks Retrieve task
+                              lists/response
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C05AY19GTQE
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                Google task is created in a new tasklist  as
+                                ticket type of zendesk is not present in Google
+                                task
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleTasksCreatetasklist2
+                            $ref: >-
+                              #/block/If 2/node-output/Google Tasks Create task
+                              list 2/response/payload
+                          - variable: GoogleTasksCreatetask
+                            $ref: >-
+                              #/block/If 2/node-output/Google Tasks Create
+                              task/response/payload
+                          - variable: GoogleTasksRetrievetasklists
+                            $ref: >-
+                              #/node-output/Google Tasks Retrieve task
+                              lists/response/payload
+                          - variable: GoogleTasksRetrievetasklistsMetadata
+                            $ref: >-
+                              #/node-output/Google Tasks Retrieve task
+                              lists/response
+                          - variable: Setvariable
+                            $ref: '#/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a task in a list in Google Tasks when a new ticket is created in Zendesk Service
+models: {}

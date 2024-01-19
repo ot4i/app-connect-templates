@@ -1,6 +1,6 @@
 
 
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Download%20a%20PDF%20Attachment%20from%20Salesforce%20and%20Add%20the%20PDF%20Document%20To%20Watson%20Discovery%20Service_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Download%20a%20PDF%20Attachment%20from%20Salesforce%20and%20Add%20the%20PDF%20Document%20To%20Watson%20Discovery%20Service_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Connect to your [Salesforce account](https://ibm.biz/aassalesforce).

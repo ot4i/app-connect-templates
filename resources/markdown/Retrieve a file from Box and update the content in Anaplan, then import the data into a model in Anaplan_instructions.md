@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Retrieve%20a%20file%20from%20Box%20and%20update%20the%20content%20in%20Anaplan,%20then%20import%20the%20data%20into%20a%20model%20in%20Anaplan_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Retrieve%20a%20file%20from%20Box%20and%20update%20the%20content%20in%20Anaplan,%20then%20import%20the%20data%20into%20a%20model%20in%20Anaplan_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:

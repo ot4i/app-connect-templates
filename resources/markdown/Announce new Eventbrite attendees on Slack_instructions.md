@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Announce%20new%20Eventbrite%20attendees%20on%20Slack_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Announce%20new%20Eventbrite%20attendees%20on%20Slack_instructions.md) (opens in a new window).
 
 This template creates the flow from the [Welcome to IBM App Connect \[Part 1 of 4\]: Create a simple event-driven flow](https://www.youtube.com/watch?v=xa-65X2RZuE&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH&index=4&t=0s) video of how to send a Slack message when new attendees register for the Sunflower festival Eventbrite event.
 
@@ -9,7 +9,7 @@ To use this flow, you'll need to set up an event in Eventbrite. The event needs 
 * Last name
 * Company
 
-In the video of this flow, the event also collects information about the attendee's email address, phone number and how they are getting to the event. That information is not essential for this template. It is used in a follow on flow, and instructions on setting up that extra information are included in the [follow on template instructions](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%202%20-%20Announce%20new%20Eventbrite%20attendees%20on%20Slack%20and%20send%20a%20voucher_instructions.md).
+In the video of this flow, the event also collects information about the attendee's email address, phone number and how they are getting to the event. That information is not essential for this template. It is used in a follow on flow, and instructions on setting up that extra information are included in the [follow on template instructions](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%202%20-%20Announce%20new%20Eventbrite%20attendees%20on%20Slack%20and%20send%20a%20voucher_instructions.md).
 
 ## Using the template
 

@@ -1,0 +1,235 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        postGroups:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-3'
+          input-context:
+            data: Groups
+          output-context:
+            data: Groups
+      options:
+        resources:
+          - business-object: Groups
+            model:
+              $ref: '#/models/Groups'
+            triggers:
+              post: postGroups
+      type: api-trigger
+  action-interfaces:
+    action-interface-6:
+      type: api-action
+      business-object: getAdminDirectoryV1GroupsByGroupKeyMembers_model
+      connector-type: googlegroups
+      actions:
+        RETRIEVEALL: {}
+    action-interface-11:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: getAdminDirectoryV1Groups_model
+      connector-type: googlegroups
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-3:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Groups Retrieve groups
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  email: '{{$Request.groupid}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - retrieve-action:
+              name: Google Groups Retrieve members
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              filter:
+                where:
+                  groupKey: '{{$GoogleGroupsRetrievegroups.id}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGroupsRetrievegroups
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      groups/response/payload
+                  - variable: GoogleGroupsRetrievegroupsMetadata
+                    $ref: '#/node-output/Google Groups Retrieve groups/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-4'
+              source:
+                expression: '$GoogleGroupsRetrievemembers '
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGroupsRetrievemembers
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      members/response/payload
+                  - variable: GoogleGroupsRetrievemembersMetadata
+                    $ref: '#/node-output/Google Groups Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGroupsRetrievegroupbyID
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve group by
+                      ID/response/payload
+                  - variable: GoogleGroupsRetrievemembers
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      members/response/payload
+                  - variable: GoogleGroupsRetrievemembersMetadata
+                    $ref: '#/node-output/Google Groups Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - email:
+                            template: '{{$Foreachitem.email}}'
+              display-name: get members
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Groups successfully add custom operation
+                  status-code: 200
+                  map:
+                    mappings:
+                      - groupid:
+                          template: '22'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: GoogleGroupsRetrievegroupbyID
+                        $ref: >-
+                          #/node-output/Google Groups Retrieve group by
+                          ID/response/payload
+                      - variable: GoogleGroupsRetrievemembers
+                        $ref: >-
+                          #/node-output/Google Groups Retrieve
+                          members/response/payload
+                      - variable: GoogleGroupsRetrievemembersMetadata
+                        $ref: '#/node-output/Google Groups Retrieve members/response'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  input: []
+    assembly-4:
+      assembly:
+        execute:
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-11'
+              map:
+                mappings:
+                  - Subject:
+                      template: New member is added
+                  - To:
+                      template: '{{$Foreachitem.email}}'
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: A new member is added to the group.
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGroupsRetrievegroups
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      groups/response/payload
+                  - variable: GoogleGroupsRetrievegroupsMetadata
+                    $ref: '#/node-output/Google Groups Retrieve groups/response'
+                  - variable: GoogleGroupsRetrievemembers
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      members/response/payload
+                  - variable: GoogleGroupsRetrievemembersMetadata
+                    $ref: '#/node-output/Google Groups Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a notification message via Gmail to a specific group in Google Groups
+models:
+  Groups:
+    name: Groups
+    properties:
+      groupid:
+        required: false
+        id: true
+        type: string
+      memberid:
+        required: false
+        id: false
+        type: string
+    plural: Groups
+    description: ' '
+    operations:
+      post: '#/integration/assemblies/assembly-3'
+    methods:
+      post:
+        name: post
+        display:
+          name: Add
+        accessType: WRITE
+        accepts:
+          - arg: data
+            type: Groups
+            http:
+              source: body
+        returns:
+          arg: data
+          type: Groups
+          root: true
+        http:
+          verb: POST
+          path: /post
+    interactions: {}

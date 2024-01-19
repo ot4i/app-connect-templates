@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Retrieve%20documents%20from%20IBM%20Cloudant%20and%20publish%20them%20in%20Google%20Cloud%20PubSub%20topics_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20documents%20from%20IBM%20Cloudant%20and%20publish%20them%20in%20Google%20Cloud%20PubSub%20topics_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Click **Operations**, and then click **Edit flow**.
