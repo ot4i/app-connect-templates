@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Send%20a%20Slack%20message%20for%20opportunities%20created%20in%20Insightly%20based%20on%20the%20opportunity%20value_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Send%20a%20Slack%20message%20for%20opportunities%20created%20in%20Insightly%20based%20on%20the%20opportunity%20value_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
