@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Insert%20data%20into%20the%20Snowflake%20table%20when%20a%20new%20file%20gets%20created%20in%20Amazon%20S3_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Insert%20data%20into%20the%20Snowflake%20table%20when%20a%20new%20file%20gets%20created%20in%20Amazon%20S3_instructions.md) (opens in a new window).
 
 
 1. Click **Create flow** to start using the template.

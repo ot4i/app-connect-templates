@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20setup%202%20-%20Create%20Sunflower%20Festival%20order%20in%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20setup%202%20-%20Create%20Sunflower%20Festival%20order%20in%20Salesforce_instructions.md) (opens in a new window).
 
-This template sets up the Salesforce order which is used with the template [Welcome guide part 4 - Flower order API](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md).
+This template sets up the Salesforce order which is used with the template [Welcome guide part 4 - Flower order API](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md).
 
 ## Prerequisites
 

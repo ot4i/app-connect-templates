@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Use%20Slack%20to%20notify%20of%20unprocessed%20UKG%20leave%20requests_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Use%20Slack%20to%20notify%20of%20unprocessed%20UKG%20leave%20requests_instructions.md) (opens in a new window).
 
 ## Prerequisites
 This template assumes that the following resources are available:

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/At%20regular%20intervals%20extract%20Salesforce%20lead%20details%20and%20upload%20Box%20file%20with%20CSV%20output_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/At%20regular%20intervals%20extract%20Salesforce%20lead%20details%20and%20upload%20Box%20file%20with%20CSV%20output_instructions.md) (opens in a new window).
 ## Prerequisites
 This template references entities that you can create as follows:
 - In your Salesforce instance, create some leads with first name, last name, and email address details.

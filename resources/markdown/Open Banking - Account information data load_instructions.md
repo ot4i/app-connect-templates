@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Open%20Banking%20-%20Account%20information%20data%20load_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Open%20Banking%20-%20Account%20information%20data%20load_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Connect to your [Yapily account](https://ibm.biz/aasyapily).

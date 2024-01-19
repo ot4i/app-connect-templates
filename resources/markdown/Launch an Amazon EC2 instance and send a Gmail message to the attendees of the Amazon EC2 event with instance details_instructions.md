@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Launch%20an%20Amazon%20EC2%20instance%20and%20send%20a%20Gmail%20message%20to%20the%20attendees%20of%20the%20Amazon%20EC2%20event%20with%20instance%20details_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Launch%20an%20Amazon%20EC2%20instance%20and%20send%20a%20Gmail%20message%20to%20the%20attendees%20of%20the%20Amazon%20EC2%20event%20with%20instance%20details_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:

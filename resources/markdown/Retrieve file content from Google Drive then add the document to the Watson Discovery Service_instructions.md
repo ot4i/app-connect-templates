@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Retrieve%20file%20content%20from%20Google%20Drive%20then%20add%20the%20document%20to%20the%20Watson%20Discovery%20Service_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20file%20content%20from%20Google%20Drive%20then%20add%20the%20document%20to%20the%20Watson%20Discovery%20Service_instructions.md) (opens in a new window).
 
 Before using this template, you need a Watson Discovery service account that you have configured with an Environment and Collection.  To get started with a Watson Discovery service, see [Getting started with Discovery](https://cloud.ibm.com/docs/services/discovery?topic=discovery-getting-started).
 

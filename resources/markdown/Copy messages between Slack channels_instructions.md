@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Copy%20messages%20between%20Slack%20channels_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Copy%20messages%20between%20Slack%20channels_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. Connect to your [Slack account](https://ibm.biz/aasslack).

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Retrieve%20employees%20from%20Microsoft%20Dynamics%20365%20for%20Finance%20and%20Operations%20and%20create%20users%20in%20Microsoft%20Active%20Directory_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20employees%20from%20Microsoft%20Dynamics%20365%20for%20Finance%20and%20Operations%20and%20create%20users%20in%20Microsoft%20Active%20Directory_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
