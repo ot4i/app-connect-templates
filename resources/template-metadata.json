@@ -2889,7 +2889,7 @@
   "offerings": ["app connect professional"]
 },
 {
-  "name": "Create a job requistion in Workday",
+  "name": "Create a job requisition in Workday",
   "description": "Use this API template to create a job requistion in Workday.",
   "summary": "API flow using 1 application",
   "sourceApp": "api",
@@ -2907,7 +2907,7 @@
   "offerings": ["app connect professional"]
 },
 {
-  "name": "Data integration between Box files and Microsoft Azure Blob storage",
+  "name": "Itegrate data between Box files and Microsoft Azure Blob storage",
   "description": "Use this template to create a scheduler-based flow that retrieves CSV-type file metadata from Box for a specified time. For each Box file, the file content is retrieved in text format, and the content is appended into a Microsoft Azure Blob storage container.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
