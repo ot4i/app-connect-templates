@@ -1,0 +1,190 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Attendee
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Event
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  organizationID: '344797520005'
+                input:
+                  - variable: EventbriteCreateevent
+                    $ref: '#/node-output/Eventbrite Create event/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EventbriteRetrieveevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveevents
+                    $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                  - variable: EventbriteRetrieveeventsMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Eventbrite Event
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve attendees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  event_id: '{{$Foreachitem.id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveevents
+                    $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                  - variable: EventbriteRetrieveeventsMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: EventbriteRetrieveattendees
+                  $ref: >-
+                    #/block/For each/node-output/Eventbrite Retrieve
+                    attendees/response/payload
+                - variable: EventbriteRetrieveattendeesMetadata
+                  $ref: >-
+                    #/block/For each/node-output/Eventbrite Retrieve
+                    attendees/response
+                - variable: EventbriteRetrieveevents
+                  $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
+                - variable: EventbriteRetrieveeventsMetadata
+                  $ref: '#/node-output/Eventbrite Retrieve events/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Foreachitem.created}}':
+                          gte: '{{$now()}}'
+                      - '{{$Foreachitem.status}}': Completed
+                        hashKey: object:790
+                  execute:
+                    - create-action:
+                        name: Google Calendar Create event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - attendees:
+                                foreach:
+                                  input: '[0]'
+                                  iterator: attendeesItem
+                                  mappings:
+                                    - email:
+                                        template: >-
+                                          {{$EventbriteRetrieveattendees.profile.email[1]}}
+                            - endTime:
+                                template: '2023-09-13T10:00:00'
+                            - id:
+                                template: >-
+                                  tbp52a61ab1teqs5lpo1qte2lk@group.calendar.google.com
+                            - startTime:
+                                template: '2023-09-13T10:00:00'
+                            - summary:
+                                template: '{{$Foreachitem.summary}}'
+                            - timeZone:
+                                template: Asia/Kolkata
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: EventbriteRetrieveattendees
+                              $ref: >-
+                                #/block/For each/node-output/Eventbrite Retrieve
+                                attendees/response/payload
+                            - variable: EventbriteRetrieveattendeesMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Eventbrite Retrieve
+                                attendees/response
+                            - variable: EventbriteRetrieveevents
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                events/response/payload
+                            - variable: EventbriteRetrieveeventsMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                events/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create an event in Google Calendar for each registered Eventbrite event attendee
+  description: Use this template to create an event in Google Calendar for each registered Eventbrite event attendee. In this example, a Google Calendar event is sent to each of the newly registered Eventbrite attendees.
+models: {}

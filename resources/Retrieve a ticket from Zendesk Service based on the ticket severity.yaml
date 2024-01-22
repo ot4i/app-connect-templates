@@ -1,0 +1,226 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        retrieveallTriage:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: triage
+          output-context:
+            data: triage
+      options:
+        resources:
+          - business-object: triage
+            model:
+              $ref: '#/models/triage'
+            triggers:
+              retrieveall: retrieveallTriage
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      currentTime:
+                        type: number
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - currentTime:
+                            expression: '$number($toMillis($now() ) ) '
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      timeObject:
+                        type: object
+                        properties:
+                          urgent:
+                            type: number
+                          high:
+                            type: number
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - timeObject:
+                            mappings:
+                              - high:
+                                  expression: '86400000'
+                              - urgent:
+                                  expression: '14400000'
+          - set-variable:
+              name: Set variable 3
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      timeToUse:
+                        type: number
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - timeToUse:
+                            expression: >-
+                              $number($lookup($Setvariable2.variable.timeObject
+                              , $api.where.priority  )  )
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: >-
+                        {{$fromMillis($number($Setvariable.variable.currentTime)-$number($Setvariable3.variable.timeToUse 
+                        )  )}}
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Zendesk Service Retrieve tickets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  priority: '{{$api.where.priority}}'
+                input:
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: Setvariable3
+                    $ref: '#/node-output/Set variable 3/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - response:
+              name: response-1
+              reply-maps:
+                - title: triage successfully retrieved
+                  status-code: 200
+                  map:
+                    mappings:
+                      - triage:
+                          foreach:
+                            input: '$ZendeskServiceRetrievetickets '
+                            iterator: triageItem
+                            mappings:
+                              - id:
+                                  expression: '$triageItem.id '
+                              - priority:
+                                  template: '{{$triageItem.priority}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: Setvariable
+                        $ref: '#/node-output/Set variable/response/payload'
+                      - variable: Setvariable2
+                        $ref: '#/node-output/Set variable 2/response/payload'
+                      - variable: Setvariable3
+                        $ref: '#/node-output/Set variable 3/response/payload'
+                      - variable: ZendeskServiceRetrievetickets
+                        $ref: >-
+                          #/node-output/Zendesk Service Retrieve
+                          tickets/response/payload
+                      - variable: ZendeskServiceRetrieveticketsMetadata
+                        $ref: >-
+                          #/node-output/Zendesk Service Retrieve
+                          tickets/response
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  input: []
+        tags:
+          - incomplete
+  name: Retrieve a ticket from Zendesk Service based on the ticket severity
+  description: Use this API template to retrieve tickets from Zendesk Service at regular intervals based on the ticket severity.
+models:
+  triage:
+    name: triage
+    properties:
+      priority:
+        required: false
+        id: false
+        type: string
+      id:
+        required: false
+        id: true
+        type: number
+      status:
+        required: false
+        id: false
+        type: string
+      subject:
+        required: false
+        id: false
+        type: string
+      assignee_id:
+        required: false
+        id: false
+        type: number
+    plural: triage
+    description: ' '
+    operations:
+      retrieveall: '#/integration/assemblies/assembly-1'
+    interactions:
+      retrieveall:
+        pagination-type: none
+        filterSupport:
+          queryablefields:
+            - priority

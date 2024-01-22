@@ -1,0 +1,168 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 30 09 * * MON
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: week
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        DOWNLOADFILE: {}
+    action-interface-3:
+      type: api-action
+      business-object: appendBlob
+      connector-type: azureblobstorage
+      actions:
+        UPSERTWITHWHERE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Box Retrieve file metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - file_extensions: csv
+                    - created_at_range_min: '{{$Trigger.lastEventTime}}'
+                    - created_at_range_max: '{{$Trigger.currentEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$BoxRetrievefilemetadata '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Box File
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Box Retrieve file content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - fileType:
+                      template: Text
+                  - id:
+                      template: '{{$Foreachitem.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - upsert-action:
+              name: Microsoft Azure Blob storage Update or create append blob
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - containerName:
+                      template: 000azuretest
+                  - metadata:
+                      mappings:
+                        - Data:
+                            template: test csv data 50
+                customSchemas:
+                  properties.`metadata`:
+                    type: object
+                    properties:
+                      Data:
+                        type: string
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefilecontent
+                    $ref: >-
+                      #/block/For each/node-output/Box Retrieve file
+                      content/response/payload
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - name: testpratik
+                    - containerName: 000azuretest
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BoxRetrievefilecontent
+                    $ref: >-
+                      #/block/For each/node-output/Box Retrieve file
+                      content/response/payload
+                  - variable: BoxRetrievefilemetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response/payload'
+                  - variable: BoxRetrievefilemetadataMetadata
+                    $ref: '#/node-output/Box Retrieve file metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+  name: Integrate data between Box files and Microsoft Azure Blob storage
+  description: Use this template to create a scheduler-based flow that retrieves CSV-type file metadata from Box for a specified time. For each Box file, the file content is retrieved in text format, and the content is appended into a Microsoft Azure Blob storage container. This scenario helps to merge multiple CSV files into a Microsoft Azure Blob storage container.
+models: {}
