@@ -163,5 +163,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Data integration between Box files and Microsoft Azure Blob storage
+  name: Integrate data between Box files and Microsoft Azure Blob storage
 models: {}
