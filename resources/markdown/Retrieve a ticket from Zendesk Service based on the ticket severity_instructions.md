@@ -8,8 +8,6 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 
 Use this API template to retrieve tickets from Zendesk Service at regular intervals based on the ticket severity.
 
-Retrieve%20a%20ticket%20from%20Zendesk%20Service%20based%20on%20the%20ticket%20severity.yaml
-
 
 
 
