@@ -1,0 +1,138 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Row
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            DriveId: b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+            WorkbookId: 01NODPFITFOPR6AFMSTJFYL7MDYOMUHTQP
+            WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+            parentFilter:
+              DriveId: >-
+                b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+              WorkbookId: 01NODPFITFOPR6AFMSTJFYL7MDYOMUHTQP
+              WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+      connector-type: msexcel
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: MailChimp Retrieve members
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - unique_email_id: '{{$Trigger.rowData.C}}'
+                    - list_id: 6fc8383307
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MailChimpRetrievemembers
+                  $ref: '#/node-output/MailChimp Retrieve members/response/payload'
+                - variable: MailChimpRetrievemembersMetadata
+                  $ref: '#/node-output/MailChimp Retrieve members/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MailChimpRetrievemembersMetadata."status-code"}}': '200'
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: Subscriber already exist.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MailChimpRetrievemembers
+                              $ref: >-
+                                #/node-output/MailChimp Retrieve
+                                members/response/payload
+                            - variable: MailChimpRetrievemembersMetadata
+                              $ref: >-
+                                #/node-output/MailChimp Retrieve
+                                members/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: MailChimp Add subscriber to a list
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - email_address:
+                              template: '{{$Trigger.rowData.C}}'
+                          - list_id:
+                              template: 6fc8383307
+                          - merge_fields:
+                              mappings:
+                                - FNAME:
+                                    template: '{{$Trigger.rowData.A}}'
+                                - LNAME:
+                                    template: '{{$Trigger.rowData.B}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: MailChimpRetrievemembers
+                            $ref: >-
+                              #/node-output/MailChimp Retrieve
+                              members/response/payload
+                          - variable: MailChimpRetrievemembersMetadata
+                            $ref: '#/node-output/MailChimp Retrieve members/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Add a subscriber to a list in Mailchimp when a new row is appended in Microsoft Excel Online
+  description: Use this template to add subscribers to a list in Mailchimp when new rows are appended to a Microsoft Excel Online spreadsheet. In this example, when a new row is appended in a Microsoft Excel spreadsheet, for each MailChimp member whose status code equals 200, a Slack notification is posted in a channel to notify them that the member already exists. Otherwise, the member is added as a subsciber to a list in MaliChimp.
+models: {}

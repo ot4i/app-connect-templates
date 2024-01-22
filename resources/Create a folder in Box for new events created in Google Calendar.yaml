@@ -1,0 +1,53 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlecalendar
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: events
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            id: appconnect999@gmail.com
+            parentFilter:
+              id: appconnect999@gmail.com
+            subscription:
+              createdField: updated
+              updatedField: updated
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZ
+              pollingInterval: '5'
+              isCreatedQueryable: true
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Box Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: Docs for event {{$Trigger.description}}
+                  - parent_id:
+                      template: '0'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a folder in Box for new events created in Google Calendar
+  description: Use this template to create a box folder for new events created in Google Calendar. This scenario helps the user upload files or documents before the Google Calendar event into a Box folder.
+models: {}

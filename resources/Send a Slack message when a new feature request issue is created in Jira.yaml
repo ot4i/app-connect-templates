@@ -1,0 +1,75 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: jira
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Issue
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 5
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: JiraCreateissue
+                  $ref: '#/node-output/Jira Create issue/response/payload'
+                - variable: JiraRetrieveissue
+                  $ref: '#/node-output/Jira Retrieve issue/response/payload'
+                - variable: JiraRetrieveissueMetadata
+                  $ref: '#/node-output/Jira Retrieve issue/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.fields.issuetype.name}}': New Feature
+                      - '': ''
+                        hashKey: object:357
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04FRCNTLLX
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  New feature request for project 
+                                  {{$Trigger.fields.project.name}} has been
+                                  created
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Slack message when a new feature request issue is created in Jira
+  description: Use this template to send a Slack message to an intended group when an issue requesting a new feature is created in Jira.
+models: {}
