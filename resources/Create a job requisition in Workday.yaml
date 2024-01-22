@@ -143,7 +143,7 @@ integration:
                   input: []
         tags:
           - incomplete
-  name: Create a job requistion in Workday
+  name: Create a job requisition in Workday
   description: Use this API template to create a job requistion in Workday.
 models:
   job_requisitions:
