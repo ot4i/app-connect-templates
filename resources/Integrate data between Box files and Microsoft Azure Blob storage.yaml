@@ -163,6 +163,6 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Data integration between Box files and Microsoft Azure Blob storage
+  name: Integrate data between Box files and Microsoft Azure Blob storage
   description: Use this template to create a scheduler-based flow that retrieves CSV-type file metadata from Box for a specified time. For each Box file, the file content is retrieved in text format, and the content is appended into a Microsoft Azure Blob storage container. This scenario helps to merge multiple CSV files into a Microsoft Azure Blob storage container.
 models: {}
