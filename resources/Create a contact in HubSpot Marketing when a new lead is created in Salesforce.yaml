@@ -1,0 +1,160 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getCrmV3ObjectsContacts_model
+      connector-type: hubspotmarketing
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postCrmV3ObjectsContacts_model
+      connector-type: hubspotmarketing
+      actions:
+        postCrmV3ObjectsContacts: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: HubSpot Marketing Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$HubSpotMarketingRetrievecontacts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotMarketingRetrievecontacts
+                    $ref: >-
+                      #/node-output/HubSpot Marketing Retrieve
+                      contacts/response/payload
+                  - variable: HubSpotMarketingRetrievecontactsMetadata
+                    $ref: '#/node-output/HubSpot Marketing Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: HubSpot Marketing Contacts
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: HubSpotMarketingRetrievecontacts
+                  $ref: >-
+                    #/node-output/HubSpot Marketing Retrieve
+                    contacts/response/payload
+                - variable: HubSpotMarketingRetrievecontactsMetadata
+                  $ref: '#/node-output/HubSpot Marketing Retrieve contacts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Email}}':
+                      neq: '{{$Foreachitem.email}}'
+                  execute:
+                    - custom-action:
+                        name: HubSpot Marketing Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postCrmV3ObjectsContacts
+                        map:
+                          mappings:
+                            - company:
+                                template: '{{$Trigger.Company}}'
+                            - email:
+                                template: '{{$Trigger.Email}}'
+                            - firstname:
+                                template: '{{$Trigger.FirstName}}'
+                            - jobtitle:
+                                template: '{{$Trigger.Title}}'
+                            - lastname:
+                                template: '{{$Trigger.LastName}}'
+                            - mobilephone:
+                                template: '{{$Trigger.MobilePhone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: HubSpotMarketingRetrievecontacts
+                              $ref: >-
+                                #/node-output/HubSpot Marketing Retrieve
+                                contacts/response/payload
+                            - variable: HubSpotMarketingRetrievecontactsMetadata
+                              $ref: >-
+                                #/node-output/HubSpot Marketing Retrieve
+                                contacts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04FRCNTLLX
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: ' {{$Trigger.Name}} already exisits'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: HubSpotMarketingRetrievecontacts
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve
+                              contacts/response/payload
+                          - variable: HubSpotMarketingRetrievecontactsMetadata
+                            $ref: >-
+                              #/node-output/HubSpot Marketing Retrieve
+                              contacts/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a contact in HubSpot Marketing when a new lead is created in Salesforce
+models: {}

@@ -2950,6 +2950,69 @@
   "targetApps": ["magento", "gmail"],
   "tags": ["api", "magento", "gmail"],
   "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a contact in HubSpot Marketing when a new row is appended in Microsoft Excel Online",
+  "description": "Use this template to create a contact in HubSpot Marketing whenever a new row is appended in Microsoft Excel Online. In this example, a contact is created in HubSpot Marketing for each row retrieved from the Microsoft Excel Online spreadsheet with a unique email address.",
+  "summary": "Microsoft Excel Online to HubSpot Marketing",
+  "sourceApp": "msexcel",
+  "targetApps": ["hubspotmarketing", "hubspotmarketing"],
+  "tags": ["msexcel", "hubspotmarketing", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in MailChimp",
+  "description": "Use this template to append a row in the Microsoft Excel Online spreadsheet whenever a new subscriber is created in MailChimp. In this example, the MailChimp sucbriber details are appended to the Microsoft Excel Online spreadsheet for each newly created MailChimp sucbriber that has a unique email address.",
+  "summary": "MailChimp to Microsoft Excel Online",
+  "sourceApp": "mailchimp",
+  "targetApps": ["msexcel", "msexcel"],
+  "tags": ["mailchimp", "msexcel", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a contact in HubSpot Marketing when a new lead is created in Salesforce",
+  "description": "Use this template to create a contact in HubSpot Marketing whenever a new lead is created in Salesforce. In this example, a new contact is created in HubSpot Marketing for each newly created Salesforce lead that has a unique email address. Otherwise, a Slack message gets posted to a channel indicating that the lead already exists.",
+  "summary": "Salesforce to 2 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["hubspotmarketing", "hubspotmarketing", "slack"],
+  "tags": ["salesforce", "hubspotmarketing", "slack", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Validate the data between Wufoo form entry responses and Microsoft Excel Online worksheet data",
+  "description": "Use this template to check and validate the data between Wufoo form entry responses and Microsoft Excel Online worksheet data, and send a Slack message for the validated responses. In this example, the responses from the Wufoo entry are validated across a Microsoft Excel Online worksheet that contains answers for a course. The responses are validated with the answers, and a Slack notification gets sent to the intended recipient, whether the answer is correct or incorrect.",
+  "summary": "Wufoo to 2 applications",
+  "sourceApp": "wufoo",
+  "targetApps": ["msexcel", "slack"],
+  "tags": ["wufoo", "msexcel", "slack", "foreach", "if", "setVariable"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Add a subscriber to a list in MailChimp when a new form entry is created in Wufoo",
+  "description": "Use this template to add subscribers to a list in MailChimp whenever a new form entry is created in Wufoo. In this example, for each MaiLChimp member that has a unique email address, the member details are added to a list in MailChimp as a subscriber.",
+  "summary": "Wufoo to MailChimp",
+  "sourceApp": "wufoo",
+  "targetApps": ["mailchimp", "mailchimp"],
+  "tags": ["wufoo", "mailchimp", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a lead in Salesforce when a new form entry is created in Wufoo",
+  "description": "Use this template to create a contact in Salesforce whenever a new form entry is created in Wufoo. In this example, for each lead that has a unique email address, the lead is created in Saleforce. Otherwise, a Slack message gets posted to a channel indicating that the lead already exists.",
+  "summary": "Wufoo to 2 applications",
+  "sourceApp": "wufoo",
+  "targetApps": ["salesforce", "salesforce", "slack"],
+  "tags": ["wufoo", "salesforce", "slack", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Insert a record in Google Cloud BigQuery when a new form entry is created in Wufoo",
+  "description": "Use this template to insert a record in the Google Cloud BigQuery table whenever a new form entry is created in Wufoo. In this example, the record is inserted in a table in Google Cloud BigQuery for each record that has a unique email address.",
+  "summary": "Wufoo to Google Cloud BigQuery",
+  "sourceApp": "wufoo",
+  "targetApps": ["googlebigquery", "googlebigquery"],
+  "tags": ["wufoo", "googlebigquery", "foreach", "if"],
+  "offerings": ["app connect professional"]
  }
 ]
 }
