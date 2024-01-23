@@ -2662,6 +2662,582 @@
    "targetApps": ["zendeskservice", "googletasks", "slack"],
    "tags": ["scheduler", "zendeskservice", "googletasks", "slack", "foreach"],
    "offerings": ["app connect professional"]
-  }
+  },
+  {
+   "name": "Create a new row in a Google Sheets spreadsheet for each new employee retrieved from the Amazon Redshift record",
+   "description": "Use this template to create a new row in a Google Sheets spreadsheet for each new employee retrieved from the Amazon Redshift record.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["amazonredshift", "googlesheet"],
+   "tags": ["scheduler", "amazonredshift", "googlesheet", "setVariable", "foreach", "JSON parser"],
+   "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Integrate data between IBM Cloud Object Storage S3 and Amazon Redshift",
+  "description": "Use this template to create a scheduler-based flow that retrieves object files from a specified IBM Cloud Object Storage S3 (COSS3) bucket and downloads the object content. The content is then parsed using CSV Parser to convert the CSV text into a JSON object. Subsequently, the object details are either created or updated in the specified Amazon Redshift record.",
+  "summary": "1 flow using 3 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["ibmcoss3", "amazonredshift", "gmail"],
+  "tags": ["scheduler", "ibmcoss3", "amazonredshift", "gmail", "if", "foreach", "CSV parser"],
+  "offerings": ["app connect professional"]
+ },
+ {
+	"name": "Add a card to a list in Trello when a new task is created in Insightly",
+	"description": "Use this template to create a new card in Trello when a new task is created in Insightly. In this example, based on Insightly task category ID and priotity, a new card gets added to a list in Trello.",
+	"summary": "Insightly to Trello",
+	"sourceApp": "insightly",
+	"targetApps": ["trello"],
+	"tags": ["insightly", "trello"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Add a subscriber to a list in Mailchimp when a new row is appended in Microsoft Excel Online",
+	"description": "Use this template to add subscribers to a list in Mailchimp when new rows are appended to a Microsoft Excel Online spreadsheet. In this example, when a new row is appended in a Microsoft Excel spreadsheet, for each MailChimp member whose status code equals 200, a Slack notification is posted in a channel to notify them that the member already exists. Otherwise, the member is added as a subsciber to a list in MaliChimp.",
+	"summary": "Microsoft Excel Online to 2 applications",
+	"sourceApp": "msexcel",
+	"targetApps": ["mailchimp", "slack", "mailchimp"],
+	"tags": ["msexcel", ""],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Append a row in the Microsoft Excel Online spreadsheet for each new response created in SurveyMonkey",
+	"description": "Use this template to append a row in the Microsoft Excel Online spreadsheet for each new response created in SurveyMonkey. In this example, for each SurveyMonkey's answer, the responses are added to a spreadsheet in Microsoft Excel Online.",
+	"summary": "SurveyMonkey to Microsoft Excel Online",
+	"sourceApp": "surveymonkey",
+	"targetApps": ["msexcel"],
+	"tags": ["surveymonkey", "msexcel"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Create a contact and add the contact to a specific group in Google Contacts when a subscriber is created in MailChimp",
+	"description": "Use this template to create a contact and add the contact to a specific contact group in Google Contacts whenever a new subscriber is created in MailChimp.",
+	"summary": "MailChimp to Google Contacts",
+	"sourceApp": "mailchimp",
+	"targetApps": ["googlecontacts", "googlecontacts"],
+	"tags": ["mailchimp", "googlecontacts"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Create a folder in Box for new events created in Google Calendar",
+	"description": "Use this template to create a box folder for new events created in Google Calendar. This scenario helps the user upload files or documents before the Google Calendar event into a Box folder.",
+	"summary": "Google Calendar to Box",
+	"sourceApp": "googlecalendar",
+	"targetApps": ["box"],
+	"tags": ["googlecalendar", "box"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Create a list in Microsoft To Do for a new list created in MailChimp",
+	"description": "Use this template to create a list in Microsoft To Do whenever a new list is created in MailChimp.",
+	"summary": "MailChimp to Microsoft To Do",
+	"sourceApp": "mailchimp",
+	"targetApps": ["mstodo", "mstodo"],
+	"tags": ["mailchimp", "mstodo"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Create a ticket in Zendesk Service when a new form entry is created in Wufoo",
+	"description": "Use this template to create a ticket in Zendesk Service when a new form entry is created in Wufoo. In this example, whenever a new form entry is created, a Zendesk Service ticket is created as a task.",
+	"summary": "Wufoo to Zendesk Service",
+	"sourceApp": "wufoo",
+	"targetApps": ["zendeskservice"],
+	"tags": ["wufoo", "zendeskservice"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Create an item in mondaydotcom when a new lead is created in Salesforce based on the Salesforce lead rating",
+	"description": "Use this template to create an item in monday.com when a new lead is created in Salesforce based on the Salesforce lead rating. In this example, the item is created with different group identifiers for rating, such as hot or warm.",
+	"summary": "Salesforce to monday.com",
+	"sourceApp": "salesforce",
+	"targetApps": ["mondaydotcom"],
+	"tags": ["salesforce", "mondaydotcom"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Slack message for each closed opportunity retrieved from Insightly",
+	"description": "Use this template to send a Slack message for each opportunity that is retrieved from Insightly, which was recently closed. The Slack message consists of the opportunity details.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["insightly", "slack"],
+	"tags": ["scheduler", "insightly", "slack"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Slack message for opportunities created in Insightly based on the opportunity value",
+	"description": "Use this template to send a Slack message for new opportunities created in Insightly. In this example, a Slack message is sent for high-bid opportunities created in Insightly. Whenever a new opportunity is created in Insightly with an opportunity value greater than $25,000, a Slack message is sent to the intended recipient. The Slack message consists of the opportunity details.",
+	"summary": "Insightly to Slack",
+	"sourceApp": "insightly",
+	"targetApps": ["slack"],
+	"tags": ["insightly", "slack"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a reminder Gmail message to the event attendees for each Google Calendar event",
+	"description": "Use this template to send a Gmail message to remind the attendees of each Google Calendar event. In this example, for each event that has been created in Google Calendar, a reminder message is sent to the event attendees via Gmail 24 hours before the event.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["googlecalendar", "gmail"],
+	"tags": ["scheduler", "googlecalendar", "gmail"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a welcome Gmail message to the newly added campaign member in Salesforce",
+	"description": "Use this template to send a welcome Gmail message to the newly added campaign members in Salesforce.",
+	"summary": "Salesforce to Gmail",
+	"sourceApp": "salesforce",
+	"targetApps": ["salesforce", "gmail"],
+	"tags": ["salesforce", "gmail"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Add a subscriber to a list in MailChimp for each other customer retrieved from Shopify",
+	"description": "Use this template to add subscribers to a list in MailChimp for each customer retrieved from Shopify. In this example, for each Shopify customer that has a unique email address, the customer details are added to a list in MailChimp as a subscriber. Otherwise, a Slack message gets posted to a channel indicating that the customer already exist in MailChimp.",
+	"summary": "Scheduler to 3 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["shopify", "mailchimp", "slack"],
+	"tags": ["scheduler", "shopify", "mailchimp", "slack", "foreach", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Gmail message when a new employee record is retrieved from Google Cloud BigQuery",
+	"description": "Use this template to send a Gmail message to the intended recipients whenever a new employee record is retrieved from Google Cloud BigQuery. In this example, a Gmail message with the employee details and the joining date is sent based on the employee record retrieved from Google Cloud BigQuery.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["googlebigquery", "gmail"],
+	"tags": ["scheduler", "googlebigquery", "gmail", "foreach", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Add a card to a list in Trello for each new form entry created in Wufoo",
+	"description": "Use this template to add a card to a list in Trello for each new form entry created in Wufoo. In this example, for each Wufoo's new form entry that has a unique lead entry, the Wufoo lead details are added to a list in Trello.",
+	"summary": "Wufoo to Trello",
+	"sourceApp": "wufoo",
+	"targetApps": ["wufoo", "trello"],
+	"tags": ["wufoo", "trello", "foreach", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Append a row in the Microsoft Excel Online spreadsheet for each new form entry created in Wufoo",
+	"description": "Use this template to append a row in the Microsoft Excel Online spreadsheet for each new form entry created in Wufoo. In this example, for each Wufoo's new form entry that has a unique email address, the responses are added to a spreadsheet in Microsoft Excel Online.",
+	"summary": "Wufoo to Microsoft Excel Online",
+	"sourceApp": "wufoo",
+	"targetApps": ["wufoo", "msexcel"],
+	"tags": ["wufoo", "msexcel", "foreach", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Create an event in Google Calendar for each new form entry created in Wufoo",
+	"description": "Use this template to create an event in Google Calendar for each new form entry created in Wufoo. In this example, for each Wufoo's new form entry that has a unique email address, an event is created for the attendee based on their email address.",
+	"summary": "Wufoo to Google Calendar",
+	"sourceApp": "wufoo",
+	"targetApps": ["wufoo", "googlecalendar"],
+	"tags": ["wufoo", "googlecalendar", "foreach", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Slack message for each new form entry created in Wufoo",
+	"description": "Use this template to send a Slack message for each new form entry created in Wufoo. In this example, for each Wufoo's new form entry that has a unique email address, a Slack message is posted to the intended group to notify them that lead information has been created.",
+	"summary": "Wufoo to Slack",
+	"sourceApp": "wufoo",
+	"targetApps": ["slack"],
+	"tags": ["wufoo", "slack", "foreach", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Slack message when a new feature request issue is created in Jira",
+	"description": "Use this template to send a Slack message to an intended group when an issue requesting a new feature is created in Jira.",
+	"summary": "Jira to Slack",
+	"sourceApp": "jira",
+	"targetApps": ["slack"],
+	"tags": ["jira", "slack", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Slack message when a new incident ticket with urgent priority is created in Zendesk Service",
+	"description": "Use this template to send a Slack message when a new ticket is created in Zendesk Service. In this example, a Slack message is posted to the intended group to notify them that an incident ticket has been created with urgent priority in Zendesk Service.",
+	"summary": "Zendesk Service to Slack",
+	"sourceApp": "zendeskservice",
+	"targetApps": ["slack"],
+	"tags": ["zendeskservice", "slack", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a Slack message when a new Salesforce opportunity is created for a new customer that has been closed",
+	"description": "Use this template to send a Slack message to an intended group whenever a new opportunity is created in Salesforce. The Slack message is posted in a channel if the opportunity is created for a new customer and the opportunity status is closed.",
+	"summary": "Salesforce to Slack",
+	"sourceApp": "salesforce",
+	"targetApps": ["slack"],
+	"tags": ["salesforce", "slack", "if"],
+	"offerings": ["app connect professional"]
+},
+{
+	"name": "Send a status message via Gmail when a lead is created in Salesforce",
+	"description": "Use this template to send a status message using Gmail when a lead is created in Salesforce. In this example, a Gmail message is sent to the intended recipients if the newly created lead status is open in Salesforce.",
+	"summary": "Salesforce to Gmail",
+	"sourceApp": "salesforce",
+	"targetApps": ["gmail"],
+	"tags": ["salesforce", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+{
+  "name": "Create a job requisition in Workday when a new row is appended in Microsoft Excel Online",
+  "description": "Use this template to create a job requisition in Workday whenever a new row is appended in Microsoft Excel Online. In this example, if the budget amount is less than a specific amount, an HTTP method is invoked to create a job requisition in Workday. This is a sequel flow for 'Create a job requisition in Workday' template.",
+  "summary": "Microsoft Excel Online to HTTP",
+  "sourceApp": "msexcel",
+  "targetApps": ["http"],
+  "tags": ["msexcel", "http"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Create a job requisition in Workday",
+  "description": "Use this API template to create a job requistion in Workday.",
+  "summary": "API flow using 1 application",
+  "sourceApp": "api",
+  "targetApps": ["workday"],
+  "tags": ["api", "workday"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Create an event in Google Calendar for each registered Eventbrite event attendee",
+  "description": "Use this template to create an event in Google Calendar for each registered Eventbrite event attendee. In this example, a Google Calendar event is sent to each of the newly registered Eventbrite attendees.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["eventbrite", "eventbrite", "googlecalendar"],
+  "tags": ["scheduler", "eventbrite", "googlecalendar"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Integrate data between Box files and Microsoft Azure Blob storage",
+  "description": "Use this template to create a scheduler-based flow that retrieves CSV-type file metadata from Box for a specified time. For each Box file, the file content is retrieved in text format, and the content is appended into a Microsoft Azure Blob storage container.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["box", "box", "azureblobstorage"],
+  "tags": ["scheduler", "box", "azureblobstorage"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Invoke an HTTP method for each item retrieved from a new sales order created using Magento",
+  "description": "Use this template to invoke a method for each item retrieved from a new sales order created using Magento. In this example, when a new sales order is created, an HTTP method is invoked, which sends a request to a client URL to get the customer email details.",
+  "summary": "Magento to HTTP",
+  "sourceApp": "magento",
+  "targetApps": ["http"],
+  "tags": ["magento", "http"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Retrieve a ticket from Zendesk Service based on the ticket severity",
+  "description": "Use this API template to retrieve tickets from Zendesk Service at regular intervals based on the ticket severity.",
+  "summary": "API flow using 1 application",
+  "sourceApp": "api",
+  "targetApps": ["zendeskservice"],
+  "tags": ["api", "zendeskservice"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Send a Gmail message to the assignee based on the retrieved Zendesk Service ticket severity",
+  "description": "Use this template to invoke an HTTP method to get the retrieved Zendesk Service tickets and send a Gmail message to the assignee to inform them of the status of the ticket. This is a sequel flow for 'Retrieve a ticket from Zendesk Service based on the ticket severity' template.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["http", "gmail"],
+  "tags": ["scheduler", "http", "gmail"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Send a Gmail message when a new sales rule coupon is created in Magento",
+  "description": "Use this API template to create a new sales rule coupon in Magento and send the coupon details to the customer via Gmail message.",
+  "summary": "API flow using 2 applications",
+  "sourceApp": "api",
+  "targetApps": ["magento", "gmail"],
+  "tags": ["api", "magento", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a contact in HubSpot Marketing when a new row is appended in Microsoft Excel Online",
+  "description": "Use this template to create a contact in HubSpot Marketing whenever a new row is appended in Microsoft Excel Online. In this example, a contact is created in HubSpot Marketing for each row retrieved from the Microsoft Excel Online spreadsheet with a unique email address.",
+  "summary": "Microsoft Excel Online to HubSpot Marketing",
+  "sourceApp": "msexcel",
+  "targetApps": ["hubspotmarketing", "hubspotmarketing"],
+  "tags": ["msexcel", "hubspotmarketing", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in MailChimp",
+  "description": "Use this template to append a row in the Microsoft Excel Online spreadsheet whenever a new subscriber is created in MailChimp. In this example, the MailChimp sucbriber details are appended to the Microsoft Excel Online spreadsheet for each newly created MailChimp sucbriber that has a unique email address.",
+  "summary": "MailChimp to Microsoft Excel Online",
+  "sourceApp": "mailchimp",
+  "targetApps": ["msexcel", "msexcel"],
+  "tags": ["mailchimp", "msexcel", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a contact in HubSpot Marketing when a new lead is created in Salesforce",
+  "description": "Use this template to create a contact in HubSpot Marketing whenever a new lead is created in Salesforce. In this example, a new contact is created in HubSpot Marketing for each newly created Salesforce lead that has a unique email address. Otherwise, a Slack message gets posted to a channel indicating that the lead already exists.",
+  "summary": "Salesforce to 2 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["hubspotmarketing", "hubspotmarketing", "slack"],
+  "tags": ["salesforce", "hubspotmarketing", "slack", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Validate the data between Wufoo form entry responses and Microsoft Excel Online worksheet data",
+  "description": "Use this template to check and validate the data between Wufoo form entry responses and Microsoft Excel Online worksheet data, and send a Slack message for the validated responses. In this example, the responses from the Wufoo entry are validated across a Microsoft Excel Online worksheet that contains answers for a course. The responses are validated with the answers, and a Slack notification gets sent to the intended recipient, whether the answer is correct or incorrect.",
+  "summary": "Wufoo to 2 applications",
+  "sourceApp": "wufoo",
+  "targetApps": ["msexcel", "slack"],
+  "tags": ["wufoo", "msexcel", "slack", "foreach", "if", "setVariable"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Add a subscriber to a list in MailChimp when a new form entry is created in Wufoo",
+  "description": "Use this template to add subscribers to a list in MailChimp whenever a new form entry is created in Wufoo. In this example, for each MaiLChimp member that has a unique email address, the member details are added to a list in MailChimp as a subscriber.",
+  "summary": "Wufoo to MailChimp",
+  "sourceApp": "wufoo",
+  "targetApps": ["mailchimp", "mailchimp"],
+  "tags": ["wufoo", "mailchimp", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a lead in Salesforce when a new form entry is created in Wufoo",
+  "description": "Use this template to create a contact in Salesforce whenever a new form entry is created in Wufoo. In this example, for each lead that has a unique email address, the lead is created in Saleforce. Otherwise, a Slack message gets posted to a channel indicating that the lead already exists.",
+  "summary": "Wufoo to 2 applications",
+  "sourceApp": "wufoo",
+  "targetApps": ["salesforce", "salesforce", "slack"],
+  "tags": ["wufoo", "salesforce", "slack", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Insert a record in Google Cloud BigQuery when a new form entry is created in Wufoo",
+  "description": "Use this template to insert a record in the Google Cloud BigQuery table whenever a new form entry is created in Wufoo. In this example, the record is inserted in a table in Google Cloud BigQuery for each record that has a unique email address.",
+  "summary": "Wufoo to Google Cloud BigQuery",
+  "sourceApp": "wufoo",
+  "targetApps": ["googlebigquery", "googlebigquery"],
+  "tags": ["wufoo", "googlebigquery", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+	"name": "Send a Slack message when the task count in Asana exceeds the limit",
+	"description": "Use this template to send a Slack message when the task count in Asana exceeds the limit. In this example, a Slack notification is sent when the Asana task count is greater than 5, and the tasks are not completed.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["asana", "slack"],
+	"tags": ["scheduler", "asana", "slack", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Append a row in Microsoft Excel Online when a new lead is created in Marketo",
+	"description": "Use this template to append a row in Microsoft Excel Online when a new lead is created in Marketo.",
+	"summary": "Marketo to 2 applications",
+	"sourceApp": "marketo",
+	"targetApps": ["msexcel", "googlesheet"],
+	"tags": ["marketo", "msexcel", "googlesheet", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Append a row in Microsoft Excel Online when a new Salesforce account with more than 500 employees is created",
+	"description": "Use this template to append a row in the Microsoft Excel Online spreadsheet when a new Salesforce account with more than 500 employees is created.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["msexcel", "slack"],
+	"tags": ["salesforce", "msexcel", "slack", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Update a case in Salesforce when a Zendesk Service ticket status is updated to closed",
+	"description": "Use this template to update a case in Salesforce when a Zendesk Service ticket status is updated to closed.",
+	"summary": "Zendesk Service to 2 applications",
+	"sourceApp": "zendeskservice",
+	"targetApps": ["salesforce", "gmail"],
+	"tags": ["zendeskservice", "salesforce", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a contact in HubSpot Marketing when a campaign member is created or updated in Salesforce",
+	"description": "Use this template to create a contact in HubSpot CRM whenever a campaign member is created or updated in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["hubspotcrm", "gmail"],
+	"tags": ["salesforce", "hubspotcrm", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a task in Asana when a new case is created in Salesforce",
+	"description": "Use this template to create a task in Asana when a new case is created in Salesforce.",
+	"summary": "Salesforce to Asana",
+	"sourceApp": "salesforce",
+	"targetApps": ["asana"],
+	"tags": ["salesforce", "asana", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in Box when a new document is created in Salesforce",
+	"description": "Use this template to create a file in Box when a new document is created in Salesforce. A Gmail message is sent to notify the users that a new document has been created in Box.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["box", "gmail"],
+	"tags": ["salesforce", "box", "gmail"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a folder in Box for new contacts created in Salesforce",
+	"description": "Use this template to create a folder in Box for new contacts created in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["box", "gmail", "box"],
+	"tags": ["salesforce", "box", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create or update a contact in HubSpot Marketing when an account is created or updated in Salesforce",
+	"description": "Use this template to create or update a contact in HubSpot Marketing when an account is created or updated in Salesforce.",
+	"summary": "Salesforce to HubSpot Marketing",
+	"sourceApp": "salesforce",
+	"targetApps": ["hubspotmarketing"],
+	"tags": ["salesforce", "hubspotmarketing", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in Google Drive for each new document created in Salesforce",
+	"description": "Use this template to create a file in Google Drive for each new document created in Salesforce.",
+	"summary": "Salesforce to Google Drive",
+	"sourceApp": "salesforce",
+	"targetApps": ["googledrive", "googledrive"],
+	"tags": ["salesforce", "googledrive", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Send an SMS message via Twilio when a new row is appended to a Google Sheets worksheet",
+	"description": "Use this template to send an SMS message via Twilio when a new row is appended to a Google Sheets worksheet.",
+	"summary": "Google Sheets to Twilio",
+	"sourceApp": "googlesheet",
+	"targetApps": ["twilio"],
+	"tags": ["googlesheet"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a row in Google Sheets for each new task created in Asana",
+	"description": "Use this template to create a row in Google Sheets for each new task created in Asana.",
+	"summary": "Asana to 3 applications",
+	"sourceApp": "asana",
+	"targetApps": ["googlesheet", "slack", "marketo"],
+	"tags": ["asana", "googlesheet", "slack", "marketo", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a row in the Google Sheets worksheet when a new campaign member is created in Microsoft Dynamics 365 for Sales",
+	"description": "Use this template to create a row in the Google Sheets worksheet when a new campaign member is created in Microsoft Dynamics 365 for Sales.",
+	"summary": "Microsoft Dynamics 365 for Sale to Google Sheets",
+	"sourceApp": "msdynamicscrmrest",
+	"targetApps": ["googlesheet"],
+	"tags": ["msdynamicscrmrest", "googlesheet"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a project in Workday for each Jira project retrieved",
+	"description": "Use this template to create a project in Workday for each Jira project retrieved.",
+	"summary": "Scheduler to 3 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["jira", "workday", "slack"],
+	"tags": ["scheduler", "jira", "foreach", "workday"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in Box based on the value retrieved from a row in a Google Sheets worksheet",
+	"description": "Use this template to create a file in Box based on the value retrieved from each new row in a Google Sheets worksheet.",
+	"summary": "Scheduler to 4 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["googlesheet", "slack", "http", "box"],
+	"tags": ["scheduler", "googlesheet", "slack", "http", "box", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in Box for each attachment downloaded from an email",
+	"description": "Use this template to create a file in Box for each attachment downloaded from an email.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["email", "box"],
+	"tags": ["scheduler", "email", "foreach", "box"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Send an SMS message via Twilio when a new task is created in Asana",
+	"description": "Use this template to send an SMS message via Twilio when a new task is created in Asana.",
+	"summary": "Asana to Twilio",
+	"sourceApp": "asana",
+	"targetApps": ["twilio"],
+	"tags": ["asana", "twilio", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Send an SMS message via Twilio when a new issue is created in Jira",
+	"description": "Use this template to send an SMS message via Twilio when a new issue is created in Jira.",
+	"summary": "Jira to 2 applications",
+	"sourceApp": "jira",
+	"targetApps": ["jira", "twilio", "slack"],
+	"tags": ["jira", "twilio", "slack", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Send a Slack notification for each new closed and won opportunity in Salesforce",
+	"description": "Use this template to send a Slack notification for each new closed and won opportunity in Salesforce.",
+	"summary": "Salesforce to Slack",
+	"sourceApp": "salesforce",
+	"targetApps": ["slack"],
+	"tags": ["salesforce", "slackslack", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a contact in HubSpot CRM for each campaign member of a completed campaign in Salesforce",
+	"description": "Use this template to create a contact in HubSpot CRM when a campaign status is updated to completed in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["salesforce", "gmail", "hubspotcrm", "gmail"],
+	"tags": ["salesforce", "gmail", "hubspotcrm", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create an account in Salesforce when a new attendee is created in Eventbrite",
+	"description": "Use this template to create an account in Salesforce when a new attendee is created in Eventbrite.",
+	"summary": "Eventbrite to Salesforce",
+	"sourceApp": "eventbrite",
+	"targetApps": ["salesforce"],
+	"tags": ["eventbrite", "salesforce", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a lead in Marketo when a new contact is created in Salesforce",
+	"description": "Use this template to create a lead in Marketo when a new contact is created in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["marketo", "marketo", "gmail"],
+	"tags": ["salesforce", "marketo", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in a Box folder when a new attachment is created in Salesforce",
+	"description": "Use this template to create a file in a Box folder when a new attachment is created in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["salesforce", "box", "box", "gmail"],
+	"tags": ["salesforce", "box", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in Dropbox for each new opportunity in Salesforce that has attachments",
+	"description": "Use this template to create a file in Dropbox for each new opportunity in Salesforce that has attachments.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["salesforce", "salesforce", "salesforce", "dropbox", "dropbox"],
+	"tags": ["scheduler", "salesforce", "dropbox", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a new contact in Google Contacts when a campaign member is created or updated in Salesforce",
+	"description": "Use this template to create a contact in Google Contacts whenever a new campaign member is either created or updated in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["googlecontacts", "googlecontacts", "gmail"],
+	"tags": ["salesforce", "googlecontacts", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ }    
 ]
 }
