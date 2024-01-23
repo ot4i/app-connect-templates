@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Arrange%20welcome%20drinks%20for%20an%20Eventbrite%20event_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Arrange%20welcome%20drinks%20for%20an%20Eventbrite%20event_instructions.md) (opens in a new window).
 
 1. Before you start this flow, complete the following steps:
     * Create an Eventbrite event with a custom question 'What complimentary drink would you like on arrival?'. Provide three answers 'Beer', 'Wine', and 'Juice'.

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Load%20NetSuite%20ERP%20products%20into%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Load%20NetSuite%20ERP%20products%20into%20Salesforce_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 1. (Optional) Update the Scheduler node to suit your requirements.
