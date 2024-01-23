@@ -3,7 +3,6 @@ integration:
   type: trigger-action
   trigger-interfaces:
     trigger-interface-1:
-      connector-type: salesforce
       type: event-trigger
       triggers:
         CREATED:
@@ -12,23 +11,69 @@ integration:
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
           options: {}
+      connector-type: salesforce
   action-interfaces:
-    action-interface-1:
-      type: api-action
-      business-object: OE_INBOUND_INT_Service___PROCESS_ORDER
-      connector-type: oracleebs
-      actions:
-        CREATE_ORDER: {}
     action-interface-2:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: OE_INBOUND_INT_Service___PROCESS_ORDER
+      connector-type: oracleebs
+      actions:
+        CREATE_ORDER: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      OracleEBSParams:
+                        type: object
+                        properties:
+                          Language:
+                            type: string
+                          ResponsibilityKey:
+                            type: string
+                          ResponsibilityShortCode:
+                            type: string
+                          SecurityGroup:
+                            type: string
+                          OrderTypeId:
+                            type: string
+                          OrganizationId:
+                            type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - OracleEBSParams:
+                            mappings:
+                              - Language:
+                                  template: AMERICAN
+                              - OrderTypeId:
+                                  template: '1001'
+                              - OrganizationId:
+                                  template: '121'
+                              - ResponsibilityKey:
+                                  template: ISL_RECEIVABLES_MANAGER
+                              - ResponsibilityShortCode:
+                                  template: AR
+                              - SecurityGroup:
+                                  template: STANDARD
           - custom-action:
               name: Oracle E-Business Suite Create order
               target:
@@ -38,44 +83,87 @@ integration:
                 mappings:
                   - P_HEADER_REC:
                       mappings:
+                        - ATTRIBUTE1:
+                            template: '{{$Trigger.Name}} --oppotunity name'
+                        - ATTRIBUTE2:
+                            template: '{{$Trigger.OrderNumber__c}} --- order number'
+                        - ATTRIBUTE3:
+                            template: '{{$Trigger.Amount}}-- amount '
+                        - BOOKED_FLAG:
+                            template: 'Y'
+                        - FOB_POINT_CODE:
+                            template: SHIP POINT
+                        - FREIGHT_CARRIER_CODE:
+                            template: Due
+                        - INVOICE_TO_ORG_ID:
+                            template: '1040'
                         - ORDER_TYPE_ID:
-                            template: ' {{$Trigger.Type}}'
+                            template: >-
+                              {{$Setvariable.variable.OracleEBSParams.OrderTypeId}}
+                        - SALESREP_ID:
+                            template: '-3'
+                        - SOLD_TO_ORG_ID:
+                            template: '1040'
+                  - P_LINE_TBL:
+                      mappings:
+                        - P_LINE_TBL_ITEM:
+                            foreach:
+                              input: '[0]'
+                              iterator: P_LINE_TBL_ITEMItem
+                              mappings:
+                                - BOOKED_FLAG:
+                                    template: 'Y'
+                                - INVENTORY_ITEM_ID:
+                                    template: '1002'
+                                - ORDERED_ITEM:
+                                    template: AS54111
+                                - ORDERED_QUANTITY:
+                                    template: '1'
                   - SOAHeader:
                       mappings:
                         - NLSLanguage:
-                            template: '{{$Trigger.AccountId}}'
+                            template: '{{$Setvariable.variable.OracleEBSParams.Language}}'
                         - OrgId:
-                            template: ' {{$Trigger.Id}}'
+                            template: >-
+                              {{$Setvariable.variable.OracleEBSParams.OrganizationId}}
                         - RespApplication:
-                            template: '{{$Trigger.OwnerId}}'
+                            template: >-
+                              {{$Setvariable.variable.OracleEBSParams.ResponsibilityShortCode}}
                         - Responsibility:
-                            template: '{{$Trigger.CampaignId}}'
+                            template: >-
+                              {{$Setvariable.variable.OracleEBSParams.ResponsibilityKey}}
                         - SecurityGroup:
-                            template: '{{$Trigger.TotalOpportunityQuantity}}'
+                            template: >-
+                              {{$Setvariable.variable.OracleEBSParams.SecurityGroup}}
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
           - create-action:
-              name: Slack Send message
+              name: Slack Create message
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               map:
                 mappings:
                   - OBJECT_ID:
-                      template: C04100PVAH3
+                      template: C04G6R92ZR7
                   - OBJECT_NAME:
                       template: channel
                   - text:
                       template: >-
-                        Order created
-                        :{{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ORDER_NUMBER}}
+                        {{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ATTRIBUTE1}},------{{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ATTRIBUTE2}},-----{{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ATTRIBUTE3}},---EBS
+                        OrderNumber
+                        {{$OracleEBusinessSuiteCreateorder.X_HEADER_REC.ORDER_NUMBER}}
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
                   - variable: OracleEBusinessSuiteCreateorder
                     $ref: >-
                       #/node-output/Oracle E-Business Suite Create

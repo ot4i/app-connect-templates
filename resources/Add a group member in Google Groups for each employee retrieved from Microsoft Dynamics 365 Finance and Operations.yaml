@@ -1,0 +1,304 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Employee
+      connector-type: msdynamicsfando
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getAdminDirectoryV1Groups_model
+      connector-type: googlegroups
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postAdminDirectoryV1GroupsByGroupKeyMembers_model
+      connector-type: googlegroups
+      actions:
+        postAdminDirectoryV1GroupsByGroupKeyMembers: {}
+    action-interface-4:
+      type: api-action
+      business-object: postAdminDirectoryV1Groups_model
+      connector-type: googlegroups
+      actions:
+        postAdminDirectoryV1Groups: {}
+    action-interface-5:
+      type: api-action
+      business-object: postAdminDirectoryV1GroupsByGroupKeyMembers_model
+      connector-type: googlegroups
+      actions:
+        postAdminDirectoryV1GroupsByGroupKeyMembers: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: >-
+                Microsoft Dynamics 365 for Finance and Operations Retrieve
+                employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  EmploymentStartDate: '2023-08-15T16:53:00.000Z'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftDynamics365forFinanceandOperationsRetrieveemployees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Microsoft Dynamics 365 for Finance and Operations Employee
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Groups Retrieve groups
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  email: '{{$Foreachitem.OfficeLocation}}@ibmappcon.com'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response/payload
+                  - variable: >-
+                      MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Dynamics 365 for Finance and
+                      Operations Retrieve employees/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleGroupsRetrievegroups
+                  $ref: >-
+                    #/block/For each/node-output/Google Groups Retrieve
+                    groups/response/payload
+                - variable: GoogleGroupsRetrievegroupsMetadata
+                  $ref: >-
+                    #/block/For each/node-output/Google Groups Retrieve
+                    groups/response
+                - variable: MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                  $ref: >-
+                    #/node-output/Microsoft Dynamics 365 for Finance and
+                    Operations Retrieve employees/response/payload
+                - variable: >-
+                    MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                  $ref: >-
+                    #/node-output/Microsoft Dynamics 365 for Finance and
+                    Operations Retrieve employees/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$GoogleGroupsRetrievegroupsMetadata."status-code"}}':
+                      neq: '204'
+                  execute:
+                    - custom-action:
+                        name: Google Groups Add member to group
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postAdminDirectoryV1GroupsByGroupKeyMembers
+                        map:
+                          mappings:
+                            - ___type:
+                                template: EXTERNAL
+                            - delivery_settings:
+                                template: ALL_MAIL
+                            - email:
+                                template: '{{$Foreachitem.PrimaryContactEmail}}'
+                            - groupKey:
+                                template: '{{$Foreachitem.OfficeLocation}}@ibmappcon.com'
+                            - role:
+                                template: MEMBER
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleGroupsRetrievegroups
+                              $ref: >-
+                                #/block/For each/node-output/Google Groups
+                                Retrieve groups/response/payload
+                            - variable: GoogleGroupsRetrievegroupsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Google Groups
+                                Retrieve groups/response
+                            - variable: >-
+                                MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                              $ref: >-
+                                #/node-output/Microsoft Dynamics 365 for Finance
+                                and Operations Retrieve
+                                employees/response/payload
+                            - variable: >-
+                                MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Dynamics 365 for Finance
+                                and Operations Retrieve employees/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - custom-action:
+                      name: Google Groups Create group
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      action: postAdminDirectoryV1Groups
+                      map:
+                        mappings:
+                          - email:
+                              template: '{{$Foreachitem.OfficeLocation}}@ibmappcon.com'
+                          - name:
+                              template: '{{$Foreachitem.OfficeLocation}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleGroupsRetrievegroups
+                            $ref: >-
+                              #/block/For each/node-output/Google Groups
+                              Retrieve groups/response/payload
+                          - variable: GoogleGroupsRetrievegroupsMetadata
+                            $ref: >-
+                              #/block/For each/node-output/Google Groups
+                              Retrieve groups/response
+                          - variable: >-
+                              MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                            $ref: >-
+                              #/node-output/Microsoft Dynamics 365 for Finance
+                              and Operations Retrieve employees/response/payload
+                          - variable: >-
+                              MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                            $ref: >-
+                              #/node-output/Microsoft Dynamics 365 for Finance
+                              and Operations Retrieve employees/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - custom-action:
+                      name: Google Groups Add member to group 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      action: postAdminDirectoryV1GroupsByGroupKeyMembers
+                      map:
+                        mappings:
+                          - ___type:
+                              template: EXTERNAL
+                          - delivery_settings:
+                              template: ALL_MAIL
+                          - email:
+                              template: '{{$Foreachitem.PrimaryContactEmail}}'
+                          - groupKey:
+                              template: '{{$GoogleGroupsCreategroup.email}}'
+                          - role:
+                              template: MEMBER
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleGroupsCreategroup
+                            $ref: >-
+                              #/block/If/node-output/Google Groups Create
+                              group/response/payload
+                          - variable: GoogleGroupsRetrievegroups
+                            $ref: >-
+                              #/block/For each/node-output/Google Groups
+                              Retrieve groups/response/payload
+                          - variable: GoogleGroupsRetrievegroupsMetadata
+                            $ref: >-
+                              #/block/For each/node-output/Google Groups
+                              Retrieve groups/response
+                          - variable: >-
+                              MicrosoftDynamics365forFinanceandOperationsRetrieveemployees
+                            $ref: >-
+                              #/node-output/Microsoft Dynamics 365 for Finance
+                              and Operations Retrieve employees/response/payload
+                          - variable: >-
+                              MicrosoftDynamics365forFinanceandOperationsRetrieveemployeesMetadata
+                            $ref: >-
+                              #/node-output/Microsoft Dynamics 365 for Finance
+                              and Operations Retrieve employees/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Add a group member in Google Groups for each employee retrieved from Microsoft Dynamics 365 Finance and Operations
+models: {}

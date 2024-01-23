@@ -1,0 +1,222 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 15
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: ibmappconcustomsql
+      connector-type: amazonredshift
+      actions:
+        EXECUTECUSTOMSQL: {}
+    action-interface-4:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      previousruntime:
+                        type: string
+                        format: date-time
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - previousruntime:
+                            template: '2023-11-07 08:16:56'
+          - custom-action:
+              name: Amazon Redshift Execute custom SQL
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: EXECUTECUSTOMSQL
+              map:
+                mappings:
+                  - customSql:
+                      format:
+                        type: sql
+                      template: >-
+                        select
+                        appconnect.tracks."track_name",appconnect.tracks."experienced",appconnect.newjoinees."full_name",appconnect.newjoinees."address",appconnect.newjoinees."doj",appconnect.newjoinees."dob",appconnect.skills."technology",appconnect.skills."experience"
+                        FROM appconnect.tracks JOIN appconnect.newjoinees ON
+                        appconnect.tracks."emp_id"=appconnect.newjoinees."emp_id"
+                        JOIN appconnect.skills ON
+                        appconnect.newjoinees."emp_id"=appconnect.skills."emp_id" 
+                        where appconnect.newjoinees."doj" >
+                        {{$Setvariable.variable.previousruntime}} and
+                        appconnect.newjoinees."doj" <
+                        {{$Trigger.currentEventTime}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$AmazonRedshiftExecutecustomSQL.data '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: AmazonRedshiftExecutecustomSQL
+                    $ref: >-
+                      #/node-output/Amazon Redshift Execute custom
+                      SQL/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Amazon Redshift record
+    assembly-2:
+      assembly:
+        execute:
+          - parse:
+              name: JSON Parser Parse
+              parse-format: json
+              source:
+                template: '{{$Foreachitem}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: AmazonRedshiftExecutecustomSQL
+                    $ref: >-
+                      #/node-output/Amazon Redshift Execute custom
+                      SQL/response/payload
+                  - variable: GmailSendemail2
+                    $ref: '#/node-output/Gmail Send email 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: |2-
+                    {
+                      "track_name": "dev",
+                      "experienced": false,
+                      "full_name": "Abhay kumar",
+                      "address": "Goa",
+                      "doj": "2023-11-16 15:55:00.0",
+                      "dob": "1996-09-16 15:55:00.0",
+                      "technology": "nodejs",
+                      "experience": 6
+                    }
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  track_name:
+                    type: string
+                  experienced:
+                    type: boolean
+                  full_name:
+                    type: string
+                  address:
+                    type: string
+                  doj:
+                    type: string
+                  dob:
+                    type: string
+                  technology:
+                    type: string
+                  experience:
+                    type: number
+                title: Parsed JSON
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$JSONParserParse.full_name}}'
+                        - '2':
+                            template: '{{$JSONParserParse.address}}'
+                        - '3':
+                            template: '{{$JSONParserParse.dob}}'
+                        - '4':
+                            template: '{{$JSONParserParse.technology}}'
+                        - '5':
+                            template: '{{$JSONParserParse.experience}}'
+                        - '6':
+                            template: '{{$JSONParserParse.track_name}}'
+                        - '7':
+                            template: '{{$JSONParserParse.doj}}'
+                  - spreadsheetID:
+                      template: 1AsiiiZpjCVDw5h4bW_84SZ3Z8slW9cnJc2MmOIQr8OY
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: >-
+                      #/block/For each/node-output/JSON Parser
+                      Parse/response/payload
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: AmazonRedshiftExecutecustomSQL
+                    $ref: >-
+                      #/node-output/Amazon Redshift Execute custom
+                      SQL/response/payload
+                  - variable: GmailSendemail2
+                    $ref: '#/node-output/Gmail Send email 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a new row in a Google Sheets spreadsheet for each new employee retrieved from the Amazon Redshift record
+models: {}

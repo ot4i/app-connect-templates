@@ -1,0 +1,85 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: CampaignMember
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Campaign
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve campaigns
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Id: '{{$Trigger.CampaignId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        Hello {{$Trigger.Name}}, You are successfully registered
+                        for the campaign {{$Trigger.CampaignId}}-
+                        {{$SalesforceRetrievecampaigns.Name}} . The campaign
+                        duration is from
+                        {{$SalesforceRetrievecampaigns.StartDate}}to
+                        {{$SalesforceRetrievecampaigns.EndDate}}. 
+                  - Subject:
+                      template: 'Welcome {{$Trigger.Salutation}}{{$Trigger.FirstName}}! '
+                  - To:
+                      template: '{{$Trigger.Email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecampaigns
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      campaigns/response/payload
+                  - variable: SalesforceRetrievecampaignsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve campaigns/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a welcome Gmail message to the newly added campaign member in Salesforce
+models: {}

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/API%20to%20retrieve%20source%20code%20repository%20details%20and%20send%20an%20email%20about%20inactive%20repositories_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20to%20retrieve%20source%20code%20repository%20details%20and%20send%20an%20email%20about%20inactive%20repositories_instructions.md) (opens in a new window).
 
 ## Prerequisites
 

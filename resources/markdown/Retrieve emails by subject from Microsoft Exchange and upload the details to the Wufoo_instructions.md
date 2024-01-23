@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Retrieve%20emails%20by%20subject%20from%20Microsoft%20Exchange%20and%20upload%20the%20details%20to%20the%20Wufoo_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20emails%20by%20subject%20from%20Microsoft%20Exchange%20and%20upload%20the%20details%20to%20the%20Wufoo_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Click **Operations**, then **Edit flow**.

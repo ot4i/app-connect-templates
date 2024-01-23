@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Create%20a%20task%20in%20a%20list%20in%20Microsoft%20To%20Do%20based%20on%20the%20information%20retrieved%20from%20Microsoft%20Excel%20Online_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20task%20in%20a%20list%20in%20Microsoft%20To%20Do%20based%20on%20the%20information%20retrieved%20from%20Microsoft%20Excel%20Online_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:

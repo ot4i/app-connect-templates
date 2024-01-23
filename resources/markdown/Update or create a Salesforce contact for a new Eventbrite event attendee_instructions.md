@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Update%20or%20create%20a%20Salesforce%20contact%20for%20a%20new%20Eventbrite%20event%20attendee_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Update%20or%20create%20a%20Salesforce%20contact%20for%20a%20new%20Eventbrite%20event%20attendee_instructions.md) (opens in a new window).
 
 1. Clicking **Create flow** takes you to the App connect flow editor.
 1. Connect to your [Eventbrite account](https://ibm.biz/aaseventbrite).

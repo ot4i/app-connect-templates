@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20a%20new%20task%20in%20Asana%20when%20a%20new%20Salesforce%20campaign%20is%20created_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20new%20task%20in%20Asana%20when%20a%20new%20Salesforce%20campaign%20is%20created_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Click the Salesforce / **New campaign** node.

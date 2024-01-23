@@ -3013,6 +3013,6 @@
   "targetApps": ["googlebigquery", "googlebigquery"],
   "tags": ["wufoo", "googlebigquery", "foreach", "if"],
   "offerings": ["app connect professional"]
- }    
+ }
 ]
 }

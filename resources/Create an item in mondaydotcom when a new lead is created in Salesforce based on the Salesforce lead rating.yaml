@@ -1,0 +1,152 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Lead
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Item
+      connector-type: mondaydotcom
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Item
+      connector-type: mondaydotcom
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Item
+      connector-type: mondaydotcom
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Rating}}': hot
+                  execute:
+                    - create-action:
+                        name: monday.com Create item
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - board_id:
+                                template: '1817306777'
+                            - create_item:
+                                mappings:
+                                  - column_values:
+                                      mappings:
+                                        - date4:
+                                            mappings:
+                                              - date:
+                                                  template: '{{$Trigger.CreatedDate}}'
+                                        - name:
+                                            template: '{{$Trigger.Name}}'
+                                        - status:
+                                            mappings:
+                                              - label:
+                                                  template: '{{$Trigger.Status}}'
+                                  - item_name:
+                                      template: '{{$Trigger.Name}}'
+                            - group_id:
+                                template: topics
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.Rating}}': warm
+                  execute:
+                    - create-action:
+                        name: monday.com Create item 3
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - board_id:
+                                template: '1817306777'
+                            - create_item:
+                                mappings:
+                                  - column_values:
+                                      mappings:
+                                        - date4:
+                                            mappings:
+                                              - date:
+                                                  template: '{{$Trigger.CreatedDate}}'
+                                        - name:
+                                            template: '{{$Trigger.Name}}'
+                                        - status:
+                                            mappings:
+                                              - label:
+                                                  template: '{{$Trigger.Status}}'
+                                  - item_name:
+                                      template: '{{$Trigger.Name}}'
+                            - group_id:
+                                template: group_title
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: monday.com Create item 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - board_id:
+                              template: '1817306777'
+                          - create_item:
+                              mappings:
+                                - column_values:
+                                    mappings:
+                                      - date4:
+                                          mappings:
+                                            - date:
+                                                template: '{{$Trigger.CreatedDate}}'
+                                      - name:
+                                          template: '{{$Trigger.Name}}'
+                                      - status:
+                                          mappings:
+                                            - label:
+                                                template: '{{$Trigger.Status}}'
+                                - item_name:
+                                    template: '{{$Trigger.Name}}'
+                          - group_id:
+                              template: new_group
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create an item in mondaydotcom when a new lead is created in Salesforce based on the Salesforce lead rating
+models: {}

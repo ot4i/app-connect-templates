@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20an%20incident%20in%20ServiceNow%20whenever%20a%20new%20customer%20issue%20record%20is%20added%20to%20IBM%20Db2) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20an%20incident%20in%20ServiceNow%20whenever%20a%20new%20customer%20issue%20record%20is%20added%20to%20IBM%20Db2) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to your [IBM Db2 on Cloud account](https://ibm.biz/acibmdb2).

@@ -1,0 +1,211 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Calendar Retrieve events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  id: appconnect999@gmail.com
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleCalendarRetrieveevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleCalendarRetrieveevents
+                    $ref: >-
+                      #/node-output/Google Calendar Retrieve
+                      events/response/payload
+                  - variable: GoogleCalendarRetrieveeventsMetadata
+                    $ref: '#/node-output/Google Calendar Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Calendar events
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      current_time_converted:
+                        type: number
+                      event_start_time_converted:
+                        type: number
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleCalendarRetrieveevents
+                    $ref: >-
+                      #/node-output/Google Calendar Retrieve
+                      events/response/payload
+                  - variable: GoogleCalendarRetrieveeventsMetadata
+                    $ref: '#/node-output/Google Calendar Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - current_time_converted:
+                            expression: '$number($toMillis($Trigger.currentEventTime ) ) '
+                        - event_start_time_converted:
+                            expression: '$number($toMillis($Foreachitem.startTime)) '
+          - set-variable:
+              name: Set variable 2
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      difference_24hours:
+                        type: number
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: GoogleCalendarRetrieveevents
+                    $ref: >-
+                      #/node-output/Google Calendar Retrieve
+                      events/response/payload
+                  - variable: GoogleCalendarRetrieveeventsMetadata
+                    $ref: '#/node-output/Google Calendar Retrieve events/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - difference_24hours:
+                            expression: >-
+                              $number($Setvariable.variable.event_start_time_converted-86400000) 
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Setvariable
+                  $ref: '#/block/For each/node-output/Set variable/response/payload'
+                - variable: Setvariable2
+                  $ref: '#/block/For each/node-output/Set variable 2/response/payload'
+                - variable: GoogleCalendarRetrieveevents
+                  $ref: >-
+                    #/node-output/Google Calendar Retrieve
+                    events/response/payload
+                - variable: GoogleCalendarRetrieveeventsMetadata
+                  $ref: '#/node-output/Google Calendar Retrieve events/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Setvariable.variable.current_time_converted}}':
+                      gte: '{{$Setvariable2.variable.difference_24hours}}'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Dear Attendee, This is gentle reminder to
+                                  attend the Event scheduled on
+                                  {{$Foreachitem.startTime}} for the event
+                                  {{$Foreachitem.summary}}
+                            - Subject:
+                                template: Reminder for the Event
+                            - To:
+                                template: '{{$join($Foreachitem.attendees.email, '', '')}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable
+                              $ref: >-
+                                #/block/For each/node-output/Set
+                                variable/response/payload
+                            - variable: Setvariable2
+                              $ref: >-
+                                #/block/For each/node-output/Set variable
+                                2/response/payload
+                            - variable: GoogleCalendarRetrieveevents
+                              $ref: >-
+                                #/node-output/Google Calendar Retrieve
+                                events/response/payload
+                            - variable: GoogleCalendarRetrieveeventsMetadata
+                              $ref: >-
+                                #/node-output/Google Calendar Retrieve
+                                events/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a reminder Gmail message to the event attendees for each Google Calendar event
+models: {}

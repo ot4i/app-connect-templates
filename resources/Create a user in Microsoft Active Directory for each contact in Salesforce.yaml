@@ -1,0 +1,230 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: User
+      connector-type: msad
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve accounts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  Name: Last but not least
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - retrieve-action:
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - CreatedDate:
+                        gt: '2020-01-14'
+                    - AccountId: '{{$SalesforceRetrieveaccounts.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrievecontacts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryCreateuser
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Active Directory
+                      Create user/response/payload
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                customSchemas: {}
+                mappings: []
+              display-name: Salesforce Contact
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Active Directory Create user
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - cn:
+                      template: '{{$Foreachitem.Name}}_{{$millis()}}'
+                  - company:
+                      template: '{{$SalesforceRetrieveaccounts.Name}}'
+                  - givenName:
+                      template: '{{$Foreachitem.FirstName}}'
+                  - ou:
+                      template: OU=sgou001,DC=ibm,DC=msad,DC=com
+                  - sn:
+                      template: '{{$Foreachitem.LastName}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+          - update-action:
+              name: Salesforce Update contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - AccountId:
+                      template: '{{$Foreachitem.AccountId}}'
+                  - Description:
+                      template: >-
+                        Created new  user in MSAD:
+                        {{$MicrosoftActiveDirectoryCreateuser.distinguishedName}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryCreateuser
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Active Directory
+                      Create user/response/payload
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+              filter:
+                where:
+                  Id: '{{$Foreachitem.Id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftActiveDirectoryCreateuser
+                    $ref: >-
+                      #/block/For each/node-output/Microsoft Active Directory
+                      Create user/response/payload
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+              allow-empty-output: true
+  name: Create a user in Microsoft Active Directory for each contact in Salesforce
+models: {}

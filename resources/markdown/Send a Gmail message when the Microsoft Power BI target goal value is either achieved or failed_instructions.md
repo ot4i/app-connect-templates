@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Send%20a%20Gmail%20message%20when%20the%20Microsoft%20Power%20BI%20target%20goal%20value%20is%20either%20achieved%20or%20failed_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Send%20a%20Gmail%20message%20when%20the%20Microsoft%20Power%20BI%20target%20goal%20value%20is%20either%20achieved%20or%20failed_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
