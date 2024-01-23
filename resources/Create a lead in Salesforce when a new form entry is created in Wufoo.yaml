@@ -1,0 +1,155 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: wufoo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: qese9sd0m3qnk6
+            parentFilter:
+              Hash: qese9sd0m3qnk6
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrieveleads '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveleads
+                    $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                  - variable: SalesforceRetrieveleadsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve leads/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Salesforce Lead
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveleads
+                  $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                - variable: SalesforceRetrieveleadsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve leads/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Field3}}':
+                      neq: '{{$Foreachitem.Email}}'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Company:
+                                template: '{{$Trigger.Field9}}'
+                            - Email:
+                                template: '{{$Trigger.Field3}}'
+                            - FirstName:
+                                template: '{{$Trigger.Field1}}'
+                            - LastName:
+                                template: '{{$Trigger.Field2}}'
+                            - Salutation:
+                                template: Mr.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveleads
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                leads/response/payload
+                            - variable: SalesforceRetrieveleadsMetadata
+                              $ref: '#/node-output/Salesforce Retrieve leads/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04FRCNTLLX
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                {{$Trigger.Field1}} {{$Trigger.Field2}} already
+                                exisits
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrieveleads
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              leads/response/payload
+                          - variable: SalesforceRetrieveleadsMetadata
+                            $ref: '#/node-output/Salesforce Retrieve leads/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a lead in Salesforce when a new form entry is created in Wufoo
+  description: Use this template to create a contact in Salesforce whenever a new form entry is created in Wufoo. In this example, for each lead that has a unique email address, the lead is created in Saleforce. Otherwise, a Slack message gets posted to a channel indicating that the lead already exists.
+models: {}
