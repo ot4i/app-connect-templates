@@ -1,0 +1,265 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: request
+      connector-type: http
+      actions:
+        INVOKE: {}
+    action-interface-6:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Sheets Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - spreadsheetID: 1QMAbV39PQi3GF6xwUsJagBmFQAbdaliFx32g7jGF8J0
+                    - worksheetID: inprogresstask
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '[$GoogleSheetsRetrieverows.values ]'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      values:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrieverows
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                  - variable: GoogleSheetsRetrieverowsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              display-name: Google Sheets worksheetRow
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleSheetsRetrieverows
+                  $ref: '#/node-output/Google Sheets Retrieve rows/response/payload'
+                - variable: GoogleSheetsRetrieverowsMetadata
+                  $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$contains($Foreachitem  , "http")}}':
+                      '=': 'true'
+                  execute:
+                    - create-action:
+                        name: Slack Send message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04FU6KHPS6
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: got the url--{{$Foreachitem}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleSheetsRetrieverows
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response/payload
+                            - variable: GoogleSheetsRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: HTTP Invoke method
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: INVOKE
+                        map:
+                          mappings:
+                            - method:
+                                template: GET
+                            - url:
+                                template: '{{$Foreachitem}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage2
+                              $ref: >-
+                                #/block/If/node-output/Slack Send message
+                                2/response/payload
+                            - variable: GoogleSheetsRetrieverows
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response/payload
+                            - variable: GoogleSheetsRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Google Sheets Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Box Create file
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - content:
+                                template: ddd
+                            - fileType:
+                                template: Text
+                            - name:
+                                template: '{{$substring($Foreachitem ,11, 6)}}'
+                            - parent_id:
+                                template: '186655905997'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SlackSendmessage2
+                              $ref: >-
+                                #/block/If/node-output/Slack Send message
+                                2/response/payload
+                            - variable: HTTPInvokemethod
+                              $ref: >-
+                                #/block/If/node-output/HTTP Invoke
+                                method/response/payload
+                            - variable: HTTPInvokemethodMetadata
+                              $ref: >-
+                                #/block/If/node-output/HTTP Invoke
+                                method/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04FU6KHPS6
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: GSS current item--{{$Foreachitem}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleSheetsRetrieverows
+                            $ref: >-
+                              #/node-output/Google Sheets Retrieve
+                              rows/response/payload
+                          - variable: GoogleSheetsRetrieverowsMetadata
+                            $ref: '#/node-output/Google Sheets Retrieve rows/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a file in Box based on the value retrieved from a row in a Google Sheets worksheet
+models: {}

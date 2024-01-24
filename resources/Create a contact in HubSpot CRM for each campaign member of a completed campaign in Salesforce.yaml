@@ -1,0 +1,232 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED:
+          input-context:
+            data: Campaign
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postCrmV3ObjectsContacts_model
+      connector-type: hubspotcrm
+      actions:
+        postCrmV3ObjectsContacts: {}
+    action-interface-1:
+      type: api-action
+      business-object: CampaignMember
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Status}}': Completed
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve campaign members
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        filter:
+                          where:
+                            CampaignId: '{{$Trigger.Id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: false
+                    - create-action:
+                        name: Gmail Send email 4
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$SalesforceRetrievecampaignmembers}}'
+                            - Subject:
+                                template: Retrieve campaign members
+                            - To:
+                                template: preprodtest94@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecampaignmembers
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                campaign members/response/payload
+                            - variable: SalesforceRetrievecampaignmembersMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                campaign members/response
+                            - variable: GmailSendemail3
+                              $ref: >-
+                                #/node-output/Gmail Send email
+                                3/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - for-each:
+                        name: For each
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-2'
+                        source:
+                          expression: '$SalesforceRetrievecampaignmembers '
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecampaignmembers
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                campaign members/response/payload
+                            - variable: SalesforceRetrievecampaignmembersMetadata
+                              $ref: >-
+                                #/block/If/node-output/Salesforce Retrieve
+                                campaign members/response
+                            - variable: GmailSendemail4
+                              $ref: >-
+                                #/block/If/node-output/Gmail Send email
+                                4/response/payload
+                            - variable: GmailSendemail3
+                              $ref: >-
+                                #/node-output/Gmail Send email
+                                3/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        display-name: Salesforce Campaign Member
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: Status is not complete
+                          - To:
+                              template: preprodtest94@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: HubSpot CRM Create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postCrmV3ObjectsContacts
+              map:
+                mappings:
+                  - properties:
+                      mappings:
+                        - email:
+                            template: '{{$Foreachitem.Email}}'
+                        - firstname:
+                            template: '{{$Foreachitem.FirstName}}'
+                        - lastname:
+                            template: '{{$Foreachitem.LastName}}'
+                        - phone:
+                            template: '{{$Foreachitem.Phone}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecampaignmembers
+                    $ref: >-
+                      #/block/If/node-output/Salesforce Retrieve campaign
+                      members/response/payload
+                  - variable: SalesforceRetrievecampaignmembersMetadata
+                    $ref: >-
+                      #/block/If/node-output/Salesforce Retrieve campaign
+                      members/response
+                  - variable: GmailSendemail4
+                    $ref: '#/block/If/node-output/Gmail Send email 4/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$HubSpotCRMCreatecontact}}'
+                  - Subject:
+                      template: Hubspot contact created successfully
+                  - To:
+                      template: preprodtest94@abc.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HubSpotCRMCreatecontact
+                    $ref: >-
+                      #/block/For each/node-output/HubSpot CRM Create
+                      contact/response/payload
+                  - variable: SalesforceRetrievecampaignmembers
+                    $ref: >-
+                      #/block/If/node-output/Salesforce Retrieve campaign
+                      members/response/payload
+                  - variable: SalesforceRetrievecampaignmembersMetadata
+                    $ref: >-
+                      #/block/If/node-output/Salesforce Retrieve campaign
+                      members/response
+                  - variable: GmailSendemail3
+                    $ref: '#/node-output/Gmail Send email 3/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a contact in HubSpot CRM for each campaign member of a completed campaign in Salesforce
+models: {}

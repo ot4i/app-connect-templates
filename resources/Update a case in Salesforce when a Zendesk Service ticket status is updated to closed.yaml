@@ -1,0 +1,171 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        UPDATED_POLLER:
+          input-context:
+            data: Ticket
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: zendeskservice
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.status}}': closed
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve cases
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        filter:
+                          where:
+                            Subject:
+                              contains: '{{$Trigger.id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                        allow-empty-output: false
+                    - update-action:
+                        name: Salesforce Update case
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Status:
+                                template: Closed
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecases
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                cases/response/payload
+                            - variable: SalesforceRetrievecasesMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                cases/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            Id: '{{$SalesforceRetrievecases.Id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecases
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                cases/response/payload
+                            - variable: SalesforceRetrievecasesMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                cases/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-empty-output: false
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$SalesforceUpdatecase}}'
+                            - Subject:
+                                template: Salesforce Case Updated
+                            - To:
+                                template: preprodtest94@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrievecases
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                cases/response/payload
+                            - variable: SalesforceRetrievecasesMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Retrieve
+                                cases/response
+                            - variable: SalesforceUpdatecase
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Update
+                                case/response/payload
+                            - variable: SalesforceUpdatecaseMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Salesforce Update
+                                case/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: >-
+                                Salesforce case not present with given ticket
+                                id:{{$Trigger.id}}
+                          - To:
+                              template: preprodtest94@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Update a case in Salesforce when a Zendesk Service ticket status is updated to closed
+models: {}

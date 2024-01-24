@@ -1,0 +1,192 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Marketo Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  email: '{{$Trigger.Email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MarketoRetrieveleads
+                  $ref: '#/node-output/Marketo Retrieve leads/response/payload'
+                - variable: MarketoRetrieveleadsMetadata
+                  $ref: '#/node-output/Marketo Retrieve leads/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$MarketoRetrieveleads}}':
+                      '=': ''
+                  execute:
+                    - create-action:
+                        name: Marketo Create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - address:
+                                template: '{{$Trigger.MailingStreet}}'
+                            - billingCity:
+                                template: '{{$Trigger.MailingCity}}'
+                            - billingCountry:
+                                template: '{{$Trigger.OtherCountry}}'
+                            - billingPostalCode:
+                                template: '{{$Trigger.OtherPostalCode}}'
+                            - billingState:
+                                template: '{{$Trigger.MailingState}}'
+                            - billingStreet:
+                                template: '{{$Trigger.MailingStreet}}'
+                            - city:
+                                template: '{{$Trigger.MailingCity}}'
+                            - country:
+                                template: '{{$Trigger.MailingCountry}}'
+                            - dateOfBirth:
+                                template: '{{$Trigger.Birthdate}}'
+                            - email:
+                                template: '{{$Trigger.Email}}'
+                            - fax:
+                                expression: '$Trigger.Fax '
+                            - firstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - lastName:
+                                template: '{{$Trigger.LastName}}'
+                            - leadRole:
+                                template: '{{$Trigger.Title}}'
+                            - leadSource:
+                                template: '{{$Trigger.LeadSource}}'
+                            - leadStatus:
+                                template: '{{$Trigger.CleanStatus}}'
+                            - mainPhone:
+                                template: '{{$Trigger.Phone}}'
+                            - mobilePhone:
+                                expression: '$Trigger.MobilePhone '
+                            - phone:
+                                expression: '$Trigger.HomePhone '
+                            - postalCode:
+                                template: '{{$Trigger.MailingPostalCode}}'
+                            - state:
+                                template: '{{$Trigger.MailingState}}'
+                            - title:
+                                template: '{{$Trigger.Title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoRetrieveleads
+                              $ref: >-
+                                #/node-output/Marketo Retrieve
+                                leads/response/payload
+                            - variable: MarketoRetrieveleadsMetadata
+                              $ref: '#/node-output/Marketo Retrieve leads/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$MarketoCreatelead}}'
+                            - Subject:
+                                template: Lead is created for Marketo
+                            - To:
+                                template: preprodtest94@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoCreatelead
+                              $ref: >-
+                                #/block/If/node-output/Marketo Create
+                                lead/response/payload
+                            - variable: MarketoRetrieveleads
+                              $ref: >-
+                                #/node-output/Marketo Retrieve
+                                leads/response/payload
+                            - variable: MarketoRetrieveleadsMetadata
+                              $ref: '#/node-output/Marketo Retrieve leads/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: Lead is already present
+                          - To:
+                              template: preprodtest94@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: MarketoRetrieveleads
+                            $ref: >-
+                              #/node-output/Marketo Retrieve
+                              leads/response/payload
+                          - variable: MarketoRetrieveleadsMetadata
+                            $ref: '#/node-output/Marketo Retrieve leads/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a lead in Marketo when a new contact is created in Salesforce
+models: {}
