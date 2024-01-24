@@ -1,0 +1,159 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: salesforce
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Contact
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Box Retrieve folders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: BoxRetrievefolders
+                  $ref: '#/node-output/Box Retrieve folders/response/payload'
+                - variable: BoxRetrievefoldersMetadata
+                  $ref: '#/node-output/Box Retrieve folders/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$BoxRetrievefolders.id}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Body:
+                                template: folder already exists
+                            - Subject:
+                                template: uc7
+                            - To:
+                                template: kamakshi_manerikar@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BoxRetrievefolders
+                              $ref: >-
+                                #/node-output/Box Retrieve
+                                folders/response/payload
+                            - variable: BoxRetrievefoldersMetadata
+                              $ref: '#/node-output/Box Retrieve folders/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Box Create folder
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - name:
+                              template: '{{$Trigger.Id}}'
+                          - parent_id:
+                              template: '0'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxRetrievefolders
+                            $ref: >-
+                              #/node-output/Box Retrieve
+                              folders/response/payload
+                          - variable: BoxRetrievefoldersMetadata
+                            $ref: '#/node-output/Box Retrieve folders/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - Body:
+                              template: >-
+                                You are cordinaly invited for the Event held by
+                                IBM in Jan 2024, please follow the folder with
+                                ID - {{$BoxCreatefolder.id}} for the related
+                                documents
+                          - Subject:
+                              template: uc7
+                          - To:
+                              template: >-
+                                saieesh_homkhandi@abc.com,kamakshi_manerikar@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxCreatefolder
+                            $ref: >-
+                              #/block/If/node-output/Box Create
+                              folder/response/payload
+                          - variable: BoxRetrievefolders
+                            $ref: >-
+                              #/node-output/Box Retrieve
+                              folders/response/payload
+                          - variable: BoxRetrievefoldersMetadata
+                            $ref: '#/node-output/Box Retrieve folders/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a folder in Box for new contacts created in Salesforce
+models: {}

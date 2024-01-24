@@ -1,0 +1,100 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Account
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        APPENDROW: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.NumberOfEmployees}}':
+                      gte: '500'
+                  execute:
+                    - custom-action:
+                        name: Microsoft Excel Online Append row
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: APPENDROW
+                        map:
+                          mappings:
+                            - DriveId:
+                                template: >-
+                                  b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                            - WorkbookId:
+                                template: 01NODPFIRFLJ3UU3LZEFGZTZQZ7HKG5GZT
+                            - WorksheetId:
+                                template: '{445ED58F-A0D2-45F3-9FF5-095529EE7CC8}'
+                            - rowData:
+                                mappings:
+                                  - A:
+                                      template: '{{$Trigger.Name}}'
+                                  - B:
+                                      template: '{{$Trigger.NumberOfEmployees}}'
+                                  - C:
+                                      template: '{{$Trigger.AnnualRevenue}}'
+                                  - D:
+                                      template: '{{$Trigger.Type}}'
+                                  - E:
+                                      template: '{{$Trigger.Industry}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C04G6R92ZR7
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: '{{$Trigger.Name}} has employees less than 500'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+        tags:
+          - incomplete
+  name: Append a row in Microsoft Excel Online when a new Salesforce account with more than 500 employees is created
+models: {}

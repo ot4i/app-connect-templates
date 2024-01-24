@@ -1,0 +1,380 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '1206091897919337'
+            team-id: '1206091897919339'
+            project: '1206092381088118'
+            parentFilter:
+              workspace-id: '1206091897919337'
+              team-id: '1206091897919339'
+              project: '1206092381088118'
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: spreadsheet
+      connector-type: googlesheet
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Sheets Retrieve spreadsheets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleSheetsRetrievespreadsheets.title '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsRetrievespreadsheets
+                    $ref: >-
+                      #/node-output/Google Sheets Retrieve
+                      spreadsheets/response/payload
+                  - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                    $ref: '#/node-output/Google Sheets Retrieve spreadsheets/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Sheets Title
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleSheetsRetrievespreadsheets
+                  $ref: >-
+                    #/node-output/Google Sheets Retrieve
+                    spreadsheets/response/payload
+                - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                  $ref: '#/node-output/Google Sheets Retrieve spreadsheets/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.workspace.name}}': '{{$Foreachitem}}'
+                  execute:
+                    - if:
+                        name: If
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleSheetsRetrievespreadsheets
+                            $ref: >-
+                              #/node-output/Google Sheets Retrieve
+                              spreadsheets/response/payload
+                          - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                            $ref: >-
+                              #/node-output/Google Sheets Retrieve
+                              spreadsheets/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$Trigger.completed}}': 'true'
+                            execute:
+                              - create-action:
+                                  name: Google Sheets Create row
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-1
+                                  map:
+                                    mappings:
+                                      - fields:
+                                          mappings:
+                                            - '1':
+                                                template: '{{$Trigger.name}}'
+                                            - '2':
+                                                template: '{{$Trigger.notes}}'
+                                      - spreadsheetID:
+                                          template: >-
+                                            1QMAbV39PQi3GF6xwUsJagBmFQAbdaliFx32g7jGF8J0
+                                      - worksheetID:
+                                          template: completedtask
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: GoogleSheetsRetrievespreadsheets
+                                        $ref: >-
+                                          #/node-output/Google Sheets Retrieve
+                                          spreadsheets/response/payload
+                                      - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                                        $ref: >-
+                                          #/node-output/Google Sheets Retrieve
+                                          spreadsheets/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Slack Send message
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-2
+                                  map:
+                                    mappings:
+                                      - OBJECT_ID:
+                                          template: C23HG5K3Q
+                                      - OBJECT_NAME:
+                                          template: channel
+                                      - text:
+                                          template: >-
+                                            tak id==={{$Trigger.gid}} got create on
+                                            techwarroior spread
+                                            sheet====={{$GoogleSheetsCreaterow}}
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: GoogleSheetsCreaterow
+                                        $ref: >-
+                                          #/block/If/node-output/Google Sheets
+                                          Create row/response/payload
+                                      - variable: GoogleSheetsRetrievespreadsheets
+                                        $ref: >-
+                                          #/node-output/Google Sheets Retrieve
+                                          spreadsheets/response/payload
+                                      - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                                        $ref: >-
+                                          #/node-output/Google Sheets Retrieve
+                                          spreadsheets/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Marketo Create lead
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-7
+                                  map:
+                                    mappings:
+                                      - company:
+                                          template: bosch2
+                                      - email:
+                                          template: kelvin3456@abc.com
+                                      - firstName:
+                                          template: kelvin
+                                      - lastName:
+                                          template: kamal
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: GoogleSheetsCreaterow
+                                        $ref: >-
+                                          #/block/If/node-output/Google Sheets
+                                          Create row/response/payload
+                                      - variable: SlackSendmessage
+                                        $ref: >-
+                                          #/block/If/node-output/Slack Send
+                                          message/response/payload
+                                      - variable: GoogleSheetsRetrievespreadsheets
+                                        $ref: >-
+                                          #/node-output/Google Sheets Retrieve
+                                          spreadsheets/response/payload
+                                      - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                                        $ref: >-
+                                          #/node-output/Google Sheets Retrieve
+                                          spreadsheets/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute:
+                            - create-action:
+                                name: Google Sheets Create row 2
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-6
+                                map:
+                                  mappings:
+                                    - fields:
+                                        mappings:
+                                          - '1':
+                                              template: '{{$Trigger.name}}'
+                                          - '2':
+                                              template: '{{$Trigger.notes}}'
+                                    - spreadsheetID:
+                                        template: >-
+                                          1QMAbV39PQi3GF6xwUsJagBmFQAbdaliFx32g7jGF8J0
+                                    - worksheetID:
+                                        template: inprogresstask
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Foreachitem
+                                      $ref: '#/block/For each/current-item'
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: GoogleSheetsRetrievespreadsheets
+                                      $ref: >-
+                                        #/node-output/Google Sheets Retrieve
+                                        spreadsheets/response/payload
+                                    - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                                      $ref: >-
+                                        #/node-output/Google Sheets Retrieve
+                                        spreadsheets/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                            - create-action:
+                                name: Slack Send message 3
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-4
+                                map:
+                                  mappings:
+                                    - OBJECT_ID:
+                                        template: C23HG5K3Q
+                                    - OBJECT_NAME:
+                                        template: channel
+                                    - text:
+                                        template: >-
+                                          tak id==={{$Trigger.gid}} got create on
+                                          techwarroior spread
+                                          sheet==={{$GoogleSheetsCreaterow2}}
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Foreachitem
+                                      $ref: '#/block/For each/current-item'
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: GoogleSheetsCreaterow2
+                                      $ref: >-
+                                        #/block/If/node-output/Google Sheets
+                                        Create row 2/response/payload
+                                    - variable: GoogleSheetsRetrievespreadsheets
+                                      $ref: >-
+                                        #/node-output/Google Sheets Retrieve
+                                        spreadsheets/response/payload
+                                    - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                                      $ref: >-
+                                        #/node-output/Google Sheets Retrieve
+                                        spreadsheets/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                        output-schema: {}
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C23HG5K3Q
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: >-
+                                worksheet for your asana workspace is not
+                                available
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GoogleSheetsRetrievespreadsheets
+                            $ref: >-
+                              #/node-output/Google Sheets Retrieve
+                              spreadsheets/response/payload
+                          - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                            $ref: >-
+                              #/node-output/Google Sheets Retrieve
+                              spreadsheets/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Foreachitem
+                          $ref: '#/block/For each/current-item'
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: GoogleSheetsRetrievespreadsheets
+                          $ref: >-
+                            #/node-output/Google Sheets Retrieve
+                            spreadsheets/response/payload
+                        - variable: GoogleSheetsRetrievespreadsheetsMetadata
+                          $ref: >-
+                            #/node-output/Google Sheets Retrieve
+                            spreadsheets/response
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: end the flow
+                      status-code: 200
+              output-schema: {}
+  name: Create a row in Google Sheets for each new task created in Asana
+models: {}
