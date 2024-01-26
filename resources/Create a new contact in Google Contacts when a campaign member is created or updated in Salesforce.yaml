@@ -1,0 +1,154 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          input-context:
+            data: CampaignMember
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: getPeoplesearchContacts_model
+      connector-type: googlecontacts
+      actions:
+        getPeoplesearchContacts: {}
+    action-interface-1:
+      type: api-action
+      business-object: postPeoplecreateContact_model
+      connector-type: googlecontacts
+      actions:
+        postPeoplecreateContact: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Contacts Retrieve contacts by search string
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: getPeoplesearchContacts
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  query: '{{$Trigger.FirstName}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleContactsRetrievecontactsbysearchstring
+                  $ref: >-
+                    #/node-output/Google Contacts Retrieve contacts by search
+                    string/response/payload
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$GoogleContactsRetrievecontactsbysearchstring}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Google Contacts Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postPeoplecreateContact
+                        map:
+                          mappings:
+                            - company:
+                                template: '{{$Trigger.CompanyOrAccount}}'
+                            - emailAddresses:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: emailAddressesItem
+                                  mappings:
+                                    - ___type:
+                                        template: work
+                                    - value:
+                                        template: '{{$Trigger.Email}}'
+                            - firstName:
+                                template: '{{$Trigger.FirstName}}'
+                            - lastName:
+                                template: '{{$Trigger.LastName}}'
+                            - middleName:
+                                template: '{{$Trigger.Name}}'
+                            - phoneNumbers:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: phoneNumbersItem
+                                  mappings:
+                                    - ___type:
+                                        template: work
+                                    - value:
+                                        template: '{{$Trigger.Phone}}'
+                            - prefix:
+                                template: '{{$Trigger.Salutation}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleContactsRetrievecontactsbysearchstring
+                              $ref: >-
+                                #/node-output/Google Contacts Retrieve contacts
+                                by search string/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: contact already exist
+                          - To:
+                              template: abhay_kumar@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: HubSpotCRMRetrievecontactsbyfilters
+                            $ref: >-
+                              #/node-output/HubSpot CRM Retrieve contacts by
+                              filters/response/payload
+                          - variable: HubSpotCRMRetrievecontactsbyfiltersMetadata
+                            $ref: >-
+                              #/node-output/HubSpot CRM Retrieve contacts by
+                              filters/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a new contact in Google Contacts when a campaign member is created or updated in Salesforce
+models: {}

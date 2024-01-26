@@ -1,0 +1,83 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCoupon:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: coupon
+          output-context:
+            data: coupon
+      options:
+        resources:
+          - business-object: coupon
+            model:
+              $ref: '#/models/coupon'
+            triggers:
+              create: createCoupon
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: SalesRuleCoupon
+      connector-type: magento
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Magento Create sales rule coupon
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: coupon successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - CustomerEmail:
+                          template: '{{$Request.CustomerEmail}}'
+                      - customerID:
+                          template: '{{$Request.customerID}}'
+                  input: []
+        tags:
+          - incomplete
+  name: Send a Gmail message when a new sales rule coupon is created in Magento
+models:
+  coupon:
+    name: coupon
+    properties:
+      customerID:
+        required: false
+        id: true
+        type: string
+      CustomerEmail:
+        required: false
+        id: false
+        type: string
+    plural: coupon
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'

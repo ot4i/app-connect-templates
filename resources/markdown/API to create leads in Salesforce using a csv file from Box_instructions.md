@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/API%20to%20create%20leads%20in%20Salesforce%20using%20a%20csv%20file%20from%20Box_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20to%20create%20leads%20in%20Salesforce%20using%20a%20csv%20file%20from%20Box_instructions.md) (opens in a new window).
 
 This API takes a URL to a CSV file in Box, and an optional event name. It uses that information to retrieve the file's contents (CSV data), parse that CSV data, and create a new lead in Salesforce for every line that matches the event name given when calling the API. If you didn't give an event name, leads for all the lines from the CSV are created or updated in Salesforce.  The email address is used to determine if the lead already exists in Salesforce or not. The flow does not change the original file.
 

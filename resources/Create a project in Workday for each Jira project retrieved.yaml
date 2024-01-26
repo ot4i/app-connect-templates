@@ -1,0 +1,153 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Project
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Financial_Management___Put_Basic_Project
+      connector-type: workday
+      actions:
+        Put_Basic_Project: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Jira Retrieve projects
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$JiraRetrieveprojects '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveprojects
+                    $ref: '#/node-output/Jira Retrieve projects/response/payload'
+                  - variable: JiraRetrieveprojectsMetadata
+                    $ref: '#/node-output/Jira Retrieve projects/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Jira Project
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Workday Put Basic Project
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: Put_Basic_Project
+              map:
+                mappings:
+                  - Basic_Project_Data:
+                      mappings:
+                        - Project_ID:
+                            template: '{{$Foreachitem.id}}'
+                        - Project_Name:
+                            template: '{{$Foreachitem.name}}'
+                  - Project_Reference:
+                      mappings:
+                        - ID__NORMALIZED:
+                            mappings:
+                              - attributes:
+                                  foreach:
+                                    input: '[1]'
+                                    iterator: attributesItem
+                                    mappings:
+                                      - attr_value:
+                                          template: '{{$Foreachitem.lead.avatarUrls."32x32"}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveprojects
+                    $ref: '#/node-output/Jira Retrieve projects/response/payload'
+                  - variable: JiraRetrieveprojectsMetadata
+                    $ref: '#/node-output/Jira Retrieve projects/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C04UR5KMWQN
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: get projects=={{$WorkdayPutBasicProject}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: WorkdayPutBasicProject
+                    $ref: >-
+                      #/block/For each/node-output/Workday Put Basic
+                      Project/response/payload
+                  - variable: JiraRetrieveprojects
+                    $ref: '#/node-output/Jira Retrieve projects/response/payload'
+                  - variable: JiraRetrieveprojectsMetadata
+                    $ref: '#/node-output/Jira Retrieve projects/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a project in Workday for each Jira project retrieved
+models: {}

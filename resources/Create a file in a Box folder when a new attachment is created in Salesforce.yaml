@@ -1,0 +1,316 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Attachment
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              createdField: CreatedDate
+              updatedField: LastModifiedDate
+              timeFormat: YYYY-MM-DDTHH:mm:ss.SSSZZ
+              timeZone: US/Pacific
+              pollingInterval: 1
+              isCreatedQueryable: true
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Attachment
+      connector-type: salesforce
+      actions:
+        DOWNLOADCONTENT: {}
+    action-interface-3:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: Folder
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Salesforce Retrieve contents of attachment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADCONTENT
+              map:
+                mappings:
+                  - ContentType:
+                      template: Binary
+                  - Id:
+                      template: '{{$Trigger.Id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Box Retrieve folders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  query: 70108000001S71uAAC
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontentsofattachment
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve contents of
+                      attachment/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SalesforceRetrieveaccounts
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response/payload'
+                - variable: SalesforceRetrieveaccountsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                - variable: SalesforceRetrievecontentsofattachment
+                  $ref: >-
+                    #/node-output/Salesforce Retrieve contents of
+                    attachment/response/payload
+                - variable: BoxRetrievefolders
+                  $ref: '#/node-output/Box Retrieve folders/response/payload'
+                - variable: BoxRetrievefoldersMetadata
+                  $ref: '#/node-output/Box Retrieve folders/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$BoxRetrievefoldersMetadata."status-code"}}':
+                      neq: '204'
+                  execute:
+                    - create-action:
+                        name: Box Create file 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - content:
+                                template: >-
+                                  {{$SalesforceRetrievecontentsofattachment.content}}
+                            - fileType:
+                                template: Binary
+                            - name:
+                                template: >-
+                                  {{$substringBefore($Trigger.Name,
+                                  ".")}}{{$millis()}}.{{$substringAfter($Trigger.Name,
+                                  ".")}}
+                            - parent_id:
+                                template: '238862209850'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: SalesforceRetrievecontentsofattachment
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve contents of
+                                attachment/response/payload
+                            - variable: BoxRetrievefolders
+                              $ref: >-
+                                #/node-output/Box Retrieve
+                                folders/response/payload
+                            - variable: BoxRetrievefoldersMetadata
+                              $ref: '#/node-output/Box Retrieve folders/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        map:
+                          mappings:
+                            - Body:
+                                template: '{{$BoxCreatefile2}}'
+                            - Subject:
+                                template: box test 204 status code
+                            - To:
+                                template: kamakshi_manerikar@abc.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BoxCreatefile2
+                              $ref: >-
+                                #/block/If/node-output/Box Create file
+                                2/response/payload
+                            - variable: SalesforceRetrievecontentsofattachment
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve contents of
+                                attachment/response/payload
+                            - variable: BoxRetrievefolders
+                              $ref: >-
+                                #/node-output/Box Retrieve
+                                folders/response/payload
+                            - variable: BoxRetrievefoldersMetadata
+                              $ref: '#/node-output/Box Retrieve folders/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Box Create folder
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      map:
+                        mappings:
+                          - name:
+                              template: '{{$Trigger.ParentId}}_{{$random()}}'
+                          - parent_id:
+                              template: '0'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: SalesforceRetrievecontentsofattachment
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve contents of
+                              attachment/response/payload
+                          - variable: BoxRetrievefolders
+                            $ref: >-
+                              #/node-output/Box Retrieve
+                              folders/response/payload
+                          - variable: BoxRetrievefoldersMetadata
+                            $ref: '#/node-output/Box Retrieve folders/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Box Create file
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-5'
+                      map:
+                        mappings:
+                          - content:
+                              template: >-
+                                {{$SalesforceRetrievecontentsofattachment.content}}
+                          - fileType:
+                              template: Binary
+                          - name:
+                              template: >-
+                                {{$substringBefore($Trigger.Name,
+                                ".")}}{{$millis()}}.{{$substringAfter($Trigger.Name,
+                                ".")}}
+                          - parent_id:
+                              template: '238865691997'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxCreatefolder
+                            $ref: >-
+                              #/block/If/node-output/Box Create
+                              folder/response/payload
+                          - variable: SalesforceRetrieveaccounts
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              accounts/response/payload
+                          - variable: SalesforceRetrieveaccountsMetadata
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve
+                              accounts/response
+                          - variable: SalesforceRetrievecontentsofattachment
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve contents of
+                              attachment/response/payload
+                          - variable: BoxRetrievefolders
+                            $ref: >-
+                              #/node-output/Box Retrieve
+                              folders/response/payload
+                          - variable: BoxRetrievefoldersMetadata
+                            $ref: '#/node-output/Box Retrieve folders/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - Body:
+                              template: '{{$BoxCreatefile}}'
+                          - Subject:
+                              template: event flow o/p
+                          - To:
+                              template: kamakshi_manerikar@abc.com
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BoxCreatefolder
+                            $ref: >-
+                              #/block/If/node-output/Box Create
+                              folder/response/payload
+                          - variable: BoxCreatefile
+                            $ref: >-
+                              #/block/If/node-output/Box Create
+                              file/response/payload
+                          - variable: SalesforceRetrievecontentsofattachment
+                            $ref: >-
+                              #/node-output/Salesforce Retrieve contents of
+                              attachment/response/payload
+                          - variable: BoxRetrievefolders
+                            $ref: >-
+                              #/node-output/Box Retrieve
+                              folders/response/payload
+                          - variable: BoxRetrievefoldersMetadata
+                            $ref: '#/node-output/Box Retrieve folders/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Create a file in a Box folder when a new attachment is created in Salesforce
+models: {}

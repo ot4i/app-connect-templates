@@ -4,8 +4,8 @@
   "description": "App Connect Templates",
   "license": "MIT",
   "engines": {
-    "node": "6.11",
-    "npm": "3.x"
+    "node": "18.x",
+    "npm": "10.x"
   },
   "scripts": {
     "pretest": "npm run lint",

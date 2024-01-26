@@ -1,0 +1,147 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: mailchimp
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Members
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            list_id: 6fc8383307
+            parentFilter:
+              list_id: 6fc8383307
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        APPENDROW: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Excel Online Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - DriveId: >-
+                        b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                    - WorkbookId: 01EMFW4SZM7AMDJ2Q6YVELN6LVIN3M4I2J
+                    - WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftExcelOnlineRetrieverows '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Microsoft Excel Online Row
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftExcelOnlineRetrieverows
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve
+                    rows/response/payload
+                - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                  $ref: '#/node-output/Microsoft Excel Online Retrieve rows/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.email_address}}':
+                      neq: '{{$Foreachitem.rowData.D}}'
+                  execute:
+                    - custom-action:
+                        name: Microsoft Excel Online Append row
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: APPENDROW
+                        map:
+                          mappings:
+                            - DriveId:
+                                template: >-
+                                  b!MmVmPM4U8EuqRpvhE0yqn16fri17N6lEhhc3nxKwjIefJ8IRqH_pS471M5t232uQ
+                            - WorkbookId:
+                                template: 01EMFW4SZM7AMDJ2Q6YVELN6LVIN3M4I2J
+                            - WorksheetId:
+                                template: '{00000000-0001-0000-0000-000000000000}'
+                            - rowData:
+                                mappings:
+                                  - A:
+                                      template: '{{$Trigger.id}}'
+                                  - B:
+                                      template: '{{$Trigger.merge_fields.FNAME}}'
+                                  - C:
+                                      template: '{{$Trigger.merge_fields.LNAME}}'
+                                  - D:
+                                      template: '{{$Trigger.email_address}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in MailChimp
+models: {}

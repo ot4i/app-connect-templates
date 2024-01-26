@@ -1,0 +1,130 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Attendee
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            organizationID: '720242721483'
+            parentFilter:
+              organizationID: '720242721483'
+      connector-type: eventbrite
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve accounts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SalesforceRetrieveaccounts '
+                input:
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Salesforce Account
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: SalesforceRetrieveaccounts
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response/payload'
+                - variable: SalesforceRetrieveaccountsMetadata
+                  $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.profile.name}}': '{{$Foreachitem.Name}}'
+                  execute:
+                    - create-action:
+                        name: Salesforce Create account
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - Description:
+                                template: '{{$SalesforceRetrieveaccounts.Description}}'
+                            - Industry:
+                                template: '{{$SalesforceRetrieveaccounts.Industry}}'
+                            - Name:
+                                template: '{{$Trigger.profile.name}}'
+                            - Phone:
+                                template: '{{$Trigger.profile.cell_phone}}'
+                            - ShippingCity:
+                                template: '{{$Trigger.profile.addresses.home.city}}'
+                            - ShippingCountry:
+                                template: '{{$Trigger.profile.addresses.ship.country}}'
+                            - ShippingPostalCode:
+                                template: >-
+                                  {{$Trigger.profile.addresses.ship.postal_code}}
+                            - ShippingState:
+                                template: '{{$Trigger.profile.addresses.ship.region}}'
+                            - ShippingStreet:
+                                template: '{{$Trigger.profile.addresses.home.address_1}}'
+                            - Type:
+                                template: Customer - Direct
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: SalesforceRetrieveaccounts
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response/payload
+                            - variable: SalesforceRetrieveaccountsMetadata
+                              $ref: >-
+                                #/node-output/Salesforce Retrieve
+                                accounts/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create an account in Salesforce when a new attendee is created in Eventbrite
+models: {}

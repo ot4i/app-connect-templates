@@ -1,0 +1,82 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '182726432864867'
+            team-id: '182726434927590'
+            project: '428262580509970'
+            parentFilter:
+              workspace-id: '182726432864867'
+              team-id: '182726434927590'
+              project: '428262580509970'
+      connector-type: asana
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postMessagesjsonByFromphone_model
+      connector-type: twilio
+      actions:
+        postMessagesjsonByFromphone: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.assignee_status}}': inbox
+                  execute:
+                    - custom-action:
+                        name: Twilio Send message by phone number
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postMessagesjsonByFromphone
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  {{$Trigger.gid}}===eventd==={{$Trigger.eventId}}{{$Trigger.name}}==name===status==={{$Trigger.assignee_status}}
+                            - From:
+                                template: '+12765660288'
+                            - MessageType:
+                                template: Text
+                            - To:
+                                template: '918123558508'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: >-
+                        if assigee status is not equal to inbox do not send
+                        message to number
+                      status-code: 200
+              output-schema: {}
+  name: Send an SMS message via Twilio when a new task is created in Asana
+models: {}

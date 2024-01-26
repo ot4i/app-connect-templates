@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Send%20a%20Gmail%20message%20to%20a%20contact%20whenever%20a%20case%20is%20updated%20to%20a%20closed%20status%20in%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Send%20a%20Gmail%20message%20to%20a%20contact%20whenever%20a%20case%20is%20updated%20to%20a%20closed%20status%20in%20Salesforce_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Download%20an%20expense%20report%20in%20Expensify%20and%20send%20the%20report%20to%20the%20manager%20for%20approval%20via%20DocuSign_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Download%20an%20expense%20report%20in%20Expensify%20and%20send%20the%20report%20to%20the%20manager%20for%20approval%20via%20DocuSign_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Click Operations, then click Edit flow to edit the operations.
