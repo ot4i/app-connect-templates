@@ -3238,6 +3238,114 @@
 	"targetApps": ["googlecontacts", "googlecontacts", "gmail"],
 	"tags": ["salesforce", "googlecontacts", "gmail", "if"],
 	"offerings": ["app connect professional"]
- }    
+ },
+ {
+	"name": "Create a contact in Salesforce when a new company record is created in Microsoft SQL Server",
+	"description": "Use this template to create a contact in Salesforce when a new company record is created in Microsoft SQL Server.",
+	"summary": "Microsoft SQL Server to Salesforce",
+	"sourceApp": "mssql",
+	"targetApps": ["salesforce"],
+	"tags": ["mssql", "salesforce"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a file in Box for new documents created in Salesforce",
+	"description": "Use this template to create a file in Box for all new documents created in Salesforce.",
+	"summary": "Salesforce to Box",
+	"sourceApp": "salesforce",
+	"targetApps": ["box", "box"],
+	"tags": ["salesforce", "box", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a lead in Marketo for each new attendee retrieved from Eventbrite",
+	"description": "Use this template to create a lead in Marketo for each attendee retrieved from Eventbrite.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["eventbrite", "marketo", "marketo"],
+	"tags": ["scheduler", "eventbrite", "marketo", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a lead in Salesforce for each Eventbrite attendee",
+	"description": "Use this template to create a lead in Salesforce for each attendee retrieved from Eventbrite.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["eventbrite","salesforce"],
+	"tags": ["scheduler", "eventbrite", "salesforce", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create an account in Salesforce for each new Eventbrite attendee",
+	"description": "Use this template to create an account in Salesforce for each new Eventbrite attendee.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["eventbrite", "salesforce"],
+	"tags": ["scheduler", "eventbrite", "salesforce", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create an incident in ServiceNow for each new WhatsApp message retrieved from Twilio",
+	"description": "Use this template to create an incident in ServiceNow for each new WhatsApp message retrieved from Twilio.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["twilio", "servicenow"],
+	"tags": ["scheduler", "twilio", "servicenow", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create an SAP customer set in SAP via OData for each new opportunity retrieved from Salesforce",
+	"description": "Use this template to create an SAP customer set in SAP via OData for each new opportunity retrieved from Salesforce. ",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["salesforce", "sapodata", "gmail"],
+	"tags": ["salesforce", "sapodata", "gmail", "foreach", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Invite a new Salesforce contact to access a file in Google Drive",
+	"description": "Use this template to invite new contacts in Salesforce to be collaborators in Google Drive.",
+	"summary": "Salesforce to Google Drive",
+	"sourceApp": "salesforce",
+	"targetApps": ["googledrive"],
+	"tags": ["salesforce", "googledrive", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Invoke a function from AWS Lambda whenever a new row is appended in Google Sheets",
+	"description": "Use this template to update an existing row in a Google Sheets worksheet based on an AWS Lambda function execution report.",
+	"summary": "Google Sheets to 2 applications",
+	"sourceApp": "googlesheet",
+	"targetApps": ["amazonlambda", "gmail", "googlesheet"],
+	"tags": ["googlesheet", "amazonlambda", "gmail"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Send a message by phone number via Twilio when new all-day-event information is updated in a Google Sheets worksheet",
+	"description": "Use this template to send a message by phone number via Twilio when new Google Calendar all-day-event information is updated in a Google Sheets worksheet.",
+	"summary": "Google Calendar to 2 applications",
+	"sourceApp": "googlecalendar",
+	"targetApps": ["googlesheet", "twilio"],
+	"tags": ["googlecalendar", "googlesheet", "twilio", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Update or create a customer set in SAP via OData when a new contact is created in Salesforce",
+	"description": "Use this template to update or create a customer set in SAP via OData when a new contact is created in Salesforce.",
+	"summary": "Salesforce to 2 applications",
+	"sourceApp": "salesforce",
+	"targetApps": ["sapodata", "gmail"],
+	"tags": ["salesforce", "sapodata", "gmail", "if"],
+	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a row in Google Sheets worksheet when a new lead is created in Marketo",
+	"description": "Use this template to create a row in Google Sheets worksheet when a new lead is created in Marketo.",
+	"summary": "Marketo to Google Sheets",
+	"sourceApp": "marketo ",
+	"targetApps": ["googlesheet"],
+	"tags": ["marketo", "googlesheet"],
+	"offerings": ["app connect professional"]
+ }
 ]
 }

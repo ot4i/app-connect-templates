@@ -1,0 +1,245 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: Attendee
+      connector-type: eventbrite
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: leads
+      connector-type: marketo
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Eventbrite Retrieve attendees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  event_id: '777525889867'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EventbriteRetrieveattendees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                  - variable: GmailSendemail2
+                    $ref: '#/node-output/Gmail Send email 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      attendee:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MarketoRetrieveleads
+                    $ref: >-
+                      #/block/For each/node-output/Marketo Retrieve
+                      leads/response/payload
+                  - variable: MarketoRetrieveleadsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Marketo Retrieve
+                      leads/response
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                  - variable: GmailSendemail2
+                    $ref: '#/node-output/Gmail Send email 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - attendee:
+                            template: '{{$Foreachitem}}'
+              display-name: Eventbrite Attendee
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Marketo Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              filter:
+                where:
+                  email: abhu@abc.com
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EventbriteRetrieveattendees
+                    $ref: >-
+                      #/node-output/Eventbrite Retrieve
+                      attendees/response/payload
+                  - variable: EventbriteRetrieveattendeesMetadata
+                    $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MarketoRetrieveleads
+                  $ref: >-
+                    #/block/For each/node-output/Marketo Retrieve
+                    leads/response/payload
+                - variable: MarketoRetrieveleadsMetadata
+                  $ref: '#/block/For each/node-output/Marketo Retrieve leads/response'
+                - variable: EventbriteRetrieveattendees
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response/payload'
+                - variable: EventbriteRetrieveattendeesMetadata
+                  $ref: '#/node-output/Eventbrite Retrieve attendees/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$MarketoRetrieveleadsMetadata."status-code"}}': '204'
+                      - '{{$Foreachitem.created}}':
+                          gt: '{{$Trigger.currentEventTime}}'
+                        hashKey: object:892
+                  execute:
+                    - create-action:
+                        name: Marketo Create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - address:
+                                template: '{{$Foreachitem.profile.addresses.home}}'
+                            - city:
+                                template: '{{$Foreachitem.profile.addresses.home.city}}'
+                            - company:
+                                template: '{{$Foreachitem.profile.company}}'
+                            - country:
+                                template: >-
+                                  {{$Foreachitem.profile.addresses.home.country}}
+                            - dateOfBirth:
+                                template: '{{$Foreachitem.profile.birth_date}}'
+                            - email:
+                                template: '{{$Foreachitem.profile.email}}'
+                            - firstName:
+                                template: '{{$Foreachitem.profile.first_name}}'
+                            - lastName:
+                                template: '{{$Foreachitem.profile.last_name}}'
+                            - mobilePhone:
+                                expression: '$Foreachitem.profile.cell_phone '
+                            - postalCode:
+                                template: >-
+                                  {{$Foreachitem.profile.addresses.home.postal_code}}
+                            - title:
+                                template: '{{$Foreachitem.profile.job_title}}'
+                            - website:
+                                template: '{{$Foreachitem.profile.website}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MarketoRetrieveleads
+                              $ref: >-
+                                #/block/For each/node-output/Marketo Retrieve
+                                leads/response/payload
+                            - variable: MarketoRetrieveleadsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Marketo Retrieve
+                                leads/response
+                            - variable: EventbriteRetrieveattendees
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response/payload
+                            - variable: EventbriteRetrieveattendeesMetadata
+                              $ref: >-
+                                #/node-output/Eventbrite Retrieve
+                                attendees/response
+                            - variable: GmailSendemail2
+                              $ref: >-
+                                #/node-output/Gmail Send email
+                                2/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a lead in Marketo for each new attendee retrieved from Eventbrite
+models: {}

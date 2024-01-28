@@ -1,0 +1,108 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlecalendar
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: events
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            id: 6qk23qq40njrnpmibdeb33rhh0@group.calendar.google.com
+            parentFilter:
+              id: 6qk23qq40njrnpmibdeb33rhh0@group.calendar.google.com
+            subscription:
+              updatedField: fromDate
+              timeZone: Asia/Kolkata
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postMessagesjsonByFromphone_model
+      connector-type: twilio
+      actions:
+        postMessagesjsonByFromphone: {}
+    action-interface-3:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.allDayEvent}}': 'true'
+                  execute:
+                    - create-action:
+                        name: Google Sheets Create row
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - fields:
+                                mappings:
+                                  - '1':
+                                      template: '{{$Trigger.startTime}}'
+                                  - '2':
+                                      template: '{{$Trigger.endTime}}'
+                                  - '3':
+                                      template: '{{$Trigger.location}}'
+                                  - '4':
+                                      template: '{{$Trigger.description}}'
+                            - spreadsheetID:
+                                template: 1gbi9TpDenhpS7CsGMssIKBpXYCUFWhVq1UJvdGHWVc8
+                            - worksheetID:
+                                template: newworksheet
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Twilio Send message by phone number
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postMessagesjsonByFromphone
+                        map:
+                          mappings:
+                            - Body:
+                                template: >-
+                                  Hi All your new event data is updated in your
+                                  worksheet at
+                                  {{$GoogleSheetsCreaterow.rowNumber}}==={{$Trigger.startTime}}===descritpion=={{$Trigger.description}}==endtime==={{$Trigger.endTime}}==location==={{$Trigger.location}}
+                            - From:
+                                template: '+12765660288'
+                            - MessageType:
+                                template: Text
+                            - To:
+                                template: '918123558508'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleSheetsCreaterow
+                              $ref: >-
+                                #/block/If/node-output/Google Sheets Create
+                                row/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a message by phone number via Twilio when new all-day-event information is updated in a Google Sheets worksheet
+models: {}
