@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Syncs%20Microsoft%20Active%20Directory%20computers%20to%20Microsoft%20Entra%20ID_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Syncs%20Microsoft%20Active%20Directory%20computers%20to%20Microsoft%20Entra%20ID_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:

@@ -3342,7 +3342,7 @@
 	"name": "Create a row in Google Sheets worksheet when a new lead is created in Marketo",
 	"description": "Use this template to create a row in Google Sheets worksheet when a new lead is created in Marketo.",
 	"summary": "Marketo to Google Sheets",
-	"sourceApp": "marketo",
+	"sourceApp": "marketo ",
 	"targetApps": ["googlesheet"],
 	"tags": ["marketo", "googlesheet"],
 	"offerings": ["app connect professional"]

@@ -1,0 +1,121 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: q1z0scqf0z2bi37
+            parentFilter:
+              Hash: q1z0scqf0z2bi37
+      connector-type: wufoo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Card
+      connector-type: trello
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: FormEntry
+      connector-type: wufoo
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Wufoo Retrieve form entries
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Hash: q1z0scqf0z2bi37
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$WufooRetrieveformentries '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: WufooRetrieveformentries
+                    $ref: '#/node-output/Wufoo Retrieve form entries/response/payload'
+                  - variable: WufooRetrieveformentriesMetadata
+                    $ref: '#/node-output/Wufoo Retrieve form entries/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Wufoo FormEntry
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: WufooRetrieveformentries
+                  $ref: '#/node-output/Wufoo Retrieve form entries/response/payload'
+                - variable: WufooRetrieveformentriesMetadata
+                  $ref: '#/node-output/Wufoo Retrieve form entries/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Field9}}':
+                      neq: '{{$Foreachitem.Field15}}'
+                  execute:
+                    - create-action:
+                        name: Trello Add card to list
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - desc:
+                                template: '{{$Trigger.Field15}} is new confirmed lead'
+                            - idBoard:
+                                template: 629d966d3cfea5316e006691
+                            - idList:
+                                template: 629d966d3cfea5316e00669a
+                            - idOrganization:
+                                template: 6087b4630e5b124b38c75386
+                            - name:
+                                template: '{{$Trigger.Field15}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Add a card to a list in Trello for each new form entry created in Wufoo
+models: {}

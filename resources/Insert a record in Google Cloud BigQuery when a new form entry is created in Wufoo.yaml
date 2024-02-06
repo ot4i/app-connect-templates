@@ -1,0 +1,130 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: wufoo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: qese9sd0m3qnk6
+            parentFilter:
+              Hash: qese9sd0m3qnk6
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: CustomTable
+      connector-type: googlebigquery
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: CustomTable
+      connector-type: googlebigquery
+      actions:
+        INSERTTABLEDATA: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Cloud BigQuery Retrieve CustomTable records
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$GoogleCloudBigQueryRetrieveCustomTablerecords '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleCloudBigQueryRetrieveCustomTablerecords
+                    $ref: >-
+                      #/node-output/Google Cloud BigQuery Retrieve CustomTable
+                      records/response/payload
+                  - variable: GoogleCloudBigQueryRetrieveCustomTablerecordsMetadata
+                    $ref: >-
+                      #/node-output/Google Cloud BigQuery Retrieve CustomTable
+                      records/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Cloud BigQuery CustomTable
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleCloudBigQueryRetrieveCustomTablerecords
+                  $ref: >-
+                    #/node-output/Google Cloud BigQuery Retrieve CustomTable
+                    records/response/payload
+                - variable: GoogleCloudBigQueryRetrieveCustomTablerecordsMetadata
+                  $ref: >-
+                    #/node-output/Google Cloud BigQuery Retrieve CustomTable
+                    records/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.Field3}}':
+                      neq: '{{$Foreachitem."Email address"}}'
+                  execute:
+                    - custom-action:
+                        name: Google Cloud BigQuery Insert CustomTable record
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: INSERTTABLEDATA
+                        map:
+                          mappings:
+                            - Email address:
+                                template: '{{$Trigger.Field3}}'
+                            - Emp id:
+                                expression: '$Trigger.Field7 '
+                            - Emp name:
+                                template: '{{$Trigger.Field1}}{{$Trigger.Field2}}'
+                            - Grade:
+                                expression: '$Trigger.Field6 '
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleCloudBigQueryRetrieveCustomTablerecords
+                              $ref: >-
+                                #/node-output/Google Cloud BigQuery Retrieve
+                                CustomTable records/response/payload
+                            - variable: >-
+                                GoogleCloudBigQueryRetrieveCustomTablerecordsMetadata
+                              $ref: >-
+                                #/node-output/Google Cloud BigQuery Retrieve
+                                CustomTable records/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Insert a record in Google Cloud BigQuery when a new form entry is created in Wufoo
+models: {}

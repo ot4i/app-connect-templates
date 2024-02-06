@@ -1,0 +1,130 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: false
+                  timeZone: UTC
+                  every: day
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Opportunity
+      connector-type: insightly
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Insightly Retrieve opportunities
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$InsightlyRetrieveopportunities '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: InsightlyRetrieveopportunities
+                    $ref: >-
+                      #/node-output/Insightly Retrieve
+                      opportunities/response/payload
+                  - variable: InsightlyRetrieveopportunitiesMetadata
+                    $ref: '#/node-output/Insightly Retrieve opportunities/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Insightly Opportunity
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: InsightlyRetrieveopportunities
+                  $ref: >-
+                    #/node-output/Insightly Retrieve
+                    opportunities/response/payload
+                - variable: InsightlyRetrieveopportunitiesMetadata
+                  $ref: '#/node-output/Insightly Retrieve opportunities/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.ACTUAL_CLOSE_DATE}}':
+                      gte: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  Insightly opportunity id
+                                  {{$Foreachitem.OPPORTUNITY_ID}} for the person
+                                  {{$Foreachitem.OPPORTUNITY_NAME}} is Closed in
+                                  the system.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: InsightlyRetrieveopportunities
+                              $ref: >-
+                                #/node-output/Insightly Retrieve
+                                opportunities/response/payload
+                            - variable: InsightlyRetrieveopportunitiesMetadata
+                              $ref: >-
+                                #/node-output/Insightly Retrieve
+                                opportunities/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send a Slack message for each closed opportunity retrieved from Insightly
+models: {}

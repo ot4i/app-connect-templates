@@ -1,0 +1,199 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        DOWNLOADEMAIL: {}
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Email Retrieve emails metadata
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - dateFilter: 2023-12-06T
+                    - folder: INBOX
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$EmailRetrieveemailsmetadata '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Email mail
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Email Download email content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADEMAIL
+              map:
+                mappings:
+                  - folder:
+                      template: INBOX
+                  - uid:
+                      expression: '$Foreachitem.uid '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Box Create file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - content:
+                      template: '{{$EmailDownloademailcontent.attachments}}'
+                  - fileType:
+                      template: Binary
+                  - name:
+                      template: Email_ {{$Foreachitem.subject}}_ {{$random()}}
+                  - parent_id:
+                      template: '186655905997'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailDownloademailcontent
+                    $ref: >-
+                      #/block/For each/node-output/Email Download email
+                      content/response/payload
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Subject:
+                      template: 'box file creted '
+                  - To:
+                      template: kamakshi_manerikar@abc.com
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: '{{$BoxCreatefile}}'
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailDownloademailcontent
+                    $ref: >-
+                      #/block/For each/node-output/Email Download email
+                      content/response/payload
+                  - variable: BoxCreatefile
+                    $ref: >-
+                      #/block/For each/node-output/Box Create
+                      file/response/payload
+                  - variable: EmailRetrieveemailsmetadata
+                    $ref: >-
+                      #/node-output/Email Retrieve emails
+                      metadata/response/payload
+                  - variable: EmailRetrieveemailsmetadataMetadata
+                    $ref: '#/node-output/Email Retrieve emails metadata/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a file in Box for each attachment downloaded from an email
+models: {}

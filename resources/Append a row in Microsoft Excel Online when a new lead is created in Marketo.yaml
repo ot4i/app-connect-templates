@@ -1,0 +1,189 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: marketo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: leads
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            webhookURLSuffix: neGHF-O2QMVVKoXnW7B1C6fRMSPurSJByXKVoMxVA167DPqqj_YQu_tnDFqapraz
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      connector-type: googlesheet
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: Row
+      connector-type: msexcel
+      actions:
+        APPENDROW: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Microsoft Excel Online Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - DriveId: >-
+                        b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                    - WorkbookId: 01NODPFIVF2BO4Y3ZSMVEZOLI3OV3MYYUU
+                    - WorksheetId: '{02A981C1-A6BB-4E8E-939F-50344C18E2AF}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 30
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MicrosoftExcelOnlineRetrieverows '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftExcelOnlineRetrieverows
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response/payload
+                  - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                    $ref: >-
+                      #/node-output/Microsoft Excel Online Retrieve
+                      rows/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Microsoft Excel Online Row
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.id}}'
+                        - '2':
+                            template: '{{$Trigger.firstName}}'
+                        - '3':
+                            template: '{{$Trigger.lastName}}'
+                        - '4':
+                            template: '{{$Trigger.phone}}'
+                        - '5':
+                            template: '{{$Trigger.email}}'
+                        - '6':
+                            template: '{{$Trigger.company}}'
+                  - spreadsheetID:
+                      template: 16SEe6TDI92A1JN6Khki0ga4h271Jo6wnmyUANC1OoA8
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: MicrosoftExcelOnlineRetrieverows
+                  $ref: >-
+                    #/node-output/Microsoft Excel Online Retrieve
+                    rows/response/payload
+                - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                  $ref: '#/node-output/Microsoft Excel Online Retrieve rows/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.company}}':
+                      neq: '{{$Foreachitem.rowData.A}}'
+                  execute:
+                    - custom-action:
+                        name: Microsoft Excel Online Append row
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: APPENDROW
+                        map:
+                          mappings:
+                            - DriveId:
+                                template: >-
+                                  b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
+                            - WorkbookId:
+                                template: 01NODPFIVF2BO4Y3ZSMVEZOLI3OV3MYYUU
+                            - WorksheetId:
+                                template: '{02A981C1-A6BB-4E8E-939F-50344C18E2AF}'
+                            - rowData:
+                                mappings:
+                                  - A:
+                                      template: '{{$Trigger.company}}'
+                                  - B:
+                                      template: '{{$Trigger.firstName}}'
+                                  - C:
+                                      template: '{{$Trigger.lastName}}'
+                                  - D:
+                                      template: '{{$Trigger.email}}'
+                                  - E:
+                                      template: '{{$Trigger.website}}'
+                                  - F:
+                                      template: '{{$Trigger.annualRevenue}}'
+                                  - G:
+                                      template: '{{$Trigger.isLead}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: MicrosoftExcelOnlineRetrieverows
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response/payload
+                            - variable: MicrosoftExcelOnlineRetrieverowsMetadata
+                              $ref: >-
+                                #/node-output/Microsoft Excel Online Retrieve
+                                rows/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Append a row in Microsoft Excel Online when a new lead is created in Marketo
+models: {}

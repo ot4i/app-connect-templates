@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/master/resources/markdown/Creates%20data%20extension%20values%20in%20Salesforce%20Marketing%20Cloud%20for%20contacts%20created%20in%20Salesforce%20event_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Creates%20data%20extension%20values%20in%20Salesforce%20Marketing%20Cloud%20for%20contacts%20created%20in%20Salesforce%20event_instructions.md) (opens in a new window).
 
 1. Click **Create flow** to start using the template.
 2. Connect to the following accounts by using your credentials:
