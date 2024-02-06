@@ -3346,6 +3346,15 @@
 	"targetApps": ["googlesheet"],
 	"tags": ["marketo", "googlesheet"],
 	"offerings": ["app connect professional"]
+ },
+ {
+	"name": "Create a new row in a Google Sheets worksheet for each new opportunity retrieved from the MySQL record",
+	"description": "Use this template to create a new row in a Google Sheets worksheet for each new opportunity retrieved from the MySQL record.",
+	"summary": "Scheduler to 2 applications",
+	"sourceApp": "streaming-connector-scheduler",
+	"targetApps": ["mysql", "googlesheet"],
+	"tags": ["scheduler", "mysql", "googlesheet", "setVariable", "foreach"],
+	"offerings": ["app connect professional"]
  }
 ]
 }
