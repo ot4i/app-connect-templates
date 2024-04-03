@@ -27,20 +27,17 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: FormEntry
       connector-type: wufoo
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: postTts3Single_model
       connector-type: infobip
-      account-name: Account 3
       actions:
         postTts3Single: {}
   assemblies:
