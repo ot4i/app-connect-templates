@@ -3355,6 +3355,44 @@
 	"targetApps": ["mysql", "googlesheet"],
 	"tags": ["scheduler", "mysql", "googlesheet", "setVariable", "foreach"],
 	"offerings": ["app connect professional"]
- }
+ },
+    {
+    "name": "Automate appointment booking in Infobip using Google Calendar and Wufoo form",
+    "description": "Use this template to automate appointment booking in Infobip using Google Calendar and Wufoo form",
+    "summary": "streaming-connector-scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "infobip",
+        "googlecalendar",
+        "wufoo"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "infobip",
+        "googlecalendar",
+        "wufoo"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Send personalized welcome voice message to new sign up in Infobip from Wufoo",
+    "description": "Use this template to send personalized welcome voice message to new sign up in Infobip from Wufoo",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "infobip",
+        "wufoo"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "infobip",
+        "wufoo"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+}
 ]
 }
