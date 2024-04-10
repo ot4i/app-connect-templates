@@ -7,4 +7,4 @@ To refer to these instructions while editing the flow, open [the Github page](ht
    
 3. To start the flow, in the banner click **Start flow**.
 
-Use this template to send a voice message via Infobip for each new form entry created in Wufoo
+Use this template to send a voice message via Infobip for each new form entry created in Wufoo.
