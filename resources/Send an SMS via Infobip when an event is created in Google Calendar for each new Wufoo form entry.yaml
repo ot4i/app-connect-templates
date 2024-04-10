@@ -176,8 +176,8 @@ integration:
                                           Your appointment has been booked from
                                           {{$Foreachitem.Field6}} to
                                           {{$Foreachitem.Field7}}.                                                                       
-                                          (Customize the text according to the
-                                          template you created in Infobip)
+                                          Note: Customize the text according to the
+                                          template you created in Infobip.
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: Foreachitem
