@@ -1,0 +1,207 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: FormEntry
+      connector-type: wufoo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: postSms2TextAdvanced_model
+      connector-type: infobip
+      actions:
+        postSms2TextAdvanced: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Wufoo Retrieve form entries
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Hash: m1t9rxap1k41wv8
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 100
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$WufooRetrieveformentries '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Wufoo form entry
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.DateCreated}}':
+                      gt: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - create-action:
+                        name: Google Calendar Create event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - attendees:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: attendeesItem
+                                  mappings:
+                                    - email:
+                                        template: '{{$Foreachitem.Field4}}'
+                            - endTime:
+                                template: '{{$Foreachitem.Field7}}'
+                            - id:
+                                template: >-
+                                  ac57aa15a6d56d8990ce4a8003040179bce8e99eaefa384e7656591160bccdf7@group.calendar.google.com
+                            - startTime:
+                                template: '{{$Foreachitem.Field6}}'
+                            - summary:
+                                template: >-
+                                  Appointment with {{$Foreachitem.Field1}}
+                                  {{$Foreachitem.Field2}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: WufooRetrieveformentries
+                              $ref: >-
+                                #/node-output/Wufoo Retrieve form
+                                entries/response/payload
+                            - variable: WufooRetrieveformentriesMetadata
+                              $ref: >-
+                                #/node-output/Wufoo Retrieve form
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        name: Infobip Send SMS message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postSms2TextAdvanced
+                        map:
+                          mappings:
+                            - messages:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: messagesItem
+                                  mappings:
+                                    - destinations:
+                                        foreach:
+                                          input: '[{}]'
+                                          iterator: destinationsItem
+                                          mappings:
+                                            - to:
+                                                template: '{{$Foreachitem.Field3}}'
+                                    - from:
+                                        template: '631356'
+                                    - regional:
+                                        mappings:
+                                          - indiaDlt:
+                                              mappings:
+                                                - contentTemplateId:
+                                                    template: '1107170590364750426'
+                                                - principalEntityId:
+                                                    template: '1101485530000075077'
+                                    - text:
+                                        template: >-
+                                          Hi
+                                          {{$Foreachitem.Field1}}{{$Foreachitem.Field2}},
+                                          Your appointment has been booked from
+                                          {{$Foreachitem.Field6}} to
+                                          {{$Foreachitem.Field7}}.                                                                       
+                                          Note: Customize the text according to the
+                                          template you created in Infobip.
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleCalendarCreateevent
+                              $ref: >-
+                                #/block/If/node-output/Google Calendar Create
+                                event/response/payload
+                            - variable: WufooRetrieveformentries
+                              $ref: >-
+                                #/node-output/Wufoo Retrieve form
+                                entries/response/payload
+                            - variable: WufooRetrieveformentriesMetadata
+                              $ref: >-
+                                #/node-output/Wufoo Retrieve form
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Send an SMS via Infobip when an event is created in Google Calendar for each
+    new Wufoo form entry
+models: {}
