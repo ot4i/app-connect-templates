@@ -3367,7 +3367,7 @@
  },
  {
     "name": "Send a voice message via Infobip for each new form entry created in Wufoo",
-    "description": "Use this template to send a voice message via Infobip for each new form entry created in Wufoo",
+    "description": "Use this template to send a voice message via Infobip for each new form entry created in Wufoo.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["infobip", "wufoo"],
