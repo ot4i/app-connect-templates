@@ -1,0 +1,142 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: FormEntry
+      connector-type: wufoo
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postTts3Single_model
+      connector-type: infobip
+      actions:
+        postTts3Single: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Wufoo Retrieve form entries
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Hash: z1j6mk810bcn8c6
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 100
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$WufooRetrieveformentries '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: WufooRetrieveformentries
+                    $ref: '#/node-output/Wufoo Retrieve form entries/response/payload'
+                  - variable: WufooRetrieveformentriesMetadata
+                    $ref: '#/node-output/Wufoo Retrieve form entries/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Wufoo form entry
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: WufooRetrieveformentries
+                  $ref: '#/node-output/Wufoo Retrieve form entries/response/payload'
+                - variable: WufooRetrieveformentriesMetadata
+                  $ref: '#/node-output/Wufoo Retrieve form entries/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.DateCreated}}':
+                      gt: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - custom-action:
+                        name: Infobip Send single voice message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postTts3Single
+                        map:
+                          mappings:
+                            - from:
+                                template: '631356'
+                            - text:
+                                template: >-
+                                  Hi {{$Foreachitem.Field1}}
+                                  {{$Foreachitem.Field2}}  Welcome to appconnect
+                                  demo
+                            - to:
+                                template: '{{$Foreachitem.Field3}}'
+                            - voices:
+                                mappings:
+                                  - gender:
+                                      template: female
+                                  - name:
+                                      template: Jessica
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Send a voice message via Infobip for each new form entry created in Wufoo
+models: {}

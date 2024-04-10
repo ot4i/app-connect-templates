@@ -3355,6 +3355,24 @@
 	"targetApps": ["mysql", "googlesheet"],
 	"tags": ["scheduler", "mysql", "googlesheet", "setVariable", "foreach"],
 	"offerings": ["app connect professional"]
- }
+ },
+ {
+    "name": "Send an SMS via Infobip when an event is created in Google Calendar for each new Wufoo form entry",
+    "description": "Use this template to send an SMS via Infobip when an event is created in Google Calendar for each new Wufoo form entry.",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["infobip", "googlecalendar", "wufoo"],
+    "tags": ["streaming-connector-scheduler", "infobip", "googlecalendar", "wufoo"],
+    "offerings": ["app connect professional"]
+ },
+ {
+    "name": "Send a voice message via Infobip for each new form entry created in Wufoo",
+    "description": "Use this template to send a voice message via Infobip for each new form entry created in Wufoo.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["infobip", "wufoo"],
+    "tags": ["streaming-connector-scheduler", "infobip", "wufoo"],
+    "offerings": ["app connect professional"]
+}
 ]
 }
