@@ -1,0 +1,644 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 2
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getMeTimeEntries_model
+      connector-type: toggltrack
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getWorkspacesByWorkspaceIdProjects_model
+      connector-type: toggltrack
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: customer
+      connector-type: quickbooks
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: getWorkspacesByWorkspaceIdClients_model
+      connector-type: toggltrack
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: customer
+      connector-type: quickbooks
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: invoice
+      connector-type: quickbooks
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: invoice
+      connector-type: quickbooks
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Toggl Track Retrieve time entries
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  since:
+                    gt: ''
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$TogglTrackRetrievetimeentries '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: TogglTrackRetrievetimeentries
+                    $ref: >-
+                      #/node-output/Toggl Track Retrieve time
+                      entries/response/payload
+                  - variable: TogglTrackRetrievetimeentriesMetadata
+                    $ref: '#/node-output/Toggl Track Retrieve time entries/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Toggl Track Time entries
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: TogglTrackRetrievetimeentries
+                  $ref: >-
+                    #/node-output/Toggl Track Retrieve time
+                    entries/response/payload
+                - variable: TogglTrackRetrievetimeentriesMetadata
+                  $ref: '#/node-output/Toggl Track Retrieve time entries/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.billable}}': 'true'
+                  execute:
+                    - retrieve-action:
+                        name: Toggl Track Retrieve workspace projects
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            workspace_id: '{{$Foreachitem.workspace_id}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TogglTrackRetrievetimeentries
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response/payload
+                            - variable: TogglTrackRetrievetimeentriesMetadata
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: false
+                    - for-each:
+                        name: For each 2
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-3'
+                        source:
+                          expression: '$TogglTrackRetrieveworkspaceprojects '
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TogglTrackRetrieveworkspaceprojects
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response/payload
+                            - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response
+                            - variable: TogglTrackRetrievetimeentries
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response/payload
+                            - variable: TogglTrackRetrievetimeentriesMetadata
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        display-name: Toggl Track Workspace projects
+              else:
+                execute: []
+              output-schema: {}
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: TogglTrackRetrieveworkspaceprojects
+                  $ref: >-
+                    #/block/If/node-output/Toggl Track Retrieve workspace
+                    projects/response/payload
+                - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                  $ref: >-
+                    #/block/If/node-output/Toggl Track Retrieve workspace
+                    projects/response
+                - variable: TogglTrackRetrievetimeentries
+                  $ref: >-
+                    #/node-output/Toggl Track Retrieve time
+                    entries/response/payload
+                - variable: TogglTrackRetrievetimeentriesMetadata
+                  $ref: '#/node-output/Toggl Track Retrieve time entries/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.project_id}}': '{{$Foreach2item.id}}'
+                  execute:
+                    - retrieve-action:
+                        name: Toggl Track Retrieve clients
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            workspace_id: '{{$Foreachitem.workspace_id}}'
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TogglTrackRetrieveworkspaceprojects
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response/payload
+                            - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response
+                            - variable: TogglTrackRetrievetimeentries
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response/payload
+                            - variable: TogglTrackRetrievetimeentriesMetadata
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: false
+                        allow-empty-output: false
+                    - for-each:
+                        name: For each 3
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-4'
+                        source:
+                          expression: '$TogglTrackRetrieveclients '
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TogglTrackRetrieveclients
+                              $ref: >-
+                                #/block/If 2/node-output/Toggl Track Retrieve
+                                clients/response/payload
+                            - variable: TogglTrackRetrieveclientsMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Toggl Track Retrieve
+                                clients/response
+                            - variable: TogglTrackRetrieveworkspaceprojects
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response/payload
+                            - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response
+                            - variable: TogglTrackRetrievetimeentries
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response/payload
+                            - variable: TogglTrackRetrievetimeentriesMetadata
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        display-name: Toggl Track Clients
+              else:
+                execute: []
+              output-schema: {}
+    assembly-4:
+      assembly:
+        execute:
+          - if:
+              name: If 3
+              input:
+                - variable: Foreach3item
+                  $ref: '#/block/For each 3/current-item'
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: TogglTrackRetrieveclients
+                  $ref: >-
+                    #/block/If 2/node-output/Toggl Track Retrieve
+                    clients/response/payload
+                - variable: TogglTrackRetrieveclientsMetadata
+                  $ref: >-
+                    #/block/If 2/node-output/Toggl Track Retrieve
+                    clients/response
+                - variable: TogglTrackRetrieveworkspaceprojects
+                  $ref: >-
+                    #/block/If/node-output/Toggl Track Retrieve workspace
+                    projects/response/payload
+                - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                  $ref: >-
+                    #/block/If/node-output/Toggl Track Retrieve workspace
+                    projects/response
+                - variable: TogglTrackRetrievetimeentries
+                  $ref: >-
+                    #/node-output/Toggl Track Retrieve time
+                    entries/response/payload
+                - variable: TogglTrackRetrievetimeentriesMetadata
+                  $ref: '#/node-output/Toggl Track Retrieve time entries/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreach2item.client_id}}': '{{$Foreach3item.id}}'
+                  execute:
+                    - retrieve-action:
+                        name: QuickBooks Retrieve customers
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            CompanyName: '{{$Foreach3item.name}}'
+                          input:
+                            - variable: Foreach3item
+                              $ref: '#/block/For each 3/current-item'
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: TogglTrackRetrieveclients
+                              $ref: >-
+                                #/block/If 2/node-output/Toggl Track Retrieve
+                                clients/response/payload
+                            - variable: TogglTrackRetrieveclientsMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/Toggl Track Retrieve
+                                clients/response
+                            - variable: TogglTrackRetrieveworkspaceprojects
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response/payload
+                            - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Toggl Track Retrieve
+                                workspace projects/response
+                            - variable: TogglTrackRetrievetimeentries
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response/payload
+                            - variable: TogglTrackRetrievetimeentriesMetadata
+                              $ref: >-
+                                #/node-output/Toggl Track Retrieve time
+                                entries/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - if:
+                        name: If 4
+                        input:
+                          - variable: Foreach3item
+                            $ref: '#/block/For each 3/current-item'
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: QuickBooksRetrievecustomers
+                            $ref: >-
+                              #/block/If 3/node-output/QuickBooks Retrieve
+                              customers/response/payload
+                          - variable: QuickBooksRetrievecustomersMetadata
+                            $ref: >-
+                              #/block/If 3/node-output/QuickBooks Retrieve
+                              customers/response
+                          - variable: TogglTrackRetrieveclients
+                            $ref: >-
+                              #/block/If 2/node-output/Toggl Track Retrieve
+                              clients/response/payload
+                          - variable: TogglTrackRetrieveclientsMetadata
+                            $ref: >-
+                              #/block/If 2/node-output/Toggl Track Retrieve
+                              clients/response
+                          - variable: TogglTrackRetrieveworkspaceprojects
+                            $ref: >-
+                              #/block/If/node-output/Toggl Track Retrieve
+                              workspace projects/response/payload
+                          - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                            $ref: >-
+                              #/block/If/node-output/Toggl Track Retrieve
+                              workspace projects/response
+                          - variable: TogglTrackRetrievetimeentries
+                            $ref: >-
+                              #/node-output/Toggl Track Retrieve time
+                              entries/response/payload
+                          - variable: TogglTrackRetrievetimeentriesMetadata
+                            $ref: >-
+                              #/node-output/Toggl Track Retrieve time
+                              entries/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$QuickBooksRetrievecustomersMetadata."status-code"}}': '204'
+                            execute:
+                              - create-action:
+                                  name: QuickBooks Create customer
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-5
+                                  map:
+                                    mappings:
+                                      - CompanyName:
+                                          template: '{{$Foreach3item.name}}'
+                                      - DisplayName:
+                                          template: '{{$Foreach3item.name}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreach3item
+                                        $ref: '#/block/For each 3/current-item'
+                                      - variable: Foreach2item
+                                        $ref: '#/block/For each 2/current-item'
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: QuickBooksRetrievecustomers
+                                        $ref: >-
+                                          #/block/If 3/node-output/QuickBooks
+                                          Retrieve customers/response/payload
+                                      - variable: QuickBooksRetrievecustomersMetadata
+                                        $ref: >-
+                                          #/block/If 3/node-output/QuickBooks
+                                          Retrieve customers/response
+                                      - variable: TogglTrackRetrieveclients
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve clients/response/payload
+                                      - variable: TogglTrackRetrieveclientsMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve clients/response
+                                      - variable: TogglTrackRetrieveworkspaceprojects
+                                        $ref: >-
+                                          #/block/If/node-output/Toggl Track
+                                          Retrieve workspace
+                                          projects/response/payload
+                                      - variable: >-
+                                          TogglTrackRetrieveworkspaceprojectsMetadata
+                                        $ref: >-
+                                          #/block/If/node-output/Toggl Track
+                                          Retrieve workspace projects/response
+                                      - variable: TogglTrackRetrievetimeentries
+                                        $ref: >-
+                                          #/node-output/Toggl Track Retrieve time
+                                          entries/response/payload
+                                      - variable: TogglTrackRetrievetimeentriesMetadata
+                                        $ref: >-
+                                          #/node-output/Toggl Track Retrieve time
+                                          entries/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: QuickBooks Create invoice
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-6
+                                  map:
+                                    mappings:
+                                      - CustomerRef:
+                                          mappings:
+                                            - value:
+                                                template: '{{$QuickBooksCreatecustomer.Id}}'
+                                      - Line:
+                                          mappings:
+                                            - Amount:
+                                                expression: '  $number($Foreach2item.rate ) * $Foreachitem.duration '
+                                            - DetailType:
+                                                template: SalesItemLineDetail
+                                            - SalesItemLineDetail:
+                                                mappings:
+                                                  - ServiceDate:
+                                                      template: '{{$Foreachitem.start}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreach3item
+                                        $ref: '#/block/For each 3/current-item'
+                                      - variable: Foreach2item
+                                        $ref: '#/block/For each 2/current-item'
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: QuickBooksCreatecustomer
+                                        $ref: >-
+                                          #/block/If 4/node-output/QuickBooks
+                                          Create customer/response/payload
+                                      - variable: QuickBooksRetrievecustomers
+                                        $ref: >-
+                                          #/block/If 3/node-output/QuickBooks
+                                          Retrieve customers/response/payload
+                                      - variable: QuickBooksRetrievecustomersMetadata
+                                        $ref: >-
+                                          #/block/If 3/node-output/QuickBooks
+                                          Retrieve customers/response
+                                      - variable: TogglTrackRetrieveclients
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve clients/response/payload
+                                      - variable: TogglTrackRetrieveclientsMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve clients/response
+                                      - variable: TogglTrackRetrieveworkspaceprojects
+                                        $ref: >-
+                                          #/block/If/node-output/Toggl Track
+                                          Retrieve workspace
+                                          projects/response/payload
+                                      - variable: >-
+                                          TogglTrackRetrieveworkspaceprojectsMetadata
+                                        $ref: >-
+                                          #/block/If/node-output/Toggl Track
+                                          Retrieve workspace projects/response
+                                      - variable: TogglTrackRetrievetimeentries
+                                        $ref: >-
+                                          #/node-output/Toggl Track Retrieve time
+                                          entries/response/payload
+                                      - variable: TogglTrackRetrievetimeentriesMetadata
+                                        $ref: >-
+                                          #/node-output/Toggl Track Retrieve time
+                                          entries/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute:
+                            - create-action:
+                                name: QuickBooks Create invoice 2
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-7
+                                map:
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Foreach3item
+                                      $ref: '#/block/For each 3/current-item'
+                                    - variable: Foreach2item
+                                      $ref: '#/block/For each 2/current-item'
+                                    - variable: Foreachitem
+                                      $ref: '#/block/For each/current-item'
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: QuickBooksRetrievecustomers
+                                      $ref: >-
+                                        #/block/If 3/node-output/QuickBooks
+                                        Retrieve customers/response/payload
+                                    - variable: QuickBooksRetrievecustomersMetadata
+                                      $ref: >-
+                                        #/block/If 3/node-output/QuickBooks
+                                        Retrieve customers/response
+                                    - variable: TogglTrackRetrieveclients
+                                      $ref: >-
+                                        #/block/If 2/node-output/Toggl Track
+                                        Retrieve clients/response/payload
+                                    - variable: TogglTrackRetrieveclientsMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/Toggl Track
+                                        Retrieve clients/response
+                                    - variable: TogglTrackRetrieveworkspaceprojects
+                                      $ref: >-
+                                        #/block/If/node-output/Toggl Track
+                                        Retrieve workspace
+                                        projects/response/payload
+                                    - variable: >-
+                                        TogglTrackRetrieveworkspaceprojectsMetadata
+                                      $ref: >-
+                                        #/block/If/node-output/Toggl Track
+                                        Retrieve workspace projects/response
+                                    - variable: TogglTrackRetrievetimeentries
+                                      $ref: >-
+                                        #/node-output/Toggl Track Retrieve time
+                                        entries/response/payload
+                                    - variable: TogglTrackRetrievetimeentriesMetadata
+                                      $ref: >-
+                                        #/node-output/Toggl Track Retrieve time
+                                        entries/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                                  mappings: []
+                        output-schema: {}
+              else:
+                execute: []
+              output-schema: {}
+  name: Create the invoice in Quickbooks based on billable hours tracked in Toggl Track
+models: {}
