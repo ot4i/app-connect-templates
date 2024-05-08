@@ -1,0 +1,130 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 2
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: order
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postSmsSend_model
+      connector-type: clicksend
+      actions:
+        postSmsSend: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - status: open
+                    - created_at_min: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ShopifyRetrieveorders  '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: ClickSendRetrieveaccountinformation
+                    $ref: >-
+                      #/node-output/Click Send Retrieve account
+                      information/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Shopify Order
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Click Send Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postSmsSend
+              map:
+                mappings:
+                  - messages:
+                      foreach:
+                        input: '{}'
+                        iterator: messagesItem
+                        mappings:
+                          - body:
+                              template: >-
+                                Your Order has been placed. Order ID is:
+                                {{$Foreachitem.id}}
+                          - custom_string:
+                              template: test
+                          - from:
+                              template: '+61411111111'
+                          - source:
+                              template: Shopify Order
+                          - to:
+                              template: '{{$Foreachitem.shipping_address.phone}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send confirmation sms notification when customer place any order
+models: {}
