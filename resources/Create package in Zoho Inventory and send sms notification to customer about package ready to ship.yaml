@@ -1,0 +1,697 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: getContacts_model
+      connector-type: zohoinventory
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postContacts_model
+      connector-type: zohoinventory
+      actions:
+        postContacts: {}
+    action-interface-4:
+      type: api-action
+      business-object: postItems_model
+      connector-type: zohoinventory
+      actions:
+        postItems: {}
+    action-interface-5:
+      type: api-action
+      business-object: postSalesorders_model
+      connector-type: zohoinventory
+      actions:
+        postSalesorders: {}
+    action-interface-6:
+      type: api-action
+      business-object: postPackages_model
+      connector-type: zohoinventory
+      actions:
+        postPackages: {}
+    action-interface-7:
+      type: api-action
+      business-object: postSmsSend_model
+      connector-type: clicksend
+      actions:
+        postSmsSend: {}
+    action-interface-9:
+      type: api-action
+      business-object: getItems_model
+      connector-type: zohoinventory
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: order
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - fulfillment_status: unshipped
+                    - created_at_min: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ShopifyRetrieveorders '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Shopify order
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho Inventory Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  email: '{{$Foreachitem.email}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoInventoryRetrievecontacts
+                  $ref: >-
+                    #/block/For each/node-output/Zoho Inventory Retrieve
+                    contacts/response/payload
+                - variable: ZohoInventoryRetrievecontactsMetadata
+                  $ref: >-
+                    #/block/For each/node-output/Zoho Inventory Retrieve
+                    contacts/response
+                - variable: ShopifyRetrieveorders
+                  $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                - variable: ShopifyRetrieveordersMetadata
+                  $ref: '#/node-output/Shopify Retrieve orders/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$count($ZohoInventoryRetrievecontacts)}}': '0'
+                  execute:
+                    - custom-action:
+                        name: Zoho Inventory Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postContacts
+                        map:
+                          mappings:
+                            - billing_address:
+                                mappings:
+                                  - country:
+                                      template: '{{$Foreachitem.billing_address.country}}'
+                                  - phone:
+                                      template: '{{$Foreachitem.billing_address.phone}}'
+                            - contact_name:
+                                template: '{{$Foreachitem.billing_address.first_name}}'
+                            - contact_persons:
+                                foreach:
+                                  input: '{}'
+                                  iterator: contact_personsItem
+                                  mappings:
+                                    - email:
+                                        template: '{{$Foreachitem.email}}'
+                            - contact_type:
+                                template: customer
+                            - shipping_address:
+                                mappings:
+                                  - country:
+                                      template: '{{$Foreachitem.billing_address.country}}'
+                                  - phone:
+                                      template: '{{$Foreachitem.billing_address.phone}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoInventoryRetrievecontacts
+                              $ref: >-
+                                #/block/For each/node-output/Zoho Inventory
+                                Retrieve contacts/response/payload
+                            - variable: ZohoInventoryRetrievecontactsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Zoho Inventory
+                                Retrieve contacts/response
+                            - variable: ShopifyRetrieveorders
+                              $ref: >-
+                                #/node-output/Shopify Retrieve
+                                orders/response/payload
+                            - variable: ShopifyRetrieveordersMetadata
+                              $ref: '#/node-output/Shopify Retrieve orders/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ZohoInventoryCreatecontact
+                        $ref: >-
+                          #/block/If/node-output/Zoho Inventory Create
+                          contact/response/payload
+                      - variable: ZohoInventoryRetrievecontacts
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response/payload
+                      - variable: ZohoInventoryRetrievecontactsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response
+                      - variable: ShopifyRetrieveorders
+                        $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                      - variable: ShopifyRetrieveordersMetadata
+                        $ref: '#/node-output/Shopify Retrieve orders/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - customer_id:
+                          template: '{{$ZohoInventoryCreatecontact.contact_id}}'
+              else:
+                execute: []
+                map:
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: ZohoInventoryRetrievecontacts
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response/payload
+                    - variable: ZohoInventoryRetrievecontactsMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response
+                    - variable: ShopifyRetrieveorders
+                      $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                    - variable: ShopifyRetrieveordersMetadata
+                      $ref: '#/node-output/Shopify Retrieve orders/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                  mappings:
+                    - customer_id:
+                        template: '{{$ZohoInventoryRetrievecontacts.contact_id}}'
+              output-schema:
+                type: object
+                properties:
+                  customer_id:
+                    type: string
+                required: []
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$Foreachitem.line_items '
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: shopify items
+    assembly-3:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho Inventory Retrieve items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-9'
+              filter:
+                where:
+                  name: '{{$Foreach2item.title}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If 2
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoInventoryRetrieveitems
+                  $ref: >-
+                    #/block/For each 2/node-output/Zoho Inventory Retrieve
+                    items/response/payload
+                - variable: ZohoInventoryRetrieveitemsMetadata
+                  $ref: >-
+                    #/block/For each 2/node-output/Zoho Inventory Retrieve
+                    items/response
+                - variable: ZohoInventoryRetrievecontacts
+                  $ref: >-
+                    #/block/For each/node-output/Zoho Inventory Retrieve
+                    contacts/response/payload
+                - variable: ZohoInventoryRetrievecontactsMetadata
+                  $ref: >-
+                    #/block/For each/node-output/Zoho Inventory Retrieve
+                    contacts/response
+                - variable: If
+                  $ref: '#/block/For each/node-output/If/response/payload'
+                - variable: ShopifyRetrieveorders
+                  $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                - variable: ShopifyRetrieveordersMetadata
+                  $ref: '#/node-output/Shopify Retrieve orders/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoInventoryRetrieveitemsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Zoho Inventory Create item
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: postItems
+                        map:
+                          mappings:
+                            - item_type:
+                                template: inventory
+                            - name:
+                                template: '{{$Foreachitem.line_items[0].title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoInventoryRetrieveitems
+                              $ref: >-
+                                #/block/For each 2/node-output/Zoho Inventory
+                                Retrieve items/response/payload
+                            - variable: ZohoInventoryRetrieveitemsMetadata
+                              $ref: >-
+                                #/block/For each 2/node-output/Zoho Inventory
+                                Retrieve items/response
+                            - variable: ZohoInventoryRetrievecontacts
+                              $ref: >-
+                                #/block/For each/node-output/Zoho Inventory
+                                Retrieve contacts/response/payload
+                            - variable: ZohoInventoryRetrievecontactsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Zoho Inventory
+                                Retrieve contacts/response
+                            - variable: If
+                              $ref: '#/block/For each/node-output/If/response/payload'
+                            - variable: ShopifyRetrieveorders
+                              $ref: >-
+                                #/node-output/Shopify Retrieve
+                                orders/response/payload
+                            - variable: ShopifyRetrieveordersMetadata
+                              $ref: '#/node-output/Shopify Retrieve orders/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreach2item
+                        $ref: '#/block/For each 2/current-item'
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ZohoInventoryCreateitem
+                        $ref: >-
+                          #/block/If 2/node-output/Zoho Inventory Create
+                          item/response/payload
+                      - variable: ZohoInventoryRetrieveitems
+                        $ref: >-
+                          #/block/For each 2/node-output/Zoho Inventory Retrieve
+                          items/response/payload
+                      - variable: ZohoInventoryRetrieveitemsMetadata
+                        $ref: >-
+                          #/block/For each 2/node-output/Zoho Inventory Retrieve
+                          items/response
+                      - variable: ZohoInventoryRetrievecontacts
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response/payload
+                      - variable: ZohoInventoryRetrievecontactsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response
+                      - variable: If
+                        $ref: '#/block/For each/node-output/If/response/payload'
+                      - variable: ShopifyRetrieveorders
+                        $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                      - variable: ShopifyRetrieveordersMetadata
+                        $ref: '#/node-output/Shopify Retrieve orders/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - item_id:
+                          template: '{{$ZohoInventoryCreateitem.item_id}}'
+              else:
+                execute: []
+                map:
+                  mappings:
+                    - item_id:
+                        template: '{{$ZohoInventoryRetrieveitems.item_id}}'
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreach2item
+                      $ref: '#/block/For each 2/current-item'
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: ZohoInventoryRetrieveitems
+                      $ref: >-
+                        #/block/For each 2/node-output/Zoho Inventory Retrieve
+                        items/response/payload
+                    - variable: ZohoInventoryRetrieveitemsMetadata
+                      $ref: >-
+                        #/block/For each 2/node-output/Zoho Inventory Retrieve
+                        items/response
+                    - variable: ZohoInventoryRetrievecontacts
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response/payload
+                    - variable: ZohoInventoryRetrievecontactsMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response
+                    - variable: If
+                      $ref: '#/block/For each/node-output/If/response/payload'
+                    - variable: ShopifyRetrieveorders
+                      $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                    - variable: ShopifyRetrieveordersMetadata
+                      $ref: '#/node-output/Shopify Retrieve orders/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties:
+                  item_id:
+                    type: string
+                required: []
+          - custom-action:
+              name: Zoho Inventory Create sales order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              action: postSalesorders
+              map:
+                mappings:
+                  - customer_id:
+                      template: '{{$If.customer_id}}'
+                  - line_items:
+                      foreach:
+                        mappings:
+                          - item_id:
+                              template: '{{$If2.item_id}}'
+                        input: '{}'
+                        iterator: line_itemsItem
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrieveitems
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Retrieve
+                      items/response/payload
+                  - variable: ZohoInventoryRetrieveitemsMetadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Retrieve
+                      items/response
+                  - variable: If2
+                    $ref: '#/block/For each 2/node-output/If 2/response/payload'
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Zoho Inventory Create package
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              action: postPackages
+              map:
+                mappings:
+                  - date:
+                      template: '{{$ZohoInventoryCreatesalesorder._date_}}'
+                  - line_items:
+                      foreach:
+                        mappings:
+                          - quantity:
+                              expression: '$Foreachitem.line_items[0].quantity '
+                          - so_line_item_id:
+                              template: '{{$line_itemsItem.line_item_id}}'
+                        input: '$ZohoInventoryCreatesalesorder._line_items_ '
+                        iterator: line_itemsItem
+                  - package_number:
+                      template: '{{$ZohoInventoryCreatesalesorder.salesorder_id}}'
+                  - salesorder_id:
+                      template: '{{$ZohoInventoryCreatesalesorder.salesorder_id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrieveitems
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Retrieve
+                      items/response/payload
+                  - variable: ZohoInventoryRetrieveitemsMetadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Retrieve
+                      items/response
+                  - variable: If2
+                    $ref: '#/block/For each 2/node-output/If 2/response/payload'
+                  - variable: ZohoInventoryCreatesalesorder
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Create sales
+                      order/response/payload
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: ClickSend Send SMS message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              action: postSmsSend
+              map:
+                mappings:
+                  - messages:
+                      foreach:
+                        input: '{}'
+                        iterator: messagesItem
+                        mappings:
+                          - body:
+                              template: >-
+                                Your package
+                                {{$ZohoInventoryCreatepackage.shipment_order.associated_packages[0].package_id}}
+                                is ready to be shipped
+                          - from:
+                              template: '+61411111111'
+                          - source:
+                              template: Zoho usecase
+                          - to:
+                              template: '{{$Foreachitem.shipping_address.phone}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ZohoInventoryRetrieveitems
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      items/response/payload
+                  - variable: ZohoInventoryRetrieveitemsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      items/response
+                  - variable: ZohoInventoryCreateitem
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Create
+                      item/response/payload
+                  - variable: ZohoInventoryCreatesalesorder
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Create sales
+                      order/response/payload
+                  - variable: ZohoInventoryCreatepackage
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Create
+                      package/response/payload
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Create package in Zoho Inventory and send sms notification to customer about package ready to ship
+models: {}

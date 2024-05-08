@@ -1,0 +1,204 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postSmsSend_model
+      connector-type: clicksend
+      actions:
+        postSmsSend: {}
+    action-interface-1:
+      type: api-action
+      business-object: getSalesorders_model
+      connector-type: zohoinventory
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: getContacts_model
+      connector-type: zohoinventory
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho Inventory Retrieve sales orders 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 3
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each 3
+              assembly:
+                $ref: '#/integration/assemblies/assembly-4'
+              source:
+                expression: '$ZohoInventoryRetrievesalesorders2 '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrievesalesorders2
+                    $ref: >-
+                      #/node-output/Zoho Inventory Retrieve sales orders
+                      2/response/payload
+                  - variable: ZohoInventoryRetrievesalesorders2Metadata
+                    $ref: >-
+                      #/node-output/Zoho Inventory Retrieve sales orders
+                      2/response
+                  - variable: ClickSendRetrieveaccountinformation
+                    $ref: >-
+                      #/node-output/Click Send Retrieve account
+                      information/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Zoho Inventory Sales orders
+    assembly-4:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreach3item
+                  $ref: '#/block/For each 3/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoInventoryRetrievesalesorders2
+                  $ref: >-
+                    #/node-output/Zoho Inventory Retrieve sales orders
+                    2/response/payload
+                - variable: ZohoInventoryRetrievesalesorders2Metadata
+                  $ref: >-
+                    #/node-output/Zoho Inventory Retrieve sales orders
+                    2/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Foreach3item.status}}': fulfilled
+                      - '{{$Foreach3item.delivery_date}}':
+                          gt: >-
+                            {{$formatDate($toMillis($Trigger.lastEventTime ),
+                            "YYYY-MM-DD","UTC")}}
+                        hashKey: object:791
+                  execute:
+                    - retrieve-action:
+                        name: Zoho Inventory Retrieve contacts
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            email: '{{$Foreach3item.email}}'
+                          input:
+                            - variable: Foreach3item
+                              $ref: '#/block/For each 3/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoInventoryRetrievesalesorders2
+                              $ref: >-
+                                #/node-output/Zoho Inventory Retrieve sales
+                                orders 2/response/payload
+                            - variable: ZohoInventoryRetrievesalesorders2Metadata
+                              $ref: >-
+                                #/node-output/Zoho Inventory Retrieve sales
+                                orders 2/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: false
+                    - custom-action:
+                        name: Click Send Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postSmsSend
+                        map:
+                          mappings:
+                            - messages:
+                                foreach:
+                                  input: '{}'
+                                  iterator: messagesItem
+                                  mappings:
+                                    - body:
+                                        template: >-
+                                          Your Order
+                                          {{$Foreach3item.salesorder_id}} has been
+                                          fullfilled and delivered on
+                                          {{$Foreach3item.delivery_date}}. Thanks
+                                          for shopping with us. Please provide
+                                          your feedback on wufoo_link
+                                    - custom_string:
+                                        template: test
+                                    - from:
+                                        template: '+61411111111'
+                                    - source:
+                                        template: APPConnect
+                                    - to:
+                                        template: >-
+                                          {{$ZohoInventoryRetrievecontacts._phone_}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreach3item
+                              $ref: '#/block/For each 3/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoInventoryRetrievecontacts
+                              $ref: >-
+                                #/block/If/node-output/Zoho Inventory Retrieve
+                                contacts/response/payload
+                            - variable: ZohoInventoryRetrievecontactsMetadata
+                              $ref: >-
+                                #/block/If/node-output/Zoho Inventory Retrieve
+                                contacts/response
+                            - variable: ZohoInventoryRetrievesalesorders2
+                              $ref: >-
+                                #/node-output/Zoho Inventory Retrieve sales
+                                orders 2/response/payload
+                            - variable: ZohoInventoryRetrievesalesorders2Metadata
+                              $ref: >-
+                                #/node-output/Zoho Inventory Retrieve sales
+                                orders 2/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Send confirmation sms notification when customer place any order
+models: {}

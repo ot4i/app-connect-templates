@@ -1,0 +1,163 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: gmail
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postSmsSend_model
+      connector-type: clicksend
+      actions:
+        postSmsSend: {}
+    action-interface-1:
+      type: api-action
+      business-object: getListsByListIdContacts_model
+      connector-type: clicksend
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ClickSend Retrieve contacts by list ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  list_id: '2321040'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ClickSendRetrievecontactsbylistID '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ClickSendRetrievecontactsbylistID
+                    $ref: >-
+                      #/node-output/ClickSend Retrieve contacts by list
+                      ID/response/payload
+                  - variable: ClickSendRetrievecontactsbylistIDMetadata
+                    $ref: >-
+                      #/node-output/ClickSend Retrieve contacts by list
+                      ID/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: ClickSend Contacts
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ClickSendRetrievecontactsbylistID
+                  $ref: >-
+                    #/node-output/ClickSend Retrieve contacts by list
+                    ID/response/payload
+                - variable: ClickSendRetrievecontactsbylistIDMetadata
+                  $ref: >-
+                    #/node-output/ClickSend Retrieve contacts by list
+                    ID/response
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.From}}': '{{$Foreachitem.email}}'
+                  execute:
+                    - custom-action:
+                        name: ClickSend Send SMS message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postSmsSend
+                        map:
+                          mappings:
+                            - messages:
+                                foreach:
+                                  input: '{}'
+                                  iterator: messagesItem
+                                  mappings:
+                                    - body:
+                                        template: >-
+                                          Your complaint has been received and is
+                                          currently in an active state.
+                                    - from:
+                                        template: '+61447254068'
+                                    - source:
+                                        template: Gmail Complain
+                                    - to:
+                                        template: '{{$Foreachitem.phone_number}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ClickSendRetrievecontactsbylistID
+                              $ref: >-
+                                #/node-output/ClickSend Retrieve contacts by
+                                list ID/response/payload
+                            - variable: ClickSendRetrievecontactsbylistIDMetadata
+                              $ref: >-
+                                #/node-output/ClickSend Retrieve contacts by
+                                list ID/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  completion-action:
+                    terminate:
+                      info:
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: ClickSendRetrievecontactsbylistID
+                            $ref: >-
+                              #/node-output/ClickSend Retrieve contacts by list
+                              ID/response/payload
+                          - variable: ClickSendRetrievecontactsbylistIDMetadata
+                            $ref: >-
+                              #/node-output/ClickSend Retrieve contacts by list
+                              ID/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        message: Contact found
+                        status-code: 200
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Send acknowledgement through sms notification to customers on receiving any
+    complain
+models: {}
