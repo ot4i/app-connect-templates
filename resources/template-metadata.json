@@ -3383,16 +3383,6 @@
     "tags": ["Scheduler","jira", "toggltrack"],
     "offerings": ["app connect professional"]
    },
-
-{
-    "name": "Create the invoice in Quickbooks based on billable hours tracked in Toggl Track",
-    "description": "Use this template to create the invoice in Quickbooks based on billable hours tracked in Toggl Track.",
-    "summary": "Scheduler to 2 applications",
-    "sourceApp": "Scheduler",
-    "targetApps": ["quickbooks", "toggltrack"],
-    "tags": ["Scheduler","quickbooks", "toggltrack"],
-    "offerings": ["app connect professional"]
-   },
    {
     "name": "Invite new BambooHR employee for filling time entries in Toggl Track",
     "description": "Use this template to invite new BambooHR employee for filling time entries in Toggl Track.",
