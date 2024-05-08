@@ -3373,6 +3373,63 @@
     "targetApps": ["infobip", "wufoo"],
     "tags": ["streaming-connector-scheduler", "infobip", "wufoo"],
     "offerings": ["app connect professional"]
+},
+    {
+    "name": "Send confirmation sms notification when customer place any order",
+    "description": "Use this template to send confirmation sms notification when customer place any order.",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify","clicksend"],
+    "tags": ["streaming-connector-scheduler", "shopify","clicksend"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Send thank you message with feedback link to the customers after order is generated",
+    "description": "Use this template to send thank you message with feedback link to the customers after order is generated.",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["zohoinventory","clicksend"],
+    "tags": ["streaming-connector-scheduler", "zohoinventory","clicksend"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Create package in Zoho Inventory and send sms notification to customer about package ready to ship",
+    "description": "Use this template to create package in Zoho Inventory and send sms notification to customer about package ready to ship.",
+    "summary": "streaming-connector-scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["clicksend", "shopify","zohoinventory"],
+    "tags": ["streaming-connector-scheduler","clicksend", "shopify","zohoinventory"],
+    "offerings": ["app connect professional"]
+   },
+
+{
+    "name": "Create sms campaign for notifying existing ecommerce customers about the upcoming sale",
+    "description": "Use this template to create sms campaign for notifying existing ecommerce customers about the upcoming sale.",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify","clicksend"],
+    "tags": ["streaming-connector-scheduler","shopify","clicksend"],
+    "offerings": ["app connect professional"]
+   },
+
+{
+    "name": "Send acknowledgement through sms notification to customers on receiving any complain",
+    "description": "Use this template to send acknowledgement through sms notification to customers on receiving any complain.",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "gmail",
+    "targetApps": ["clicksend"],
+    "tags": ["gmail","clicksend"],
+    "offerings": ["app connect professional"]
+   
+},
+{
+    "name": "Send personalized welcome voice message to new sign up customers",
+    "description": "Use this template to send personalized welcome voice message to new sign up customers.",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["wufoo","clicksend"],
+    "tags": ["streaming-connector-scheduler","wufoo","clicksend"],
+    "offerings": ["app connect professional"]
 }
 ]
 }
