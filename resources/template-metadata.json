@@ -3373,6 +3373,24 @@
     "targetApps": ["infobip", "wufoo"],
     "tags": ["streaming-connector-scheduler", "infobip", "wufoo"],
     "offerings": ["app connect professional"]
-}
+},
+    {
+    "name": "Create time entries in Toggl Track for the time spent on task in Jeera",
+    "description": "Use this template to create time entries in Toggl Track for the time spent on task in Jeera.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["jira", "toggltrack"],
+    "tags": ["streaming-connector-scheduler","jira", "toggltrack"],
+    "offerings": ["app connect professional"]
+   },
+       {
+    "name": "Send an invite to fill time entries in Toggl Track for each new employee added to BambooHR",
+    "description": "Use this template to send an invite to fill time entries in Toggl Track for each new employee added to BambooHR.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["bamboohr", "toggltrack"],
+    "tags": ["streaming-connector-scheduler","bamboohr", "toggltrack"],
+    "offerings": ["app connect professional"]
+   }
 ]
 }
