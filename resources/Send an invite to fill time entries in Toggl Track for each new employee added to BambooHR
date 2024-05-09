@@ -150,5 +150,5 @@ integration:
                     $ref: '#/node-output/BambooHR Retrieve employees/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Invite new BambooHR employee for filling time entries in Toggl Track
+  name: Send an invite to fill time entries in Toggl Track for each new employee added to BambooHR
 models: {}
