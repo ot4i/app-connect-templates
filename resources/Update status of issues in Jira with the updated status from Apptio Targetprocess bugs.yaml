@@ -1,0 +1,221 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: CST6CDT
+  action-interfaces:
+    action-interface-5:
+      type: api-action
+      business-object: getApiV2Bugs_model
+      connector-type: apptiotargetprocess
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: Issue
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-10:
+      type: api-action
+      business-object: IssueComment
+      connector-type: jira
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Apptio Targetprocess Retrieve bugs
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              filter:
+                where:
+                  modifyDate:
+                    gt: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$ApptioTargetprocessRetrievebugs '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ApptioTargetprocessRetrievebugs
+                    $ref: >-
+                      #/node-output/Apptio Targetprocess Retrieve
+                      bugs/response/payload
+                  - variable: ApptioTargetprocessRetrievebugsMetadata
+                    $ref: '#/node-output/Apptio Targetprocess Retrieve bugs/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Apptio Targetprocess Bugs
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If 3
+              input:
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ApptioTargetprocessRetrievebugs
+                  $ref: >-
+                    #/node-output/Apptio Targetprocess Retrieve
+                    bugs/response/payload
+                - variable: ApptioTargetprocessRetrievebugsMetadata
+                  $ref: '#/node-output/Apptio Targetprocess Retrieve bugs/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreach2item.modifyDate}}':
+                      gt: '{{$Foreach2item.createDate}}'
+                  execute:
+                    - retrieve-action:
+                        name: Jira Retrieve issue
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        filter:
+                          where:
+                            id: '{{$split($Foreach2item.name , ":")[0]}}'
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ApptioTargetprocessRetrievebugs
+                              $ref: >-
+                                #/node-output/Apptio Targetprocess Retrieve
+                                bugs/response/payload
+                            - variable: ApptioTargetprocessRetrievebugsMetadata
+                              $ref: >-
+                                #/node-output/Apptio Targetprocess Retrieve
+                                bugs/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - if:
+                        name: If 4
+                        input:
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: JiraRetrieveissue
+                            $ref: >-
+                              #/block/If 3/node-output/Jira Retrieve
+                              issue/response/payload
+                          - variable: JiraRetrieveissueMetadata
+                            $ref: >-
+                              #/block/If 3/node-output/Jira Retrieve
+                              issue/response
+                          - variable: ApptioTargetprocessRetrievebugs
+                            $ref: >-
+                              #/node-output/Apptio Targetprocess Retrieve
+                              bugs/response/payload
+                          - variable: ApptioTargetprocessRetrievebugsMetadata
+                            $ref: >-
+                              #/node-output/Apptio Targetprocess Retrieve
+                              bugs/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$JiraRetrieveissueMetadata."status-code"}}': '200'
+                            execute:
+                              - create-action:
+                                  name: Jira Create issue comment 2
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-10
+                                  map:
+                                    mappings:
+                                      - body:
+                                          template: >-
+                                            After the update at
+                                            {{$JiraRetrieveissue.fields.updated}}:
+                                            The Apptio Targetprocess Status -
+                                            {{$Foreach2item.entityState.name}} and
+                                            Priority -
+                                            {{$Foreach2item.priority.name}}
+                                      - issueId:
+                                          template: '{{$JiraRetrieveissue.id}}'
+                                      - key:
+                                          template: ITSAMPLE
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreach2item
+                                        $ref: '#/block/For each 2/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: JiraRetrieveissue
+                                        $ref: >-
+                                          #/block/If 3/node-output/Jira Retrieve
+                                          issue/response/payload
+                                      - variable: JiraRetrieveissueMetadata
+                                        $ref: >-
+                                          #/block/If 3/node-output/Jira Retrieve
+                                          issue/response
+                                      - variable: ApptioTargetprocessRetrievebugs
+                                        $ref: >-
+                                          #/node-output/Apptio Targetprocess
+                                          Retrieve bugs/response/payload
+                                      - variable: ApptioTargetprocessRetrievebugsMetadata
+                                        $ref: >-
+                                          #/node-output/Apptio Targetprocess
+                                          Retrieve bugs/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute: []
+                        output-schema: {}
+              else:
+                execute: []
+              output-schema: {}
+  name: Update status of issues in Jira with the updated status from Apptio Targetprocess bugs
+models: {}
