@@ -3373,6 +3373,132 @@
     "targetApps": ["infobip", "wufoo"],
     "tags": ["streaming-connector-scheduler", "infobip", "wufoo"],
     "offerings": ["app connect professional"]
+},
+    {
+    "name": "Create tickets in Zendesk Service for the bugs in Apptio Targetprocess related to IT services",
+    "description": "Use this template to create tickets in Zendesk Service for the bugs in Apptio Targetprocess related to IT services",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "apptiotargetprocess",
+        "zendeskservice"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "apptiotargetprocess",
+        "zendeskservice"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Update Apptio Targetprocess bugs with latest status and priority from Zendesk Service tickets",
+    "description": "Use this template to update Apptio Targetprocess bugs with latest status and priority from Zendesk Service tickets. This is a sequel flow for, Create tickets in Zendesk Service for the bugs in Apptio Targetprocess related to IT services.",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "zendeskservice",
+        "apptiotargetprocess"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "zendeskservice",
+        "apptiotargetprocess"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Assign open tasks to a team from Apptio Targetprocess and send details to the team Gmail",
+    "description": "Use this template to fetch open tasks from apptio targetprocess and assign to a team and send details to the team gmail",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "apptiotargetprocess",
+        "gmail"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "apptiotargetprocess",
+        "gmail"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Create bugs in Apptio Targetprocess for the issues in Jira",
+    "description": "Use this template to create bugs in Apptio Targetprocess for the issues in Jira",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "jira",
+        "apptiotargetprocess"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "jira",
+        "apptiotargetprocess"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Update status of issues in Jira with the updated status from Apptio Targetprocess bugs",
+    "description": "Use this template to update status of issues in Jira with the updated status from Apptio Targetprocess bugs. This is a sequel flow for, Create bugs in Apptio Targetprocess for the issues in Jira",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "apptiotargetprocess",
+        "jira"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "apptiotargetprocess",
+        "jira"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Write comments in the issues in Jira with the new comments from Apptio Targetprocess bugs",
+    "description": "Use this template to write comments in the issues in Jira with the new comments from Apptio Targetprocess bugs. This is a sequel flow for, Create bugs in Apptio Targetprocess for the issues in Jira",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "apptiotargetprocess",
+        "jira"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "apptiotargetprocess",
+        "jira"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Add employees of BambooHR to users in Apptio Targetprocess",
+    "description": "Use this template to retrevie the list of employees from BambooHR and add them as users in targetprocess",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "bamboohr",
+        "apptiotargetprocess"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "bamboohr",
+        "apptiotargetprocess"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
 }
 ]
 }
