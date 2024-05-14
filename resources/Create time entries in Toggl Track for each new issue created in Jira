@@ -98,7 +98,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Jira IssueCollection
+              display-name: Jira issue collection
     assembly-2:
       assembly:
         execute:
@@ -336,5 +336,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Create time entries in Toggl Track for the time spent on task in Jeera
+  name: Create time entries in Toggl Track for each new issue created in Jira
 models: {}
