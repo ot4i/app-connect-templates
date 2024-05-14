@@ -1,0 +1,340 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 2
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: IssueCollection
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getWorkspacesByWorkspaceIdProjects_model
+      connector-type: toggltrack
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postWorkspacesByWorkspaceIdProjects_model
+      connector-type: toggltrack
+      actions:
+        postWorkspacesByWorkspaceIdProjects: {}
+    action-interface-4:
+      type: api-action
+      business-object: postWorkspacesByWorkspaceIdTimeEntries_model
+      connector-type: toggltrack
+      actions:
+        postWorkspacesByWorkspaceIdTimeEntries: {}
+    action-interface-5:
+      type: api-action
+      business-object: postWorkspacesByWorkspaceIdTimeEntries_model
+      connector-type: toggltrack
+      actions:
+        postWorkspacesByWorkspaceIdTimeEntries: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Jira Retrieve all issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  lastModified: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$JiraRetrieveallissues '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveallissues
+                    $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                  - variable: JiraRetrieveallissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve all issues/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Jira issue collection
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: JiraRetrieveallissues
+                  $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                - variable: JiraRetrieveallissuesMetadata
+                  $ref: '#/node-output/Jira Retrieve all issues/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.fields.status.name}}': Completed
+                  execute:
+                    - retrieve-action:
+                        name: Toggl Track Retrieve workspace projects
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          where:
+                            and:
+                              - name: '{{$Foreachitem.fields.project.name}}'
+                              - workspace_id: '7680400'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JiraRetrieveallissues
+                              $ref: >-
+                                #/node-output/Jira Retrieve all
+                                issues/response/payload
+                            - variable: JiraRetrieveallissuesMetadata
+                              $ref: '#/node-output/Jira Retrieve all issues/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 50
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - if:
+                        name: If
+                        input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: TogglTrackRetrieveworkspaceprojects
+                            $ref: >-
+                              #/block/If 2/node-output/Toggl Track Retrieve
+                              workspace projects/response/payload
+                          - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                            $ref: >-
+                              #/block/If 2/node-output/Toggl Track Retrieve
+                              workspace projects/response
+                          - variable: JiraRetrieveallissues
+                            $ref: >-
+                              #/node-output/Jira Retrieve all
+                              issues/response/payload
+                          - variable: JiraRetrieveallissuesMetadata
+                            $ref: '#/node-output/Jira Retrieve all issues/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              and:
+                                - '{{$TogglTrackRetrieveworkspaceprojectsMetadata."status-code"}}': '204'
+                                - '{{$TogglTrackRetrieveworkspaceprojectsMetadata}}':
+                                    '=': ''
+                                  hashKey: object:671
+                            execute:
+                              - custom-action:
+                                  name: Toggl Track Create workspace project
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-3
+                                  action: postWorkspacesByWorkspaceIdProjects
+                                  map:
+                                    mappings:
+                                      - active:
+                                          expression: 'true'
+                                      - billable:
+                                          expression: 'true'
+                                      - is_private:
+                                          expression: 'true'
+                                      - name:
+                                          template: '{{$Foreachitem.fields.project.name}}'
+                                      - recurring:
+                                          expression: 'false'
+                                      - workspace_id:
+                                          template: '7680400'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: TogglTrackRetrieveworkspaceprojects
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve workspace
+                                          projects/response/payload
+                                      - variable: >-
+                                          TogglTrackRetrieveworkspaceprojectsMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve workspace projects/response
+                                      - variable: JiraRetrieveallissues
+                                        $ref: >-
+                                          #/node-output/Jira Retrieve all
+                                          issues/response/payload
+                                      - variable: JiraRetrieveallissuesMetadata
+                                        $ref: >-
+                                          #/node-output/Jira Retrieve all
+                                          issues/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - custom-action:
+                                  name: Toggl Track Create time entry
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-4
+                                  action: postWorkspacesByWorkspaceIdTimeEntries
+                                  map:
+                                    mappings:
+                                      - billable:
+                                          expression: 'true'
+                                      - created_with:
+                                          template: >-
+                                            {{$Foreachitem.fields.issuetype.description}}
+                                      - description:
+                                          template: >-
+                                            Worked on Jeera Issue
+                                            {{$Foreachitem.id}}
+                                      - duration:
+                                          expression: '$Foreachitem.fields.timespent '
+                                      - project_id:
+                                          expression: '$TogglTrackCreateworkspaceproject.id '
+                                      - start:
+                                          template: '{{$Foreachitem.fields.created}}'
+                                      - workspace_id:
+                                          template: '7680400'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: TogglTrackCreateworkspaceproject
+                                        $ref: >-
+                                          #/block/If/node-output/Toggl Track
+                                          Create workspace
+                                          project/response/payload
+                                      - variable: TogglTrackRetrieveworkspaceprojects
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve workspace
+                                          projects/response/payload
+                                      - variable: >-
+                                          TogglTrackRetrieveworkspaceprojectsMetadata
+                                        $ref: >-
+                                          #/block/If 2/node-output/Toggl Track
+                                          Retrieve workspace projects/response
+                                      - variable: JiraRetrieveallissues
+                                        $ref: >-
+                                          #/node-output/Jira Retrieve all
+                                          issues/response/payload
+                                      - variable: JiraRetrieveallissuesMetadata
+                                        $ref: >-
+                                          #/node-output/Jira Retrieve all
+                                          issues/response
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute:
+                            - custom-action:
+                                name: Toggl Track Create time entry 2
+                                target:
+                                  $ref: >-
+                                    #/integration/action-interfaces/action-interface-5
+                                action: postWorkspacesByWorkspaceIdTimeEntries
+                                map:
+                                  mappings:
+                                    - billable:
+                                        expression: 'true'
+                                    - created_with:
+                                        template: >-
+                                          {{$Foreachitem.fields.issuetype.description}}
+                                    - description:
+                                        template: >-
+                                          Worked on Jeera Issue
+                                          {{$Foreachitem.id}}
+                                    - duration:
+                                        expression: '$Foreachitem.fields.timespent '
+                                    - project_id:
+                                        expression: >-
+                                          $TogglTrackRetrieveworkspaceprojects[0].id 
+                                    - start:
+                                        template: '{{$Foreachitem.fields.created}}'
+                                    - workspace_id:
+                                        template: '7680400'
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Foreachitem
+                                      $ref: '#/block/For each/current-item'
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: TogglTrackRetrieveworkspaceprojects
+                                      $ref: >-
+                                        #/block/If 2/node-output/Toggl Track
+                                        Retrieve workspace
+                                        projects/response/payload
+                                    - variable: >-
+                                        TogglTrackRetrieveworkspaceprojectsMetadata
+                                      $ref: >-
+                                        #/block/If 2/node-output/Toggl Track
+                                        Retrieve workspace projects/response
+                                    - variable: JiraRetrieveallissues
+                                      $ref: >-
+                                        #/node-output/Jira Retrieve all
+                                        issues/response/payload
+                                    - variable: JiraRetrieveallissuesMetadata
+                                      $ref: >-
+                                        #/node-output/Jira Retrieve all
+                                        issues/response
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                        output-schema: {}
+              else:
+                execute: []
+              output-schema: {}
+  name: Create time entries in Toggl Track for each new issue created in Jira
+models: {}
