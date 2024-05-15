@@ -27,6 +27,7 @@ integration:
                     - SUN
                   timeZone: UTC
       connector-type: streaming-connector-scheduler
+      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -74,10 +75,6 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: BambooHRRetrieveemployees
-                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
-                  - variable: BambooHRRetrieveemployeesMetadata
-                    $ref: '#/node-output/BambooHR Retrieve employees/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               mode: sequential
@@ -132,23 +129,13 @@ integration:
                               expression: '7680400'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
-                  - variable: Foreachitem
-                    $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: BambooHRRetrieveemployees2
-                    $ref: >-
-                      #/block/For each/node-output/BambooHR Retrieve employees
-                      2/response/payload
-                  - variable: BambooHRRetrieveemployees2Metadata
-                    $ref: >-
-                      #/block/For each/node-output/BambooHR Retrieve employees
-                      2/response
-                  - variable: BambooHRRetrieveemployees
-                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
-                  - variable: BambooHRRetrieveemployeesMetadata
-                    $ref: '#/node-output/BambooHR Retrieve employees/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send an invite to fill time entries in Toggl Track for each new employee added to BambooHR
+  name: >-
+    Send an invite to fill time entries in Toggl Track for each new employee
+    added to BambooHR
 models: {}
