@@ -27,6 +27,7 @@ integration:
                     - SUN
                   timeZone: UTC
       connector-type: streaming-connector-scheduler
+      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -87,10 +88,6 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: JiraRetrieveallissues
-                    $ref: '#/node-output/Jira Retrieve all issues/response/payload'
-                  - variable: JiraRetrieveallissuesMetadata
-                    $ref: '#/node-output/Jira Retrieve all issues/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               mode: sequential
@@ -105,14 +102,10 @@ integration:
           - if:
               name: If 2
               input:
-                - variable: Foreachitem
-                  $ref: '#/block/For each/current-item'
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: JiraRetrieveallissues
-                  $ref: '#/node-output/Jira Retrieve all issues/response/payload'
-                - variable: JiraRetrieveallissuesMetadata
-                  $ref: '#/node-output/Jira Retrieve all issues/response'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
               branch:
@@ -148,24 +141,10 @@ integration:
                     - if:
                         name: If
                         input:
-                          - variable: Foreachitem
-                            $ref: '#/block/For each/current-item'
                           - variable: Trigger
                             $ref: '#/trigger/payload'
-                          - variable: TogglTrackRetrieveworkspaceprojects
-                            $ref: >-
-                              #/block/If 2/node-output/Toggl Track Retrieve
-                              workspace projects/response/payload
-                          - variable: TogglTrackRetrieveworkspaceprojectsMetadata
-                            $ref: >-
-                              #/block/If 2/node-output/Toggl Track Retrieve
-                              workspace projects/response
-                          - variable: JiraRetrieveallissues
-                            $ref: >-
-                              #/node-output/Jira Retrieve all
-                              issues/response/payload
-                          - variable: JiraRetrieveallissuesMetadata
-                            $ref: '#/node-output/Jira Retrieve all issues/response'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
                           - variable: flowDetails
                             $ref: '#/flowDetails'
                         branch:
@@ -198,28 +177,10 @@ integration:
                                           template: '7680400'
                                     $map: http://ibm.com/appconnect/map/v1
                                     input:
-                                      - variable: Foreachitem
-                                        $ref: '#/block/For each/current-item'
                                       - variable: Trigger
                                         $ref: '#/trigger/payload'
-                                      - variable: TogglTrackRetrieveworkspaceprojects
-                                        $ref: >-
-                                          #/block/If 2/node-output/Toggl Track
-                                          Retrieve workspace
-                                          projects/response/payload
-                                      - variable: >-
-                                          TogglTrackRetrieveworkspaceprojectsMetadata
-                                        $ref: >-
-                                          #/block/If 2/node-output/Toggl Track
-                                          Retrieve workspace projects/response
-                                      - variable: JiraRetrieveallissues
-                                        $ref: >-
-                                          #/node-output/Jira Retrieve all
-                                          issues/response/payload
-                                      - variable: JiraRetrieveallissuesMetadata
-                                        $ref: >-
-                                          #/node-output/Jira Retrieve all
-                                          issues/response
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
                                       - variable: flowDetails
                                         $ref: '#/flowDetails'
                               - custom-action:
@@ -249,33 +210,10 @@ integration:
                                           template: '7680400'
                                     $map: http://ibm.com/appconnect/map/v1
                                     input:
-                                      - variable: Foreachitem
-                                        $ref: '#/block/For each/current-item'
                                       - variable: Trigger
                                         $ref: '#/trigger/payload'
-                                      - variable: TogglTrackCreateworkspaceproject
-                                        $ref: >-
-                                          #/block/If/node-output/Toggl Track
-                                          Create workspace
-                                          project/response/payload
-                                      - variable: TogglTrackRetrieveworkspaceprojects
-                                        $ref: >-
-                                          #/block/If 2/node-output/Toggl Track
-                                          Retrieve workspace
-                                          projects/response/payload
-                                      - variable: >-
-                                          TogglTrackRetrieveworkspaceprojectsMetadata
-                                        $ref: >-
-                                          #/block/If 2/node-output/Toggl Track
-                                          Retrieve workspace projects/response
-                                      - variable: JiraRetrieveallissues
-                                        $ref: >-
-                                          #/node-output/Jira Retrieve all
-                                          issues/response/payload
-                                      - variable: JiraRetrieveallissuesMetadata
-                                        $ref: >-
-                                          #/node-output/Jira Retrieve all
-                                          issues/response
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
                                       - variable: flowDetails
                                         $ref: '#/flowDetails'
                         else:
@@ -308,28 +246,10 @@ integration:
                                         template: '7680400'
                                   $map: http://ibm.com/appconnect/map/v1
                                   input:
-                                    - variable: Foreachitem
-                                      $ref: '#/block/For each/current-item'
                                     - variable: Trigger
                                       $ref: '#/trigger/payload'
-                                    - variable: TogglTrackRetrieveworkspaceprojects
-                                      $ref: >-
-                                        #/block/If 2/node-output/Toggl Track
-                                        Retrieve workspace
-                                        projects/response/payload
-                                    - variable: >-
-                                        TogglTrackRetrieveworkspaceprojectsMetadata
-                                      $ref: >-
-                                        #/block/If 2/node-output/Toggl Track
-                                        Retrieve workspace projects/response
-                                    - variable: JiraRetrieveallissues
-                                      $ref: >-
-                                        #/node-output/Jira Retrieve all
-                                        issues/response/payload
-                                    - variable: JiraRetrieveallissuesMetadata
-                                      $ref: >-
-                                        #/node-output/Jira Retrieve all
-                                        issues/response
+                                    - variable: Foreachitem
+                                      $ref: '#/block/For each/current-item'
                                     - variable: flowDetails
                                       $ref: '#/flowDetails'
                         output-schema: {}
