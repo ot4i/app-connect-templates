@@ -137,6 +137,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: >-
-    Send a voice message via Infobip for each new form entry created in Wufoo
+  name: Send a voice message via Infobip for each new form entry created in Wufoo
 models: {}
