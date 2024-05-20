@@ -3375,52 +3375,49 @@
     "offerings": ["app connect professional"]
 },
 {
-  "name": "Send an SMS message through ClickSend for each order placed in Shopify",
-  "description": "Use this template to Send an SMS message through ClickSend for each order placed in Shopify.",
-  "summary": "Scheduler to 2 applications",
-  "sourceApp": "scheduler",
-  "targetApps": ["shopify","clicksend"],
-  "tags": ["scheduler", "shopify","clicksend"],
-  "offerings": ["app connect professional"]
-},
-{
-    "name": "Send an SMS message through ClickSend for each complaint received through Gmail",
-    "description": "Use this template to Send an SMS message through ClickSend for each complaint received through Gmail.",
-    "summary": "Gmail to ClickSend",
-    "sourceApp": "gmail",
-    "targetApps": ["clicksend"],
-    "tags": ["gmail","clicksend"],
-    "offerings": ["app connect professional"]
-   
-},
-{
-  "name": "Send a voice message through ClickSend for each new form entry created in Wufoo",
-  "description": "Use this template to send a voice message through ClickSend for each new form entry created in Wufoo.",
-  "summary": "Scheduler to 2 applications",
-  "sourceApp": "scheduler",
-  "targetApps": ["wufoo","clicksend"],
-  "tags": ["scheduler","wufoo","clicksend"],
-  "offerings": ["app connect professional"]
- 
-},
-{
    "name": "Create time entries in Toggl Track for each new issue created in Jira",
    "description": "Use this template to create time entries in Toggl Track for each new issue created in Jira.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["jira", "toggltrack"],
-   "tags": ["streaming-connector-scheduler","jira", "toggltrack"],
+   "tags": ["streaming-connector-scheduler", "jira", "toggltrack"],
    "offerings": ["app connect professional"]
-   },
-   {
+},
+{
     "name": "Send an invite to fill time entries in Toggl Track for each new employee added to BambooHR",
     "description": "Use this template to send an invite to fill time entries in Toggl Track for each new employee added to BambooHR.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["bamboohr", "toggltrack"],
-    "tags": ["streaming-connector-scheduler","bamboohr", "toggltrack"],
+    "tags": ["streaming-connector-scheduler", "bamboohr", "toggltrack"],
     "offerings": ["app connect professional"]
-   }
-
+},
+{
+  "name": "Send an SMS message through ClickSend for each order placed in Shopify",
+  "description": "Use this template to send an SMS message through ClickSend for each order placed in Shopify.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["shopify", "clicksend"],
+  "tags": ["scheduler", "shopify", "clicksend"],
+  "offerings": ["app connect professional"]
+},
+{
+    "name": "Send an SMS message through ClickSend for each complaint received through Gmail",
+    "description": "Use this template to send an SMS message through ClickSend for each complaint received through Gmail.",
+    "summary": "Gmail to ClickSend",
+    "sourceApp": "gmail",
+    "targetApps": ["clicksend"],
+    "tags": ["gmail", "clicksend"],
+    "offerings": ["app connect professional"]
+},
+{
+  "name": "Send a voice message through ClickSend for each new form entry created in Wufoo",
+  "description": "Use this template to send a voice message through ClickSend for each new form entry created in Wufoo.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["wufoo", "clicksend"],
+  "tags": ["scheduler", "wufoo", "clicksend"],
+  "offerings": ["app connect professional"] 
+}
 ]
 }
