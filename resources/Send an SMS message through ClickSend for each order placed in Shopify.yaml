@@ -34,7 +34,7 @@ integration:
       connector-type: shopify
       actions:
         RETRIEVEALL: {}
-    action-interface-2:
+    action-interface-3:
       type: api-action
       business-object: postSmsSend_model
       connector-type: clicksend
@@ -71,14 +71,6 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: ShopifyRetrieveorders
-                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
-                  - variable: ShopifyRetrieveordersMetadata
-                    $ref: '#/node-output/Shopify Retrieve orders/response'
-                  - variable: ClickSendRetrieveaccountinformation
-                    $ref: >-
-                      #/node-output/Click Send Retrieve account
-                      information/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               mode: sequential
@@ -86,14 +78,14 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Shopify Order
+              display-name: Shopify order
     assembly-2:
       assembly:
         execute:
           - custom-action:
-              name: Click Send Send message
+              name: ClickSend Send SMS message
               target:
-                $ref: '#/integration/action-interfaces/action-interface-2'
+                $ref: '#/integration/action-interfaces/action-interface-3'
               action: postSmsSend
               map:
                 mappings:
@@ -104,8 +96,8 @@ integration:
                         mappings:
                           - body:
                               template: >-
-                                Your Order has been placed. Order ID is:
-                                {{$Foreachitem.id}}
+                                Your Order has been placed. Order ID
+                                is:{{$Foreachitem.id}}
                           - custom_string:
                               template: test
                           - from:
@@ -116,15 +108,11 @@ integration:
                               template: '{{$Foreachitem.shipping_address.phone}}'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
-                  - variable: Foreachitem
-                    $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: ShopifyRetrieveorders
-                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
-                  - variable: ShopifyRetrieveordersMetadata
-                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send confirmation sms notification when customer place any order
+  name: Send an SMS message through ClickSend for each order placed in Shopify
 models: {}

@@ -52,16 +52,6 @@ integration:
               source:
                 expression: '$ClickSendRetrievecontactsbylistID '
                 input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: ClickSendRetrievecontactsbylistID
-                    $ref: >-
-                      #/node-output/ClickSend Retrieve contacts by list
-                      ID/response/payload
-                  - variable: ClickSendRetrievecontactsbylistIDMetadata
-                    $ref: >-
-                      #/node-output/ClickSend Retrieve contacts by list
-                      ID/response
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               mode: sequential
@@ -69,7 +59,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: ClickSend Contacts
+              display-name: ClickSend contacts
         tags:
           - incomplete
     assembly-2:
@@ -80,16 +70,6 @@ integration:
               input:
                 - variable: Foreachitem
                   $ref: '#/block/For each/current-item'
-                - variable: Trigger
-                  $ref: '#/trigger/payload'
-                - variable: ClickSendRetrievecontactsbylistID
-                  $ref: >-
-                    #/node-output/ClickSend Retrieve contacts by list
-                    ID/response/payload
-                - variable: ClickSendRetrievecontactsbylistIDMetadata
-                  $ref: >-
-                    #/node-output/ClickSend Retrieve contacts by list
-                    ID/response
                 - variable: flowDetails
                   $ref: '#/flowDetails'
               branch:
@@ -122,16 +102,6 @@ integration:
                           input:
                             - variable: Foreachitem
                               $ref: '#/block/For each/current-item'
-                            - variable: Trigger
-                              $ref: '#/trigger/payload'
-                            - variable: ClickSendRetrievecontactsbylistID
-                              $ref: >-
-                                #/node-output/ClickSend Retrieve contacts by
-                                list ID/response/payload
-                            - variable: ClickSendRetrievecontactsbylistIDMetadata
-                              $ref: >-
-                                #/node-output/ClickSend Retrieve contacts by
-                                list ID/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
                   completion-action:
@@ -140,16 +110,6 @@ integration:
                         input:
                           - variable: Foreachitem
                             $ref: '#/block/For each/current-item'
-                          - variable: Trigger
-                            $ref: '#/trigger/payload'
-                          - variable: ClickSendRetrievecontactsbylistID
-                            $ref: >-
-                              #/node-output/ClickSend Retrieve contacts by list
-                              ID/response/payload
-                          - variable: ClickSendRetrievecontactsbylistIDMetadata
-                            $ref: >-
-                              #/node-output/ClickSend Retrieve contacts by list
-                              ID/response
                           - variable: flowDetails
                             $ref: '#/flowDetails'
                         message: Contact found
@@ -158,6 +118,6 @@ integration:
                 execute: []
               output-schema: {}
   name: >-
-    Send acknowledgement through sms notification to customers on receiving any
-    complain
+    Send an SMS message through ClickSend for each complaint received through
+    Gmail
 models: {}

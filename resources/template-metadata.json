@@ -3374,29 +3374,19 @@
     "tags": ["streaming-connector-scheduler", "infobip", "wufoo"],
     "offerings": ["app connect professional"]
 },
-    {
-    "name": "Send confirmation sms notification when customer place any order",
-    "description": "Use this template to send confirmation sms notification when customer place any order.",
-    "summary": "streaming-connector-scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["shopify","clicksend"],
-    "tags": ["streaming-connector-scheduler", "shopify","clicksend"],
-    "offerings": ["app connect professional"]
-   },
 {
-    "name": "Create sms campaign for notifying existing ecommerce customers about the upcoming sale",
-    "description": "Use this template to create sms campaign for notifying existing ecommerce customers about the upcoming sale.",
-    "summary": "streaming-connector-scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["shopify","clicksend"],
-    "tags": ["streaming-connector-scheduler","shopify","clicksend"],
-    "offerings": ["app connect professional"]
-   },
-
+  "name": "Send an SMS message through ClickSend for each order placed in Shopify",
+  "description": "Use this template to Send an SMS message through ClickSend for each order placed in Shopify.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "scheduler",
+  "targetApps": ["shopify","clicksend"],
+  "tags": ["scheduler", "shopify","clicksend"],
+  "offerings": ["app connect professional"]
+},
 {
-    "name": "Send acknowledgement through sms notification to customers on receiving any complain",
-    "description": "Use this template to send acknowledgement through sms notification to customers on receiving any complain.",
-    "summary": "1 flow using 2 applications",
+    "name": "Send an SMS message through ClickSend for each complaint received through Gmail",
+    "description": "Use this template to Send an SMS message through ClickSend for each complaint received through Gmail.",
+    "summary": "Gmail to ClickSend",
     "sourceApp": "gmail",
     "targetApps": ["clicksend"],
     "tags": ["gmail","clicksend"],
@@ -3404,13 +3394,14 @@
    
 },
 {
-    "name": "Send personalized welcome voice message to new sign up customers",
-    "description": "Use this template to send personalized welcome voice message to new sign up customers.",
-    "summary": "streaming-connector-scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["wufoo","clicksend"],
-    "tags": ["streaming-connector-scheduler","wufoo","clicksend"],
-    "offerings": ["app connect professional"]
+  "name": "Send a voice message through ClickSend for each new form entry created in Wufoo",
+  "description": "Use this template to send a voice message through ClickSend for each new form entry created in Wufoo.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "scheduler",
+  "targetApps": ["wufoo","clicksend"],
+  "tags": ["scheduler","wufoo","clicksend"],
+  "offerings": ["app connect professional"]
+ 
 }
 ]
 }
