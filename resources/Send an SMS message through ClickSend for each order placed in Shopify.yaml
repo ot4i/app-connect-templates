@@ -4,18 +4,19 @@ integration:
   trigger-interfaces:
     trigger-interface-1:
       type: event-trigger
+      connector-type: streaming-connector-scheduler
       triggers:
         SCHEDULE:
-          input-context:
-            data: scheduler
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
           options:
             subscription:
               scheduleConfiguration:
                 interval:
                   unit: minute
-                  value: 2
+                  value: 1
                   runOnceOncheck: true
                   days:
                     - MON
@@ -26,49 +27,38 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      connector-type: streaming-connector-scheduler
       account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: order
       connector-type: shopify
+      account-name: Account 1
       actions:
         RETRIEVEALL: {}
-      account-name: Account 1
-    action-interface-3:
+    action-interface-2:
       type: api-action
       business-object: postSmsSend_model
       connector-type: clicksend
+      account-name: Account 1
       actions:
         postSmsSend: {}
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
         execute:
           - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: true
               name: Shopify Retrieve orders
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
-                where:
-                  and:
-                    - status: open
-                    - created_at_min: '{{$Trigger.lastEventTime}}'
-                input:
-                  - variable: Trigger
-                    $ref: '#/trigger/payload'
-                  - variable: flowDetails
-                    $ref: '#/flowDetails'
-                limit: 2
-              allow-truncation: true
-              pagination-type: TOKEN
-              allow-empty-output: false
+                limit: 10
           - for-each:
-              name: For each
-              assembly:
-                $ref: '#/integration/assemblies/assembly-2'
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
               source:
                 expression: '$ShopifyRetrieveorders '
                 input:
@@ -82,23 +72,23 @@ integration:
                     $ref: '#/flowDetails'
               mode: sequential
               continue-on-error: true
-              map:
-                $map: http://ibm.com/appconnect/map/v1
-                mappings: []
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
               display-name: Shopify order
     assembly-2:
       assembly:
         execute:
           - custom-action:
+              action: postSmsSend
               name: ClickSend Send SMS message
               target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
-              action: postSmsSend
+                $ref: '#/integration/action-interfaces/action-interface-2'
               map:
                 mappings:
                   - messages:
                       foreach:
-                        input: '{}'
+                        input: '[]'
                         iterator: messagesItem
                         mappings:
                           - body:
