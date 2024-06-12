@@ -74,6 +74,10 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: BambooHRRetrieveemployees
+                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
+                  - variable: BambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/BambooHR Retrieve employees/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               mode: sequential
@@ -130,6 +134,18 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
+                  - variable: BambooHRRetrieveemployees
+                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
+                  - variable: BambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/BambooHR Retrieve employees/response'
+                  - variable: BambooHRRetrieveemployees2
+                    $ref: >-
+                      #/block/For each/node-output/BambooHR Retrieve employees
+                      2/response/payload
+                  - variable: BambooHRRetrieveemployees2Metadata
+                    $ref: >-
+                      #/block/For each/node-output/BambooHR Retrieve employees
+                      2/response
                   - variable: Foreachitem
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
