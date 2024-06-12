@@ -1,0 +1,124 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: CST6CDT
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getApiV2Bugs_model
+      connector-type: apptiotargetprocess
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Apptio Targetprocess Retrieve bugs
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - createDate:
+                        gt: '{{$Trigger.lastEventTime}}'
+                    - Tags:
+                        contains: IT Services
+                    - EntityState___Name: Open
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 5000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ApptioTargetprocessRetrievebugs '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Apptio Targetprocess Bugs
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Zendesk Service Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - description:
+                      template: >-
+                        Apptio Targetprocess Priority:
+                        {{$Foreachitem.priority.name}},
+                        {{$Foreachitem.description}}
+                  - priority:
+                      template: normal
+                  - requester:
+                      mappings:
+                        - email:
+                            template: '{{$Foreachitem.creator.login}}'
+                        - name:
+                            template: '{{$Foreachitem.creator.fullName}}'
+                  - subject:
+                      template: '{{$Foreachitem.id}}#: {{$Foreachitem.name}}'
+                  - tags:
+                      expression: ' [$Foreachitem.tags]'
+                  - type:
+                      template: problem
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Create tickets in Zendesk Service for the bugs in Apptio Targetprocess
+    related to IT services
+models: {}

@@ -1,0 +1,289 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: IssueCollection
+      connector-type: jira
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postApiV1Bugs_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Bugs: {}
+    action-interface-3:
+      type: api-action
+      business-object: getApiV2Projects_model
+      connector-type: apptiotargetprocess
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: postApiV1Projects_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Projects: {}
+    action-interface-9:
+      type: api-action
+      business-object: postApiV1Bugs_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Bugs: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Jira Retrieve all issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  created: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 500
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$JiraRetrieveallissues '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Jira IssueCollection
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Apptio Targetprocess Retrieve projects
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  Name: >-
+                    {{$Foreachitem.fields.project.id}}:{{$Foreachitem.fields.project.name}}
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JiraRetrieveallissues
+                    $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                  - variable: JiraRetrieveallissuesMetadata
+                    $ref: '#/node-output/Jira Retrieve all issues/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ApptioTargetprocessRetrieveprojectsMetadata."status-code"}}': '200'
+                  execute:
+                    - custom-action:
+                        name: Apptio Targetprocess Create or update bug 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-9'
+                        action: postApiV1Bugs
+                        map:
+                          mappings:
+                            - Description:
+                                template: '{{$Foreachitem.fields.description}}'
+                            - Name:
+                                template: >-
+                                  {{$Foreachitem.id}}:
+                                  {{$Foreachitem.fields.summary}}
+                            - Project:
+                                mappings:
+                                  - Id:
+                                      expression: '$ApptioTargetprocessRetrieveprojects.id '
+                            - Tags:
+                                template: '{{$Foreachitem.fields.issuetype.name}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          limit: 10
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ApptioTargetprocessCreateorupdateproject
+                        $ref: >-
+                          #/block/If 2/node-output/Apptio Targetprocess Create
+                          or update project/response/payload
+                      - variable: ApptioTargetprocessRetrieveprojects
+                        $ref: >-
+                          #/block/For each/node-output/Apptio Targetprocess
+                          Retrieve projects/response/payload
+                      - variable: ApptioTargetprocessRetrieveprojectsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Apptio Targetprocess
+                          Retrieve projects/response
+                      - variable: Setvariable
+                        $ref: >-
+                          #/block/For each/node-output/Set
+                          variable/response/payload
+                      - variable: JiraRetrieveallissues
+                        $ref: >-
+                          #/node-output/Jira Retrieve all
+                          issues/response/payload
+                      - variable: JiraRetrieveallissuesMetadata
+                        $ref: '#/node-output/Jira Retrieve all issues/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - projectid:
+                          template: '{{$ApptioTargetprocessCreateorupdateproject.Id}}'
+              else:
+                execute:
+                  - custom-action:
+                      name: Apptio Targetprocess Create or update project
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-4'
+                      action: postApiV1Projects
+                      map:
+                        mappings:
+                          - Description:
+                              template: '{{$Foreachitem.fields.project}}'
+                          - Name:
+                              template: >-
+                                {{$Foreachitem.fields.project.id}}:{{$Foreachitem.fields.project.name}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      filter:
+                        limit: 10
+                  - custom-action:
+                      name: Apptio Targetprocess Create or update bug
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      action: postApiV1Bugs
+                      map:
+                        mappings:
+                          - Description:
+                              template: '{{$Foreachitem.fields.description}}'
+                          - Name:
+                              template: >-
+                                {{$Foreachitem.id}}:
+                                {{$Foreachitem.fields.summary}}
+                          - Project:
+                              mappings:
+                                - Id:
+                                    expression: >-
+                                      $ApptioTargetprocessCreateorupdateproject.Id 
+                          - Tags:
+                              template: '{{$Foreachitem.fields.issuetype.name}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      filter:
+                        limit: 10
+                map:
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: ApptioTargetprocessRetrieveprojects
+                      $ref: >-
+                        #/block/For each/node-output/Apptio Targetprocess
+                        Retrieve projects/response/payload
+                    - variable: ApptioTargetprocessRetrieveprojectsMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Apptio Targetprocess
+                        Retrieve projects/response
+                    - variable: Setvariable
+                      $ref: >-
+                        #/block/For each/node-output/Set
+                        variable/response/payload
+                    - variable: JiraRetrieveallissues
+                      $ref: '#/node-output/Jira Retrieve all issues/response/payload'
+                    - variable: JiraRetrieveallissuesMetadata
+                      $ref: '#/node-output/Jira Retrieve all issues/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                  mappings:
+                    - projectid:
+                        template: '{{$ApptioTargetprocessRetrieveprojects[0].Id}}'
+              output-schema:
+                type: object
+                properties:
+                  projectid:
+                    type: string
+                required: []
+  name: Create bugs in Apptio Targetprocess for the issues in Jira
+models: {}
