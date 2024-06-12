@@ -1,0 +1,182 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 2
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Ticket
+      connector-type: zendeskservice
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: getApiV2Bugs_model
+      connector-type: apptiotargetprocess
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: postApiV1Comments_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Comments: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zendesk Service Retrieve tickets
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  updated_at:
+                    gt: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 5000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ZendeskServiceRetrievetickets '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Zendesk Service Ticket
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.updated_at}}':
+                      gt: '{{$Foreachitem.created_at}}'
+                  execute:
+                    - retrieve-action:
+                        name: Apptio Targetprocess Retrieve bugs 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            Id: '{{$split($Foreachitem.subject , "#:")[0]}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZendeskServiceRetrievetickets
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response/payload
+                            - variable: ZendeskServiceRetrieveticketsMetadata
+                              $ref: >-
+                                #/node-output/Zendesk Service Retrieve
+                                tickets/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 1
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - if:
+                        name: If 2
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        branch:
+                          - condition:
+                              '{{$ApptioTargetprocessRetrievebugs2Metadata."status-code"}}': '200'
+                            execute:
+                              - custom-action:
+                                  name: >-
+                                    Apptio Targetprocess Create or update
+                                    comment
+                                  target:
+                                    $ref: >-
+                                      #/integration/action-interfaces/action-interface-5
+                                  action: postApiV1Comments
+                                  map:
+                                    mappings:
+                                      - Description:
+                                          template: >-
+                                            Zendest ticket after the update at
+                                            {{$Foreachitem.updated_at}}: Status -
+                                            {{$Foreachitem.status}} , Priority -
+                                            {{$Foreachitem.priority}}
+                                      - General:
+                                          mappings:
+                                            - Id:
+                                                expression: $ApptioTargetprocessRetrievebugs2.id
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: Foreachitem
+                                        $ref: '#/block/For each/current-item'
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                                  filter:
+                                    limit: 10
+                        else:
+                          execute: []
+                        output-schema: {}
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Update Apptio Targetprocess bugs with latest status and priority from
+    Zendesk Service tickets
+models: {}
