@@ -3391,6 +3391,24 @@
     "targetApps": ["bamboohr", "toggltrack"],
     "tags": ["streaming-connector-scheduler","bamboohr", "toggltrack"],
     "offerings": ["app connect professional"]
+   },
+    {
+    "name": "Create event in Google Calendar for applied leave in Factorial HR",
+    "description": "Use this template to Create event in Google Calendar for applied leave in Factorial HR.",
+    "summary": "scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["factorialhr", "googlecalendar"],
+    "tags": ["streaming-connector-scheduler","factorialhr", "googlecalendar"],
+    "offerings": ["app connect professional"]
+   },
+    {
+    "name": "Seamless sync time entries between Factorial HR and Toggl Track",
+    "description": "Use this template to Seamless sync time entries between Factorial HR and Toggl Track.",
+    "summary": "scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["factorialhr","toggltrack"],
+    "tags": ["streaming-connector-scheduler","factorialhr","toggltrack"],
+    "offerings": ["app connect professional"]
    }
 ]
 }
