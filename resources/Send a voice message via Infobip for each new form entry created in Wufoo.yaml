@@ -69,10 +69,6 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: WufooRetrieveformentries
-                    $ref: '#/node-output/Wufoo Retrieve form entries/response/payload'
-                  - variable: WufooRetrieveformentriesMetadata
-                    $ref: '#/node-output/Wufoo Retrieve form entries/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               mode: sequential
@@ -89,14 +85,10 @@ integration:
           - if:
               name: If
               input:
-                - variable: Foreachitem
-                  $ref: '#/block/For each/current-item'
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: WufooRetrieveformentries
-                  $ref: '#/node-output/Wufoo Retrieve form entries/response/payload'
-                - variable: WufooRetrieveformentriesMetadata
-                  $ref: '#/node-output/Wufoo Retrieve form entries/response'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
               branch:
@@ -128,15 +120,14 @@ integration:
                                       template: Jessica
                           $map: http://ibm.com/appconnect/map/v1
                           input:
-                            - variable: Foreachitem
-                              $ref: '#/block/For each/current-item'
                             - variable: Trigger
                               $ref: '#/trigger/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
                             - variable: flowDetails
                               $ref: '#/flowDetails'
               else:
                 execute: []
               output-schema: {}
-  name: >-
-    Send a voice message via Infobip for each new form entry created in Wufoo
+  name: Send a voice message via Infobip for each new form entry created in Wufoo
 models: {}
