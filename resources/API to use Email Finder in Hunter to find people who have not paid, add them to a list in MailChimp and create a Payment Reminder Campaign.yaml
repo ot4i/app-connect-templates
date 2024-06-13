@@ -24,21 +24,18 @@ integration:
       type: api-action
       business-object: Members
       connector-type: mailchimp
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-3:
       type: api-action
       business-object: Campaigns
       connector-type: mailchimp
-      account-name: Account 1
       actions:
         CREATE: {}
     action-interface-1:
       type: api-action
       business-object: getV2EmailFinder_model
       connector-type: UDA.54eqpgxb6e.openapi.Hunter
-      account-name: Account 1
       actions:
         getV2EmailFinder: {}
   assemblies:
