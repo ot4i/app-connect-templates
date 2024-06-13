@@ -27,7 +27,6 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      account-name: Account 2
   action-interfaces:
     action-interface-2:
       type: api-action
@@ -35,12 +34,10 @@ integration:
       connector-type: salesforce
       actions:
         UPSERTWITHWHERE: {}
-      account-name: Account 1
     action-interface-1:
       type: api-action
       business-object: getV2DomainSearch_model
       connector-type: hunter
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
   assemblies:
