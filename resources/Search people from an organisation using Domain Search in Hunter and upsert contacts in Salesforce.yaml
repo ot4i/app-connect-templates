@@ -1,0 +1,149 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      account-name: Account 2
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        UPSERTWITHWHERE: {}
+      account-name: Account 1
+    action-interface-1:
+      type: api-action
+      business-object: getV2DomainSearch_model
+      connector-type: hunter
+      account-name: Account 1
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: true
+              name: Hunter Search email addresses by domain
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  domain: gm.com
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 3
+              pagination-type: SKIP_LIMIT
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '$HunterSearchemailaddressesbydomain '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HunterSearchemailaddressesbydomain
+                    $ref: >-
+                      #/node-output/Hunter Search email addresses by
+                      domain/response/payload
+                  - variable: HunterSearchemailaddressesbydomainMetadata
+                    $ref: >-
+                      #/node-output/Hunter Search email addresses by
+                      domain/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: emaildomain
+    assembly-2:
+      assembly:
+        execute:
+          - upsert-action:
+              name: Salesforce Update or create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Department:
+                      template: '{{$Foreachitem.department}}'
+                  - Email:
+                      template: '{{$Foreachitem.value}}'
+                  - FirstName:
+                      template: '{{$Foreachitem.first_name}}'
+                  - LastName:
+                      template: '{{$Foreachitem.last_name}}'
+                  - LeadSource:
+                      template: '{{$Foreachitem.sources.uri}}'
+                  - MobilePhone:
+                      template: '{{$Foreachitem.phone_number}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HunterSearchemailaddressesbydomain
+                    $ref: >-
+                      #/node-output/Hunter Search email addresses by
+                      domain/response/payload
+                  - variable: HunterSearchemailaddressesbydomainMetadata
+                    $ref: >-
+                      #/node-output/Hunter Search email addresses by
+                      domain/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Email: '{{$Foreachitem.value}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HunterSearchemailaddressesbydomain
+                    $ref: >-
+                      #/node-output/Hunter Search email addresses by
+                      domain/response/payload
+                  - variable: HunterSearchemailaddressesbydomainMetadata
+                    $ref: >-
+                      #/node-output/Hunter Search email addresses by
+                      domain/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Search people from an organisation using Domain Search and upsert contacts
+    in Salesforce
+models: {}
