@@ -21,20 +21,17 @@ integration:
               updatedField: eventId
               timeZone: Asia/Kolkata
               pollingInterval: 1
-      account-name: Account 1
   action-interfaces:
     action-interface-2:
       type: api-action
       business-object: postV2CampaignsByIdRecipients_model
       connector-type: UDA.default.openapi.Hunter1.0
-      account-name: Account 1
       actions:
         postV2CampaignsByIdRecipients: {}
     action-interface-1:
       type: api-action
       business-object: postV2CampaignsByIdRecipients_model
       connector-type: hunter
-      account-name: Account 1
       actions:
         postV2CampaignsByIdRecipients: {}
   assemblies:
