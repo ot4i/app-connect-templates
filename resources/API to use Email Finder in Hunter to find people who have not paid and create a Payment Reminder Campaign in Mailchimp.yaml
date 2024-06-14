@@ -1,0 +1,189 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        retrieveallCustomer:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Customer
+          output-context:
+            data: Customer
+      options:
+        resources:
+          - business-object: Customer
+            model:
+              $ref: '#/models/Customer'
+            triggers:
+              retrieveall: retrieveallCustomer
+      type: api-trigger
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Campaigns
+      connector-type: mailchimp
+      account-name: Account 1
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: getV2EmailFinder_model
+      connector-type: hunter
+      account-name: Account 1
+      actions:
+        getV2EmailFinder: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              action: getV2EmailFinder
+              name: Hunter Find email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              filter:
+                where:
+                  and:
+                    - domain: '{{$api.where.Domain}}'
+                    - first_name: '{{$api.where.FirstName}}'
+                    - last_name: '{{$api.where.LastName}}'
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+          - create-action:
+              name: MailChimp Add subscriber to a list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - email_address:
+                      template: '{{$HunterFindemail.data.email}}'
+                  - list_id:
+                      template: b979eddef3
+                  - merge_fields:
+                      mappings:
+                        - FNAME:
+                            template: '{{$HunterFindemail.data.first_name}}'
+                        - LNAME:
+                            template: '{{$HunterFindemail.meta.params.last_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: HunterFindemail
+                    $ref: '#/node-output/Hunter Find email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+          - create-action:
+              name: MailChimp Create campaign
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - list_id:
+                      template: b979eddef3
+                  - settings:
+                      mappings:
+                        - from_name:
+                            template: Event Coordinator
+                        - subject_line:
+                            template: Reminder for payment
+                        - title:
+                            template: Payment Due
+                  - type:
+                      template: regular
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: HunterFindemail
+                    $ref: '#/node-output/Hunter Find email/response/payload'
+                  - variable: MailChimpAddsubscribertoalist
+                    $ref: >-
+                      #/node-output/MailChimp Add subscriber to a
+                      list/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Customer successfully retrieved
+                  status-code: 200
+                  map:
+                    mappings:
+                      - Customer:
+                          foreach:
+                            input: '[0]'
+                            iterator: CustomerItem
+                            mappings:
+                              - Domain:
+                                  template: '{{$Hunter10EmailFinder.data.domain}}'
+                              - Email:
+                                  template: '{{$Hunter10EmailFinder.data.email}}'
+                              - FirstName:
+                                  template: '{{$Hunter10EmailFinder.data.first_name}}'
+                              - LastName:
+                                  template: '{{$Hunter10EmailFinder.data.last_name}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                      - variable: Hunter10EmailFinder
+                        $ref: '#/node-output/Hunter1.0 Email Finder/response/payload'
+                      - variable: Hunter10EmailFinderMetadata
+                        $ref: '#/node-output/Hunter1.0 Email Finder/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  input: []
+  name: Payment Reminder Campaign
+models:
+  Customer:
+    name: Customer
+    properties:
+      Domain:
+        required: false
+        id: false
+        type: string
+      Email:
+        required: false
+        id: true
+        type: string
+      FirstName:
+        required: false
+        id: false
+        type: string
+      LastName:
+        required: false
+        id: false
+        type: string
+    plural: Customer
+    description: ' '
+    operations:
+      retrieveall: '#/integration/assemblies/assembly-1'
+    interactions:
+      retrieveall:
+        pagination-type: none
+        filterSupport:
+          queryablefields:
+            - Domain
+            - FirstName
+            - LastName
