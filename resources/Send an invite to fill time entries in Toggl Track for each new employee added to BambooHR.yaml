@@ -4,12 +4,13 @@ integration:
   trigger-interfaces:
     trigger-interface-1:
       type: event-trigger
+      connector-type: streaming-connector-scheduler
       triggers:
         SCHEDULE:
-          input-context:
-            data: scheduler
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
           options:
             subscription:
               scheduleConfiguration:
@@ -26,7 +27,6 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      connector-type: streaming-connector-scheduler
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -36,25 +36,28 @@ integration:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
-      business-object: postOrganizationsByOrganizationIdInvitations_model
-      connector-type: toggltrack
-      actions:
-        postOrganizationsByOrganizationIdInvitations: {}
-    action-interface-3:
-      type: api-action
       business-object: employees
       connector-type: bamboohr
       actions:
         RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postOrganizationsByOrganizationIdInvitations_model
+      connector-type: toggltrack
+      actions:
+        postOrganizationsByOrganizationIdInvitations: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
           - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: true
               name: BambooHR Retrieve employees
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
+                limit: 10
                 where:
                   since: '{{$Trigger.lastEventTime}}'
                 input:
@@ -62,13 +65,10 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-                limit: 10
-              allow-truncation: true
-              allow-empty-output: false
           - for-each:
-              name: For each
-              assembly:
-                $ref: '#/integration/assemblies/assembly-2'
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
               source:
                 expression: '$BambooHRRetrieveemployees '
                 input:
@@ -82,43 +82,43 @@ integration:
                     $ref: '#/flowDetails'
               mode: sequential
               continue-on-error: true
-              map:
-                $map: http://ibm.com/appconnect/map/v1
-                mappings: []
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
               display-name: BambooHR employees
     assembly-2:
       assembly:
         execute:
           - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: false
               name: BambooHR Retrieve employees 2
               target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
+                $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
+                limit: 10
                 where:
                   id: '{{$Foreachitem.id}}'
                 input:
-                  - variable: Foreachitem
-                    $ref: '#/block/For each/current-item'
                   - variable: Trigger
                     $ref: '#/trigger/payload'
                   - variable: BambooHRRetrieveemployees
                     $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
                   - variable: BambooHRRetrieveemployeesMetadata
                     $ref: '#/node-output/BambooHR Retrieve employees/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-                limit: 10
-              allow-truncation: false
-              allow-empty-output: false
           - custom-action:
-              name: Toggl Track Create new invitation
-              target:
-                $ref: '#/integration/action-interfaces/action-interface-2'
               action: postOrganizationsByOrganizationIdInvitations
+              name: Toggl Track Create workspace invite
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
               map:
                 mappings:
                   - emails:
-                      expression: '[$BambooHRRetrieveemployees2.workEmail ]'
+                      expression: '$BambooHRRetrieveemployees2.workEmail '
                   - organization_id:
                       template: '7652498'
                   - workspaces:
@@ -150,7 +150,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: >-
-    Send an invite to fill time entries in Toggl Track for each new employee
-    added to BambooHR
+  name: Send an invite to fill time entries in Toggl Track for each new employee added to BambooHR
 models: {}
