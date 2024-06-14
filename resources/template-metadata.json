@@ -3392,7 +3392,7 @@
     "tags": ["streaming-connector-scheduler","bamboohr", "toggltrack"],
     "offerings": ["app connect professional"]
    },
-    {"name": "Search people from an organisation using Domain Search in Hunter and upsert contacts in Salesforce. ",
+   {"name": "Search people from an organisation using Domain Search in Hunter and upsert contacts in Salesforce. ",
     "description": "Use this template to search people from an organization and create or update the lead in salesforce.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
