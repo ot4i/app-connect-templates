@@ -89,7 +89,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Time Registries
+              display-name: Time registries
     assembly-2:
       assembly:
         execute:
