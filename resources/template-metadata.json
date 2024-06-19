@@ -3409,6 +3409,33 @@
     "targetApps": ["factorialhr", "toggltrack"],
     "tags": ["streaming-connector-scheduler", "factorialhr", "toggltrack"],
     "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Search people from an organization by email domain in Hunter and create or update contacts in Salesforce",
+    "description": "Use this template to search people from an organization by using email domain and create or update contacts in Salesforce.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["hunter", "salesforce"],
+    "tags": ["hunter", "salesforce", "streaming-connector-scheduler"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter",
+    "description": "Use this template to create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter.",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["hunter", "mailchimp"],
+    "tags": ["api", "hunter", "mailchimp"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Add recipients to a campaign using Hunter when a Google Calendar event is scheduled",
+    "description": "Use this template to check for response status of invitees (whether tentative or accepted) when an event is created in Google Calendar, and add those recipients to a campaign in Hunter.",
+    "summary": "Google Calendar to Hunter",
+    "sourceApp": "googlecalendar",
+    "targetApps": ["hunter"],
+    "tags": ["googlecalendar", "hunter"],
+    "offerings": ["app connect professional"]
    }
 ]
 }
