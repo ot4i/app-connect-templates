@@ -3393,7 +3393,7 @@
     "offerings": ["app connect professional"]
    },
    {"name": "Search people from an organization by email domain in Hunter and create or update contacts in Salesforce",
-    "description": "Use this template to search people from an organization and create or update the lead contacts in salesforce.",
+    "description": "Use this template to search people from an organization and create or update contacts in salesforce.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["hunter", "salesforce"],
@@ -3402,7 +3402,7 @@
    },
    {
     "name": "Create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter",
-    "description": "Use this template to find a specific person using Email Finder in Hunter, add that person to a list in mailchimp and create a campaign.",
+    "description": "Use this template to create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
     "targetApps": ["hunter", "mailchimp"],
@@ -3412,7 +3412,7 @@
    {
     "name": "Add recipients to a campaign using Hunter when a Google Calendar event is scheduled",
     "description": "Use this template to check for response status whether tentative or accepted when an event is created in Google Calendar and add those recipients to a campaign in Hunter",
-    "summary": "googlecalendar to hunter",
+    "summary": "Google Calendar to Hunter",
     "sourceApp": "googlecalendar",
     "targetApps": ["hunter"],
     "tags": ["googlecalendar", "hunter", "response", "tentative", "accepted", "leads", "campaign"],
