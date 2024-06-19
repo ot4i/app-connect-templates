@@ -141,6 +141,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: >-
-    Search people from an organisation using Domain Search and upsert contacts
-    in Salesforce
+    Search people from an organization by email domain in Hunter and create or update contacts in Salesforce
 models: {}

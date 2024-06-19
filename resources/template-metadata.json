@@ -3396,8 +3396,8 @@
     "description": "Use this template to search people from an organization and create or update the lead contacts in salesforce.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["hunter","salesforce"],
-    "tags": ["hunter","salesforce","scheduler","contacts","organisation","leads","domain-search","email"],
+    "targetApps": ["hunter", "salesforce"],
+    "tags": ["hunter", "salesforce", "streaming-connector-scheduler", "contacts", "organisation", "leads", "domain-search", "email"],
     "offerings": ["app connect professional"]
    },
    {
@@ -3405,17 +3405,17 @@
     "description": "Use this template to find a specific person using Email Finder in Hunter, add that person to a list in mailchimp and create a campaign.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
-    "targetApps": ["hunter,mailchimp"],
-    "tags": ["api", "hunter","mailchimp","subscriber","list","payment","email-finder","domain","firstname","lastname","reminder","campaign"],
+    "targetApps": ["hunter", "mailchimp"],
+    "tags": ["api", "hunter", "mailchimp", "subscriber", "list", "payment", "email-finder", "domain", "firstname", "lastname", "reminder", "campaign"],
     "offerings": ["app connect professional"]
    },
    {
     "name": "Add recipients to a campaign using Hunter when a Google Calendar event is scheduled",
     "description": "Use this template to check for response status whether tentative or accepted when an event is created in Google Calendar and add those recipients to a campaign in Hunter",
-    "summary": "googlecalendar to 1 application",
+    "summary": "googlecalendar to hunter",
     "sourceApp": "googlecalendar",
     "targetApps": ["hunter"],
-    "tags": ["googlecalendar","hunter","response","tentative","accepted","leads","campaign"],
+    "tags": ["googlecalendar", "hunter", "response", "tentative", "accepted", "leads", "campaign"],
     "offerings": ["app connect professional"]
    }
 ]
