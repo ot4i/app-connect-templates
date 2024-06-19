@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/API%20to%20use20Email%20Finder%20in%20Hunter%20to%20find%20people%20who%20have%20not%20paid%20and%20create%20a%20Payment%20Reminder%20Campaign%20in%20Mailchimp_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20payment20reminder%20in%20Mailchimp%20for%20unpaid%20attendee%20emails%20found%20using%20Hunter_instructions.md) (opens in a new window).
 
 This API makes use of Email Finder in Hunter to find a person who have not done a payment. Any leads found will be added to a list in Mailchimp and a Payment Reminder Campaign is sent to all these leads.
 
