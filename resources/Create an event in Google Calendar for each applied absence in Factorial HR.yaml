@@ -1,0 +1,179 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: getApiV1TimeLeaves_model
+      connector-type: factorialhr
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: getApiV1EmployeesById_model
+      connector-type: factorialhr
+      actions:
+        getApiV1EmployeesById: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: true
+              allow-truncation: true
+              name: Factorial HR Retrieve absence details
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                limit: 10
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$FactorialHRRetrieveabsencedetails '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FactorialHRRetrieveabsencedetails
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response/payload
+                  - variable: FactorialHRRetrieveabsencedetailsMetadata
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Absences
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              action: getApiV1EmployeesById
+              name: Factorial HR Retrieve employee by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FactorialHRRetrieveabsencedetails
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response/payload
+                  - variable: FactorialHRRetrieveabsencedetailsMetadata
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  id: '{{$Foreachitem.employee_id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FactorialHRRetrieveabsencedetails
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response/payload
+                  - variable: FactorialHRRetrieveabsencedetailsMetadata
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Google Calendar Create event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - attendees:
+                      foreach:
+                        input: '[{}]'
+                        iterator: attendeesItem
+                        mappings:
+                          - displayName:
+                              template: '{{$Foreachitem.employee_full_name}}'
+                          - email:
+                              template: '{{$FactorialHRRetrieveemployeebyID.email}}'
+                          - id:
+                              template: '{{$Foreachitem.employee_id}}'
+                  - description:
+                      template: '{{$Foreachitem.description}}'
+                  - endTime:
+                      template: '{{$Foreachitem.finish_on}}'
+                  - id:
+                      template: >-
+                        20339a4660b19dc14009342413b68d3ae1584ecbcbf4dd0fcd1641a9a05b177f@group.calendar.google.com
+                  - startTime:
+                      template: '{{$Foreachitem.start_on}}'
+                  - summary:
+                      template: '{{$Foreachitem.leave_type_name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FactorialHRRetrieveabsencedetails
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response/payload
+                  - variable: FactorialHRRetrieveabsencedetailsMetadata
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve absence
+                      details/response
+                  - variable: FactorialHRRetrieveemployeebyID
+                    $ref: >-
+                      #/block/For each/node-output/Factorial HR Retrieve
+                      employee by ID/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an event in Google Calendar for each applied absence in Factorial HR
+models: {}

@@ -3380,7 +3380,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["jira", "toggltrack"],
-    "tags": ["streaming-connector-scheduler","jira", "toggltrack"],
+    "tags": ["streaming-connector-scheduler", "jira", "toggltrack"],
     "offerings": ["app connect professional"]
    },
    {
@@ -3389,7 +3389,25 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["bamboohr", "toggltrack"],
-    "tags": ["streaming-connector-scheduler","bamboohr", "toggltrack"],
+    "tags": ["streaming-connector-scheduler", "bamboohr", "toggltrack"],
+    "offerings": ["app connect professional"]
+   },
+    {
+    "name": "Create an event in Google Calendar for each applied absence in Factorial HR",
+    "description": "Use this template to create an event in Google Calendar for each applied absence in Factorial HR.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["factorialhr", "googlecalendar"],
+    "tags": ["streaming-connector-scheduler", "factorialhr", "googlecalendar"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Create time entries in Toggl Track for each time registry added in Factorial HR",
+    "description": "Use this template to create time entries in Toggl Track for each time registry added in Factorial HR.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["factorialhr", "toggltrack"],
+    "tags": ["streaming-connector-scheduler", "factorialhr", "toggltrack"],
     "offerings": ["app connect professional"]
    }
 ]
