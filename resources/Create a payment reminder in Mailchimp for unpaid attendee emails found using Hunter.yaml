@@ -151,7 +151,7 @@ integration:
                       - variable: flowDetails
                         $ref: '#/flowDetails'
                   input: []
-  name: Payment Reminder Campaign
+  name: Create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter
 models:
   Customer:
     name: Customer
