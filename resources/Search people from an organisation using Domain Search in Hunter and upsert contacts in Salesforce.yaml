@@ -84,7 +84,7 @@ integration:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
-              display-name: emaildomain
+              display-name: email domain
     assembly-2:
       assembly:
         execute:
