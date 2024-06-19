@@ -12,4 +12,4 @@ To refer to these instructions while editing the flow, open [the github page](ht
 6. Click Done.
 7. To start the flow, in the banner click, **Start flow**.
 
-For more information about creating flows for an API, see the tutorial [Creating flows for an API](https://www.ibm.com/docs/en/app-connect/saas?topic=designer-introduction-creating-flows-api-part-1)
+For more information about creating flows for an API, see the tutorial [Creating flows for an API](https://www.ibm.com/docs/en/app-connect/saas?topic=designer-introduction-creating-flows-api-part-1).
