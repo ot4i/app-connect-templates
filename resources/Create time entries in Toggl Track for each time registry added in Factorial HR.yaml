@@ -1,0 +1,314 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postWorkspacesByWorkspaceIdTimeEntries_model
+      connector-type: toggltrack
+      actions:
+        postWorkspacesByWorkspaceIdTimeEntries: {}
+    action-interface-3:
+      type: api-action
+      business-object: getWorkspacesByWorkspaceIdProjects_model
+      connector-type: toggltrack
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: getApiV1TimeShifts_model
+      connector-type: factorialhr
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Factorial HR Retrieve shifts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  and:
+                    - year: '{{$split($Trigger.lastEventTime , "-")[0]}}'
+                    - month: '{{$split($Trigger.lastEventTime , "-")[1]}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$FactorialHRRetrieveshifts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FactorialHRRetrieveshifts
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve
+                      shifts/response/payload
+                  - variable: FactorialHRRetrieveshiftsMetadata
+                    $ref: '#/node-output/Factorial HR Retrieve shifts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Time registries
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: FactorialHRRetrieveshifts
+                  $ref: '#/node-output/Factorial HR Retrieve shifts/response/payload'
+                - variable: FactorialHRRetrieveshiftsMetadata
+                  $ref: '#/node-output/Factorial HR Retrieve shifts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem._month_}}':
+                      lt: '10'
+                  execute: []
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: FactorialHRRetrievetimeregistries
+                        $ref: >-
+                          #/node-output/Factorial HR Retrieve time
+                          registries/response/payload
+                      - variable: FactorialHRRetrievetimeregistriesMetadata
+                        $ref: >-
+                          #/node-output/Factorial HR Retrieve time
+                          registries/response
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - NewMonth:
+                          template: 0{{$Foreachitem._month_}}
+              else:
+                execute: []
+                map:
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: FactorialHRRetrievetimeregistries
+                      $ref: >-
+                        #/node-output/Factorial HR Retrieve time
+                        registries/response/payload
+                    - variable: FactorialHRRetrievetimeregistriesMetadata
+                      $ref: >-
+                        #/node-output/Factorial HR Retrieve time
+                        registries/response
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                  mappings:
+                    - NewMonth:
+                        template: '{{$Foreachitem._month_}}'
+              output-schema:
+                type: object
+                properties:
+                  NewMonth:
+                    type: string
+                required: []
+          - if:
+              name: If 2
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: If
+                  $ref: '#/block/For each/node-output/If/response/payload'
+                - variable: FactorialHRRetrieveshifts
+                  $ref: '#/node-output/Factorial HR Retrieve shifts/response/payload'
+                - variable: FactorialHRRetrieveshiftsMetadata
+                  $ref: '#/node-output/Factorial HR Retrieve shifts/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.day}}':
+                      lt: '10'
+                  execute: []
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: If
+                        $ref: '#/block/For each/node-output/If/response/payload'
+                      - variable: FactorialHRRetrievetimeregistries
+                        $ref: >-
+                          #/node-output/Factorial HR Retrieve time
+                          registries/response/payload
+                      - variable: FactorialHRRetrievetimeregistriesMetadata
+                        $ref: >-
+                          #/node-output/Factorial HR Retrieve time
+                          registries/response
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - NewDate:
+                          template: 0{{$Foreachitem.day}}
+              else:
+                execute: []
+                map:
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: If
+                      $ref: '#/block/For each/node-output/If/response/payload'
+                    - variable: FactorialHRRetrievetimeregistries
+                      $ref: >-
+                        #/node-output/Factorial HR Retrieve time
+                        registries/response/payload
+                    - variable: FactorialHRRetrievetimeregistriesMetadata
+                      $ref: >-
+                        #/node-output/Factorial HR Retrieve time
+                        registries/response
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                  mappings:
+                    - NewDate:
+                        template: '{{$Foreachitem.day}}'
+              output-schema:
+                type: object
+                properties:
+                  NewDate:
+                    type: string
+                required: []
+          - retrieve-action:
+              name: Toggl Track Retrieve workspace projects
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  and:
+                    - name: AppConnect
+                    - workspace_id: '7878215'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: If2
+                    $ref: '#/block/For each/node-output/If 2/response/payload'
+                  - variable: FactorialHRRetrieveshifts
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve
+                      shifts/response/payload
+                  - variable: FactorialHRRetrieveshiftsMetadata
+                    $ref: '#/node-output/Factorial HR Retrieve shifts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - custom-action:
+              name: Toggl Track Create time entry
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postWorkspacesByWorkspaceIdTimeEntries
+              map:
+                mappings:
+                  - created_with:
+                      template: '{{$Foreachitem.employee_id}}'
+                  - project_id:
+                      expression: '$TogglTrackRetrieveworkspaceprojects.id '
+                  - start:
+                      template: >-
+                        {{$Foreachitem._year_}}-{{$If.NewMonth}}-{{$If2.NewDate}}T{{$Foreachitem.clock_in}}:00Z
+                  - stop:
+                      template: >-
+                        {{$Foreachitem._year_}}-{{$If.NewMonth}}-{{$If2.NewDate}}T{{$Foreachitem.clock_out}}:00Z
+                  - workspace_id:
+                      template: '7878215'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: If2
+                    $ref: '#/block/For each/node-output/If 2/response/payload'
+                  - variable: SlackSendmessage2
+                    $ref: >-
+                      #/block/For each/node-output/Slack Send message
+                      2/response/payload
+                  - variable: TogglTrackRetrieveworkspaceprojects
+                    $ref: >-
+                      #/block/For each/node-output/Toggl Track Retrieve
+                      workspace projects/response/payload
+                  - variable: TogglTrackRetrieveworkspaceprojectsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Toggl Track Retrieve
+                      workspace projects/response
+                  - variable: FactorialHRRetrieveshifts
+                    $ref: >-
+                      #/node-output/Factorial HR Retrieve
+                      shifts/response/payload
+                  - variable: FactorialHRRetrieveshiftsMetadata
+                    $ref: '#/node-output/Factorial HR Retrieve shifts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create time entries in Toggl Track for each time registry added in Factorial HR
+models: {}
