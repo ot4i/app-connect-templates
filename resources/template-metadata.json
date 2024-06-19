@@ -3392,8 +3392,8 @@
     "tags": ["streaming-connector-scheduler","bamboohr", "toggltrack"],
     "offerings": ["app connect professional"]
    },
-   {"name": "Search people from an organisation using Domain Search in Hunter and upsert contacts in Salesforce",
-    "description": "Use this template to search people from an organization and create or update the lead in salesforce.",
+   {"name": "Search people from an organization by email domain in Hunter and create or update contacts in Salesforce",
+    "description": "Use this template to search people from an organization and create or update the lead contacts in salesforce.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["hunter","salesforce"],
@@ -3401,7 +3401,7 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "API to use Email Finder in Hunter to find people who have not paid and create a Payment Reminder Campaign in Mailchimp",
+    "name": "Create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter",
     "description": "Use this template to find a specific person using Email Finder in Hunter, add that person to a list in mailchimp and create a campaign.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
@@ -3410,7 +3410,7 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Adding recipients to a campaign in Hunter when a Google Calendar event is scheduled",
+    "name": "Add recipients to a campaign using Hunter when a Google Calendar event is scheduled",
     "description": "Use this template to check for response status whether tentative or accepted when an event is created in Google Calendar and add those recipients to a campaign in Hunter",
     "summary": "googlecalendar to 1 application",
     "sourceApp": "googlecalendar",
