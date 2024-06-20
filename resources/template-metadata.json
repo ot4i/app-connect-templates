@@ -3398,7 +3398,7 @@
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["shopify", "clicksend"],
-  "tags": ["scheduler", "shopify", "clicksend"],
+  "tags": ["streaming-connector-scheduler", "shopify", "clicksend"],
   "offerings": ["app connect professional"]
 },
 {
@@ -3416,7 +3416,7 @@
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["wufoo", "clicksend"],
-  "tags": ["scheduler", "wufoo", "clicksend"],
+  "tags": ["streaming-connector-scheduler", "wufoo", "clicksend"],
   "offerings": ["app connect professional"] 
 }
 ]
