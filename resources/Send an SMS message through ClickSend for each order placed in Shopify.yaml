@@ -27,20 +27,17 @@ integration:
                     - SAT
                     - SUN
                   timeZone: UTC
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: order
       connector-type: shopify
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
     action-interface-2:
       type: api-action
       business-object: postSmsSend_model
       connector-type: clicksend
-      account-name: Account 1
       actions:
         postSmsSend: {}
   assemblies:
