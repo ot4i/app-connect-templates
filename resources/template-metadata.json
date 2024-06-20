@@ -3436,6 +3436,33 @@
     "targetApps": ["hunter"],
     "tags": ["googlecalendar", "hunter"],
     "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Send an SMS message through ClickSend for each order placed in Shopify",
+    "description": "Use this template to send an SMS message through ClickSend for each order placed in Shopify.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify", "clicksend"],
+    "tags": ["streaming-connector-scheduler", "shopify", "clicksend"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Send an SMS message through ClickSend for each complaint received through Gmail",
+    "description": "Use this template to send an SMS message through ClickSend for each complaint received through Gmail.",
+    "summary": "Gmail to ClickSend",
+    "sourceApp": "gmail",
+    "targetApps": ["clicksend"],
+    "tags": ["gmail", "clicksend"],
+    "offerings": ["app connect professional"]
+   },
+   {
+    "name": "Send a voice message through ClickSend for each new form entry created in Wufoo",
+    "description": "Use this template to send a voice message through ClickSend for each new form entry created in Wufoo.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["wufoo", "clicksend"],
+    "tags": ["streaming-connector-scheduler", "wufoo", "clicksend"],
+    "offerings": ["app connect professional"] 
    }
 ]
 }
