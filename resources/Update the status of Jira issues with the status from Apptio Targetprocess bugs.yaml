@@ -173,7 +173,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: >-
-    Update status of issues in Jira with the updated status from Apptio
-    Targetprocess bugs
+  name: Update the status of Jira issues with the status from Apptio Targetprocess bugs
 models: {}

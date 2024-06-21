@@ -156,5 +156,5 @@ integration:
                     $ref: '#/flowDetails'
               filter:
                 limit: 10
-  name: Add employees of BambooHR to users in Apptio Targetprocess
+  name: Add employees of BambooHR as users in Apptio Targetprocess
 models: {}

@@ -176,7 +176,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: >-
-    Update Apptio Targetprocess bugs with latest status and priority from
-    Zendesk Service tickets
+  name: Update Apptio Targetprocess bugs with the latest status and priority from Zendesk Service tickets
 models: {}
