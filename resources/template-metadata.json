@@ -6969,6 +6969,146 @@
       ]
     },
     {
+      "name": "Create an event in Google Calendar for each applied absence in Factorial HR",
+      "description": "Use this template to create an event in Google Calendar for each applied absence in Factorial HR.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": [
+        "factorialhr",
+        "googlecalendar"
+      ],
+      "tags": [
+        "streaming-connector-scheduler",
+        "factorialhr",
+        "googlecalendar"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Create time entries in Toggl Track for each time registry added in Factorial HR",
+      "description": "Use this template to create time entries in Toggl Track for each time registry added in Factorial HR.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": [
+        "factorialhr",
+        "toggltrack"
+      ],
+      "tags": [
+        "streaming-connector-scheduler",
+        "factorialhr",
+        "toggltrack"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Search people from an organization by email domain in Hunter and create or update contacts in Salesforce",
+      "description": "Use this template to search people from an organization by using email domain and create or update contacts in Salesforce.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": [
+        "hunter",
+        "salesforce"
+      ],
+      "tags": [
+        "hunter",
+        "salesforce",
+        "streaming-connector-scheduler"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter",
+      "description": "Use this template to create a payment reminder in Mailchimp for unpaid attendee emails found using Hunter.",
+      "summary": "1 flow using 2 applications",
+      "sourceApp": "api",
+      "targetApps": [
+        "hunter",
+        "mailchimp"
+      ],
+      "tags": [
+        "api",
+        "hunter",
+        "mailchimp"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Add recipients to a campaign using Hunter when a Google Calendar event is scheduled",
+      "description": "Use this template to check for response status of invitees (whether tentative or accepted) when an event is created in Google Calendar, and add those recipients to a campaign in Hunter.",
+      "summary": "Google Calendar to Hunter",
+      "sourceApp": "googlecalendar",
+      "targetApps": [
+        "hunter"
+      ],
+      "tags": [
+        "googlecalendar",
+        "hunter"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Send an SMS message through ClickSend for each order placed in Shopify",
+      "description": "Use this template to send an SMS message through ClickSend for each order placed in Shopify.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": [
+        "shopify",
+        "clicksend"
+      ],
+      "tags": [
+        "streaming-connector-scheduler",
+        "shopify",
+        "clicksend"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Send an SMS message through ClickSend for each complaint received through Gmail",
+      "description": "Use this template to send an SMS message through ClickSend for each complaint received through Gmail.",
+      "summary": "Gmail to ClickSend",
+      "sourceApp": "gmail",
+      "targetApps": [
+        "clicksend"
+      ],
+      "tags": [
+        "gmail",
+        "clicksend"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
+      "name": "Send a voice message through ClickSend for each new form entry created in Wufoo",
+      "description": "Use this template to send a voice message through ClickSend for each new form entry created in Wufoo.",
+      "summary": "Scheduler to 2 applications",
+      "sourceApp": "streaming-connector-scheduler",
+      "targetApps": [
+        "wufoo",
+        "clicksend"
+      ],
+      "tags": [
+        "streaming-connector-scheduler",
+        "wufoo",
+        "clicksend"
+      ],
+      "offerings": [
+        "app connect professional"
+      ]
+    },
+    {
       "name": "Create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess",
       "description": "Use this template to create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess",
       "summary": "streaming-connector-scheduler to 2 applications",
