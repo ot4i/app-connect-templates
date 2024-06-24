@@ -1,0 +1,342 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: CST6CDT
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getApiV2Tasks_model
+      connector-type: apptiotargetprocess
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postApiV1Tasks_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Tasks: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: getApiV2Projects_model
+      connector-type: apptiotargetprocess
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: postApiV1Projects_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Projects: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Apptio Targetprocess Retrieve tasks
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - createDate:
+                        gt: '{{$Trigger.lastEventTime}}'
+                    - EntityState___Name: Open
+                    - Tags:
+                        contains: Dev 1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 5000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ApptioTargetprocessRetrievetasks '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      TasksAssigned:
+                        type: array
+                        items:
+                          type: object
+                          properties: {}
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ApptioTargetprocessRetrieveprojects
+                    $ref: >-
+                      #/block/For each/node-output/Apptio Targetprocess Retrieve
+                      projects/response/payload
+                  - variable: ApptioTargetprocessRetrieveprojectsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Apptio Targetprocess Retrieve
+                      projects/response
+                  - variable: ApptioTargetprocessCreateorupdatetask
+                    $ref: >-
+                      #/block/For each/node-output/Apptio Targetprocess Create
+                      or update task/response/payload
+                  - variable: ApptioTargetprocessRetrievetasks
+                    $ref: >-
+                      #/node-output/Apptio Targetprocess Retrieve
+                      tasks/response/payload
+                  - variable: ApptioTargetprocessRetrievetasksMetadata
+                    $ref: '#/node-output/Apptio Targetprocess Retrieve tasks/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - TasksAssigned:
+                            expression: >-
+                              [ {"Task ID":
+                              $ApptioTargetprocessCreateorupdatetask.Id, "Task
+                              Name":
+                              $ApptioTargetprocessCreateorupdatetask.Name,
+                              "Project ID":
+                              $ApptioTargetprocessCreateorupdatetask._Project_.Id,
+                              "Project Name":
+                              $ApptioTargetprocessCreateorupdatetask._Project_.Name}]
+              display-name: Apptio Targetprocess Tasks
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreach
+                  $ref: '#/node-output/For each/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$count($Foreach.output.TasksAssigned )}}':
+                      gt: '0'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Body:
+                                template: |-
+                                  Assigned Task Details:
+                                  {{$Foreach.output.TasksAssigned}}
+                            - Subject:
+                                template: >-
+                                  Open Tasks are assigned to the team : Team
+                                  Charley
+                            - To:
+                                template: soaruser10@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Foreach
+                              $ref: '#/node-output/For each/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Apptio Targetprocess Retrieve projects
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  and:
+                    - Id: '{{$Foreachitem.project.id}}'
+                    - TeamProjectsName: Team Charlie
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ApptioTargetprocessRetrievetasks
+                    $ref: >-
+                      #/node-output/Apptio Targetprocess Retrieve
+                      tasks/response/payload
+                  - variable: ApptioTargetprocessRetrievetasksMetadata
+                    $ref: '#/node-output/Apptio Targetprocess Retrieve tasks/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ApptioTargetprocessRetrieveprojectsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Apptio Targetprocess Create or update project
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        action: postApiV1Projects
+                        map:
+                          mappings:
+                            - TeamProjects:
+                                mappings:
+                                  - Items:
+                                      foreach:
+                                        input: '[{}]'
+                                        iterator: ItemsItem
+                                        mappings:
+                                          - Team:
+                                              mappings:
+                                                - Id:
+                                                    expression: '49400'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            Id: '{{$Foreachitem.project.id}}'
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ApptioTargetprocessRetrieveprojects
+                              $ref: >-
+                                #/block/For each/node-output/Apptio
+                                Targetprocess Retrieve projects/response/payload
+                            - variable: ApptioTargetprocessRetrieveprojectsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Apptio
+                                Targetprocess Retrieve projects/response
+                            - variable: ApptioTargetprocessRetrievetasks
+                              $ref: >-
+                                #/node-output/Apptio Targetprocess Retrieve
+                                tasks/response/payload
+                            - variable: ApptioTargetprocessRetrievetasksMetadata
+                              $ref: >-
+                                #/node-output/Apptio Targetprocess Retrieve
+                                tasks/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+              else:
+                execute: []
+              output-schema: {}
+          - custom-action:
+              name: Apptio Targetprocess Create or update task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postApiV1Tasks
+              map:
+                mappings:
+                  - AssignedTeams:
+                      mappings:
+                        - Items:
+                            foreach:
+                              input: '[{}]'
+                              iterator: ItemsItem
+                              mappings:
+                                - Team:
+                                    mappings:
+                                      - Id:
+                                          expression: '49400'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If2
+                    $ref: '#/block/For each/node-output/If 2/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Id: '{{$Foreachitem.id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ApptioTargetprocessRetrieveprojects
+                    $ref: >-
+                      #/block/For each/node-output/Apptio Targetprocess Retrieve
+                      projects/response/payload
+                  - variable: ApptioTargetprocessRetrieveprojectsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Apptio Targetprocess Retrieve
+                      projects/response
+                  - variable: ApptioTargetprocessRetrievetasks
+                    $ref: >-
+                      #/node-output/Apptio Targetprocess Retrieve
+                      tasks/response/payload
+                  - variable: ApptioTargetprocessRetrievetasksMetadata
+                    $ref: '#/node-output/Apptio Targetprocess Retrieve tasks/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+  name: Assign open tasks to a team from Apptio Targetprocess and send details to the team using Gmail
+models: {}
