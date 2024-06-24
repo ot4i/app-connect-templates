@@ -1,0 +1,160 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: employees
+      connector-type: bamboohr
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postApiV1Users_model
+      connector-type: apptiotargetprocess
+      actions:
+        postApiV1Users: {}
+    action-interface-3:
+      type: api-action
+      business-object: employees
+      connector-type: bamboohr
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: BambooHR Retrieve employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - since: '{{$Trigger.lastEventTime}}'
+                    - onlyCurrent: 'true'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 20
+              allow-truncation: true
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$BambooHRRetrieveemployees '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BambooHRRetrieveemployees
+                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
+                  - variable: BambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/BambooHR Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: BambooHR employees
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: BambooHR Retrieve employees 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  id: '{{$Foreachitem.id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BambooHRRetrieveemployees
+                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
+                  - variable: BambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/BambooHR Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              allow-empty-output: true
+          - custom-action:
+              name: Apptio Targetprocess Create or update user
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postApiV1Users
+              map:
+                mappings:
+                  - Email:
+                      template: '{{$BambooHRRetrieveemployees2.workEmail}}'
+                  - FirstName:
+                      template: '{{$BambooHRRetrieveemployees2.firstName}}'
+                  - IsActive:
+                      expression: 'true'
+                  - IsAdministrator:
+                      expression: 'false'
+                  - LastName:
+                      template: '{{$BambooHRRetrieveemployees2.lastName}}'
+                  - LegacySkills:
+                      template: >-
+                        {{$BambooHRRetrieveemployees2.department}}{{$BambooHRRetrieveemployees2.division}}{{$BambooHRRetrieveemployees2.jobTitle}}
+                  - Login:
+                      template: '{{$BambooHRRetrieveemployees2.workEmail}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BambooHRRetrieveemployees
+                    $ref: '#/node-output/BambooHR Retrieve employees/response/payload'
+                  - variable: BambooHRRetrieveemployeesMetadata
+                    $ref: '#/node-output/BambooHR Retrieve employees/response'
+                  - variable: BambooHRRetrieveemployees2
+                    $ref: >-
+                      #/block/For each/node-output/BambooHR Retrieve employees
+                      2/response/payload
+                  - variable: BambooHRRetrieveemployees2Metadata
+                    $ref: >-
+                      #/block/For each/node-output/BambooHR Retrieve employees
+                      2/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                limit: 10
+  name: Add employees of BambooHR as users in Apptio Targetprocess
+models: {}
