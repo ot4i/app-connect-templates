@@ -1,0 +1,189 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: payments
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: customers
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: getUsers_model
+      connector-type: zohocrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: postDeals_model
+      connector-type: zohocrm
+      actions:
+        postDeals: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Square Retrieve payments
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SquareRetrievepayments '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Square payments
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Square Retrieve customers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  customer_id: '{{$Foreachitem.customer_id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - retrieve-action:
+              name: Zoho CRM Retrieve users
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  ___type: AdminUsers
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievecustomers
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response/payload
+                  - variable: SquareRetrievecustomersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - custom-action:
+              name: Zoho CRM Create deal
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: postDeals
+              map:
+                mappings:
+                  - data:
+                      foreach:
+                        input: '[{}]'
+                        iterator: dataItem
+                        mappings:
+                          - Amount:
+                              expression: '$Foreachitem.amount_money.amount '
+                          - Closing_Date:
+                              template: '2024-05-23'
+                          - Deal_Name:
+                              template: '{{$SquareRetrievecustomers.given_name}}'
+                          - Owner:
+                              mappings:
+                                - full_name:
+                                    template: '{{$ZohoCRMRetrieveusers[0].full_name}}'
+                                - id:
+                                    template: '{{$ZohoCRMRetrieveusers[0].id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: ZohoCRMRetrieveusers
+                    $ref: >-
+                      #/block/For each/node-output/Zoho CRM Retrieve
+                      users/response/payload
+                  - variable: ZohoCRMRetrieveusersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho CRM Retrieve
+                      users/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create new deal in Zoho CRM for new payment recorded in Square
+models: {}

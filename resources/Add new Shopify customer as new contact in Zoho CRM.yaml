@@ -1,0 +1,238 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: customer
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getContactsSearch_model
+      connector-type: zohocrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: getUsers_model
+      connector-type: zohocrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: postContacts_model
+      connector-type: zohocrm
+      actions:
+        postContacts: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve customers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  created_at_min: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$ShopifyRetrievecustomers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Shopify customer
+    assembly-3:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho CRM Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Email: '{{$Foreach2item.email}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SlackSendmessage4
+                    $ref: >-
+                      #/block/For each 2/node-output/Slack Send message
+                      4/response/payload
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoCRMRetrievecontacts
+                  $ref: >-
+                    #/block/For each 2/node-output/Zoho CRM Retrieve
+                    contacts/response/payload
+                - variable: ZohoCRMRetrievecontactsMetadata
+                  $ref: >-
+                    #/block/For each 2/node-output/Zoho CRM Retrieve
+                    contacts/response
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoCRMRetrievecontactsMetadata."status-code"}}': '204'
+                  execute:
+                    - retrieve-action:
+                        name: Zoho CRM Retrieve users
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        filter:
+                          where:
+                            ___type: AdminUsers
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoCRMRetrievecontacts
+                              $ref: >-
+                                #/block/For each 2/node-output/Zoho CRM Retrieve
+                                contacts/response/payload
+                            - variable: ZohoCRMRetrievecontactsMetadata
+                              $ref: >-
+                                #/block/For each 2/node-output/Zoho CRM Retrieve
+                                contacts/response
+                            - variable: SlackSendmessage2
+                              $ref: >-
+                                #/block/For each 2/node-output/Slack Send
+                                message 2/response/payload
+                            - variable: ShopifyRetrievecustomers
+                              $ref: >-
+                                #/node-output/Shopify Retrieve
+                                customers/response/payload
+                            - variable: ShopifyRetrievecustomersMetadata
+                              $ref: >-
+                                #/node-output/Shopify Retrieve
+                                customers/response
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                        allow-truncation: false
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - custom-action:
+                        name: Zoho CRM Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: postContacts
+                        map:
+                          mappings:
+                            - data:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: dataItem
+                                  mappings:
+                                    - First_Name:
+                                        template: '{{$Foreach2item.first_name}}'
+                                    - Last_Name:
+                                        template: '{{$Foreach2item.last_name}}'
+                                    - Lead_Source:
+                                        template: Online Store
+                                    - Owner:
+                                        mappings:
+                                          - full_name:
+                                              template: '{{$ZohoCRMRetrieveusers[0].full_name}}'
+                                          - id:
+                                              template: '{{$ZohoCRMRetrieveusers[0].id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoCRMRetrievecontacts
+                              $ref: >-
+                                #/block/For each 2/node-output/Zoho CRM Retrieve
+                                contacts/response/payload
+                            - variable: ZohoCRMRetrievecontactsMetadata
+                              $ref: >-
+                                #/block/For each 2/node-output/Zoho CRM Retrieve
+                                contacts/response
+                            - variable: ZohoCRMRetrieveusers
+                              $ref: >-
+                                #/block/If/node-output/Zoho CRM Retrieve
+                                users/response/payload
+                            - variable: ZohoCRMRetrieveusersMetadata
+                              $ref: >-
+                                #/block/If/node-output/Zoho CRM Retrieve
+                                users/response
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Add new Shopify customer as new contact in Zoho CRM
+models: {}
