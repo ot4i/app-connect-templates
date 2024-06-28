@@ -3526,6 +3526,80 @@
     "targetApps": ["bamboohr", "apptiotargetprocess"],
     "tags": ["streaming-connector-scheduler", "bamboohr", "apptiotargetprocess"],
     "offerings": ["app connect professional"]
-  }  
+  },
+    {
+    "name": "Creating zoho books expenses for square payments",
+    "description": "Use this template to create zoho books expenses for square payments",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "square",
+        "zohobooks"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "square",
+        "zohobooks"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Creating zoho books items for shopify products",
+    "description": "Use this template to create zoho books items for shopify products",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "shopify",
+    "targetApps": [
+        "zohobooks"
+    ],
+    "tags": [
+        "shopify",
+        "zohobooks"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Creating zoho books invoices for shopify orders and sending an email using gmail",
+    "description": "Use this template to create zoho books invoices for shopify orders and sending an email using gmail",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "shopify",
+        "zohobooks",
+        "gmail"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "shopify",
+        "zohobooks",
+        "gmail"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Creating zoho books quotes for shopify orders and sending an slack message to the user",
+    "description": "Use this template to create zoho books quotes for shopify orders and sending an slack message to the user",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "shopify",
+        "zohobooks",
+        "slack"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "shopify",
+        "zohobooks",
+        "slack"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+}
 ]
 }
