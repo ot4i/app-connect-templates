@@ -1,0 +1,193 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: order
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postQuotes_model
+      connector-type: zohobooks
+      actions:
+        postQuotes: {}
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  created_at_min: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ShopifyRetrieveorders '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      Order_Number:
+                        type: string
+                      id:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoBooksCreatequote
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Books Create
+                      quote/response/payload
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - Order_Number:
+                            template: '{{$ZohoBooksCreatequote.reference_number}}'
+                        - id:
+                            template: '{{$ZohoBooksCreatequote.estimate_id}}'
+              display-name: Shopify order
+          - logging:
+              name: Log
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: Order Number=>{{$Foreach.output.Order_Number}}
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Zoho Books Create quote
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postQuotes
+              map:
+                mappings:
+                  - customer_id:
+                      template: '1332619000000031077'
+                  - line_items:
+                      foreach:
+                        input: '$Foreachitem.line_items '
+                        iterator: line_itemsItem
+                        mappings:
+                          - description:
+                              template: '{{$line_itemsItem.title}}'
+                          - discount_amount:
+                              expression: '$line_itemsItem.total_discount '
+                          - item_id:
+                              template: '1332619000000289019'
+                          - quantity:
+                              expression: '$line_itemsItem.quantity '
+                          - rate:
+                              expression: '$line_itemsItem.price '
+                  - reference_number:
+                      template: '{{$Foreachitem.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: D05FP3M0YGH
+                  - OBJECT_NAME:
+                      template: im
+                  - text:
+                      template: Quote is ready
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Creating zoho books quotes for shopify orders and sending an slack message
+    to the user
+models: {}
