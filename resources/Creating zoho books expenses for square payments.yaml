@@ -27,7 +27,6 @@ integration:
                     - SUN
                   timeZone: UTC
       connector-type: streaming-connector-scheduler
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
