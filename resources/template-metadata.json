@@ -3537,7 +3537,7 @@
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Create new front comments when deal stages get updated in HubSpot CRM",
+    "name": "Create new front comments when deal stages get updated in hubspotcrm",
     "description": "Use this template to Create new front comments when deal stages get updated in HubSpot CRM.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
@@ -3546,7 +3546,7 @@
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Create New message in front for contacts in contact list in hubspot marketing",
+    "name": "Create New message in Front for contacts in contact list in hubspot marketing",
     "description": "Use this template to create New message in front for contacts in contact list in hubspot.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
