@@ -1,0 +1,75 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: wrike
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: getComments_model
+          options:
+            subscription:
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: Comment
+      connector-type: github
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: GitHub undefined
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - IssueNumber:
+                      template: '49'
+                  - OwnerName:
+                      template: nonibmapp
+                  - RepoName:
+                      template: appconet8yvv
+                  - body:
+                      template: '{{$Trigger.text}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C077JJM5VS6
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: 'comment : {{$Trigger.text}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GitHubundefined
+                    $ref: '#/node-output/GitHub undefined/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a github comment when a comment is posted in wrike
+models: {}
