@@ -1,0 +1,124 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: postChannelsByChannelIdMessages_model
+      connector-type: front
+      actions:
+        postChannelsByChannelIdMessages: {}
+    action-interface-1:
+      type: api-action
+      business-object: getContactsV1Lists_model
+      connector-type: hubspotmarketing
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: true
+              allow-truncation: true
+              name: HubSpot Marketing Retrieve contact lists
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      email:
+                        type: string
+                input:
+                  - variable: GoogleGroupsRetrievegroups
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      groups/response/payload
+                  - variable: GoogleGroupsRetrievegroupsMetadata
+                    $ref: '#/node-output/Google Groups Retrieve groups/response'
+                  - variable: GoogleGroupsRetrievemembers
+                    $ref: >-
+                      #/node-output/Google Groups Retrieve
+                      members/response/payload
+                  - variable: GoogleGroupsRetrievemembersMetadata
+                    $ref: '#/node-output/Google Groups Retrieve members/response'
+                  - variable: FrontCreateMessage
+                    $ref: >-
+                      #/block/For each/node-output/Front Create
+                      Message/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              source:
+                expression: '$HubSpotMarketingRetrievecontactlists '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: hubspot Groups Group members
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              action: postChannelsByChannelIdMessages
+              name: Front Create Message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - body:
+                      template: '{{$HubSpotMarketingRetrievecontactlists}}'
+                  - channel_id:
+                      template: cha_g4xwc
+                  - to:
+                      expression: '["cct@gmail.com"]'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create New message in Front for contacts in contact list in hubspot
+models: {}
