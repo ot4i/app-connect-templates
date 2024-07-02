@@ -1,0 +1,305 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 5
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: User
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: postCustomSummary_model
+      connector-type: ibmwatsonxai
+      actions:
+        postCustomSummary: {}
+    action-interface-4:
+      type: api-action
+      business-object: postMlV1TextGeneration_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextGeneration: {}
+    action-interface-5:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: true
+              name: Salesforce undefined
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                limit: 10
+              pagination-type: TOKEN
+          - if:
+              branch:
+                - condition:
+                    '{{$SalesforceundefinedMetadata."status-code"}}': '200'
+                  execute:
+                    - for-each:
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                        source:
+                          expression: '$Salesforceundefined '
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Salesforceundefined
+                              $ref: >-
+                                #/node-output/Salesforce
+                                undefined/response/payload
+                            - variable: SalesforceundefinedMetadata
+                              $ref: '#/node-output/Salesforce undefined/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        mode: sequential
+                        continue-on-error: true
+                        name: For each 2
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-4'
+                        display-name: Salesforce User
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Salesforceundefined
+                  $ref: '#/node-output/Salesforce undefined/response/payload'
+                - variable: SalesforceundefinedMetadata
+                  $ref: '#/node-output/Salesforce undefined/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              action: postCustomEmail
+              name: IBM WatsonX.AI Generate Email Template
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - input:
+                      template: 'Generate an email without subject to '
+                  - model_id:
+                      template: ibm/granite-13b-chat-v2
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveleads
+                    $ref: '#/node-output/Salesforce Retrieve leads/response/payload'
+                  - variable: SalesforceRetrieveleadsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve leads/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+    assembly-4:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: true
+              allow-truncation: true
+              name: Salesforce Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 10
+                where:
+                  and:
+                    - IsUnreadByOwner: 'true'
+                    - Status: Open - Not Contacted
+                    - OwnerId: '{{$Foreach2item.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Salesforceundefined
+                    $ref: '#/node-output/Salesforce undefined/response/payload'
+                  - variable: SalesforceundefinedMetadata
+                    $ref: '#/node-output/Salesforce undefined/response'
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              pagination-type: TOKEN
+          - if:
+              branch:
+                - condition:
+                    '{{$SalesforceRetrieveleadsMetadata."status-code"}}': '200'
+                  execute:
+                    - custom-action:
+                        action: postMlV1TextGeneration
+                        name: IBM WatsonX.AI Generate Text
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - input:
+                                template: >-
+                                  Summarise the given open uncontacted list of
+                                  lead records:
+                                  {{$SalesforceRetrieveleads.{'Name':Name,
+                                  'Title': Title, 'Company': Company,
+                                  'Email':Email,  'Lead Creation Date':
+                                  CreatedDate} }}  for {{$Foreach2item.Name}}.
+                                  For context the list provided above contains
+                                  details of customers that need to be reached
+                                  out, and {{$Foreach2item.Name}} is the owner
+                                  and needs to reach out, so write a summary for
+                                  {{$Foreach2item.Name}} so they can get started
+                                  asap. Consider only the data and fields that
+                                  are mentioned in the list and display them
+                                  clearly in a numbered list, show the 'lead
+                                  creation date' in a user readable format
+                                  (DD/MM/YYYY) and segregate the entries per
+                                  lead record, no salutations/addressing at the
+                                  end and no hints of previous responses and
+                                  prompts.
+                            - model_id:
+                                template: ibm/granite-13b-chat-v2
+                            - parameters:
+                                mappings:
+                                  - max_new_tokens:
+                                      expression: '800'
+                                  - min_new_tokens:
+                                      expression: '200'
+                                  - time_limit:
+                                      expression: '17000'
+                            - project_id:
+                                template: 5a745c74-c93f-4cbd-ba70-bf0a93633fbd
+                            - version:
+                                template: '2024-03-14'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Salesforceundefined
+                              $ref: >-
+                                #/node-output/Salesforce
+                                undefined/response/payload
+                            - variable: SalesforceundefinedMetadata
+                              $ref: '#/node-output/Salesforce undefined/response'
+                            - variable: SalesforceRetrieveleads
+                              $ref: >-
+                                #/block/For each 2/node-output/Salesforce
+                                Retrieve leads/response/payload
+                            - variable: SalesforceRetrieveleadsMetadata
+                              $ref: >-
+                                #/block/For each 2/node-output/Salesforce
+                                Retrieve leads/response
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        map:
+                          mappings:
+                            - Subject:
+                                template: Summary of Leads for {{$Foreach2item.Name}}
+                            - To:
+                                template: '{{$Foreach2item.Email}}'
+                            - richTextBody:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        {{$IBMWatsonXAIGenerateText.results.generated_text}}
+                                  - contentType:
+                                      template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Salesforceundefined
+                              $ref: >-
+                                #/node-output/Salesforce
+                                undefined/response/payload
+                            - variable: SalesforceundefinedMetadata
+                              $ref: '#/node-output/Salesforce undefined/response'
+                            - variable: SalesforceRetrieveleads
+                              $ref: >-
+                                #/block/For each 2/node-output/Salesforce
+                                Retrieve leads/response/payload
+                            - variable: SalesforceRetrieveleadsMetadata
+                              $ref: >-
+                                #/block/For each 2/node-output/Salesforce
+                                Retrieve leads/response
+                            - variable: IBMWatsonXAIGenerateText
+                              $ref: >-
+                                #/block/If 2/node-output/IBM WatsonX.AI Generate
+                                Text/response/payload
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Salesforceundefined
+                  $ref: '#/node-output/Salesforce undefined/response/payload'
+                - variable: SalesforceundefinedMetadata
+                  $ref: '#/node-output/Salesforce undefined/response'
+                - variable: SalesforceRetrieveleads
+                  $ref: >-
+                    #/block/For each 2/node-output/Salesforce Retrieve
+                    leads/response/payload
+                - variable: SalesforceRetrieveleadsMetadata
+                  $ref: >-
+                    #/block/For each 2/node-output/Salesforce Retrieve
+                    leads/response
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+  name: Summarise open leads for a Salesforce user using IBM watsonx.ai
+models: {}
