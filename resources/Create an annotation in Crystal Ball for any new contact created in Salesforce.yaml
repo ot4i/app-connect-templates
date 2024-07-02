@@ -115,5 +115,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: sftocb
+  name: Create an annotation in Crystal Ball for any new contact created in Salesforce
 models: {}
