@@ -1,0 +1,540 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createJob_Opening:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Job_Opening
+          output-context:
+            data: Job_Opening
+      options:
+        resources:
+          - business-object: Job_Opening
+            model:
+              $ref: '#/models/Job_Opening'
+            triggers:
+              create: createJob_Opening
+      type: api-trigger
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: postJobOpenings_model
+      connector-type: zohorecruit
+      actions:
+        postJobOpenings: {}
+    action-interface-7:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: getJobRequisition_model
+      connector-type: sapsuccessfactors
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: getUsers_model
+      connector-type: zohorecruit
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getJobOpeningsSearch_model
+      connector-type: zohorecruit
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: SAP SuccessFactors Retrieve job requisitions
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  jobCode: '{{$Request.Job_Code}}'
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 50000
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SAPSuccessFactorsRetrievejobrequisitions '
+                input:
+                  - variable: SAPSuccessFactorsRetrievejobrequisitions
+                    $ref: >-
+                      #/node-output/SAP SuccessFactors Retrieve job
+                      requisitions/response/payload
+                  - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                    $ref: >-
+                      #/node-output/SAP SuccessFactors Retrieve job
+                      requisitions/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      ID:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: SAPSuccessFactorsRetrievejobrequisitions
+                    $ref: >-
+                      #/node-output/SAP SuccessFactors Retrieve job
+                      requisitions/response/payload
+                  - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                    $ref: >-
+                      #/node-output/SAP SuccessFactors Retrieve job
+                      requisitions/response
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - ID:
+                            template: >-
+                              {{$SAPSuccessFactorsRetrievejobrequisitions.templateId}}
+              display-name: SAP SuccessFactors Job requisitions
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Job_Opening successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: SAPSuccessFactorsRetrievejobrequisitions
+                        $ref: >-
+                          #/node-output/SAP SuccessFactors Retrieve job
+                          requisitions/response/payload
+                      - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                        $ref: >-
+                          #/node-output/SAP SuccessFactors Retrieve job
+                          requisitions/response
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - Hiring_Manager_ID:
+                          template: '{{$Request.Hiring_Manager_ID}}'
+                  input: []
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: ZohoRecruit Retrieve job openings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Job_Opening_Name: >-
+                    {{$split($split($Foreachitem.jobReqLocale.__deferred.uri,
+                    "(")[1], ")")[0]}}
+                input:
+                  - variable: SAPSuccessFactorsRetrievejobrequisitions
+                    $ref: >-
+                      #/node-output/SAP SuccessFactors Retrieve job
+                      requisitions/response/payload
+                  - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                    $ref: >-
+                      #/node-output/SAP SuccessFactors Retrieve job
+                      requisitions/response
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If 2
+              input:
+                - variable: SAPSuccessFactorsRetrievejobrequisitions
+                  $ref: >-
+                    #/node-output/SAP SuccessFactors Retrieve job
+                    requisitions/response/payload
+                - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                  $ref: >-
+                    #/node-output/SAP SuccessFactors Retrieve job
+                    requisitions/response
+                - variable: ZohoRecruitRetrievejobopenings
+                  $ref: >-
+                    #/block/For each/node-output/ZohoRecruit Retrieve job
+                    openings/response/payload
+                - variable: ZohoRecruitRetrievejobopeningsMetadata
+                  $ref: >-
+                    #/block/For each/node-output/ZohoRecruit Retrieve job
+                    openings/response
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    '{{$ZohoRecruitRetrievejobopeningsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: ZohoRecruit Create job opening
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postJobOpenings
+                        map:
+                          mappings:
+                            - data:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: dataItem
+                                  mappings:
+                                    - Account_Manager:
+                                        template: '{{$Request.Hiring_Manager_ID}}'
+                                    - Client_Name:
+                                        template: '{{$Request.Client_name}}'
+                                    - Designation:
+                                        template: '{{$Foreachitem.jobRole}}'
+                                    - Industry:
+                                        template: '{{$Request.Industry}}'
+                                    - Job_Opening_Name:
+                                        template: >-
+                                          JobOpening_{{$split($split($Foreachitem.jobReqLocale.__deferred.uri,
+                                          "(")[1], ")")[0]}}
+                                    - Number_of_Positions:
+                                        expression: '$Foreachitem.numberOpenings '
+                                    - Salary:
+                                        template: maz
+                                    - Target_Date:
+                                        template: '{{$Request.Target_Date}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SAPSuccessFactorsRetrievejobrequisitions
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response/payload
+                            - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response
+                            - variable: ZohoRecruitRetrievejobopenings
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response/payload
+                            - variable: ZohoRecruitRetrievejobopeningsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                    - retrieve-action:
+                        name: ZohoRecruit List users
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        filter:
+                          where:
+                            ___type: AdminUsers
+                          input:
+                            - variable: SAPSuccessFactorsRetrievejobrequisitions
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response/payload
+                            - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response
+                            - variable: ZohoRecruitRetrievejobopenings
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response/payload
+                            - variable: ZohoRecruitRetrievejobopeningsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response
+                            - variable: ZohoRecruitCreatejobopening
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit Create job
+                                opening/response/payload
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - for-each:
+                        name: For each 2
+                        assembly:
+                          $ref: '#/integration/assemblies/assembly-3'
+                        source:
+                          expression: '$ZohoRecruitListusers '
+                          input:
+                            - variable: SAPSuccessFactorsRetrievejobrequisitions
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response/payload
+                            - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response
+                            - variable: ZohoRecruitRetrievejobopenings
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response/payload
+                            - variable: ZohoRecruitRetrievejobopeningsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response
+                            - variable: ZohoRecruitCreatejobopening
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit Create job
+                                opening/response/payload
+                            - variable: ZohoRecruitListusers
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit List
+                                users/response/payload
+                            - variable: ZohoRecruitListusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit List
+                                users/response
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                        mode: sequential
+                        continue-on-error: true
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          customSchemas:
+                            properties.`output`:
+                              type: object
+                              properties:
+                                Id:
+                                  type: string
+                          input:
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoRecruitCreatejobopening
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit Create job
+                                opening/response/payload
+                            - variable: ZohoRecruitListusers
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit List
+                                users/response/payload
+                            - variable: ZohoRecruitListusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit List
+                                users/response
+                            - variable: ZohoRecruitSearchjobopenings
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit Search
+                                job openings/response/payload
+                            - variable: ZohoRecruitSearchjobopeningsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit Search
+                                job openings/response
+                            - variable: SAPSuccessFactorsRetrievejobrequisitions
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response/payload
+                            - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings:
+                            - output:
+                                mappings:
+                                  - Id:
+                                      template: '{{$ZohoRecruitListusers.id}}'
+                        display-name: ZohoRecruit Users
+              else:
+                execute: []
+              output-schema: {}
+    assembly-3:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: SAPSuccessFactorsRetrievejobrequisitions
+                  $ref: >-
+                    #/node-output/SAP SuccessFactors Retrieve job
+                    requisitions/response/payload
+                - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                  $ref: >-
+                    #/node-output/SAP SuccessFactors Retrieve job
+                    requisitions/response
+                - variable: ZohoRecruitRetrievejobopenings
+                  $ref: >-
+                    #/block/For each/node-output/ZohoRecruit Retrieve job
+                    openings/response/payload
+                - variable: ZohoRecruitRetrievejobopeningsMetadata
+                  $ref: >-
+                    #/block/For each/node-output/ZohoRecruit Retrieve job
+                    openings/response
+                - variable: ZohoRecruitCreatejobopening
+                  $ref: >-
+                    #/block/If 2/node-output/ZohoRecruit Create job
+                    opening/response/payload
+                - variable: ZohoRecruitListusers
+                  $ref: >-
+                    #/block/If 2/node-output/ZohoRecruit List
+                    users/response/payload
+                - variable: ZohoRecruitListusersMetadata
+                  $ref: '#/block/If 2/node-output/ZohoRecruit List users/response'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+              branch:
+                - condition:
+                    '{{$Foreach2item.id}}': '{{$Request.Hiring_Manager_ID}}'
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        map:
+                          mappings:
+                            - Subject:
+                                template: New Job opening created in Zohorecruit
+                            - To:
+                                template: '{{$Foreach2item.email}}'
+                            - richTextBody:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Here is the the details of job openings
+                                        created in Zohorecruit for the
+                                        {{$Request.Job_Code}} Job code.
+
+                                        Check details below.
+
+                                        Job opening ID
+                                        :{{$ZohoRecruitCreatejobopening._data_.details.id}}
+                                  - contentType:
+                                      template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SAPSuccessFactorsRetrievejobrequisitions
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response/payload
+                            - variable: SAPSuccessFactorsRetrievejobrequisitionsMetadata
+                              $ref: >-
+                                #/node-output/SAP SuccessFactors Retrieve job
+                                requisitions/response
+                            - variable: ZohoRecruitRetrievejobopenings
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response/payload
+                            - variable: ZohoRecruitRetrievejobopeningsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/ZohoRecruit
+                                Retrieve job openings/response
+                            - variable: ZohoRecruitCreatejobopening
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit Create job
+                                opening/response/payload
+                            - variable: ZohoRecruitListusers
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit List
+                                users/response/payload
+                            - variable: ZohoRecruitListusersMetadata
+                              $ref: >-
+                                #/block/If 2/node-output/ZohoRecruit List
+                                users/response
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+              else:
+                execute: []
+                map:
+                  $map: http://ibm.com/appconnect/map/v1
+                  mappings: []
+              output-schema: {}
+  name: >-
+    Create Job opening in Zoho Recruit for Job Requisition created in SAP Successfactor and send a gmail message
+models:
+  Job_Opening:
+    name: Job_Opening
+    properties:
+      Hiring_Manager_ID:
+        required: false
+        id: true
+        type: string
+      Target_Date:
+        required: false
+        id: false
+        type: string
+      Client_name:
+        required: false
+        id: false
+        type: string
+      Industry:
+        required: false
+        id: false
+        type: string
+      Job_Code:
+        required: false
+        id: false
+        type: string
+    plural: Job_Opening
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
