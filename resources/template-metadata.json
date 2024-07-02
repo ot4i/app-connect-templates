@@ -3528,7 +3528,7 @@
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Create an annotation in Crystal Ball for any new product created in Shopify",
+    "name": "Create an annotation in Crystal Ball for each new product created in Shopify",
     "description": "Use this template to create an annotation in Crystal Ball for any new product created in Shopify.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
@@ -3545,7 +3545,7 @@
   "offerings": ["app connect professional"]
   },
   {
-  "name": "Create an annotation in Crystal Ball for any new contact created in Salesforce",
+  "name": "Create an annotation in Crystal Ball for each new contact created in Salesforce",
   "description": "Use this template to create an annotation in Crystal Ball for any new contact created in Salesforce.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
