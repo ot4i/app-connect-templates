@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the Github page](https://github.com/ot4i/app-connect-templates/blob/master/resources/markdown/Create%20an%20expense%20in%20Zoho%20Books%20for%20each%20new%20payment%20in%20Square_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the Github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20an%20expense%20in%20Zoho%20Books%20for%20each%20new%20payment%20in%20Square_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
