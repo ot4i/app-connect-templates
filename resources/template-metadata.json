@@ -3528,7 +3528,7 @@
     "offerings": ["app connect professional"]
   },  
   {
-    "name": "Create new contacts in front from Google Sheets ",
+    "name": "Create new contacts in front from google sheets ",
     "description": "Use this template to create new contacts in front from Google Sheets.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
