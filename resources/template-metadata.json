@@ -3526,6 +3526,33 @@
     "targetApps": ["bamboohr", "apptiotargetprocess"],
     "tags": ["streaming-connector-scheduler", "bamboohr", "apptiotargetprocess"],
     "offerings": ["app connect professional"]
-  }  
+  },  
+  {
+    "name": "Create new contacts in front from google sheets",
+    "description": "Use this template to create new contacts in front from Google Sheets.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["googlesheet", "front"],
+    "tags": ["streaming-connector-scheduler", "front", "googlesheet"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create new front comments when deal stages get updated in hubspotcrm",
+    "description": "Use this template to Create new front comments when deal stages get updated in HubSpot CRM.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["front","hubspotcrm"],
+    "tags": ["streaming-connector-scheduler", "hubspotcrm", "front"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create New message in Front for contacts in contact list in hubspot marketing",
+    "description": "Use this template to create New message in front for contacts in contact list in hubspot.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["front", "hubspotmarketing"],
+    "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing"],
+    "offerings": ["app connect professional"]
+  }
 ]
 }
