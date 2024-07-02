@@ -250,5 +250,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: create new contacts in front from google sheets
+  name: Create new contacts in front from google sheets
 models: {}
