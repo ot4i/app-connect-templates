@@ -1,0 +1,303 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createItems:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Items
+          output-context:
+            data: Items
+      options:
+        resources:
+          - business-object: Items
+            model:
+              $ref: '#/models/Items'
+            triggers:
+              create: createItems
+      type: api-trigger
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: product
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: postItems_model
+      connector-type: zohobooks
+      actions:
+        postItems: {}
+    action-interface-2:
+      type: api-action
+      business-object: getItems_model
+      connector-type: zohobooks
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ShopifyRetrieveproducts '
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrieveproducts
+                    $ref: '#/node-output/Shopify Retrieve products/response/payload'
+                  - variable: ShopifyRetrieveproductsMetadata
+                    $ref: '#/node-output/Shopify Retrieve products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      Name:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoBooksListitems
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Books List
+                      items/response/payload
+                  - variable: ZohoBooksListitemsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Books List
+                      items/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ShopifyRetrieveproducts
+                    $ref: '#/node-output/Shopify Retrieve products/response/payload'
+                  - variable: ShopifyRetrieveproductsMetadata
+                    $ref: '#/node-output/Shopify Retrieve products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - Name:
+                            template: '{{$If.Name}}'
+                        - id:
+                            template: '{{$If.id}}'
+              display-name: Shopify product
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Customer successfully created
+                  status-code: '201'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: ShopifyRetrieveproducts
+                        $ref: >-
+                          #/node-output/Shopify Retrieve
+                          products/response/payload
+                      - variable: ShopifyRetrieveproductsMetadata
+                        $ref: '#/node-output/Shopify Retrieve products/response'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - Result:
+                          template: >-
+                            Input=>{{$ShopifyRetrieveproducts.title}}    
+                            Output=>{{$Foreach.output.Name}}
+                  input:
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+                    - variable: ShopifyRetrieveproducts
+                      $ref: '#/node-output/Shopify Retrieve products/response/payload'
+                    - variable: ShopifyRetrieveproductsMetadata
+                      $ref: '#/node-output/Shopify Retrieve products/response'
+                    - variable: Foreach
+                      $ref: '#/node-output/For each/response/payload'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+        catch:
+          - default:
+              - response:
+                  name: response-1
+                  reply-maps:
+                    - title: Bad request
+                      status-code: 400
+                      map:
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Request
+                            $ref: '#/trigger/payload'
+                          - variable: errorDetails
+                            $ref: '#/error'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        mappings:
+                          - message:
+                              template: '{{$errorDetails}}'
+                      input: []
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho Books List items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  name: '{{$Foreachitem.title}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrieveproducts
+                    $ref: '#/node-output/Shopify Retrieve products/response/payload'
+                  - variable: ShopifyRetrieveproductsMetadata
+                    $ref: '#/node-output/Shopify Retrieve products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+                - variable: ZohoBooksListitems
+                  $ref: >-
+                    #/block/For each/node-output/Zoho Books List
+                    items/response/payload
+                - variable: ZohoBooksListitemsMetadata
+                  $ref: '#/block/For each/node-output/Zoho Books List items/response'
+                - variable: ShopifyRetrieveproducts
+                  $ref: '#/node-output/Shopify Retrieve products/response/payload'
+                - variable: ShopifyRetrieveproductsMetadata
+                  $ref: '#/node-output/Shopify Retrieve products/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoBooksListitemsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Zoho Books Create item
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postItems
+                        map:
+                          mappings:
+                            - name:
+                                template: '{{$Foreachitem.title}}'
+                            - rate:
+                                expression: '$Foreachitem.variants[0].price '
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoBooksListitems
+                              $ref: >-
+                                #/block/For each/node-output/Zoho Books List
+                                items/response/payload
+                            - variable: ZohoBooksListitemsMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Zoho Books List
+                                items/response
+                            - variable: ShopifyRetrieveproducts
+                              $ref: >-
+                                #/node-output/Shopify Retrieve
+                                products/response/payload
+                            - variable: ShopifyRetrieveproductsMetadata
+                              $ref: '#/node-output/Shopify Retrieve products/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: ZohoBooksCreateitem
+                        $ref: >-
+                          #/block/If/node-output/Zoho Books Create
+                          item/response/payload
+                      - variable: ZohoBooksListitems
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Books List
+                          items/response/payload
+                      - variable: ZohoBooksListitemsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Books List
+                          items/response
+                      - variable: ShopifyRetrieveproducts
+                        $ref: >-
+                          #/node-output/Shopify Retrieve
+                          products/response/payload
+                      - variable: ShopifyRetrieveproductsMetadata
+                        $ref: '#/node-output/Shopify Retrieve products/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - Name:
+                          template: '{{$ZohoBooksCreateitem.name}}'
+                      - id:
+                          template: '{{$ZohoBooksCreateitem.item_id}}'
+              else:
+                execute: []
+              output-schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  Name:
+                    type: string
+                required: []
+  name: Create an item in Zoho Books for each new Shopify product
+models:
+  Items:
+    name: Items
+    properties:
+      Result:
+        required: false
+        id: true
+        type: string
+    plural: Items
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
