@@ -1,0 +1,119 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: false
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postApiV1Annotations_model
+      connector-type: crystalball
+      actions:
+        postApiV1Annotations: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: true
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+                where:
+                  CreatedDate: time
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              pagination-type: TOKEN
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '$SalesforceRetrievecontacts '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: Salesforce Contact
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              action: postApiV1Annotations
+              name: Crystal Ball Create annotation
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - category:
+                      template: salesforce  {{$Foreachitem.Id}}
+                  - description:
+                      template: '{{$Foreachitem.Description}}'
+                  - event_name:
+                      template: contact_create {{$SalesforceRetrievecontacts.LastName}}
+                  - url:
+                      template: salesforce.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an annotation in Crystal Ball for each new contact created in Salesforce
+models: {}
