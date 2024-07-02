@@ -3553,6 +3553,6 @@
         "targetApps": ["github","wrike","slack"],
         "tags": ["github","wrike","slack"],
         "offerings": ["app connect professional"]
-    }
+    } 
   ]
   }
