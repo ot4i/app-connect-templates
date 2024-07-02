@@ -1,0 +1,429 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: wufoo
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: qgfi5l219t9smn
+            parentFilter:
+              Hash: qgfi5l219t9smn
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: getJobOpeningsSearch_model
+      connector-type: zohorecruit
+      actions:
+        RETRIEVEALL: {}
+    action-interface-10:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: getCandidatesSearch_model
+      connector-type: zohorecruit
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: postCandidates_model
+      connector-type: zohorecruit
+      actions:
+        postCandidates: {}
+    action-interface-5:
+      type: api-action
+      business-object: getCandidatesSearch_model
+      connector-type: zohorecruit
+      actions:
+        RETRIEVEALL: {}
+    action-interface-6:
+      type: api-action
+      business-object: getHttpData_model
+      connector-type: zohorecruit
+      actions:
+        getHttpData: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: true
+              allow-truncation: true
+              name: Zoho Recruit Retrieve candidates
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                limit: 10
+                where:
+                  Email: '{{$Trigger.Field12}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              pagination-type: SKIP_LIMIT
+          - if:
+              branch:
+                - condition:
+                    '{{$ZohoRecruitRetrievecandidatesMetadata."status-code"}}': '200'
+                  execute:
+                    - retrieve-action:
+                        allow-empty-output: false
+                        allow-truncation: true
+                        name: Zoho Recruit Retrieve candidates 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        filter:
+                          limit: 10
+                          where:
+                            Email: '{{$Trigger.Field12}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoRecruitRetrievecandidates
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve
+                                candidates/response/payload
+                            - variable: ZohoRecruitRetrievecandidatesMetadata
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve
+                                candidates/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        pagination-type: SKIP_LIMIT
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    mappings:
+                      - Id:
+                          template: '{{$ZohoRecruitRetrievecandidates2.id}}'
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ZohoRecruitRetrievecandidates
+                        $ref: >-
+                          #/node-output/Zoho Recruit Retrieve
+                          candidates/response/payload
+                      - variable: ZohoRecruitRetrievecandidatesMetadata
+                        $ref: >-
+                          #/node-output/Zoho Recruit Retrieve
+                          candidates/response
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: ZohoRecruitRetrievecandidates2
+                        $ref: >-
+                          #/block/If 2/node-output/Zoho Recruit Retrieve
+                          candidates 2/response/payload
+                      - variable: ZohoRecruitRetrievecandidates2Metadata
+                        $ref: >-
+                          #/block/If 2/node-output/Zoho Recruit Retrieve
+                          candidates 2/response
+              else:
+                execute:
+                  - custom-action:
+                      action: postCandidates
+                      name: Zoho Recruit Create candidate
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - data:
+                              foreach:
+                                input: '[{}]'
+                                iterator: dataItem
+                                mappings:
+                                  - Candidate_Status:
+                                      template: New
+                                  - Email:
+                                      template: '{{$Trigger.Field12}}'
+                                  - First_Name:
+                                      template: '{{$Trigger.Field1}}'
+                                  - Last_Name:
+                                      template: '{{$Trigger.Field2}}'
+                                  - Skill_Set:
+                                      template: '{{$Trigger.Field24}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: ZohoRecruitRetrievecandidates
+                            $ref: >-
+                              #/node-output/Zoho Recruit Retrieve
+                              candidates/response/payload
+                          - variable: ZohoRecruitRetrievecandidatesMetadata
+                            $ref: >-
+                              #/node-output/Zoho Recruit Retrieve
+                              candidates/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                map:
+                  mappings:
+                    - Id:
+                        template: '{{$ZohoRecruitCreatecandidate._data_.details.id}}'
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: ZohoRecruitRetrievecandidates
+                      $ref: >-
+                        #/node-output/Zoho Recruit Retrieve
+                        candidates/response/payload
+                    - variable: ZohoRecruitRetrievecandidatesMetadata
+                      $ref: '#/node-output/Zoho Recruit Retrieve candidates/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                    - variable: ZohoRecruitCreatecandidate
+                      $ref: >-
+                        #/block/If 2/node-output/Zoho Recruit Create
+                        candidate/response/payload
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoRecruitRetrievecandidates
+                  $ref: >-
+                    #/node-output/Zoho Recruit Retrieve
+                    candidates/response/payload
+                - variable: ZohoRecruitRetrievecandidatesMetadata
+                  $ref: '#/node-output/Zoho Recruit Retrieve candidates/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties:
+                  Id:
+                    type: string
+                required: []
+          - retrieve-action:
+              name: Zoho Recruit Retrieve job openings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  Required_Skills: '{{$Trigger.Field24}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoRecruitRetrievecandidates
+                    $ref: >-
+                      #/node-output/Zoho Recruit Retrieve
+                      candidates/response/payload
+                  - variable: ZohoRecruitRetrievecandidatesMetadata
+                    $ref: '#/node-output/Zoho Recruit Retrieve candidates/response'
+                  - variable: If2
+                    $ref: '#/node-output/If 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ZohoRecruitRetrievejobopenings '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoRecruitRetrievecandidates
+                    $ref: >-
+                      #/node-output/Zoho Recruit Retrieve
+                      candidates/response/payload
+                  - variable: ZohoRecruitRetrievecandidatesMetadata
+                    $ref: '#/node-output/Zoho Recruit Retrieve candidates/response'
+                  - variable: If2
+                    $ref: '#/node-output/If 2/response/payload'
+                  - variable: ZohoRecruitRetrievejobopenings
+                    $ref: >-
+                      #/node-output/Zoho Recruit Retrieve job
+                      openings/response/payload
+                  - variable: ZohoRecruitRetrievejobopeningsMetadata
+                    $ref: '#/node-output/Zoho Recruit Retrieve job openings/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoRecruitCreatecandidate
+                    $ref: >-
+                      #/node-output/Zoho Recruit Create
+                      candidate/response/payload
+                  - variable: ZohoRecruitRetrievejobopenings
+                    $ref: >-
+                      #/node-output/Zoho Recruit Retrieve job
+                      openings/response/payload
+                  - variable: ZohoRecruitRetrievejobopeningsMetadata
+                    $ref: '#/node-output/Zoho Recruit Retrieve job openings/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - id:
+                            template: '{{$ZohoRecruitRetrievejobopenings.id}}'
+              display-name: Zoho Recruit Job openings
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: ZohoRecruitRetrievecandidates
+                  $ref: >-
+                    #/node-output/Zoho Recruit Retrieve
+                    candidates/response/payload
+                - variable: ZohoRecruitRetrievecandidatesMetadata
+                  $ref: '#/node-output/Zoho Recruit Retrieve candidates/response'
+                - variable: If2
+                  $ref: '#/node-output/If 2/response/payload'
+                - variable: ZohoRecruitRetrievejobopenings
+                  $ref: >-
+                    #/node-output/Zoho Recruit Retrieve job
+                    openings/response/payload
+                - variable: ZohoRecruitRetrievejobopeningsMetadata
+                  $ref: '#/node-output/Zoho Recruit Retrieve job openings/response'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoRecruitRetrievejobopeningsMetadata."status-code"}}':
+                      neq: '204'
+                  execute:
+                    - custom-action:
+                        action: getHttpData
+                        name: Zoho Recruit Associate candidates with job openings 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        map:
+                          mappings:
+                            - data:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: dataItem
+                                  mappings:
+                                    - ids:
+                                        expression: '[$If2.Id ]'
+                                    - jobids:
+                                        expression: '[$Foreachitem.id]'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoRecruitRetrievecandidates
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve
+                                candidates/response/payload
+                            - variable: ZohoRecruitRetrievecandidatesMetadata
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve
+                                candidates/response
+                            - variable: If2
+                              $ref: '#/node-output/If 2/response/payload'
+                            - variable: ZohoRecruitRetrievejobopenings
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve job
+                                openings/response/payload
+                            - variable: ZohoRecruitRetrievejobopeningsMetadata
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve job
+                                openings/response
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-10'
+                        map:
+                          mappings:
+                            - Subject:
+                                template: Apply Now!!!Job opening Found..
+                            - To:
+                                template: '{{$Trigger.Field12}}'
+                            - richTextBody:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Hey {{$Trigger.Field1}}
+                                        {{$Trigger.Field2}}, 
+
+                                        We found a opening for a job in
+                                        zohorecruit  that matches your skillset
+
+                                        Job ID : {{$Foreachitem.Job_Opening_ID}}
+
+                                        Job Description : 
+                                        {{$Foreachitem.Job_Description}}
+
+                                        {{$Foreachitem.Posting_Title}}
+
+                                        Thanks,
+
+                                        Regards
+                                  - contentType:
+                                      template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: ZohoRecruitRetrievecandidates
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve
+                                candidates/response/payload
+                            - variable: ZohoRecruitRetrievecandidatesMetadata
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve
+                                candidates/response
+                            - variable: If2
+                              $ref: '#/node-output/If 2/response/payload'
+                            - variable: ZohoRecruitRetrievejobopenings
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve job
+                                openings/response/payload
+                            - variable: ZohoRecruitRetrievejobopeningsMetadata
+                              $ref: >-
+                                #/node-output/Zoho Recruit Retrieve job
+                                openings/response
+                            - variable: ZohoRecruitAssociatecandidateswithjobopenings2
+                              $ref: >-
+                                #/block/If/node-output/Zoho Recruit Associate
+                                candidates with job openings 2/response/payload
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Automate Gmail notifications for matching job openings from Wufoo to Zoho
+    Recruit
+models: {}
