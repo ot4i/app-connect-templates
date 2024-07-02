@@ -3526,6 +3526,24 @@
     "targetApps": ["bamboohr", "apptiotargetprocess"],
     "tags": ["streaming-connector-scheduler", "bamboohr", "apptiotargetprocess"],
     "offerings": ["app connect professional"]
-  }  
+  }, 
+  {
+    "name": "Create job opening in Zoho Recruit for job requisition created in SAP Successfactor and send a Gmail message",
+    "description": "Use this template to create job opening in Zoho Recruit for job requisition created in SAP Successfactor and send a Gmail message.",
+    "summary": "1 flow using 3 applications",
+    "sourceApp": "api",
+    "targetApps": ["zohorecruit", "gmail","sapsuccessfactors"],
+    "tags": ["sapsuccessfactors","zohorecruit", "gmail"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Automate Gmail notifications for matching job openings from Wufoo to Zoho Recruit",
+    "description": "Use this template to automate Gmail Notifications for Matching Job Openings from Wufoo to Zoho Recruit.",
+    "summary": "Wufoo to 2 applications",
+    "sourceApp": "wufoo",
+    "targetApps": ["zohorecruit","gmail"],
+    "tags": ["wufoo","zohorecruit","gmail"],
+    "offerings": ["app connect professional"]
+   } 
 ]
 }
