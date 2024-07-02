@@ -3526,6 +3526,78 @@
     "targetApps": ["bamboohr", "apptiotargetprocess"],
     "tags": ["streaming-connector-scheduler", "bamboohr", "apptiotargetprocess"],
     "offerings": ["app connect professional"]
-  }  
+  },
+{
+    "name": "Add new Shopify customer as new contact in Zoho CRM",
+    "description": "Use this template to add new Shopify customer as new contact in Zoho CRM",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "shopify",
+        "zohocrm"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "shopify",
+        "zohocrm"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Convert Insightly CRM leads to Zoho CRM contacts",
+    "description": "Use this template to convert Insightly CRM leads to Zoho CRM contacts",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "insightly",
+        "zohocrm"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "insightly",
+        "zohocrm"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Create new deal in Zoho CRM for new payment recorded in Square",
+    "description": "Use this template to create new deal in Zoho CRM for new payment recorded in Square",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "square",
+        "zohocrm"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "square",
+        "zohocrm"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Create new lead in Zoho CRM from Wufoo forms",
+    "description": "Use this template to create new lead in Zoho CRM from Wufoo forms",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "wufoo",
+        "zohocrm"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "wufoo",
+        "zohocrm"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+}  
 ]
 }
