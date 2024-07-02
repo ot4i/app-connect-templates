@@ -47,5 +47,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: mailchimp
+  name: Create an annotation in Crystal Ball for new Mailchimp campaigns
 models: {}
