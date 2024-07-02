@@ -113,5 +113,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create an annotation in Crystal Ball for any new product created in Shopify
+  name: Create an annotation in Crystal Ball for each new product created in Shopify
 models: {}
