@@ -1,0 +1,90 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: gmail
+      triggers:
+        CREATED:
+          input-context:
+            data: mail
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postCardsByCardIdComments_model
+      connector-type: businessmap
+      actions:
+        postCardsByCardIdComments: {}
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Gmail Retrieve emails
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  id: '{{$Trigger.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GmailRetrieveemails
+                  $ref: '#/node-output/Gmail Retrieve emails/response/payload'
+                - variable: GmailRetrieveemailsMetadata
+                  $ref: '#/node-output/Gmail Retrieve emails/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    'true': '{{$contains($Trigger.Subject , "card -") }}'
+                  execute:
+                    - custom-action:
+                        name: Businessmap Create Card Comments
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postCardsByCardIdComments
+                        map:
+                          mappings:
+                            - card_id:
+                                template: '{{$substringAfter($Trigger.Subject , "-")}}'
+                            - text:
+                                template: 'from {{$Trigger.From}} : {{$Trigger.Body}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GmailRetrieveemails
+                              $ref: >-
+                                #/node-output/Gmail Retrieve
+                                emails/response/payload
+                            - variable: GmailRetrieveemailsMetadata
+                              $ref: '#/node-output/Gmail Retrieve emails/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Add comments to a card in Businessmap when a user receives update for a card as a Gmail message
+models: {}
