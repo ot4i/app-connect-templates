@@ -3553,6 +3553,24 @@
   "targetApps": ["salesforce", "crystalball"],
   "tags": ["streaming-connector-scheduler", "crystalball", "salesforce", "foreach"],
   "offerings": ["app connect professional"]
-  }  
+  },
+    {
+    "name": "Creating zoho inventory sales orders for square payments",
+    "description": "Use this template to create zoho inventory sales orders for square payments",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["square","zohoinventory"],
+    "tags": ["streaming-connector-scheduler","square","zohoinventory"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Creating zoho inventory package for shopify orders",
+    "description": "Use this template to create zoho inventory package for shopify orders",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify","zohoinventory"],
+    "tags": ["streaming-connector-scheduler","shopify","zohoinventory"],
+    "offerings": ["app connect professional"]
+}
 ]
 }
