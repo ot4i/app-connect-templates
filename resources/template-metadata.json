@@ -3526,6 +3526,33 @@
     "targetApps": ["bamboohr", "apptiotargetprocess"],
     "tags": ["streaming-connector-scheduler", "bamboohr", "apptiotargetprocess"],
     "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Create an annotation in Crystal Ball for each new product created in Shopify",
+    "description": "Use this template to create an annotation in Crystal Ball for each new product created in Shopify.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["crystalball", "shopify"],
+    "tags": ["streaming-connector-scheduler", "crystalball", "shopify", "foreach"],
+    "offerings": ["app connect professional"]
+  },
+  {
+  "name": "Create an annotation in Crystal Ball for new Mailchimp campaigns",
+  "description": "Use this template to create an annotation in Crystal Ball for any new Mailchimp campaigns.",
+  "summary": "MailChimp to Crystal Ball",
+  "sourceApp": "mailchimp",
+  "targetApps": ["crystalball"],
+  "tags": ["crystalball", "mailchimp"],
+  "offerings": ["app connect professional"]
+  },
+  {
+  "name": "Create an annotation in Crystal Ball for each new contact created in Salesforce",
+  "description": "Use this template to create an annotation in Crystal Ball for each new contact created in Salesforce.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["salesforce", "crystalball"],
+  "tags": ["streaming-connector-scheduler", "crystalball", "salesforce", "foreach"],
+  "offerings": ["app connect professional"]
   }  
 ]
 }
