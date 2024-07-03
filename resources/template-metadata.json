@@ -3526,6 +3526,42 @@
     "targetApps": ["bamboohr", "apptiotargetprocess"],
     "tags": ["streaming-connector-scheduler", "bamboohr", "apptiotargetprocess"],
     "offerings": ["app connect professional"]
-  }  
+  },
+  {
+    "name": "Add comments to a card in Businessmap when a user receives update for a card as a Gmail message",
+    "description": "Using  this template to add comments to a card in Businessmap when a user receives update for a card as a Gmail message.",
+    "summary": "Gmail to Businessmap",
+    "sourceApp": "gmail",
+    "targetApps": ["businessmap"],
+    "tags": ["gmail", "businessmap"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Add Zendesk Service users to teams in Businessmap when new users are created in Zendesk Service",
+    "description": "Using  this template to add Zendesk Service users to teams in Businessmap when new users are created in Zendesk Service.",
+    "summary": "Zendesk Service to Businessmap",
+    "sourceApp": "zendeskservice",
+    "targetApps": ["businessmap"],
+    "tags": ["zendeskservice", "businessmap"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Invite new Zendesk Service users to the Businessmap board whenever a new user is created in the Zendesk service",
+    "description": "Using  this template to invite new Zendesk Service users to the Businessmap board whenever a new user is created in the Zendesk service.",
+    "summary": "Zendesk Service to Businessmap",
+    "sourceApp": "zendeskservice",
+    "targetApps": ["businessmap"],
+    "tags": ["zendeskservice", "businessmap"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Notify team via Slack  message about cards in the backlog for a more than a specific time",
+    "description": "Using  this template to notify team via Slack  message about cards in the backlog for a more than a specific time.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["slack","businessmap"],
+    "tags": ["streaming-connector-scheduler", "slack", "businessmap"],
+    "offerings": ["app connect professional"]
+  }
 ]
 }
