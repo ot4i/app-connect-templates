@@ -3553,6 +3553,42 @@
   "targetApps": ["salesforce", "crystalball"],
   "tags": ["streaming-connector-scheduler", "crystalball", "salesforce", "foreach"],
   "offerings": ["app connect professional"]
-  }  
+  },
+{
+    "name": "Create a contact in Zoho CRM for each new customer in Shopify",
+    "description": "Use this template to create a contact in Zoho CRM for each new customer in Shopify.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify", "zohocrm"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohocrm", "foreach", "if"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Convert Insightly leads to Zoho CRM leads",
+    "description": "Use this template to convert Insightly leads to Zoho CRM leads.",
+    "summary": "Insightly to Zoho CRM",
+    "sourceApp": "insightly",
+    "targetApps": ["zohocrm"],
+    "tags": ["insightly", "zohocrm", "if"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a deal in Zoho CRM for each new paid customer in Square",
+    "description": "Use this template to create a deal in Zoho CRM for each new paid customer in Square.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["square", "zohocrm"],
+    "tags": ["streaming-connector-scheduler", "square", "zohocrm", "foreach"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a lead in Zoho CRM for each new Wufoo form entry",
+    "description": "Use this template to create a lead in Zoho CRM for each new Wufoo form entry.",
+    "summary": "Wufoo to Zoho CRM",
+    "sourceApp": "wufoo",
+    "targetApps": ["zohocrm"],
+    "tags": ["wufoo", "zohocrm", "if"],
+    "offerings": ["app connect professional"]
+}  
 ]
 }
