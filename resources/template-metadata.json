@@ -2511,7 +2511,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Update a ticket status in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days",
+   "name": "Update a ticket status in Zendesk Service for tickets that did not have a response from the user for more than 3 days",
    "description": "Use this template to update the ticket status to closed in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days. A Slack message is posted on the intended channel to notify the recipients that the ticket is closed.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
