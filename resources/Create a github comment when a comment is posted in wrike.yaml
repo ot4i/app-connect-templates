@@ -32,13 +32,13 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: GitHub undefined
+              name: GitHub Create comment
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
                 mappings:
                   - IssueNumber:
-                      template: '49'
+                      template: '9'
                   - OwnerName:
                       template: nonibmapp
                   - RepoName:
@@ -67,8 +67,8 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: GitHubundefined
-                    $ref: '#/node-output/GitHub undefined/response/payload'
+                  - variable: GitHubCreatecomment
+                    $ref: '#/node-output/GitHub Create comment/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Create a github comment when a comment is posted in wrike
