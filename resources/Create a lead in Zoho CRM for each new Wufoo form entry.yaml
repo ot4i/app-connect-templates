@@ -1,0 +1,107 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: z1j6mk810bcn8c6
+            parentFilter:
+              Hash: z1j6mk810bcn8c6
+      connector-type: wufoo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getLeadsSearch_model
+      connector-type: zohocrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: getUsers_model
+      connector-type: zohocrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postLeads_model
+      connector-type: zohocrm
+      actions:
+        postLeads: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho CRM Retrieve leads
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  Email: '{{$Trigger.Field4}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoCRMRetrieveleadsMetadata."status-code"}}': '204'
+                  execute:
+                    - retrieve-action:
+                        name: Zoho CRM Retrieve users
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        filter:
+                          limit: 10
+                        allow-truncation: true
+                        pagination-type: SKIP_LIMIT
+                        allow-empty-output: true
+                    - custom-action:
+                        name: Zoho CRM Create lead
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: postLeads
+                        map:
+                          mappings:
+                            - data:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: dataItem
+                                  mappings:
+                                    - Email:
+                                        template: '{{$Trigger.Field4}}'
+                                    - First_Name:
+                                        template: '{{$Trigger.Field1}}'
+                                    - Last_Name:
+                                        template: '{{$Trigger.Field2}}'
+                                    - Owner:
+                                        mappings:
+                                          - full_name:
+                                              template: '{{$ZohoCRMRetrieveusers[0].full_name}}'
+                                          - id:
+                                              template: '{{$ZohoCRMRetrieveusers[0].id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: Create a lead in Zoho CRM for each new Wufoo form entry
+models: {}

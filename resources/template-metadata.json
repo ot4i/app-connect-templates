@@ -2511,7 +2511,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Update a ticket status in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days",
+   "name": "Update a ticket status in Zendesk Service for tickets that did not have a response from the user for more than 3 days",
    "description": "Use this template to update the ticket status to closed in Zendesk Service for tickets that didn’t have a response from the user for more than 3 days. A Slack message is posted on the intended channel to notify the recipients that the ticket is closed.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
@@ -3528,31 +3528,94 @@
     "offerings": ["app connect professional"]
   },
   {
-      "name": "Create a github comment when a comment is posted in wrike",
-      "description": "Use this template to create a github comment when a comment is posted in wrike",
-      "summary": "Wrike to 2 applications",
-      "sourceApp": "wrike",
-      "targetApps": ["wrike","slack","github"],
-      "tags": ["wrike","slack","github"],
-      "offerings": ["app connect professional"]
+    "name": "Create an annotation in Crystal Ball for each new product created in Shopify",
+    "description": "Use this template to create an annotation in Crystal Ball for each new product created in Shopify.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["crystalball", "shopify"],
+    "tags": ["streaming-connector-scheduler", "crystalball", "shopify", "foreach"],
+    "offerings": ["app connect professional"]
   },
   {
-      "name": "Create a github issue according to the importance of wrike task",
-      "description": "Use this template to create a github issue according to the importance of wrike task",
-      "summary": "Wrike to 3 applications",
-      "sourceApp": "wrike",
-      "targetApps": ["wrike","slack","email","github"],
-      "tags": ["wrike","slack","email","github"],
-      "offerings": ["app connect professional"]
+  "name": "Create an annotation in Crystal Ball for new Mailchimp campaigns",
+  "description": "Use this template to create an annotation in Crystal Ball for any new Mailchimp campaigns.",
+  "summary": "MailChimp to Crystal Ball",
+  "sourceApp": "mailchimp",
+  "targetApps": ["crystalball"],
+  "tags": ["crystalball", "mailchimp"],
+  "offerings": ["app connect professional"]
   },
   {
-      "name": "Create a wrike task when a new issue is raised in github",
-      "description": "Use this template to create a wrike task when a new issue is raised in github",
-      "summary": "Wrike to 2 applications",
-      "sourceApp": "github",
-      "targetApps": ["github","wrike","slack"],
-      "tags": ["github","wrike","slack"],
-      "offerings": ["app connect professional"]
-  }
+  "name": "Create an annotation in Crystal Ball for each new contact created in Salesforce",
+  "description": "Use this template to create an annotation in Crystal Ball for each new contact created in Salesforce.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["salesforce", "crystalball"],
+  "tags": ["streaming-connector-scheduler", "crystalball", "salesforce", "foreach"],
+  "offerings": ["app connect professional"]
+  },
+{
+    "name": "Create a contact in Zoho CRM for each new customer in Shopify",
+    "description": "Use this template to create a contact in Zoho CRM for each new customer in Shopify.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify", "zohocrm"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohocrm", "foreach", "if"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Convert Insightly leads to Zoho CRM leads",
+    "description": "Use this template to convert Insightly leads to Zoho CRM leads.",
+    "summary": "Insightly to Zoho CRM",
+    "sourceApp": "insightly",
+    "targetApps": ["zohocrm"],
+    "tags": ["insightly", "zohocrm", "if"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a deal in Zoho CRM for each new paid customer in Square",
+    "description": "Use this template to create a deal in Zoho CRM for each new paid customer in Square.",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["square", "zohocrm"],
+    "tags": ["streaming-connector-scheduler", "square", "zohocrm", "foreach"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a lead in Zoho CRM for each new Wufoo form entry",
+    "description": "Use this template to create a lead in Zoho CRM for each new Wufoo form entry.",
+    "summary": "Wufoo to Zoho CRM",
+    "sourceApp": "wufoo",
+    "targetApps": ["zohocrm"],
+    "tags": ["wufoo", "zohocrm", "if"],
+    "offerings": ["app connect professional"]
+},
+{
+     "name": "Create a github comment when a comment is posted in wrike",
+    "description": "Use this template to create a github comment when a comment is posted in wrike",
+    "summary": "Wrike to 2 applications",
+    "sourceApp": "wrike",
+    "targetApps": ["wrike","slack","github"],
+    "tags": ["wrike","slack","github"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a github issue according to the importance of wrike task",
+    "description": "Use this template to create a github issue according to the importance of wrike task",
+    "summary": "Wrike to 3 applications",
+    "sourceApp": "wrike",
+    "targetApps": ["wrike","slack","email","github"],
+    "tags": ["wrike","slack","email","github"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a wrike task when a new issue is raised in github",
+    "description": "Use this template to create a wrike task when a new issue is raised in github",
+    "summary": "Wrike to 2 applications",
+    "sourceApp": "github",
+    "targetApps": ["github","wrike","slack"],
+    "tags": ["github","wrike","slack"],
+    "offerings": ["app connect professional"]
+}
 ]
 }
