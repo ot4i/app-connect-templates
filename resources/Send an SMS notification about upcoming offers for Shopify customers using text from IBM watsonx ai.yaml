@@ -126,7 +126,7 @@ integration:
               display-name: Square Phone number
           - custom-action:
               action: postMlV1TextGeneration
-              name: IBM WatsonX.AI Generate Text
+              name: IBM watsonx.ai Generate text
               target:
                 $ref: '#/integration/action-interfaces/action-interface-4'
               map:
