@@ -116,7 +116,7 @@ integration:
         execute:
           - custom-action:
               action: postCustomEmail
-              name: IBM WatsonX.AI Generate Email Template
+              name: IBM watsonx.ai Generate email template
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
@@ -174,7 +174,7 @@ integration:
                   execute:
                     - custom-action:
                         action: postMlV1TextGeneration
-                        name: IBM WatsonX.AI Generate Text
+                        name: IBM watsonx.ai Generate text
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-4'
                         map:
