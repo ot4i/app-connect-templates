@@ -797,6 +797,5 @@ integration:
                       required: []
                 required: []
   name: >-
-    Create an invoice in Zoho Books for each new Shopify order and send the invoice
-through Gmail
+    Create an invoice in Zoho Books for each new Shopify order and send the invoice through Gmail
 models: {}
