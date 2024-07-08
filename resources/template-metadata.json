@@ -3528,7 +3528,7 @@
     "offerings": ["app connect professional"]
   },
   {
-        "name": "Summarise open leads for a Salesforce user using IBM watsonx.ai",
+        "name": "Summarize the open leads from Salesforce using IBM watsonx ai and send an email",
         "description": "Use this template to send a scheduled mail to a salesforce user with a summary of their open - not contactacted and unread leads using IBM watsonx.ai",
         "summary": "scheduler to 3 applications",
         "sourceApp": "streaming-connector-scheduler",
@@ -3537,7 +3537,7 @@
         "offerings": ["app connect professional"]
    },
    {
-        "name": "SMS notification about upcoming offers for Shopify customers using IBM watsonx.ai",
+        "name": "Send an SMS notification about upcoming offers for Shopify customers using text from IBM watsonx ai",
         "description": "Use this template to craft compelling and captivating messages using IBM watsonx.ai to notify Shopify customers about upcoming offers.",
         "summary": "scheduler to 3 applications",
         "sourceApp": "streaming-connector-scheduler",

@@ -237,5 +237,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: SMS notification about upcoming offers for Shopify customers using IBM watsonx.ai
+  name: Send an SMS notification about upcoming offers for Shopify customers using text from IBM watsonx ai
 models: {}
