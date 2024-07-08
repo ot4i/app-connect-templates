@@ -3598,8 +3598,8 @@
     "targetApps": ["salesforce", "ibmwatsonxai", "gmail"],
     "tags": ["streaming-connector-scheduler", "salesforce", "ibmwatsonxai", "gmail", "if", "foreach"],
     "offerings": ["app connect professional"]
-  },
-  {
+ },
+ {
     "name": "Send an SMS notification about upcoming offers for Shopify customers using text from IBM watsonx ai",
     "description": "Use this template to craft compelling and captivating messages using IBM watsonx.ai to notify Shopify customers about upcoming offers.",
     "summary": "Scheduler to 3 applications",
