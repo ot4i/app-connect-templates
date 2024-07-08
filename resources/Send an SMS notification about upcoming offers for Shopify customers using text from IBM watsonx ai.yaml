@@ -167,7 +167,7 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
           - custom-action:
-              name: Click Send Create SMS campaign
+              name: Clicksend Create SMS campaign
               target:
                 $ref: '#/integration/action-interfaces/action-interface-3'
               action: postSmsCampaignsSend
@@ -205,7 +205,7 @@ integration:
       assembly:
         execute:
           - custom-action:
-              name: Click Send Create contact in contact list
+              name: Clicksend Create contact in contact list
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               action: postListsByContactListIdContacts
@@ -237,5 +237,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: SMS notification about upcoming offers for Shopify customers using IBM watsonx.ai
+  name: Send an SMS notification about upcoming offers for Shopify customers using text from IBM watsonx ai
 models: {}
