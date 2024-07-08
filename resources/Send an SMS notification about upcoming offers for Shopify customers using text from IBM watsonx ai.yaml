@@ -1,0 +1,241 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postListsByContactListIdContacts_model
+      connector-type: clicksend
+      actions:
+        postListsByContactListIdContacts: {}
+    action-interface-3:
+      type: api-action
+      business-object: postSmsCampaignsSend_model
+      connector-type: clicksend
+      actions:
+        postSmsCampaignsSend: {}
+    action-interface-5:
+      type: api-action
+      business-object: customer
+      connector-type: shopify
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: postLists_model
+      connector-type: clicksend
+      actions:
+        postLists: {}
+    action-interface-4:
+      type: api-action
+      business-object: postMlV1TextGeneration_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextGeneration: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Shopify Retrieve customers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              filter:
+                limit: 1
+                where:
+                  first_name: ABCDD
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyCreatecustomer
+                    $ref: '#/node-output/Shopify Create customer/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - custom-action:
+              name: ClickSend Create contact list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postLists
+              map:
+                mappings:
+                  - list_name:
+                      template: Upcoming Sale {{$Trigger.lastEventTime}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$ShopifyRetrievecustomers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: ClickSendCreatecontactlist
+                    $ref: >-
+                      #/node-output/ClickSend Create contact
+                      list/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: parallel
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Square Phone number
+          - custom-action:
+              action: postMlV1TextGeneration
+              name: IBM watsonx.ai Generate text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - input:
+                      template: >-
+                        Create an irresistible and fun SMS message offering a
+                        15% discount on all products. Use the code 'PERSONAL10'
+                        to unlock the deal. Make it exciting and use marketing
+                        startegies to maximize customer excitement!,complete the
+                        sms text.
+                  - model_id:
+                      template: meta-llama/llama-2-70b-chat
+                  - parameters:
+                      mappings:
+                        - max_new_tokens:
+                            expression: '300'
+                        - time_limit:
+                            expression: '10000'
+                  - project_id:
+                      template: 5a745c74-c93f-4cbd-ba70-bf0a93633fbd
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: ClickSendCreatecontactlist
+                    $ref: >-
+                      #/node-output/ClickSend Create contact
+                      list/response/payload
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: ClickSend Create SMS campaign
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postSmsCampaignsSend
+              map:
+                mappings:
+                  - body:
+                      template: '{{$IBMWatsonXAIGenerateText.results.generated_text}}'
+                  - from:
+                      template: '+61411111111'
+                  - list_id:
+                      template: '{{$ClickSendCreatecontactlist.list_id}}'
+                  - name:
+                      template: Sale Campaign
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: ClickSendCreatecontactlist
+                    $ref: >-
+                      #/node-output/ClickSend Create contact
+                      list/response/payload
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: IBMWatsonXAIGenerateText
+                    $ref: >-
+                      #/node-output/IBM WatsonX.AI Generate
+                      Text/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: ClickSend Create contact in contact list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postListsByContactListIdContacts
+              map:
+                mappings:
+                  - address_line_1:
+                      template: address line 1
+                  - contactListId:
+                      template: '{{$ClickSendCreatecontactlist.list_id}}'
+                  - email:
+                      template: '{{$ShopifyRetrievecustomers.email}}'
+                  - first_name:
+                      template: '{{$ShopifyRetrievecustomers.first_name}}'
+                  - phone_number:
+                      template: '{{$ShopifyRetrievecustomers.phone}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: '#/node-output/Shopify Retrieve customers/response/payload'
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: '#/node-output/Shopify Retrieve customers/response'
+                  - variable: ClickSendCreatecontactlist
+                    $ref: >-
+                      #/node-output/ClickSend Create contact
+                      list/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send an SMS notification about upcoming offers for Shopify customers using text from IBM watsonx ai
+models: {}
