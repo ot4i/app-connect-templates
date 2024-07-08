@@ -187,6 +187,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a quote in Zoho Books for each new Shopify order and send the quote
-through Slack
+  name: Create a quote in Zoho Books for each new Shopify order and send the quote through Slack
 models: {}
