@@ -107,7 +107,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Zoho Books List expenses
+              name: Zoho Books Retrieve expenses
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
