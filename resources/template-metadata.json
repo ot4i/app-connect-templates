@@ -3596,7 +3596,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["square", "zohobooks"],
-    "tags": ["streaming-connector-scheduler", "square", "zohobooks", "foreach", "if"],
+    "tags": ["streaming-connector-scheduler", "square", "zohobooks", "foreach", "if", "log"],
     "offerings": ["app connect professional"]
 },
 {
@@ -3614,7 +3614,7 @@
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["shopify", "zohobooks", "gmail"],
-    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "gmail", "foreach", "if"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "gmail", "foreach", "if", "log"],
     "offerings": ["app connect professional"]
 },
 {
@@ -3623,7 +3623,7 @@
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["shopify", "zohobooks", "slack"],
-    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "slack", "foreach"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "slack", "foreach", "log"],
     "offerings": ["app connect professional"]
 }  
 ]
