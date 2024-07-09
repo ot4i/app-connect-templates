@@ -3592,38 +3592,38 @@
 },
 {
     "name": "Create an expense in Zoho Books for each new payment in Square",
-    "description": "Use this template to create an expense in Zoho Books for each new payment in Square",
+    "description": "Use this template to create an expense in Zoho Books for each new payment in Square.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["square","zohobooks"],
-    "tags": ["streaming-connector-scheduler","square","zohobooks"],
+    "targetApps": ["square", "zohobooks"],
+    "tags": ["streaming-connector-scheduler", "square", "zohobooks", "foreach", "if"],
     "offerings": ["app connect professional"]
 },
 {
     "name": "Create an item in Zoho Books for each new Shopify product",
-    "description": "Use this template to create an item in Zoho Books for each new Shopify product",
+    "description": "Use this template to create an item in Zoho Books for each new Shopify product.",
     "summary": "1 flow using 2 applications",
-    "sourceApp": "shopify",
-    "targetApps": ["zohobooks"],
-    "tags": ["shopify","zohobooks"],
+    "sourceApp": "api",
+    "targetApps": ["shopify", "zohobooks"],
+    "tags": ["api", "shopify", "zohobooks", "foreach", "if"],
     "offerings": ["app connect professional"]
 },
 {
     "name": "Create an invoice in Zoho Books for each new Shopify order and send the invoice through Gmail",
-    "description": "Use this template to create an invoice in Zoho Books for each new Shopify order and send the invoice through Gmail",
+    "description": "Use this template to create an invoice in Zoho Books for each new Shopify order and send the invoice through Gmail.",
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["shopify","zohobooks","gmail"],
-    "tags": ["streaming-connector-scheduler","shopify","zohobooks","gmail"],
+    "targetApps": ["shopify", "zohobooks", "gmail"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "gmail", "foreach", "if"],
     "offerings": ["app connect professional"]
 },
 {
     "name": "Create a quote in Zoho Books for each new Shopify order and send the quote through Slack",
-    "description": "Use this template to create a quote in Zoho Books for each new Shopify order and send the quote through Slack",
+    "description": "Use this template to create a quote in Zoho Books for each new Shopify order and send the quote through Slack.",
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["shopify","zohobooks","slack"],
-    "tags": ["streaming-connector-scheduler","shopify","zohobooks","slack"],
+    "targetApps": ["shopify", "zohobooks", "slack"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "slack", "foreach"],
     "offerings": ["app connect professional"]
 }  
 ]
