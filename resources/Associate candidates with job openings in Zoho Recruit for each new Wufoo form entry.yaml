@@ -284,7 +284,7 @@ integration:
                       mappings:
                         - id:
                             template: '{{$ZohoRecruitRetrievejobopenings.id}}'
-              display-name: Zoho Recruit Job openings
+              display-name: Zoho Recruit job openings
     assembly-2:
       assembly:
         execute:
@@ -318,7 +318,7 @@ integration:
                   execute:
                     - custom-action:
                         action: getHttpData
-                        name: Zoho Recruit Associate candidates with job openings 2
+                        name: Zoho Recruit Associate candidates with job openings 
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-6'
                         map:
@@ -424,6 +424,5 @@ integration:
                 execute: []
               output-schema: {}
   name: >-
-    Automate Gmail notifications for matching job openings from Wufoo to Zoho
-    Recruit
+    Associate candidates with job openings in Zoho Recruit for each new Wufoo form entry
 models: {}
