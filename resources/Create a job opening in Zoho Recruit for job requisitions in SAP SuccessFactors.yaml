@@ -120,7 +120,7 @@ integration:
                         - ID:
                             template: >-
                               {{$SAPSuccessFactorsRetrievejobrequisitions.templateId}}
-              display-name: SAP SuccessFactors Job requisitions
+              display-name: SAP SuccessFactors job requisitions
           - response:
               name: response-1
               reply-maps:
@@ -151,7 +151,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: ZohoRecruit Retrieve job openings
+              name: Zoho Recruit Retrieve job openings
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
@@ -208,7 +208,7 @@ integration:
                     '{{$ZohoRecruitRetrievejobopeningsMetadata."status-code"}}': '204'
                   execute:
                     - custom-action:
-                        name: ZohoRecruit Create job opening
+                        name: Zoho Recruit Create job opening
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-3'
                         action: postJobOpenings
@@ -262,7 +262,7 @@ integration:
                             - variable: Request
                               $ref: '#/trigger/payload'
                     - retrieve-action:
-                        name: ZohoRecruit List users
+                        name: Zoho Recruit Retrieve users
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-4'
                         filter:
@@ -392,7 +392,7 @@ integration:
                                 mappings:
                                   - Id:
                                       template: '{{$ZohoRecruitListusers.id}}'
-                        display-name: ZohoRecruit Users
+                        display-name: Zoho Recruit Users
               else:
                 execute: []
               output-schema: {}
@@ -509,7 +509,7 @@ integration:
                   mappings: []
               output-schema: {}
   name: >-
-    Create Job opening in Zoho Recruit for Job Requisition created in SAP Successfactor and send a gmail message
+    Create a job opening in Zoho Recruit for job requisitions in SAP SuccessFactors
 models:
   Job_Opening:
     name: Job_Opening
