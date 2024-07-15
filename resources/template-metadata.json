@@ -3607,6 +3607,42 @@
     "targetApps": ["shopify", "clicksend", "ibmwatsonxai"],
     "tags": ["streaming-connector-scheduler", "shopify", "clicksend", "ibmwatsonxai", "foreach"],
     "offerings": ["app connect professional"]
-  }
+  },
+  {
+    "name": "Send invitation to the selected candidate from Zoho Recruit to join an organization through Calendly",
+    "description": "Use this template to send invitation to the selected candidate from Zoho Recruit to join an organization through Calendly",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "zohorecruit",
+        "calendly"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "zohorecruit",
+        "calendly"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+},
+{
+    "name": "Send reminder to the participants through Gmail before 30 minutes for a scheduled event in Calendly",
+    "description": "Use this template to send reminder to the participants through Gmail before 30 minutes for a scheduled event in Calendly",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+        "calendly",
+        "gmail"
+    ],
+    "tags": [
+        "streaming-connector-scheduler",
+        "calendly",
+        "gmail"
+    ],
+    "offerings": [
+        "app connect professional"
+    ]
+}
 ]
 }
