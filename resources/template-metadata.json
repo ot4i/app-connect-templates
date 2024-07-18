@@ -3589,8 +3589,26 @@
     "targetApps": ["zohocrm"],
     "tags": ["wufoo", "zohocrm", "if"],
     "offerings": ["app connect professional"]
-},
+ },
 {
+    "name": "Summarize the open leads from Salesforce using IBM watsonx ai and send an email",
+    "description": "Use this template to send a scheduled mail to a salesforce user with a summary of their open, not contacted, and unread leads using IBM watsonx.ai.",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["salesforce", "ibmwatsonxai", "gmail"],
+    "tags": ["streaming-connector-scheduler", "salesforce", "ibmwatsonxai", "gmail", "if", "foreach"],
+    "offerings": ["app connect professional"]
+ },
+ {
+    "name": "Send an SMS notification about upcoming offers for Shopify customers using text from IBM watsonx ai",
+    "description": "Use this template to craft compelling and captivating messages using IBM watsonx.ai to notify Shopify customers about upcoming offers.",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify", "clicksend", "ibmwatsonxai"],
+    "tags": ["streaming-connector-scheduler", "shopify", "clicksend", "ibmwatsonxai", "foreach"],
+    "offerings": ["app connect professional"]
+ },
+ {
     "name": "Create an expense in Zoho Books for each new payment in Square",
     "description": "Use this template to create an expense in Zoho Books for each new payment in Square.",
     "summary": "Scheduler to 2 applications",
@@ -3598,8 +3616,8 @@
     "targetApps": ["square", "zohobooks"],
     "tags": ["streaming-connector-scheduler", "square", "zohobooks", "foreach", "if", "log"],
     "offerings": ["app connect professional"]
-},
-{
+ },
+ {
     "name": "Create an item in Zoho Books for each new Shopify product",
     "description": "Use this template to create an item in Zoho Books for each new Shopify product.",
     "summary": "1 flow using 2 applications",
@@ -3607,8 +3625,8 @@
     "targetApps": ["shopify", "zohobooks"],
     "tags": ["api", "shopify", "zohobooks", "foreach", "if", "addErrorCatch"],
     "offerings": ["app connect professional"]
-},
-{
+ },
+ {
     "name": "Create an invoice in Zoho Books for each new Shopify order and send the invoice through Gmail",
     "description": "Use this template to create an invoice in Zoho Books for each new Shopify order and send the invoice through Gmail.",
     "summary": "Scheduler to 3 applications",
@@ -3616,8 +3634,8 @@
     "targetApps": ["shopify", "zohobooks", "gmail"],
     "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "gmail", "foreach", "if", "log"],
     "offerings": ["app connect professional"]
-},
-{
+ },
+ {
     "name": "Create a quote in Zoho Books for each new Shopify order and send the quote through Slack",
     "description": "Use this template to create a quote in Zoho Books for each new Shopify order and send the quote through Slack.",
     "summary": "Scheduler to 3 applications",
@@ -3625,6 +3643,6 @@
     "targetApps": ["shopify", "zohobooks", "slack"],
     "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "slack", "foreach", "log"],
     "offerings": ["app connect professional"]
-}  
+ }  
 ]
 }
