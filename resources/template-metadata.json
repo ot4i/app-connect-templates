@@ -3607,6 +3607,15 @@
     "targetApps": ["shopify", "clicksend", "ibmwatsonxai"],
     "tags": ["streaming-connector-scheduler", "shopify", "clicksend", "ibmwatsonxai", "foreach"],
     "offerings": ["app connect professional"]
-  }
+  },
+    {
+    "name": "Download an employee file in BambooHR and send the report to the manager for approval via DocuSign",
+    "description": "Use this template to download an employee file in BambooHR and send the report to the manager for approval via DocuSign",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "bamboohr",
+    "targetApps": ["docusign"],
+    "tags": ["bamboohr","docusign"],
+    "offerings": ["app connect professional"]
+}
 ]
 }
