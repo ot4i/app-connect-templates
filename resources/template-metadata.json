@@ -3605,7 +3605,7 @@
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
     "targetApps": ["shopify", "zohobooks"],
-    "tags": ["api", "shopify", "zohobooks", "foreach", "if"],
+    "tags": ["api", "shopify", "zohobooks", "foreach", "if", "addErrorCatch"],
     "offerings": ["app connect professional"]
 },
 {
