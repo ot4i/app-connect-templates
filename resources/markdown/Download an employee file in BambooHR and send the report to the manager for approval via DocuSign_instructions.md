@@ -1,0 +1,10 @@
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Download%20an%20employee%20file%20in%20BambooHR%20and%20send%20the%20report%20to%20the%20manager%20for%20approval%20via%20Docusign_instructions.md) (opens in a new window).
+
+1. Click **Use this template** to start using the template.
+2. Connect to the following accounts by using your credentials:
+   - [Docusign](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-docusign)
+   - [BambooHR](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-bamboohr)
+   
+3. To start the flow, in the banner click **Start flow**.
+
+Use this template to download an employee file in BambooHR and send the report to the manager for approval via DocuSign.
