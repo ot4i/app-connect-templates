@@ -71,5 +71,5 @@ integration:
                     $ref: '#/node-output/GitHub Create comment/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a github comment when a comment is posted in wrike
+  name: Create a comment in GitHub when a new comment is posted in Wrike and notify through a Slack message
 models: {}
