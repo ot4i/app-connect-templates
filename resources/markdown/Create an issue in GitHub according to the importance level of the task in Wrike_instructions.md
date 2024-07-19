@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20github%20issue%20according%20to%20the%20importance%20of%20wrike%20task_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20an%20issue%20in%20GitHub%20according%20to%20the%20importance%20level%20of%20the%20task%20in%20Wrike_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
