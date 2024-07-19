@@ -80,5 +80,5 @@ integration:
                     $ref: '#/node-output/Wrike Create task/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a wrike task when a new issue is raised in github
+  name: Create a task in Wrike when a new issue is raised in GitHub and notify through a Slack message
 models: {}

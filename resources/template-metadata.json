@@ -3645,31 +3645,31 @@
     "offerings": ["app connect professional"]
  },
  {
-     "name": "Create a github comment when a comment is posted in wrike",
-    "description": "Use this template to create a github comment when a comment is posted in wrike",
-    "summary": "Wrike to 2 applications",
-    "sourceApp": "wrike",
-    "targetApps": ["wrike","slack","github"],
-    "tags": ["wrike","slack","github"],
-    "offerings": ["app connect professional"]
+  "name": "Create a comment in GitHub when a new comment is posted in Wrike and notify through a Slack message",
+  "description": "Use this template to create a comment in GitHub when a new comment is posted in Wrike and notify through a Slack message.",
+  "summary": "Wrike to 2 applications",
+  "sourceApp": "wrike",
+  "targetApps": ["wrike", "slack", "github"],
+  "tags": ["wrike", "slack", "github"],
+  "offerings": ["app connect professional"]
 },
 {
-    "name": "Create a github issue according to the importance of wrike task",
-    "description": "Use this template to create a github issue according to the importance of wrike task",
-    "summary": "Wrike to 3 applications",
-    "sourceApp": "wrike",
-    "targetApps": ["wrike","slack","email","github"],
-    "tags": ["wrike","slack","email","github"],
-    "offerings": ["app connect professional"]
+  "name": "Create an issue in GitHub according to the importance level of the task in Wrike",
+  "description": "Use this template to create an issue in GitHub according to the importance level of the task in Wrike.",
+  "summary": "Wrike to 3 applications",
+  "sourceApp": "wrike",
+  "targetApps": ["wrike", "slack", "email", "github"],
+  "tags": ["wrike", "slack", "email", "github", "if"],
+  "offerings": ["app connect professional"]
 },
 {
-    "name": "Create a wrike task when a new issue is raised in github",
-    "description": "Use this template to create a wrike task when a new issue is raised in github",
-    "summary": "Wrike to 2 applications",
-    "sourceApp": "github",
-    "targetApps": ["github","wrike","slack"],
-    "tags": ["github","wrike","slack"],
-    "offerings": ["app connect professional"]
+  "name": "Create a task in Wrike when a new issue is raised in GitHub and notify through a Slack message",
+  "description": "Use this template to create a task in Wrike when a new issue is raised in GitHub and notify through a Slack message.",
+  "summary": "GitHub to 2 applications",
+  "sourceApp": "github",
+  "targetApps": ["github", "wrike", "slack"],
+  "tags": ["github", "wrike", "slack"],
+  "offerings": ["app connect professional"]
 }
 ]
 }

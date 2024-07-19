@@ -244,5 +244,5 @@ integration:
                     type: string
                 required:
                   - Importance
-  name: Create a github issue according to the importance of wrike task
+  name: Create an issue in GitHub according to the importance level of the task in Wrike
 models: {}
