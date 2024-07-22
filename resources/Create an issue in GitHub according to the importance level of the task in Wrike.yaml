@@ -1,0 +1,248 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: wrike
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: getTasks_model
+          options:
+            subscription:
+              pollingInterval: 5
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: Issue
+      connector-type: github
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-6:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+    action-interface-7:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        CREATEEMAIL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Trigger.importance}}': High
+                  execute:
+                    - create-action:
+                        name: GitHub Create issue
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OwnerName:
+                                template: nonibmapp
+                            - RepoName:
+                                template: cct
+                            - body:
+                                template: '{{$Trigger.description}}'
+                            - title:
+                                template: '{{$Trigger.title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: USLACKBOT
+                            - OBJECT_NAME:
+                                template: user
+                            - text:
+                                template: '{{$Trigger.title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GitHubCreateissue
+                              $ref: >-
+                                #/block/If/node-output/GitHub Create
+                                issue/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - custom-action:
+                        action: CREATEEMAIL
+                        name: Email Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        map:
+                          mappings:
+                            - attachmentForCreate:
+                                foreach:
+                                  mappings:
+                                    - contentType:
+                                        template: text/csv
+                                  input: '['''']'
+                                  iterator: attachmentForCreateItem
+                            - emailBody:
+                                template: '{{$Trigger.description}}'
+                            - subjectFilter:
+                                template: '{{$Trigger.title}}'
+                            - toFilter:
+                                template: jahnavim111@gmail.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GitHubCreateissue
+                              $ref: >-
+                                #/block/If/node-output/GitHub Create
+                                issue/response/payload
+                            - variable: SlackSendmessage
+                              $ref: >-
+                                #/block/If/node-output/Slack Send
+                                message/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$Trigger.importance}}': Normal
+                  execute:
+                    - create-action:
+                        name: GitHub Create issue 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - OwnerName:
+                                template: nonibmapp
+                            - RepoName:
+                                template: appconet8yvv
+                            - body:
+                                template: '{{$Trigger.description}}'
+                            - title:
+                                template: '{{$Trigger.title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Slack Send message 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: U06F85C5GQM
+                            - OBJECT_NAME:
+                                template: user
+                            - text:
+                                template: '{{$Trigger.title}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GitHubCreateissue2
+                              $ref: >-
+                                #/block/If/node-output/GitHub Create issue
+                                2/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: GitHub Create issue 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - OwnerName:
+                              template: non-ibm-primary
+                          - RepoName:
+                              template: cct-private
+                          - body:
+                              template: '{{$Trigger.description}}'
+                          - title:
+                              template: '{{$Trigger.title}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - create-action:
+                      name: Slack Send message 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-6'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: U06FMLMPXK6
+                          - OBJECT_NAME:
+                              template: user
+                          - text:
+                              template: '{{$Trigger.title}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: GitHubCreateissue3
+                            $ref: >-
+                              #/block/If/node-output/GitHub Create issue
+                              3/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties:
+                  Importance:
+                    type: string
+                required:
+                  - Importance
+  name: Create an issue in GitHub according to the importance level of the task in Wrike
+models: {}
