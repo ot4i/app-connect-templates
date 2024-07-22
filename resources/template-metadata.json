@@ -3532,17 +3532,9 @@
     "description": "Use this template to create an expense in Zoho Books for each new payment in Square",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": [
-        "square",
-        "zohobooks"
-    ],
-    "tags": [
-        "streaming-connector-scheduler",
-        "square",
-        "zohobooks"
-    ],
-    "offerings": [
-        "app connect professional"
+    "targetApps": ["square", "zohobooks"],
+    "tags": ["streaming-connector-scheduler", "square", "zohobooks"],
+    "offerings": ["app connect professional"
     ]
 },
 {
@@ -3550,35 +3542,18 @@
     "description": "Use this template to create an item in Zoho Books for each new Shopify product",
     "summary": "1 flow using 2 applications",
     "sourceApp": "shopify",
-    "targetApps": [
-        "zohobooks"
-    ],
-    "tags": [
-        "shopify",
-        "zohobooks"
-    ],
-    "offerings": [
-        "app connect professional"
-    ]
+    "targetApps": ["zohobooks"],
+    "tags": ["shopify", "zohobooks"],
+    "offerings": ["app connect professional"]
 },
 {
     "name": "Create and send a Zoho Books invoice through Gmail for each new Shopify order",
     "description": "Use this template to create and send a Zoho Books invoice through Gmail for each new Shopify order",
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": [
-        "shopify",
-        "zohobooks",
-        "gmail"
-    ],
-    "tags": [
-        "streaming-connector-scheduler",
-        "shopify",
-        "zohobooks",
-        "gmail"
-    ],
-    "offerings": [
-        "app connect professional"
+    "targetApps": ["shopify", "zohobooks", "gmail"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "gmail"],
+    "offerings": ["app connect professional"
     ]
 },
 {
@@ -3586,19 +3561,9 @@
     "description": "Use this template to create and send a Zoho Books quote through Slack for each new Shopify order",
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": [
-        "shopify",
-        "zohobooks",
-        "slack"
-    ],
-    "tags": [
-        "streaming-connector-scheduler",
-        "shopify",
-        "zohobooks",
-        "slack"
-    ],
-    "offerings": [
-        "app connect professional"
+    "targetApps": ["shopify", "zohobooks", "slack"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohobooks", "slack"],
+    "offerings": ["app connect professional"
     ]
 }
 ]
