@@ -3,9 +3,9 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Wufoo](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-wufoo)
-   - [Zoho Recruit](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-zoho-recruit) 
-   - [Gmail](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-gmail) 
+   - [Wufoo](https://ibm.biz/acwufoo)
+   - [Zoho Recruit](https://ibm.biz/aczohorecruit) 
+   - [Gmail](https://ibm.biz/acgmail) 
 
 3. To start the flow, in the banner click **Start flow**.
 
