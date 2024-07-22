@@ -3649,7 +3649,7 @@
   "description": "Use this template to create a comment in GitHub when a new comment is posted in Wrike and notify through a Slack message.",
   "summary": "Wrike to 2 applications",
   "sourceApp": "wrike",
-  "targetApps": ["slack", "github"],
+  "targetApps": ["github", "slack"],
   "tags": ["wrike", "slack", "github"],
   "offerings": ["app connect professional"]
 },
@@ -3658,7 +3658,7 @@
   "description": "Use this template to create an issue in GitHub according to the importance level of the task in Wrike.",
   "summary": "Wrike to 3 applications",
   "sourceApp": "wrike",
-  "targetApps": ["slack", "email", "github"],
+  "targetApps": ["github", "slack", "email"],
   "tags": ["wrike", "slack", "email", "github", "if"],
   "offerings": ["app connect professional"]
 },
