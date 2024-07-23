@@ -3532,8 +3532,8 @@
     "description": "Use this template to create a job opening in Zoho Recruit for job requisitions in SAP SuccessFactors.",
     "summary": "1 flow using 3 applications",
     "sourceApp": "api",
-    "targetApps": ["zohorecruit", "gmail", "sapsuccessfactors"],
-    "tags": ["foreach", "if", "sapsuccessfactors", "zohorecruit", "gmail"],
+    "targetApps": ["sapsuccessfactors", "zohorecruit", "gmail"],
+    "tags": ["api", "foreach", "if", "sapsuccessfactors", "zohorecruit", "gmail"],
     "offerings": ["app connect professional"]
   },
   {
