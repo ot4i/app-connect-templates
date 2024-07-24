@@ -2583,7 +2583,7 @@
    "offerings": ["app connect professional"]
   },
   {
-  "name": "Download an expense report in Expensify and send the report to the manager for approval via DocuSign",
+  "name": "Download an expense report in Expensify and send the report to the manager for approval via ",
   "description": "Use this template to download an expense report in Expensify and send the report to the manager for the approval via DocuSign.",
   "summary": "1 flow using 2 applications",
   "sourceApp": "api",
@@ -3614,7 +3614,7 @@
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
     "targetApps": ["bamboohr", "docusign"],
-    "tags": ["api", bamboohr", "docusign"],
+    "tags": ["api", "bamboohr", "docusign"],
     "offerings": ["app connect professional"]
 }
 ]
