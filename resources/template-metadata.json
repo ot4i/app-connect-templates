@@ -3688,6 +3688,24 @@
    "targetApps": ["zohorecruit", "gmail"],
    "tags": ["foreach", "if", "wufoo", "zohorecruit", "gmail"],
    "offerings": ["app connect professional"]
- } 
+ },
+    {
+    "name": "Create a sales order in Zoho Inventory for each new Square payment",
+    "description": "Use this template to create a sales order in Zoho Inventory for each new Square payment",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["square", "zohoinventory"],
+    "tags": ["streaming-connector-scheduler", "square", "zohoinventory", "if", "foreach"],
+    "offerings": ["app connect professional"]
+},
+{
+    "name": "Create a package in Zoho Inventory for new Shopify orders",
+    "description": "Use this template to create a package in Zoho Inventory for new Shopify orders",
+    "summary": "Scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": ["shopify", "zohoinventory"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohoinventory", "if", "foreach", "log"],
+    "offerings": ["app connect professional"]
+}
 ]
 }
