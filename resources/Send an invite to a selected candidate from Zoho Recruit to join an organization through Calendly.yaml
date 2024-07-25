@@ -113,5 +113,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Send invitation to the selected candidate from Zoho Recruit to join an organization through Calendly
+  name: Send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly
 models: {}
