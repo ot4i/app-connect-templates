@@ -181,5 +181,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Send reminder to the participants through Gmail before 30 minutes for a scheduled event in Calendly
+  name: Send reminders to the participants through Gmail for each scheduled event in Calendly
 models: {}
