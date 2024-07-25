@@ -1,0 +1,923 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: getContacts_model
+      connector-type: zohoinventory
+      actions:
+        RETRIEVEALL: {}
+    action-interface-5:
+      type: api-action
+      business-object: postContacts_model
+      connector-type: zohoinventory
+      actions:
+        postContacts: {}
+    action-interface-6:
+      type: api-action
+      business-object: postContacts_model
+      connector-type: zohoinventory
+      actions:
+        postContacts: {}
+    action-interface-2:
+      type: api-action
+      business-object: getItems_model
+      connector-type: zohoinventory
+      actions:
+        RETRIEVEALL: {}
+    action-interface-7:
+      type: api-action
+      business-object: postItems_model
+      connector-type: zohoinventory
+      actions:
+        postItems: {}
+    action-interface-8:
+      type: api-action
+      business-object: postSalesorders_model
+      connector-type: zohoinventory
+      actions:
+        postSalesorders: {}
+    action-interface-10:
+      type: api-action
+      business-object: payments
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: customers
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+    action-interface-4:
+      type: api-action
+      business-object: orders
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Square Retrieve payments
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-10'
+              filter:
+                where:
+                  and:
+                    - begin_time: '{{$split($Trigger.lastEventTime , "+")[0]}}'
+                    - location_id: L3P9SDXM9H8V4
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 100
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$SquareRetrievepayments '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      Cusotmer_ID:
+                        type: string
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ShopifyRetrievecustomers
+                    $ref: >-
+                      #/block/For each/node-output/Shopify Retrieve
+                      customers/response/payload
+                  - variable: ShopifyRetrievecustomersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Shopify Retrieve
+                      customers/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: ZohoBooksCreateinvoice
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Books Create
+                      invoice/response/payload
+                  - variable: GmailSendemail
+                    $ref: >-
+                      #/block/For each/node-output/Gmail Send
+                      email/response/payload
+                  - variable: ShopifyRetrieveorders
+                    $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                  - variable: ShopifyRetrieveordersMetadata
+                    $ref: '#/node-output/Shopify Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - Cusotmer_ID:
+                            template: '{{$If.Customer_ID}}'
+                        - id:
+                            template: ' {{$ZohoBooksCreateinvoice.invoice_number}}'
+              display-name: Square payments
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Square Retrieve customers
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  customer_id: '{{$Foreachitem.customer_id}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - retrieve-action:
+              name: Zoho Inventory Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                where:
+                  email: '{{$SquareRetrievecustomers.email_address}}'
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievecustomers
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response/payload
+                  - variable: SquareRetrievecustomersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoInventoryRetrievecontactsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Zoho Inventory Create contact
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        action: postContacts
+                        map:
+                          mappings:
+                            - contact_name:
+                                template: '{{$SquareRetrievecustomers.family_name}}'
+                            - contact_persons:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: contact_personsItem
+                                  mappings:
+                                    - email:
+                                        template: >-
+                                          {{$SquareRetrievecustomers.email_address}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ZohoInventoryCreatecontact
+                        $ref: >-
+                          #/block/If/node-output/Zoho Inventory Create
+                          contact/response/payload
+                      - variable: ShopifyRetrievecustomers
+                        $ref: >-
+                          #/block/For each/node-output/Shopify Retrieve
+                          customers/response/payload
+                      - variable: ShopifyRetrievecustomersMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Shopify Retrieve
+                          customers/response
+                      - variable: ZohoInventoryRetrievecontacts
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response/payload
+                      - variable: ZohoInventoryRetrievecontactsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response
+                      - variable: ShopifyRetrieveorders
+                        $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                      - variable: ShopifyRetrieveordersMetadata
+                        $ref: '#/node-output/Shopify Retrieve orders/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - customer_id:
+                          template: '{{$ZohoInventoryCreatecontact.contact_id}}'
+              else:
+                execute:
+                  - for-each:
+                      name: For each 3
+                      assembly:
+                        $ref: '#/integration/assemblies/assembly-4'
+                      source:
+                        expression: '$ZohoInventoryRetrievecontacts '
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      mode: sequential
+                      continue-on-error: true
+                      map:
+                        $map: http://ibm.com/appconnect/map/v1
+                        customSchemas:
+                          properties.`output`:
+                            type: object
+                            properties:
+                              customer_id:
+                                type: string
+                        input:
+                          - variable: Foreach3item
+                            $ref: '#/block/For each 3/current-item'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: If2
+                            $ref: >-
+                              #/block/For each 3/node-output/If
+                              2/response/payload
+                          - variable: ShopifyRetrievecustomers
+                            $ref: >-
+                              #/block/For each/node-output/Shopify Retrieve
+                              customers/response/payload
+                          - variable: ShopifyRetrievecustomersMetadata
+                            $ref: >-
+                              #/block/For each/node-output/Shopify Retrieve
+                              customers/response
+                          - variable: ZohoInventoryRetrievecontacts
+                            $ref: >-
+                              #/block/For each/node-output/Zoho Inventory
+                              Retrieve contacts/response/payload
+                          - variable: ZohoInventoryRetrievecontactsMetadata
+                            $ref: >-
+                              #/block/For each/node-output/Zoho Inventory
+                              Retrieve contacts/response
+                          - variable: ShopifyRetrieveorders
+                            $ref: >-
+                              #/node-output/Shopify Retrieve
+                              orders/response/payload
+                          - variable: ShopifyRetrieveordersMetadata
+                            $ref: '#/node-output/Shopify Retrieve orders/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        mappings:
+                          - output:
+                              mappings:
+                                - customer_id:
+                                    template: '{{$If2.customer_id}}'
+                      display-name: Contacts Loop
+                map:
+                  mappings:
+                    - customer_id:
+                        template: '{{$Foreach3.output.customer_id}}'
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: Foreach3
+                      $ref: '#/block/If/node-output/For each 3/response/payload'
+                    - variable: ShopifyRetrievecustomers
+                      $ref: >-
+                        #/block/For each/node-output/Shopify Retrieve
+                        customers/response/payload
+                    - variable: ShopifyRetrievecustomersMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Shopify Retrieve
+                        customers/response
+                    - variable: ZohoInventoryRetrievecontacts
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response/payload
+                    - variable: ZohoInventoryRetrievecontactsMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response
+                    - variable: ShopifyRetrieveorders
+                      $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                    - variable: ShopifyRetrieveordersMetadata
+                      $ref: '#/node-output/Shopify Retrieve orders/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties:
+                  customer_id:
+                    type: string
+                required: []
+          - retrieve-action:
+              name: Square Retrieve orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  and:
+                    - order_id: '{{$Foreachitem.order_id}}'
+                    - location_id: L3P9SDXM9H8V4
+                input:
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievecustomers
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response/payload
+                  - variable: SquareRetrievecustomersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: false
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - for-each:
+              name: For each 2
+              assembly:
+                $ref: '#/integration/assemblies/assembly-3'
+              source:
+                expression: '$SquareRetrieveorders.line_items '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      Line_Items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            item_id:
+                              type: string
+                            quantity:
+                              type: number
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: ZohoInventoryRetrieveitems
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Retrieve
+                      items/response/payload
+                  - variable: ZohoInventoryRetrieveitemsMetadata
+                    $ref: >-
+                      #/block/For each 2/node-output/Zoho Inventory Retrieve
+                      items/response
+                  - variable: If3
+                    $ref: '#/block/For each 2/node-output/If 3/response/payload'
+                  - variable: SquareRetrievecustomers
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response/payload
+                  - variable: SquareRetrievecustomersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: SquareRetrieveorders
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      orders/response/payload
+                  - variable: SquareRetrieveordersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      orders/response
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - Line_Items:
+                            foreach:
+                              input: '[{}]'
+                              iterator: Line_ItemsItem
+                              mappings:
+                                - item_id:
+                                    template: '{{$If3.Line_Items.item_id}}'
+                                - quantity:
+                                    expression: '$If3.Line_Items.qty '
+              display-name: Sqaure Item loop
+          - custom-action:
+              name: Zoho Inventory Create sales order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              action: postSalesorders
+              map:
+                mappings:
+                  - customer_id:
+                      template: '{{$If.customer_id}}'
+                  - line_items:
+                      foreach:
+                        input: '$Foreach2.output.Line_Items '
+                        iterator: line_itemsItem
+                        mappings:
+                          - item_id:
+                              template: '{{$line_itemsItem.item_id}}'
+                  - reference_number:
+                      template: '{{$Foreachitem.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: Foreach2
+                    $ref: '#/block/For each/node-output/For each 2/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+    assembly-4:
+      assembly:
+        execute:
+          - if:
+              name: If 2
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Foreach3item
+                  $ref: '#/block/For each 3/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreach3item.contact_type}}': customer
+                  execute: []
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreach3item
+                        $ref: '#/block/For each 3/current-item'
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ShopifyRetrievecustomers
+                        $ref: >-
+                          #/block/For each/node-output/Shopify Retrieve
+                          customers/response/payload
+                      - variable: ShopifyRetrievecustomersMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Shopify Retrieve
+                          customers/response
+                      - variable: ZohoInventoryRetrievecontacts
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response/payload
+                      - variable: ZohoInventoryRetrievecontactsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response
+                      - variable: ShopifyRetrieveorders
+                        $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                      - variable: ShopifyRetrieveordersMetadata
+                        $ref: '#/node-output/Shopify Retrieve orders/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - customer_id:
+                          template: '{{$Foreach3item.contact_id}}'
+              else:
+                execute:
+                  - custom-action:
+                      name: Zoho Inventory Create contact 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-6'
+                      action: postContacts
+                      map:
+                        mappings:
+                          - contact_name:
+                              template: '{{$SquareRetrievecustomers.family_name}}'
+                          - contact_persons:
+                              foreach:
+                                input: '[{}]'
+                                iterator: contact_personsItem
+                                mappings:
+                                  - email:
+                                      template: >-
+                                        {{$SquareRetrievecustomers.email_address}}
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: Foreach3item
+                            $ref: '#/block/For each 3/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                map:
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreach3item
+                      $ref: '#/block/For each 3/current-item'
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: ZohoInventoryCreatecontact2
+                      $ref: >-
+                        #/block/If 2/node-output/Zoho Inventory Create contact
+                        2/response/payload
+                    - variable: ShopifyRetrievecustomers
+                      $ref: >-
+                        #/block/For each/node-output/Shopify Retrieve
+                        customers/response/payload
+                    - variable: ShopifyRetrievecustomersMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Shopify Retrieve
+                        customers/response
+                    - variable: ZohoInventoryRetrievecontacts
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response/payload
+                    - variable: ZohoInventoryRetrievecontactsMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response
+                    - variable: ShopifyRetrieveorders
+                      $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                    - variable: ShopifyRetrieveordersMetadata
+                      $ref: '#/node-output/Shopify Retrieve orders/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                  mappings:
+                    - customer_id:
+                        template: '{{$ZohoInventoryCreatecontact2.contact_id}}'
+              output-schema:
+                type: object
+                properties:
+                  customer_id:
+                    type: string
+                required: []
+    assembly-3:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Zoho Inventory Retrieve items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  name: '{{$Foreach2item.name}}'
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SquareRetrievecustomers
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response/payload
+                  - variable: SquareRetrievecustomersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      customers/response
+                  - variable: ZohoInventoryRetrievecontacts
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response/payload
+                  - variable: ZohoInventoryRetrievecontactsMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Zoho Inventory Retrieve
+                      contacts/response
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: SquareRetrieveorders
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      orders/response/payload
+                  - variable: SquareRetrieveordersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/Square Retrieve
+                      orders/response
+                  - variable: SquareRetrievepayments
+                    $ref: '#/node-output/Square Retrieve payments/response/payload'
+                  - variable: SquareRetrievepaymentsMetadata
+                    $ref: '#/node-output/Square Retrieve payments/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: true
+          - if:
+              name: If 3
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: If
+                  $ref: '#/block/For each/node-output/If/response/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$ZohoInventoryRetrieveitemsMetadata."status-code"}}': '204'
+                  execute:
+                    - custom-action:
+                        name: Zoho Inventory Create item
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-7'
+                        action: postItems
+                        map:
+                          mappings:
+                            - name:
+                                template: '{{$Foreach2item.name}}'
+                            - rate:
+                                expression: >-
+                                  ($Foreach2item.base_price_money.amount
+                                  /100)*80
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: If
+                              $ref: '#/block/For each/node-output/If/response/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                  map:
+                    mappings:
+                      - Line_Items:
+                          foreach:
+                            input: '[{}]'
+                            iterator: Line_ItemsItem
+                            mappings:
+                              - item_id:
+                                  template: '{{$ZohoInventoryCreateitem.item_id}}'
+                              - qty:
+                                  expression: '$Foreach2item.quantity '
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Foreach2item
+                        $ref: '#/block/For each 2/current-item'
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: ZohoInventoryCreateitem
+                        $ref: >-
+                          #/block/If 3/node-output/Zoho Inventory Create
+                          item/response/payload
+                      - variable: ZohoInventoryRetrieveitems
+                        $ref: >-
+                          #/block/For each 2/node-output/Zoho Inventory Retrieve
+                          items/response/payload
+                      - variable: ZohoInventoryRetrieveitemsMetadata
+                        $ref: >-
+                          #/block/For each 2/node-output/Zoho Inventory Retrieve
+                          items/response
+                      - variable: SquareRetrievecustomers
+                        $ref: >-
+                          #/block/For each/node-output/Square Retrieve
+                          customers/response/payload
+                      - variable: SquareRetrievecustomersMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Square Retrieve
+                          customers/response
+                      - variable: ZohoInventoryRetrievecontacts
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response/payload
+                      - variable: ZohoInventoryRetrievecontactsMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Zoho Inventory Retrieve
+                          contacts/response
+                      - variable: If
+                        $ref: '#/block/For each/node-output/If/response/payload'
+                      - variable: SquareRetrieveorders
+                        $ref: >-
+                          #/block/For each/node-output/Square Retrieve
+                          orders/response/payload
+                      - variable: SquareRetrieveordersMetadata
+                        $ref: >-
+                          #/block/For each/node-output/Square Retrieve
+                          orders/response
+                      - variable: SquareRetrievepayments
+                        $ref: >-
+                          #/node-output/Square Retrieve
+                          payments/response/payload
+                      - variable: SquareRetrievepaymentsMetadata
+                        $ref: '#/node-output/Square Retrieve payments/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+              else:
+                execute: []
+                map:
+                  mappings:
+                    - Line_Items:
+                        foreach:
+                          input: '[{}]'
+                          iterator: Line_ItemsItem
+                          mappings:
+                            - item_id:
+                                template: '{{$ZohoInventoryRetrieveitems[0].item_id}}'
+                            - qty:
+                                expression: '$Foreach2item.quantity '
+                  $map: http://ibm.com/appconnect/map/v1
+                  input:
+                    - variable: Foreach2item
+                      $ref: '#/block/For each 2/current-item'
+                    - variable: Foreachitem
+                      $ref: '#/block/For each/current-item'
+                    - variable: Trigger
+                      $ref: '#/trigger/payload'
+                    - variable: ZohoInventoryRetrieveitems
+                      $ref: >-
+                        #/block/For each 2/node-output/Zoho Inventory Retrieve
+                        items/response/payload
+                    - variable: ZohoInventoryRetrieveitemsMetadata
+                      $ref: >-
+                        #/block/For each 2/node-output/Zoho Inventory Retrieve
+                        items/response
+                    - variable: ShopifyRetrievecustomers
+                      $ref: >-
+                        #/block/For each/node-output/Shopify Retrieve
+                        customers/response/payload
+                    - variable: ShopifyRetrievecustomersMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Shopify Retrieve
+                        customers/response
+                    - variable: ZohoInventoryRetrievecontacts
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response/payload
+                    - variable: ZohoInventoryRetrievecontactsMetadata
+                      $ref: >-
+                        #/block/For each/node-output/Zoho Inventory Retrieve
+                        contacts/response
+                    - variable: If
+                      $ref: '#/block/For each/node-output/If/response/payload'
+                    - variable: ShopifyRetrieveorders
+                      $ref: '#/node-output/Shopify Retrieve orders/response/payload'
+                    - variable: ShopifyRetrieveordersMetadata
+                      $ref: '#/node-output/Shopify Retrieve orders/response'
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties:
+                  Line_Items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        item_id:
+                          type: string
+                        qty:
+                          type: number
+                      required: []
+                required: []
+  name: Create a sales order in Zoho Inventory for each new Square payment
+models: {}
