@@ -95,7 +95,7 @@ integration:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
-              display-name: Hubspot Contacts List
+              display-name: HubSpot Marketing contact list
     assembly-2:
       assembly:
         execute:
