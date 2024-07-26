@@ -3533,7 +3533,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["googlesheet", "front"],
-    "tags": ["streaming-connector-scheduler", "front", "googlesheet"],
+    "tags": ["streaming-connector-scheduler", "front", "googlesheet","foreach","if"],
     "offerings": ["app connect professional"]
   },
   {
@@ -3542,7 +3542,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["front","hubspotcrm"],
-    "tags": ["streaming-connector-scheduler", "hubspotcrm", "front"],
+    "tags": ["hubspotcrm", "front","foreach","if"],
     "offerings": ["app connect professional"]
   },
   {
@@ -3551,7 +3551,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["front", "hubspotmarketing"],
-    "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing"],
+    "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing","foreach","if"],
     "offerings": ["app connect professional"]
   }
 ]
