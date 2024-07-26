@@ -1,0 +1,184 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCreate_report_upload:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: create_report_upload
+          output-context:
+            data: create_report_upload
+      options:
+        resources:
+          - business-object: create_report_upload
+            model:
+              $ref: '#/models/create_report_upload'
+            triggers:
+              create: createCreate_report_upload
+      type: api-trigger
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: envelope
+      connector-type: docusign
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: employeefiles
+      connector-type: bamboohr
+      actions:
+        DOWNLOADFILE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: BambooHR Download employee file content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - fileId:
+                      template: '{{$Request.file_ID}}'
+                  - id:
+                      template: '{{$Request.Employee_ID}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: DocuSign Create envelope
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - accountId:
+                      template: 3915355d-2e46-41d5-945c-d03f40b218ef
+                  - documents:
+                      foreach:
+                        input: '$Request.documents '
+                        iterator: documentsItem
+                        mappings:
+                          - documentBase64:
+                              template: >-
+                                {{$BambooHRDownloademployeefilecontent.fileContent}}
+                          - documentId:
+                              template: '{{$documentsItem.document_id}}'
+                          - fileExtension:
+                              template: pdf
+                          - name:
+                              template: '{{$documentsItem.document_name}}'
+                  - emailSubject:
+                      template: '{{$Request.Email_subject}}'
+                  - recipients:
+                      mappings:
+                        - signers:
+                            foreach:
+                              mappings:
+                                - email:
+                                    template: '{{$Request.recipients.recipient_email}}'
+                                - name:
+                                    template: '{{$Request.recipients.recipient_name}}'
+                                - recipientId:
+                                    template: '{{$Request.recipients.recipient_id}}'
+                              input: '$Request.recipients '
+                              iterator: signersItem
+                  - status:
+                      template: sent
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: BambooHRDownloademployeefilecontent
+                    $ref: >-
+                      #/node-output/BambooHR Download employee file
+                      content/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: create_report_upload successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: BambooHRDownloademployeefilecontent
+                        $ref: >-
+                          #/node-output/BambooHR Download employee file
+                          content/response/payload
+                      - variable: DocuSignCreateenvelope
+                        $ref: >-
+                          #/node-output/DocuSign Create
+                          envelope/response/payload
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - Envelope_ID:
+                          template: '{{$DocuSignCreateenvelope.envelopeId}}'
+                  input: []
+  name: >-
+    Download an employee file in BambooHR and send the report for approval to DocuSign
+models:
+  create_report_upload:
+    name: create_report_upload
+    properties:
+      documents:
+        required: false
+        id: false
+        type:
+          - type:
+              document_id:
+                required: false
+                id: false
+                type: string
+              document_name:
+                required: false
+                id: false
+                type: string
+      recipients:
+        required: false
+        id: false
+        type:
+          - type:
+              recipient_name:
+                required: false
+                id: false
+                type: string
+              recipient_email:
+                required: false
+                id: false
+                type: string
+              recipient_id:
+                required: false
+                id: false
+                type: string
+      file_ID:
+        required: false
+        id: false
+        type: number
+      Employee_ID:
+        required: false
+        id: false
+        type: number
+      Envelope_ID:
+        required: false
+        id: true
+        type: string
+      Email_subject:
+        required: false
+        id: false
+        type: string
+    plural: create_report_upload
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'

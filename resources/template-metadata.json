@@ -3688,24 +3688,33 @@
    "targetApps": ["zohorecruit", "gmail"],
    "tags": ["foreach", "if", "wufoo", "zohorecruit", "gmail"],
    "offerings": ["app connect professional"]
- },
-    {
-    "name": "Create a sales order in Zoho Inventory for each new Square payment",
-    "description": "Use this template to create a sales order in Zoho Inventory for each new Square payment",
-    "summary": "Scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["square", "zohoinventory"],
-    "tags": ["streaming-connector-scheduler", "square", "zohoinventory", "if", "foreach"],
-    "offerings": ["app connect professional"]
 },
 {
-    "name": "Create a package in Zoho Inventory for new Shopify orders",
-    "description": "Use this template to create a package in Zoho Inventory for new Shopify orders",
-    "summary": "Scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["shopify", "zohoinventory"],
-    "tags": ["streaming-connector-scheduler", "shopify", "zohoinventory", "if", "foreach", "log", "setVariable"],
-    "offerings": ["app connect professional"]
+   "name": "Download an employee file in BambooHR and send the report for approval to DocuSign",
+   "description": "Use this template to download an employee file in BambooHR and send the report for approval to DocuSign.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["bamboohr", "docusign"],
+   "tags": ["bamboohr", "docusign", "api"],
+   "offerings": ["app connect professional"]
+},
+{
+   "name": "Create a sales order in Zoho Inventory for each new Square payment",
+   "description": "Use this template to create a sales order in Zoho Inventory for each new Square payment.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["square", "zohoinventory"],
+   "tags": ["streaming-connector-scheduler", "square", "zohoinventory", "if", "foreach"],
+   "offerings": ["app connect professional"]
+},
+{
+   "name": "Create a package in Zoho Inventory for new Shopify orders",
+   "description": "Use this template to create a package in Zoho Inventory for new Shopify orders.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["shopify", "zohoinventory"],
+   "tags": ["streaming-connector-scheduler", "shopify", "zohoinventory", "if", "foreach", "log", "setVariable"],
+   "offerings": ["app connect professional"]
 }
 ]
 }
