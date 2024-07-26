@@ -105,7 +105,7 @@ integration:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
-              display-name: HubSpot CRM Deals
+              display-name: HubSpot CRM deal
           - response:
               name: response
               reply-maps:
