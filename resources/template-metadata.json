@@ -3610,11 +3610,11 @@
   },
     {
     "name": "Download an employee file in BambooHR and send the report for approval to DocuSign",
-    "description": "Use this template to download an employee file in BambooHR and send the report for approval to DocuSign",
+    "description": "Use this template to download an employee file in BambooHR and send the report for approval to DocuSign.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
-    "targetApps": ["docusign","bamboohr"],
-    "tags": ["bamboohr","docusign","api"],
+    "targetApps": ["docusign", "bamboohr"],
+    "tags": ["bamboohr", "docusign", "api"],
     "offerings": ["app connect professional"]
 }
 ]
