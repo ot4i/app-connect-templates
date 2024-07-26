@@ -3690,40 +3690,40 @@
    "offerings": ["app connect professional"]
  },
  {
-   "name": "Send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly",
-   "description": "Use this template to send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly",
-   "summary": "streaming-connector-scheduler to 2 applications",
-   "sourceApp": "streaming-connector-scheduler",
-   "targetApps": [
-     "zohorecruit",
-     "calendly"
-   ],
-   "tags": [
-     "streaming-connector-scheduler",
-     "zohorecruit",
-     "calendly"
-   ],
-   "offerings": [
-     "app connect professional"
-   ]
- },
- {
-   "name": "Send reminders to the participants through Gmail for each scheduled event in Calendly",
-   "description": "Use this template to send reminders to the participants through Gmail for each scheduled event in Calendly",
-   "summary": "streaming-connector-scheduler to 2 applications",
-   "sourceApp": "streaming-connector-scheduler",
-   "targetApps": [
-     "calendly",
-     "gmail"
-   ],
-   "tags": [
-     "streaming-connector-scheduler",
-     "calendly",
-     "gmail"
-   ],
-   "offerings": [
-     "app connect professional"
-   ]
- } 
+    "name": "Send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly",
+    "description": "Use this template to send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+      "zohorecruit",
+      "calendly"
+    ],
+    "tags": [
+      "streaming-connector-scheduler",
+      "zohorecruit",
+      "calendly"
+    ],
+    "offerings": [
+      "app connect professional"
+    ]
+  },
+  {
+    "name": "Send reminders to the participants through Gmail for each scheduled event in Calendly",
+    "description": "Use this template to send reminders to the participants through Gmail for each scheduled event in Calendly",
+    "summary": "streaming-connector-scheduler to 2 applications",
+    "sourceApp": "streaming-connector-scheduler",
+    "targetApps": [
+      "calendly",
+      "gmail"
+    ],
+    "tags": [
+      "streaming-connector-scheduler",
+      "calendly",
+      "gmail"
+    ],
+    "offerings": [
+      "app connect professional"
+    ]
+  }
 ]
 }
