@@ -7,4 +7,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
    
 3. To start the flow, in the banner click **Start flow**.
 
-Use this template to send reminders to the participants through Gmail for each scheduled event in Calendly
+Use this template to send reminders to the participants through Gmail for each scheduled event in Calendly.
