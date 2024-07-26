@@ -120,5 +120,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create New message in Front for contacts in contact list in hubspot marketing
+  name: Create a message in Front for each new contact added to a contact list in HubSpot Marketing
 models: {}
