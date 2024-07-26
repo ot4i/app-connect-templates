@@ -6,4 +6,5 @@ To refer to these instructions while editing the flow, open [the GitHub page](Cr
    - [Front] (http://ibm.biz/acfront)
 3. To start the flow, in the banner click **Start flow**.
    
-Use this flow to create a comment in Front for each updated deal in HubSpot CRM.
+Use this flow to create a comment in Front for each updated deal in HubSpot CRM. 
+For more information about using an API flow, see the tutorial [Creating flows for an API](https://www.ibm.com/docs/en/app-connect/saas?topic=designer-introduction-creating-flows-api-part-1).
