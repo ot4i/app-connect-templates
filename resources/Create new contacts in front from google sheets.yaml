@@ -126,7 +126,7 @@ integration:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
-              display-name: Google Sheets Contacts
+              display-name: Contact in Google Sheets rows
           - custom-action:
               action: getAccountsByIdContacts
               name: Front Retrieve account contacts
