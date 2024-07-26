@@ -3704,7 +3704,7 @@
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["shopify", "zohoinventory"],
-    "tags": ["streaming-connector-scheduler", "shopify", "zohoinventory", "if", "foreach", "log"],
+    "tags": ["streaming-connector-scheduler", "shopify", "zohoinventory", "if", "foreach", "log", "setVariable"],
     "offerings": ["app connect professional"]
 }
 ]
