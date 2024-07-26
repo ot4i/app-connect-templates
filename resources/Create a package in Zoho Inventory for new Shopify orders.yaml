@@ -509,7 +509,7 @@ integration:
                                     expression: '$If3.Line_Items.qty '
                                 - weight:
                                     expression: '$Foreach2item.grams '
-              display-name: Shopify Item loop
+              display-name: Shopify item loop
           - custom-action:
               name: Zoho Inventory Create sales order
               target:
@@ -625,7 +625,7 @@ integration:
                                     template: '{{$If5.line_items.line_item_id}}'
                                 - qty:
                                     expression: '$If5.line_items.qty '
-              display-name: Zoho Line Items
+              display-name: Zoho line items
           - custom-action:
               name: Zoho Inventory Create package
               target:
