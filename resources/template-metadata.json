@@ -3529,29 +3529,29 @@
   },  
   {
     "name": "Create a message in Front for each new contact added to Front from a sheet in Google Sheets",
-    "description": "Use this template to create new contacts in front from Google Sheets.",
+    "description": "Use this template to create a message in Front for each new contact added to Front from a sheet in Google Sheets.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["googlesheet", "front"],
-    "tags": ["streaming-connector-scheduler", "front", "googlesheet","foreach","if"],
+    "tags": ["streaming-connector-scheduler", "front", "googlesheet", "foreach"],
     "offerings": ["app connect professional"]
   },
   {
     "name": "Create a comment in Front for each updated deal in HubSpot CRM",
-    "description": "Use this template to Create new front comments when deal stages get updated in HubSpot CRM.",
-    "summary": "Scheduler to 2 applications",
-    "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["front","hubspotcrm"],
-    "tags": ["hubspotcrm", "front","foreach","if"],
+    "description": "Use this template to create a comment in Front for each updated deal in HubSpot CRM.",
+    "summary": "1 flow using 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["front", "hubspotcrm"],
+    "tags": ["api", "hubspotcrm", "front", "foreach"],
     "offerings": ["app connect professional"]
   },
   {
     "name": "Create a message in Front for each new contact added to a contact list in HubSpot Marketing",
-    "description": "Use this template to create New message in front for contacts in contact list in hubspot.",
+    "description": "Use this template to create a message in Front for each new contact added to a contact list in hubspot.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["front", "hubspotmarketing"],
-    "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing","foreach","if"],
+    "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing", "foreach"],
     "offerings": ["app connect professional"]
   }
 ]
