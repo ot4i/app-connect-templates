@@ -3541,16 +3541,16 @@
     "description": "Use this template to create a comment in Front for each updated deal in HubSpot CRM.",
     "summary": "1 flow using 2 applications",
     "sourceApp": "api",
-    "targetApps": ["front", "hubspotcrm"],
+    "targetApps": ["hubspotcrm", "front"],
     "tags": ["api", "hubspotcrm", "front", "foreach"],
     "offerings": ["app connect professional"]
   },
   {
     "name": "Create a message in Front for each new contact added to a contact list in HubSpot Marketing",
-    "description": "Use this template to create a message in Front for each new contact added to a contact list in hubspot.",
+    "description": "Use this template to create a message in Front for each new contact added to a contact list in HubSpot Marketing.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
-    "targetApps": ["front", "hubspotmarketing"],
+    "targetApps": ["hubspotmarketing", "front"],
     "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing", "foreach"],
     "offerings": ["app connect professional"]
   }
