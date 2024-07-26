@@ -95,7 +95,7 @@ integration:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
-              display-name: Hubspot Contacts List
+              display-name: HubSpot Marketing contact list
     assembly-2:
       assembly:
         execute:
@@ -120,5 +120,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create New message in Front for contacts in contact list in hubspot
+  name: Create New message in Front for contacts in contact list in hubspot marketing
 models: {}
