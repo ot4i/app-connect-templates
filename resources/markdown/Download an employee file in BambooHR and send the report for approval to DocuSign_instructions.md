@@ -8,3 +8,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 3. To start the flow, in the banner click **Start flow**.
 
 Use this template to download an employee file in BambooHR and send the report for approval to DocuSign.
+For more information about using an API flow, see the tutorial [Creating flows for an API](https://www.ibm.com/docs/en/app-connect/saas?topic=designer-introduction-creating-flows-api-part-1).
