@@ -203,7 +203,7 @@ integration:
                     $ref: '#/flowDetails'
                   - variable: api
                     $ref: '#/trigger/api/parameters'
-  name: Create new front comments when deal stages get updated in hubspotcrm
+  name: Create a comment in Front for each updated deal in HubSpot CRM
 models:
   hubspot:
     name: hubspot
