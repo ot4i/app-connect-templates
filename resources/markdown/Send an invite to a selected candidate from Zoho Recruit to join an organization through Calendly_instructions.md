@@ -2,9 +2,9 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Zoho Recruit](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-zoho-recruit)
-   - [Calendly](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-calendly)
+   - [Zoho Recruit](https://ibm.biz/aczohorecruit)
+   - [Calendly](https://ibm.biz/accalendly)
    
 3. To start the flow, in the banner click **Start flow**.
 
-Use this template to send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly
+Use this template to send an invite to a selected candidate from Zoho Recruit to join an organization through Calendly.
