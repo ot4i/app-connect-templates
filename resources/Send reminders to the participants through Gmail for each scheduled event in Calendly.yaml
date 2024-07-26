@@ -1,0 +1,185 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 5
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+      connector-type: streaming-connector-scheduler
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: event
+      connector-type: calendly
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Calendly Retrieve scheduled events
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - organization: >-
+                        https://api.calendly.com/organizations/6a7411c9-aa71-4c8b-a699-b402004bacc2
+                    - start_time:
+                        lt: >-
+                          {{$fromMillis($toMillis($Trigger.currentEventTime) +
+                          1800000)}}
+                    - start_time:
+                        gt: >-
+                          {{$fromMillis($toMillis($Trigger.lastEventTime ) +
+                          1800000)}}
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 5000
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$CalendlyRetrievescheduledevents '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Calendly event
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Foreachitem.event_guests.email}}':
+                      neq: ''
+                  execute:
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - Subject:
+                                template: >-
+                                  {{$Foreachitem.name}} - Start Time:
+                                  {{$Foreachitem.start_time}} & End Time:
+                                  {{$Foreachitem.end_time}}
+                            - To:
+                                template: >-
+                                  {{$join($Foreachitem.event_memberships.user_email,
+                                  ',
+                                  ')}},{{$join($Foreachitem.event_guests.email,
+                                  ', ')}}
+                            - richTextBody:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        There is an upcomming event
+                                        "{{$Foreachitem.name}}" on
+                                        {{$Foreachitem.start_time}}. You are
+                                        invited to join the event.
+                                  - contentType:
+                                      template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Gmail Send email 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - Subject:
+                              template: >-
+                                {{$Foreachitem.name}} - Start Time:
+                                {{$Foreachitem.start_time}} & End Time:
+                                {{$Foreachitem.end_time}}
+                          - To:
+                              template: >-
+                                {{$join($Foreachitem.event_memberships.user_email,
+                                ', ')}}
+                          - richTextBody:
+                              mappings:
+                                - content:
+                                    template: >-
+                                      There is an upcomming event
+                                      "{{$Foreachitem.name}}" on
+                                      {{$Foreachitem.start_time}}. You are
+                                      invited to join the event.
+                                - contentType:
+                                    template: text/plain
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: Send reminders to the participants through Gmail for each scheduled event in Calendly
+models: {}
