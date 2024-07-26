@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [HubSpot Marketing] (https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-hubspot-marketing).
-   - [Front] (https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-front).
+   - [HubSpot Marketing] (https://ibm.biz/achubspotmarketing)
+   - [Front] (https://ibm.biz/acfront)
 3. To start the flow, in the banner click **Start flow**.
 
-Use this flow to create new message in Front for contacts in contact list in hubspot marketing.
+Use this flow to create a message in Front for each new contact added to a contact list in HubSpot Marketing.
