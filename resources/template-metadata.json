@@ -3742,6 +3742,42 @@
    "targetApps": ["hubspotmarketing", "front"],
    "tags": ["streaming-connector-scheduler", "front", "hubspotmarketing", "foreach"],
    "offerings": ["app connect professional"]
+},
+{
+   "name": "Create a comment on a card in Businessmap when you receive an update for a card as a Gmail message",
+   "description": "Use this template to create a comment on a card in Businessmap when you receive an update for a card as a Gmail message.",
+   "summary": "Gmail to 2 applications",
+   "sourceApp": "gmail",
+   "targetApps": ["gmail", "businessmap"],
+   "tags": ["gmail", "businessmap", "if"],
+   "offerings": ["app connect professional"]
+},
+{
+   "name": "Add new Zendesk Service users to a team in Businessmap",
+   "description": "Use this template to add new Zendesk Service users to a team in Businessmap.",
+   "summary": "Zendesk Service to Businessmap",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["businessmap"],
+   "tags": ["zendeskservice", "businessmap", "if"],
+   "offerings": ["app connect professional"]
+},
+{
+   "name": "Assign new Zendesk Service users to a board in Businessmap",
+   "description": "Use this template to assign new Zendesk Service users to a board in Businessmap.",
+   "summary": "Zendesk Service to Businessmap",
+   "sourceApp": "zendeskservice",
+   "targetApps": ["businessmap"],
+   "tags": ["zendeskservice", "businessmap"],
+   "offerings": ["app connect professional"]
+},
+{
+   "name": "Send a Slack message notification about Businessmap cards in the backlog for a specific time",
+   "description": "Use this template to send a Slack message notification about Businessmap cards in the backlog for a specific time.",
+   "summary": "Scheduler to 2 applications",
+   "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["slack", "businessmap"],
+   "tags": ["streaming-connector-scheduler", "slack", "businessmap"],
+   "offerings": ["app connect professional"]
 }
 ]
 }
