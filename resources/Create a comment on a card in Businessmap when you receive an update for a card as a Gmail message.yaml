@@ -61,7 +61,7 @@ integration:
                     'true': '{{$contains($Trigger.Subject , "card -") }}'
                   execute:
                     - custom-action:
-                        name: Businessmap Create Card Comment
+                        name: Businessmap Create card comment
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         action: postCardsByCardIdComments
