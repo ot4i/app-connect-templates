@@ -194,7 +194,7 @@ integration:
               else:
                 execute:
                   - custom-action:
-                      name: Businessmap Create Team
+                      name: Businessmap Create team
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-2'
                       action: postTeams
