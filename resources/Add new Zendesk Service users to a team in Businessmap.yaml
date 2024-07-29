@@ -51,7 +51,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Businessmap Retrieve Users
+              name: Businessmap Retrieve all users
               target:
                 $ref: '#/integration/action-interfaces/action-interface-4'
               filter:
@@ -79,9 +79,9 @@ integration:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
                   - variable: BusinessmapRetrieveUsers
-                    $ref: '#/node-output/Businessmap Retrieve Users/response/payload'
+                    $ref: '#/node-output/Businessmap Retrieve all users/response/payload'
                   - variable: BusinessmapRetrieveUsersMetadata
-                    $ref: '#/node-output/Businessmap Retrieve Users/response'
+                    $ref: '#/node-output/Businessmap Retrieve all users/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
           - if:
@@ -90,9 +90,9 @@ integration:
                 - variable: Trigger
                   $ref: '#/trigger/payload'
                 - variable: BusinessmapRetrieveUsers
-                  $ref: '#/node-output/Businessmap Retrieve Users/response/payload'
+                  $ref: '#/node-output/Businessmap Retrieve all users/response/payload'
                 - variable: BusinessmapRetrieveUsersMetadata
-                  $ref: '#/node-output/Businessmap Retrieve Users/response'
+                  $ref: '#/node-output/Businessmap Retrieve all users/response'
                 - variable: BusinessmapRetrieveallteams
                   $ref: >-
                     #/node-output/Businessmap Retrieve all
@@ -106,7 +106,7 @@ integration:
                     '{{$BusinessmapRetrieveallteamsMetadata."status-code"}}': '200'
                   execute:
                     - custom-action:
-                        name: Businessmap Add User to Team 3
+                        name: Businessmap Add user to team 1
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-5'
                         action: putTeamsByTeamIdUsersByUserId
@@ -174,7 +174,7 @@ integration:
                               #/node-output/Businessmap Retrieve
                               Users/response/payload
                           - variable: BusinessmapRetrieveUsersMetadata
-                            $ref: '#/node-output/Businessmap Retrieve Users/response'
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
                           - variable: BusinessmapRetrieveallteams
                             $ref: >-
                               #/node-output/Businessmap Retrieve all
@@ -194,7 +194,7 @@ integration:
               else:
                 execute:
                   - custom-action:
-                      name: Businessmap Create Teams
+                      name: Businessmap Create Team
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-2'
                       action: postTeams
@@ -211,7 +211,7 @@ integration:
                               #/node-output/Businessmap Retrieve
                               Users/response/payload
                           - variable: BusinessmapRetrieveUsersMetadata
-                            $ref: '#/node-output/Businessmap Retrieve Users/response'
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
                           - variable: BusinessmapRetrieveallteams
                             $ref: >-
                               #/node-output/Businessmap Retrieve all
@@ -223,7 +223,7 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
                   - custom-action:
-                      name: Businessmap Add User to Team 2
+                      name: Businessmap Add user to team 2
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-3'
                       action: putTeamsByTeamIdUsersByUserId
@@ -240,7 +240,7 @@ integration:
                               #/node-output/Businessmap Retrieve
                               Users/response/payload
                           - variable: BusinessmapRetrieveUsersMetadata
-                            $ref: '#/node-output/Businessmap Retrieve Users/response'
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
                           - variable: BusinessmapRetrieveallteams
                             $ref: >-
                               #/node-output/Businessmap Retrieve all
@@ -268,7 +268,7 @@ integration:
                               #/node-output/Businessmap Retrieve
                               Users/response/payload
                           - variable: BusinessmapRetrieveUsersMetadata
-                            $ref: '#/node-output/Businessmap Retrieve Users/response'
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
                           - variable: BusinessmapRetrieveTeams
                             $ref: >-
                               #/node-output/Businessmap Retrieve
@@ -293,7 +293,7 @@ integration:
                             #/node-output/Businessmap Retrieve
                             Users/response/payload
                         - variable: BusinessmapRetrieveUsersMetadata
-                          $ref: '#/node-output/Businessmap Retrieve Users/response'
+                          $ref: '#/node-output/Businessmap Retrieve all users/response'
                         - variable: BusinessmapRetrieveallteams
                           $ref: >-
                             #/node-output/Businessmap Retrieve all
@@ -310,10 +310,10 @@ integration:
                             Teams/response/payload
                         - variable: BusinessmapAddUsertoTeam2
                           $ref: >-
-                            #/block/If/node-output/Businessmap Add User to Team
+                            #/block/If/node-output/Businessmap Add user to team
                             2/response/payload
                       message: Created team and added user
                       status-code: 200
               output-schema: {}
-  name: Add Zendesk Service users to teams in Businessmap when new users are created in Zendesk Service
+  name: Add new Zendesk Service users to a team in Businessmap
 models: {}

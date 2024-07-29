@@ -61,7 +61,7 @@ integration:
                     'true': '{{$contains($Trigger.Subject , "card -") }}'
                   execute:
                     - custom-action:
-                        name: Businessmap Create Card Comments
+                        name: Businessmap Create Card Comment
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         action: postCardsByCardIdComments
@@ -86,5 +86,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Add comments to a card in Businessmap when a user receives update for a card as a Gmail message
+  name: Create a comment on a card in Businessmap when you receive an update for a card as a Gmail message
 models: {}
