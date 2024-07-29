@@ -1,0 +1,51 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: mailchimp
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Campaigns
+          options:
+            list_id: 6fc8383307
+            parentFilter:
+              list_id: 6fc8383307
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postApiV1Annotations_model
+      connector-type: crystalball
+      actions:
+        postApiV1Annotations: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              action: postApiV1Annotations
+              name: Crystal Ball Create annotation
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - category:
+                      template: '{{$Trigger.id}} created'
+                  - description:
+                      template: mailchimp
+                  - event_name:
+                      template: campaign
+                  - url:
+                      template: https://mailchimp.com/
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create an annotation in Crystal Ball for new Mailchimp campaigns
+models: {}

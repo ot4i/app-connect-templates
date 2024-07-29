@@ -1,0 +1,218 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        retrieveHubspot:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: retrieveHubspot
+          output-context:
+            data: retrieveHubspot
+      options:
+        resources:
+          - business-object: hubspot
+            triggers:
+              retrieve: retrieveHubspot
+            model:
+              $ref: '#/models/hubspot'
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getCrmV3ObjectsDeals_model
+      connector-type: hubspotcrm
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: postConversationsByIdComments_model
+      connector-type: front
+      actions:
+        postConversationsByIdComments: {}
+    action-interface-2:
+      type: api-action
+      business-object: patchCrmV3ObjectsDealsByDealId_model
+      connector-type: hubspotcrm
+      actions:
+        patchCrmV3ObjectsDealsByDealId: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: true
+              allow-truncation: true
+              name: HubSpot CRM Retrieve all deals
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                input:
+                  - variable: HubSpotCRMRetrievealldeals
+                    $ref: >-
+                      #/node-output/HubSpot CRM Retrieve all
+                      deals/response/payload
+                  - variable: HubSpotCRMRetrievealldealsMetadata
+                    $ref: '#/node-output/HubSpot CRM Retrieve all deals/response'
+                  - variable: HubSpotCRMRetrievedealsbyfilters
+                    $ref: >-
+                      #/block/For each/node-output/HubSpot CRM Retrieve deals by
+                      filters/response/payload
+                  - variable: HubSpotCRMRetrievedealsbyfiltersMetadata
+                    $ref: >-
+                      #/block/For each/node-output/HubSpot CRM Retrieve deals by
+                      filters/response
+                  - variable: FrontCreatecomment
+                    $ref: >-
+                      #/block/For each/node-output/Front Create
+                      comment/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - name:
+                            template: '{{$FrontCreatecomment.body}}'
+              source:
+                expression: '$HubSpotCRMRetrievealldeals '
+                input:
+                  - variable: HubSpotCRMRetrievealldeals
+                    $ref: >-
+                      #/node-output/HubSpot CRM Retrieve all
+                      deals/response/payload
+                  - variable: HubSpotCRMRetrievealldealsMetadata
+                    $ref: '#/node-output/HubSpot CRM Retrieve all deals/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: HubSpot CRM deal
+          - response:
+              name: response
+              reply-maps:
+                - title: hubspot successfully retrieved
+                  status-code: 200
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: HubSpotCRMRetrievealldeals
+                        $ref: >-
+                          #/node-output/HubSpot CRM Retrieve all
+                          deals/response/payload
+                      - variable: HubSpotCRMRetrievealldealsMetadata
+                        $ref: '#/node-output/HubSpot CRM Retrieve all deals/response'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: api
+                        $ref: '#/trigger/api/parameters'
+                    mappings:
+                      - name:
+                          template: '{{$Foreach.output.name}}'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              action: patchCrmV3ObjectsDealsByDealId
+              name: HubSpot CRM Update deal
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - properties:
+                      mappings:
+                        - hs_analytics_source:
+                            template: ORGANIC_SEARCH
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: HubSpotCRMRetrievealldeals
+                    $ref: >-
+                      #/node-output/HubSpot CRM Retrieve all
+                      deals/response/payload
+                  - variable: HubSpotCRMRetrievealldealsMetadata
+                    $ref: '#/node-output/HubSpot CRM Retrieve all deals/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              filter:
+                where:
+                  id: '{{$HubSpotCRMRetrievealldeals.id}}'
+                input:
+                  - variable: HubSpotCRMRetrievealldeals
+                    $ref: >-
+                      #/node-output/HubSpot CRM Retrieve all
+                      deals/response/payload
+                  - variable: HubSpotCRMRetrievealldealsMetadata
+                    $ref: '#/node-output/HubSpot CRM Retrieve all deals/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              allow-empty-output: true
+          - custom-action:
+              action: postConversationsByIdComments
+              name: Front Create comment
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - body:
+                      template: '{{$HubSpotCRMRetrievealldeals.id}}'
+                  - id:
+                      template: cnv_1b64fqos
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: HubSpotCRMRetrievealldeals
+                    $ref: >-
+                      #/node-output/HubSpot CRM Retrieve all
+                      deals/response/payload
+                  - variable: HubSpotCRMRetrievealldealsMetadata
+                    $ref: '#/node-output/HubSpot CRM Retrieve all deals/response'
+                  - variable: HubSpotCRMUpdatedeal
+                    $ref: >-
+                      #/block/For each/node-output/HubSpot CRM Update
+                      deal/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+  name: Create a comment in Front for each updated deal in HubSpot CRM
+models:
+  hubspot:
+    name: hubspot
+    plural: hubspot
+    properties:
+      name:
+        required: false
+        id: true
+        type: string
+    operations:
+      retrieve: '#/integration/assemblies/assembly-1'
+    description: ''
