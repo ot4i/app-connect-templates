@@ -48,7 +48,7 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
           - custom-action:
-              name: Businessmap Assign User to Board
+              name: Businessmap Assign user to board
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               action: putBoardsByBoardIdUserRolesByUserId
@@ -87,5 +87,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Invite new Zendesk Service users to the Businessmap board whenever a new user is created in the Zendesk service
+  name: Assign new Zendesk Service users to a board in Businessmap
 models: {}

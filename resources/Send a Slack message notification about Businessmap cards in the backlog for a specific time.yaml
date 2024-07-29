@@ -45,7 +45,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Businessmap Retrieve Cards
+              name: Businessmap Retrieve all cards
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
@@ -88,5 +88,5 @@ integration:
                     $ref: '#/node-output/Businessmap Retrieve Cards/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Notify team via Slack  message about cards in the backlog for a more than a specific time
+  name: Send a Slack message notification about Businessmap cards in the backlog for a specific time
 models: {}
