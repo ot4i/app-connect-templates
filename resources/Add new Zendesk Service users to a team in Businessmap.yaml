@@ -1,0 +1,319 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: User
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+      connector-type: zendeskservice
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: postTeams_model
+      connector-type: businessmap
+      actions:
+        postTeams: {}
+    action-interface-3:
+      type: api-action
+      business-object: putTeamsByTeamIdUsersByUserId_model
+      connector-type: businessmap
+      actions:
+        putTeamsByTeamIdUsersByUserId: {}
+    action-interface-5:
+      type: api-action
+      business-object: putTeamsByTeamIdUsersByUserId_model
+      connector-type: businessmap
+      actions:
+        putTeamsByTeamIdUsersByUserId: {}
+    action-interface-4:
+      type: api-action
+      business-object: getUsers_model
+      connector-type: businessmap
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: getTeams_model
+      connector-type: businessmap
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Businessmap Retrieve all users
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                limit: 10
+                where:
+                  emails: '{{$Trigger.email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: false
+              allow-empty-output: false
+          - retrieve-action:
+              allow-empty-output: true
+              allow-truncation: true
+              name: Businessmap Retrieve all teams
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 10
+                where:
+                  name: Leo
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BusinessmapRetrieveUsers
+                    $ref: '#/node-output/Businessmap Retrieve all users/response/payload'
+                  - variable: BusinessmapRetrieveUsersMetadata
+                    $ref: '#/node-output/Businessmap Retrieve all users/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: BusinessmapRetrieveUsers
+                  $ref: '#/node-output/Businessmap Retrieve all users/response/payload'
+                - variable: BusinessmapRetrieveUsersMetadata
+                  $ref: '#/node-output/Businessmap Retrieve all users/response'
+                - variable: BusinessmapRetrieveallteams
+                  $ref: >-
+                    #/node-output/Businessmap Retrieve all
+                    teams/response/payload
+                - variable: BusinessmapRetrieveallteamsMetadata
+                  $ref: '#/node-output/Businessmap Retrieve all teams/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$BusinessmapRetrieveallteamsMetadata."status-code"}}': '200'
+                  execute:
+                    - custom-action:
+                        name: Businessmap Add user to team 1
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        action: putTeamsByTeamIdUsersByUserId
+                        map:
+                          mappings:
+                            - team_id:
+                                template: '{{$BusinessmapRetrieveallteams.team_id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BusinessmapRetrieveUsers
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve
+                                Users/response/payload
+                            - variable: BusinessmapRetrieveUsersMetadata
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve
+                                Users/response
+                            - variable: BusinessmapRetrieveallteams
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve all
+                                teams/response/payload
+                            - variable: BusinessmapRetrieveallteamsMetadata
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve all
+                                teams/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - user_id: '{{$BusinessmapRetrieveUsers.user_id}}'
+                              - team_id: '{{$BusinessmapRetrieveallteams.team_id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: BusinessmapRetrieveUsers
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve
+                                Users/response/payload
+                            - variable: BusinessmapRetrieveUsersMetadata
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve
+                                Users/response
+                            - variable: BusinessmapRetrieveallteams
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve all
+                                teams/response/payload
+                            - variable: BusinessmapRetrieveallteamsMetadata
+                              $ref: >-
+                                #/node-output/Businessmap Retrieve all
+                                teams/response
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 10
+                  completion-action:
+                    terminate:
+                      info:
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BusinessmapRetrieveUsers
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve
+                              Users/response/payload
+                          - variable: BusinessmapRetrieveUsersMetadata
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
+                          - variable: BusinessmapRetrieveallteams
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve all
+                              teams/response/payload
+                          - variable: BusinessmapRetrieveallteamsMetadata
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve all
+                              teams/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                          - variable: BusinessmapAddUsertoTeam3
+                            $ref: >-
+                              #/block/If/node-output/Businessmap Add User to
+                              Team 3/response/payload
+                        message: 'Added user to team '
+                        status-code: 200
+              else:
+                execute:
+                  - custom-action:
+                      name: Businessmap Create team
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-2'
+                      action: postTeams
+                      map:
+                        mappings:
+                          - name:
+                              template: '{{$Trigger.user_fields.team}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BusinessmapRetrieveUsers
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve
+                              Users/response/payload
+                          - variable: BusinessmapRetrieveUsersMetadata
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
+                          - variable: BusinessmapRetrieveallteams
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve all
+                              teams/response/payload
+                          - variable: BusinessmapRetrieveallteamsMetadata
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve all
+                              teams/response
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                  - custom-action:
+                      name: Businessmap Add user to team 2
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      action: putTeamsByTeamIdUsersByUserId
+                      map:
+                        mappings:
+                          - team_id:
+                              template: '{{$BusinessmapCreateTeams.team_id}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BusinessmapRetrieveUsers
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve
+                              Users/response/payload
+                          - variable: BusinessmapRetrieveUsersMetadata
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
+                          - variable: BusinessmapRetrieveallteams
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve all
+                              teams/response/payload
+                          - variable: BusinessmapRetrieveallteamsMetadata
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve all
+                              teams/response
+                          - variable: BusinessmapCreateTeams
+                            $ref: >-
+                              #/block/If/node-output/Businessmap Create
+                              Teams/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      filter:
+                        where:
+                          and:
+                            - user_id: '{{$BusinessmapRetrieveUsers.user_id}}'
+                            - team_id: '{{$BusinessmapCreateTeams.team_id}}'
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: BusinessmapRetrieveUsers
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve
+                              Users/response/payload
+                          - variable: BusinessmapRetrieveUsersMetadata
+                            $ref: '#/node-output/Businessmap Retrieve all users/response'
+                          - variable: BusinessmapRetrieveTeams
+                            $ref: >-
+                              #/node-output/Businessmap Retrieve
+                              Teams/response/payload
+                          - variable: BusinessmapRetrieveTeamsMetadata
+                            $ref: '#/node-output/Businessmap Retrieve Teams/response'
+                          - variable: BusinessmapCreateTeams
+                            $ref: >-
+                              #/block/If/node-output/Businessmap Create
+                              Teams/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                        limit: 10
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: BusinessmapRetrieveUsers
+                          $ref: >-
+                            #/node-output/Businessmap Retrieve
+                            Users/response/payload
+                        - variable: BusinessmapRetrieveUsersMetadata
+                          $ref: '#/node-output/Businessmap Retrieve all users/response'
+                        - variable: BusinessmapRetrieveallteams
+                          $ref: >-
+                            #/node-output/Businessmap Retrieve all
+                            teams/response/payload
+                        - variable: BusinessmapRetrieveallteamsMetadata
+                          $ref: >-
+                            #/node-output/Businessmap Retrieve all
+                            teams/response
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                        - variable: BusinessmapCreateTeams
+                          $ref: >-
+                            #/block/If/node-output/Businessmap Create
+                            Teams/response/payload
+                        - variable: BusinessmapAddUsertoTeam2
+                          $ref: >-
+                            #/block/If/node-output/Businessmap Add user to team
+                            2/response/payload
+                      message: Created team and added user
+                      status-code: 200
+              output-schema: {}
+  name: Add new Zendesk Service users to a team in Businessmap
+models: {}

@@ -1,0 +1,91 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: zendeskservice
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: User
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: putBoardsByBoardIdUserRolesByUserId_model
+      connector-type: businessmap
+      actions:
+        putBoardsByBoardIdUserRolesByUserId: {}
+    action-interface-2:
+      type: api-action
+      business-object: getUsers_model
+      connector-type: businessmap
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              allow-empty-output: false
+              allow-truncation: true
+              name: Businessmap Retrieve all users
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                limit: 1
+                where:
+                  emails: '{{$Trigger.email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Businessmap Assign user to board
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: putBoardsByBoardIdUserRolesByUserId
+              map:
+                mappings:
+                  - board_id:
+                      template: '2'
+                  - role_id:
+                      expression: '1'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BusinessmapRetrieveallusers
+                    $ref: >-
+                      #/node-output/Businessmap Retrieve all
+                      users/response/payload
+                  - variable: BusinessmapRetrieveallusersMetadata
+                    $ref: '#/node-output/Businessmap Retrieve all users/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - user_id: '{{$BusinessmapRetrieveallusers.user_id}}'
+                    - board_id: '2'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BusinessmapRetrieveallusers
+                    $ref: >-
+                      #/node-output/Businessmap Retrieve all
+                      users/response/payload
+                  - variable: BusinessmapRetrieveallusersMetadata
+                    $ref: '#/node-output/Businessmap Retrieve all users/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+  name: Assign new Zendesk Service users to a board in Businessmap
+models: {}

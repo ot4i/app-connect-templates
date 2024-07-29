@@ -1,0 +1,92 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: getCards_model
+      connector-type: businessmap
+      actions:
+        RETRIEVEALL: {}
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Businessmap Retrieve all cards
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  and:
+                    - in_current_position_since_from:
+                        gte: '2024-05-16T10:50:52.485Z'
+                    - column_ids: '18'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              allow-empty-output: false
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C040CPDSV97
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Retrieved cards ids which are more in backlog now
+                        {{$Trigger.currentEventTime}} are 
+                        {{$BusinessmapRetrieveCards.card_id}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: BusinessmapRetrieveCards
+                    $ref: '#/node-output/Businessmap Retrieve Cards/response/payload'
+                  - variable: BusinessmapRetrieveCardsMetadata
+                    $ref: '#/node-output/Businessmap Retrieve Cards/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send a Slack message notification about Businessmap cards in the backlog for a specific time
+models: {}
