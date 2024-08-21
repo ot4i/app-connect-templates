@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/edit/AnimatIan-slack-mailchimp/resources/markdown/Add%20a%20Mailchimp%20subscriber%20from%20a%20Slack%20slash%20command_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/edit/AnimatIan-slack-mailchimp/resources/markdown/Add%20a%20Mailchimp%20subscriber%20from%20a%20Slack%20slash%20command_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Connect to your [Slack account](https://ibm.biz/aasslack).
     - **Note:** To add the slash command app, you need to be the owner of a workspace or have admin privileges.
 1. On the Slack "New message" event, copy the callback URL and [configure a custom slash command](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-slack#index__consider-general) called `/contact`.

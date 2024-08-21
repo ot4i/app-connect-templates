@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Add%20Eventbrite%20event%20as%20a%20new%20Salesforce%20campaign%20and%20notify%20via%20Slack_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Add%20Eventbrite%20event%20as%20a%20new%20Salesforce%20campaign%20and%20notify%20via%20Slack_instructions.md) (opens in a new window).
 
-1. Clicking **Create flow** to start using the template.
+1. Clicking **Use this template** to start using the template.
 2. Click the Eventbrite / **New order** node.
 3. Connect to your [Eventbrite](https://ibm.biz/aaseventbrite) account and then select the Organization that you want to use.
 4. Click the [Salesforce](https://ibm.biz/aassalesforce) / **Create campaign** node.
