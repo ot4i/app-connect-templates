@@ -3,12 +3,12 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Microsoft Excel Online](https://ibm.biz/acmsexcel)
-   - [MailChimp](https://ibm.biz/acslackmailchimp)
+   - [Mailchimp](https://ibm.biz/acslackmailchimp)
    - [Slack](https://ibm.biz/acslack)
 3. To start the flow, in the banner, click **Start flow**.
 
 
-Use this template to add subscribers to a list in Mailchimp when new rows are appended to a Microsoft Excel Online spreadsheet. In this example, when a new row is appended in a Microsoft Excel Online spreadsheet, for each MailChimp member whose status code equals 200, a Slack notification is posted in a channel to notify them that the member already exists. Otherwise, the member is added as a subsciber to a list in MaliChimp.
+Use this template to add subscribers to a list in Mailchimp when new rows are appended to a Microsoft Excel Online spreadsheet. In this example, when a new row is appended in a Microsoft Excel Online spreadsheet, for each Mailchimp member whose status code equals 200, a Slack notification is posted in a channel to notify them that the member already exists. Otherwise, the member is added as a subsciber to a list in MaliChimp.
 
 
 
