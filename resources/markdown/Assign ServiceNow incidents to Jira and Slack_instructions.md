@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Assign%20ServiceNow%20incidents%20to%20Jira%20and%20Slack_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Assign%20ServiceNow%20incidents%20to%20Jira%20and%20Slack_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Connect to your [ServiceNow account](http://ibm.biz/aasservicenow).
 1. Connect to your [Jira account](http://ibm.biz/aasjira).
 1. For the Jira "Create issue" action in the If branch (for incidents with urgency=high), select the project in which you want to create the issue.

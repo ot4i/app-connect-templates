@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20case%20in%20Salesforce%20when%20a%20new%20incident%20is%20created%20in%20ServiceNow%20and%20alert%20team_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20case%20in%20Salesforce%20when%20a%20new%20incident%20is%20created%20in%20ServiceNow%20and%20alert%20team_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Connect to your [ServiceNow account](http://ibm.biz/aasservicenow).
 1. Connect to your [Salesforce account](http://ibm.biz/aassalesforce) and if required change the case origin field from phone to whatever is applicable for your business.
 1. Connect to your [Gmail account](http://ibm.biz/aasgmail).
