@@ -3,7 +3,7 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Mailchimp](https://ibm.biz/acmailchimp)
-   - [Box](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-box)
+   - [Box](https://ibm.biz/ach2box)
 3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to create a folder in Box whenever a new campaign is created in Mailchimp.
