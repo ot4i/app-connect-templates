@@ -102,7 +102,7 @@ integration:
                       gt: '{{$Foreachitem.created_at}}'
                   execute:
                     - retrieve-action:
-                        name: Apptio Targetprocess Retrieve bugs 2
+                        name: IBM Targetprocess Retrieve bugs 2
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-4'
                         filter:
@@ -142,7 +142,7 @@ integration:
                             execute:
                               - custom-action:
                                   name: >-
-                                    Apptio Targetprocess Create or update
+                                    IBM Targetprocess Create or update
                                     comment
                                   target:
                                     $ref: >-

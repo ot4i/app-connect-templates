@@ -99,7 +99,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Apptio Targetprocess Retrieve projects
+              name: IBM Targetprocess Retrieve projects
               target:
                 $ref: '#/integration/action-interfaces/action-interface-3'
               filter:
@@ -200,7 +200,7 @@ integration:
               else:
                 execute:
                   - custom-action:
-                      name: Apptio Targetprocess Create or update project
+                      name: IBM Targetprocess Create or update project
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-4'
                       action: postApiV1Projects
@@ -222,7 +222,7 @@ integration:
                       filter:
                         limit: 10
                   - custom-action:
-                      name: Apptio Targetprocess Create or update bug
+                      name: IBM Targetprocess Create or update bug
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-2'
                       action: postApiV1Bugs

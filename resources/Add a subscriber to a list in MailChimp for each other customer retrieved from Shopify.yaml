@@ -205,5 +205,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Add a subscriber to a list in MailChimp for each other customer retrieved from Shopify
+  name: Add a subscriber to a list in Mailchimp for each other customer retrieved from Shopify
 models: {}
