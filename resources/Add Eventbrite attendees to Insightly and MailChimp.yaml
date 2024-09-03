@@ -47,7 +47,7 @@ integration:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
           - create-action:
-              name: MailChimp Add subscriber to a list
+              name: Mailchimp Add subscriber to a list
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               map:
@@ -68,5 +68,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: InsightlyCreatelead
                     $ref: '#/node-output/Insightly Create lead/response/payload'
-  name: Add Eventbrite attendees to Insightly and MailChimp
+  name: Add Eventbrite attendees to Insightly and Mailchimp
 models: {}

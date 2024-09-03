@@ -127,5 +127,5 @@ integration:
                     $ref: '#/node-output/WordPress Retrieve categories/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a post in a category in WordPress when a new campaign is created in MailChimp
+  name: Create a post in a category in WordPress when a new campaign is created in Mailchimp
 models: {}

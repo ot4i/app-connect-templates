@@ -33,7 +33,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: MailChimp Retrieve members
+              name: Mailchimp Retrieve members
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               filter:
@@ -68,7 +68,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: MailChimp Members
+              display-name: Mailchimp Members
     assembly-2:
       assembly:
         execute:
@@ -91,7 +91,7 @@ integration:
                       neq: '{{$Foreachitem.email_address}}'
                   execute:
                     - create-action:
-                        name: MailChimp Add subscriber to a list
+                        name: Mailchimp Add subscriber to a list
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-1'
                         map:
@@ -123,5 +123,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Add a subscriber to a list in MailChimp when a new form entry is created in Wufoo
+  name: Add a subscriber to a list in Mailchimp when a new form entry is created in Wufoo
 models: {}

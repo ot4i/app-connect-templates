@@ -39,7 +39,7 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: MailChimp Add subscriber to a list
+              name: Mailchimp Add subscriber to a list
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               map:
@@ -54,5 +54,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Add a subscriber to a specific list in MailChimp
+  name: Add a subscriber to a specific list in Mailchimp
 models: {}

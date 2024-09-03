@@ -97,7 +97,7 @@ integration:
                       gte: '{{$Trigger.lastEventTime}}'
                   execute:
                     - create-action:
-                        name: MailChimp Create campaign
+                        name: Mailchimp Create campaign
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         map:
