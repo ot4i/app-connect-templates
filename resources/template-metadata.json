@@ -1449,8 +1449,8 @@
    "offerings": ["app connect professional"]
   },
   {	
-   "name": "Add Eventbrite attendees to Insightly and MailChimp",
-   "description": "This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a MailChimp campaign list.",
+   "name": "Add Eventbrite attendees to Insightly and Mailchimp",
+   "description": "This template creates an Insightly lead when someone registers for an event in Eventbrite and additionally subscribes the attendee to a Mailchimp campaign list.",
    "summary": "Eventbrite to 2 applications",
    "sourceApp": "eventbrite",
    "targetApps": ["insightly", "mailchimp"],
@@ -1467,9 +1467,9 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Add new Eventbrite attendees to MailChimp lists",
-   "description": "This template adds attendees of Eventbrite events to different mailing lists in MailChimp, depending on the event that they sign up to.",
-   "summary": "Eventbrite to MailChimp",
+   "name": "Add new Eventbrite attendees to Mailchimp lists",
+   "description": "This template adds attendees of Eventbrite events to different mailing lists in Mailchimp, depending on the event that they sign up to.",
+   "summary": "Eventbrite to Mailchimp",
    "sourceApp": "eventbrite",
    "targetApps": ["mailchimp"],
    "tags": ["eventbrite", "mailchimp", "marketing", "events", "mailing list"],
@@ -1809,9 +1809,9 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a folder in Box whenever a new campaign is created in MailChimp",
-   "description": "Use this template to create a folder in Box whenever a new campaign is created in MailChimp.",
-   "summary": "MailChimp to Box",
+   "name": "Create a folder in Box whenever a new campaign is created in Mailchimp",
+   "description": "Use this template to create a folder in Box whenever a new campaign is created in Mailchimp.",
+   "summary": "Mailchimp to Box",
    "sourceApp": "mailchimp",
    "targetApps": ["box"],
    "tags": ["mailchimp", "box"],
@@ -1872,9 +1872,9 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a task in Asana whenever a new subscriber is added to MailChimp",
-   "description": "Use this template to create a task in Asana whenever a new subscriber is added in MailChimp.",
-   "summary": "MailChimp to Asana ",
+   "name": "Create a task in Asana whenever a new subscriber is added to Mailchimp",
+   "description": "Use this template to create a task in Asana whenever a new subscriber is added in Mailchimp.",
+   "summary": "Mailchimp to Asana ",
    "sourceApp": "mailchimp",
    "targetApps": ["asana"],
    "tags": ["mailchimp", "asana"],
@@ -1971,9 +1971,9 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Associate a new prospect to a list in Salesforce Account Engagement when a new subscriber is created in MailChimp",
-   "description": "Use this template to associate a newly created prospect to a list in Salesforce Account Engagement from a MailChimp list whenever a new subscriber is created in MailChimp. If the list exists, based on the new subscriber, a prospect is created, and the prospect is then associated with the existing list. If the list does not exist, a list is created along with the prospect details, and it will be associated with the newly created list in Salesforce Account Engagement.",
-   "summary": "MailChimp to Salesforce Account Engagement",
+   "name": "Associate a new prospect to a list in Salesforce Account Engagement when a new subscriber is created in Mailchimp",
+   "description": "Use this template to associate a newly created prospect to a list in Salesforce Account Engagement from a Mailchimp list whenever a new subscriber is created in Mailchimp. If the list exists, based on the new subscriber, a prospect is created, and the prospect is then associated with the existing list. If the list does not exist, a list is created along with the prospect details, and it will be associated with the newly created list in Salesforce Account Engagement.",
+   "summary": "Mailchimp to Salesforce Account Engagement",
    "sourceApp": "mailchimp",
    "targetApps": ["mailchimp", "salesforceae"],
    "tags": ["mailchimp", "salesforceae", "if"],
@@ -1998,8 +1998,8 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Add subscribers to a list in MailChimp for each other contact retrieved from Google Contacts",
-   "description": "Use this template to add subscribers to a list in MailChimp for each other contact retrieved from Google Contacts. This use case retrieves the other contacts from Google Contacts by using a search string.",
+   "name": "Add subscribers to a list in Mailchimp for each other contact retrieved from Google Contacts",
+   "description": "Use this template to add subscribers to a list in Mailchimp for each other contact retrieved from Google Contacts. This use case retrieves the other contacts from Google Contacts by using a search string.",
    "summary": "Scheduler to 2 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["googlecontacts", "mailchimp"],
@@ -2106,9 +2106,9 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create a quick event in Google Calendar when a new subscriber is created in MailChimp",
-   "description": "Use this template to create a quick event in Google Calendar whenever a new subscriber is created in MailChimp.",
-   "summary": "MailChimp to Google Calendar",
+   "name": "Create a quick event in Google Calendar when a new subscriber is created in Mailchimp",
+   "description": "Use this template to create a quick event in Google Calendar whenever a new subscriber is created in Mailchimp.",
+   "summary": "Mailchimp to Google Calendar",
    "sourceApp": "mailchimp",
    "targetApps": ["googlecalendar"],
    "tags": ["mailchimp", "googlecalendar"],
@@ -2133,9 +2133,9 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create an event in Google Calendar when a new campaign is created in MailChimp",
-   "description": "Use this template to create an event in Google Calendar whenever a new campaign is created in MailChimp. If the campaign type is regular, an event is sent to each of the MailChimp members; otherwise, a Slack notification is sent to the intended channel notifying that the new campaign created is not regular.",
-   "summary": "MailChimp to 2 applications",
+   "name": "Create an event in Google Calendar when a new campaign is created in Mailchimp",
+   "description": "Use this template to create an event in Google Calendar whenever a new campaign is created in Mailchimp. If the campaign type is regular, an event is sent to each of the Mailchimp members; otherwise, a Slack notification is sent to the intended channel notifying that the new campaign created is not regular.",
+   "summary": "Mailchimp to 2 applications",
    "sourceApp": "mailchimp",
    "targetApps": ["googlecalendar", "slack"],
    "tags": ["mailchimp", "googlecalendar", "slack"],
@@ -2187,9 +2187,9 @@
    "offerings": ["app connect professional"]
   }, 
   {
-   "name": "Create a post in a category in WordPress when a new campaign is created in MailChimp",
-   "description": "Use this template to create a post in a category in WordPress whenever a new campaign is created in MailChimp.",
-   "summary": "MailChimp to WordPress",
+   "name": "Create a post in a category in WordPress when a new campaign is created in Mailchimp",
+   "description": "Use this template to create a post in a category in WordPress whenever a new campaign is created in Mailchimp.",
+   "summary": "Mailchimp to WordPress",
    "sourceApp": "mailchimp",
    "targetApps": ["wordpress"],
    "tags": ["mailchimp", "wordpress"],
@@ -2395,8 +2395,8 @@
   },
   {
    "name": "Create a candidate in Oracle HCM for all new Mailchimp subscribers",
-   "description": "Use this template to create a candidate in Oracle HCM for any new subscribers who have expressed interest in a MailChimp campaign. ",
-   "summary": "MailChimp to Oracle HCM",
+   "description": "Use this template to create a candidate in Oracle HCM for any new subscribers who have expressed interest in a Mailchimp campaign. ",
+   "summary": "Mailchimp to Oracle HCM",
    "sourceApp": "mailchimp",
    "targetApps": ["oraclehcm"],
    "tags": ["mailchimp", "oraclehcm"],
@@ -2619,18 +2619,18 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Add a subscriber to a specific list in MailChimp",
-   "description": "Use this template to add a subscriber to a specific list in MailChimp with the subscriber's email address. This is a prequel flow for ‘Add a member to a group in Google Groups when a new subscriber is added to a list’ and ‘Send a notification message via Gmail to a specific group in Google Groups’ templates. Ensure that you have started these template flows.",
-   "summary": "Scheduler to MailChimp",
+   "name": "Add a subscriber to a specific list in Mailchimp",
+   "description": "Use this template to add a subscriber to a specific list in Mailchimp with the subscriber's email address. This is a prequel flow for ‘Add a member to a group in Google Groups when a new subscriber is added to a list’ and ‘Send a notification message via Gmail to a specific group in Google Groups’ templates. Ensure that you have started these template flows.",
+   "summary": "Scheduler to Mailchimp",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["mailchimp"],
    "tags": ["scheduler", "mailchimp"],
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Add a member to a group in Google Groups when a new subscriber is added to a list in MailChimp",
+   "name": "Add a member to a group in Google Groups when a new subscriber is added to a list in Mailchimp",
    "description": "Use this template to add a member to a specific group in Google Groups when a new subscriber is added to a list. An HTTP method is invoked with a URL request to run the ‘Send a notification message via Gmail to a specific group in Google Groups’ flow. Ensure that you specify the complete URL path of the ‘Send a notification Gmail message to a specific Google Groups group’ template.",
-   "summary": "MailChimp to 2 applications",
+   "summary": "Mailchimp to 2 applications",
    "sourceApp": "mailchimp",
    "targetApps": ["googlegroups", "http"],
    "tags": ["mailchimp", "googlegroups", "http"],
@@ -2709,9 +2709,9 @@
 	"offerings": ["app connect professional"]
 },
 {
-	"name": "Create a contact and add the contact to a specific group in Google Contacts when a subscriber is created in MailChimp",
-	"description": "Use this template to create a contact and add the contact to a specific contact group in Google Contacts whenever a new subscriber is created in MailChimp.",
-	"summary": "MailChimp to Google Contacts",
+	"name": "Create a contact and add the contact to a specific group in Google Contacts when a subscriber is created in Mailchimp",
+	"description": "Use this template to create a contact and add the contact to a specific contact group in Google Contacts whenever a new subscriber is created in Mailchimp.",
+	"summary": "Mailchimp to Google Contacts",
 	"sourceApp": "mailchimp",
 	"targetApps": ["googlecontacts", "googlecontacts"],
 	"tags": ["mailchimp", "googlecontacts"],
@@ -2727,9 +2727,9 @@
 	"offerings": ["app connect professional"]
 },
 {
-	"name": "Create a list in Microsoft To Do for a new list created in MailChimp",
-	"description": "Use this template to create a list in Microsoft To Do whenever a new list is created in MailChimp.",
-	"summary": "MailChimp to Microsoft To Do",
+	"name": "Create a list in Microsoft To Do for a new list created in Mailchimp",
+	"description": "Use this template to create a list in Microsoft To Do whenever a new list is created in Mailchimp.",
+	"summary": "Mailchimp to Microsoft To Do",
 	"sourceApp": "mailchimp",
 	"targetApps": ["mstodo", "mstodo"],
 	"tags": ["mailchimp", "mstodo"],
@@ -2790,8 +2790,8 @@
 	"offerings": ["app connect professional"]
 },
 {
-	"name": "Add a subscriber to a list in MailChimp for each other customer retrieved from Shopify",
-	"description": "Use this template to add subscribers to a list in MailChimp for each customer retrieved from Shopify. In this example, for each Shopify customer that has a unique email address, the customer details are added to a list in MailChimp as a subscriber. Otherwise, a Slack message gets posted to a channel indicating that the customer already exist in MailChimp.",
+	"name": "Add a subscriber to a list in Mailchimp for each other customer retrieved from Shopify",
+	"description": "Use this template to add subscribers to a list in Mailchimp for each customer retrieved from Shopify. In this example, for each Shopify customer that has a unique email address, the customer details are added to a list in Mailchimp as a subscriber. Otherwise, a Slack message gets posted to a channel indicating that the customer already exist in Mailchimp.",
 	"summary": "Scheduler to 3 applications",
 	"sourceApp": "streaming-connector-scheduler",
 	"targetApps": ["shopify", "mailchimp", "slack"],
@@ -2961,9 +2961,9 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in MailChimp",
-  "description": "Use this template to append a row in the Microsoft Excel Online spreadsheet whenever a new subscriber is created in MailChimp. In this example, the MailChimp sucbriber details are appended to the Microsoft Excel Online spreadsheet for each newly created MailChimp sucbriber that has a unique email address.",
-  "summary": "MailChimp to Microsoft Excel Online",
+  "name": "Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in Mailchimp",
+  "description": "Use this template to append a row in the Microsoft Excel Online spreadsheet whenever a new subscriber is created in Mailchimp. In this example, the Mailchimp sucbriber details are appended to the Microsoft Excel Online spreadsheet for each newly created Mailchimp sucbriber that has a unique email address.",
+  "summary": "Mailchimp to Microsoft Excel Online",
   "sourceApp": "mailchimp",
   "targetApps": ["msexcel", "msexcel"],
   "tags": ["mailchimp", "msexcel", "foreach", "if"],
@@ -2988,9 +2988,9 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Add a subscriber to a list in MailChimp when a new form entry is created in Wufoo",
-  "description": "Use this template to add subscribers to a list in MailChimp whenever a new form entry is created in Wufoo. In this example, for each MaiLChimp member that has a unique email address, the member details are added to a list in MailChimp as a subscriber.",
-  "summary": "Wufoo to MailChimp",
+  "name": "Add a subscriber to a list in Mailchimp when a new form entry is created in Wufoo",
+  "description": "Use this template to add subscribers to a list in Mailchimp whenever a new form entry is created in Wufoo. In this example, for each Mailchimp member that has a unique email address, the member details are added to a list in Mailchimp as a subscriber.",
+  "summary": "Wufoo to Mailchimp",
   "sourceApp": "wufoo",
   "targetApps": ["mailchimp", "mailchimp"],
   "tags": ["wufoo", "mailchimp", "foreach", "if"],
@@ -3539,7 +3539,7 @@
   {
   "name": "Create an annotation in Crystal Ball for new Mailchimp campaigns",
   "description": "Use this template to create an annotation in Crystal Ball for any new Mailchimp campaigns.",
-  "summary": "MailChimp to Crystal Ball",
+  "summary": "Mailchimp to Crystal Ball",
   "sourceApp": "mailchimp",
   "targetApps": ["crystalball"],
   "tags": ["crystalball", "mailchimp"],

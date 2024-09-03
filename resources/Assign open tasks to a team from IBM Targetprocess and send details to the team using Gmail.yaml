@@ -338,5 +338,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Assign open tasks to a team from Apptio Targetprocess and send details to the team using Gmail
+  name: Assign open tasks to a team from IBM Targetprocess and send details to the team using Gmail
 models: {}

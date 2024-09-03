@@ -16,7 +16,7 @@ integration:
               scheduleConfiguration:
                 interval:
                   unit: minute
-                  value: 2
+                  value: 1
                   runOnceOncheck: true
                   days:
                     - MON
@@ -26,53 +26,53 @@ integration:
                     - FRI
                     - SAT
                     - SUN
-                  timeZone: UTC
+                  timeZone: CST6CDT
   action-interfaces:
-    action-interface-3:
-      type: api-action
-      business-object: Ticket
-      connector-type: zendeskservice
-      actions:
-        RETRIEVEALL: {}
-    action-interface-4:
+    action-interface-5:
       type: api-action
       business-object: getApiV2Bugs_model
       connector-type: apptiotargetprocess
       actions:
         RETRIEVEALL: {}
-    action-interface-5:
+    action-interface-6:
       type: api-action
-      business-object: postApiV1Comments_model
-      connector-type: apptiotargetprocess
+      business-object: Issue
+      connector-type: jira
       actions:
-        postApiV1Comments: {}
+        RETRIEVEALL: {}
+    action-interface-10:
+      type: api-action
+      business-object: IssueComment
+      connector-type: jira
+      actions:
+        CREATE: {}
   assemblies:
     assembly-1:
       assembly:
         execute:
           - retrieve-action:
-              name: Zendesk Service Retrieve tickets
+              name: Apptio Targetprocess Retrieve bugs
               target:
-                $ref: '#/integration/action-interfaces/action-interface-3'
+                $ref: '#/integration/action-interfaces/action-interface-5'
               filter:
                 where:
-                  updated_at:
+                  modifyDate:
                     gt: '{{$Trigger.lastEventTime}}'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-                limit: 5000
+                limit: 1000
               allow-truncation: true
-              pagination-type: TOKEN
+              pagination-type: SKIP_LIMIT
               allow-empty-output: true
           - for-each:
-              name: For each
+              name: For each 2
               assembly:
-                $ref: '#/integration/assemblies/assembly-2'
+                $ref: '#/integration/assemblies/assembly-3'
               source:
-                expression: '$ZendeskServiceRetrievetickets '
+                expression: '$ApptioTargetprocessRetrievebugs '
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -83,44 +83,44 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Zendesk Service Ticket
-    assembly-2:
+              display-name: Apptio Targetprocess Bugs
+    assembly-3:
       assembly:
         execute:
           - if:
-              name: If
+              name: If 3
               input:
                 - variable: Trigger
                   $ref: '#/trigger/payload'
-                - variable: Foreachitem
-                  $ref: '#/block/For each/current-item'
+                - variable: Foreach2item
+                  $ref: '#/block/For each 2/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
               branch:
                 - condition:
-                    '{{$Foreachitem.updated_at}}':
-                      gt: '{{$Foreachitem.created_at}}'
+                    '{{$Foreach2item.modifyDate}}':
+                      gt: '{{$Foreach2item.createDate}}'
                   execute:
                     - retrieve-action:
-                        name: Apptio Targetprocess Retrieve bugs 2
+                        name: Jira Retrieve issue
                         target:
-                          $ref: '#/integration/action-interfaces/action-interface-4'
+                          $ref: '#/integration/action-interfaces/action-interface-6'
                         filter:
                           where:
-                            Id: '{{$split($Foreachitem.subject , "#:")[0]}}'
+                            id: '{{$split($Foreach2item.name , ":")[0]}}'
                           input:
-                            - variable: Foreachitem
-                              $ref: '#/block/For each/current-item'
+                            - variable: Foreach2item
+                              $ref: '#/block/For each 2/current-item'
                             - variable: Trigger
                               $ref: '#/trigger/payload'
-                            - variable: ZendeskServiceRetrievetickets
+                            - variable: ApptioTargetprocessRetrievebugs
                               $ref: >-
-                                #/node-output/Zendesk Service Retrieve
-                                tickets/response/payload
-                            - variable: ZendeskServiceRetrieveticketsMetadata
+                                #/node-output/Apptio Targetprocess Retrieve
+                                bugs/response/payload
+                            - variable: ApptioTargetprocessRetrievebugsMetadata
                               $ref: >-
-                                #/node-output/Zendesk Service Retrieve
-                                tickets/response
+                                #/node-output/Apptio Targetprocess Retrieve
+                                bugs/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
                           limit: 1
@@ -128,53 +128,50 @@ integration:
                         pagination-type: SKIP_LIMIT
                         allow-empty-output: true
                     - if:
-                        name: If 2
+                        name: If 4
                         input:
                           - variable: Trigger
                             $ref: '#/trigger/payload'
-                          - variable: Foreachitem
-                            $ref: '#/block/For each/current-item'
+                          - variable: Foreach2item
+                            $ref: '#/block/For each 2/current-item'
                           - variable: flowDetails
                             $ref: '#/flowDetails'
                         branch:
                           - condition:
-                              '{{$ApptioTargetprocessRetrievebugs2Metadata."status-code"}}': '200'
+                              '{{$JiraRetrieveissueMetadata."status-code"}}': '200'
                             execute:
-                              - custom-action:
-                                  name: >-
-                                    Apptio Targetprocess Create or update
-                                    comment
+                              - create-action:
+                                  name: Jira Create issue comment 2
                                   target:
                                     $ref: >-
-                                      #/integration/action-interfaces/action-interface-5
-                                  action: postApiV1Comments
+                                      #/integration/action-interfaces/action-interface-10
                                   map:
                                     mappings:
-                                      - Description:
+                                      - body:
                                           template: >-
-                                            Zendest ticket after the update at
-                                            {{$Foreachitem.updated_at}}: Status -
-                                            {{$Foreachitem.status}} , Priority -
-                                            {{$Foreachitem.priority}}
-                                      - General:
-                                          mappings:
-                                            - Id:
-                                                expression: $ApptioTargetprocessRetrievebugs2.id
+                                            After the update at
+                                            {{$JiraRetrieveissue.fields.updated}}:
+                                            The Apptio Targetprocess Status -
+                                            {{$Foreach2item.entityState.name}} and
+                                            Priority -
+                                            {{$Foreach2item.priority.name}}
+                                      - issueId:
+                                          template: '{{$JiraRetrieveissue.id}}'
+                                      - key:
+                                          template: ITSAMPLE
                                     $map: http://ibm.com/appconnect/map/v1
                                     input:
                                       - variable: Trigger
                                         $ref: '#/trigger/payload'
-                                      - variable: Foreachitem
-                                        $ref: '#/block/For each/current-item'
+                                      - variable: Foreach2item
+                                        $ref: '#/block/For each 2/current-item'
                                       - variable: flowDetails
                                         $ref: '#/flowDetails'
-                                  filter:
-                                    limit: 10
                         else:
                           execute: []
                         output-schema: {}
               else:
                 execute: []
               output-schema: {}
-  name: Update Apptio Targetprocess bugs with the latest status and priority from Zendesk Service tickets
+  name: Update the status of Jira issues with the status from IBM Targetprocess bugs
 models: {}

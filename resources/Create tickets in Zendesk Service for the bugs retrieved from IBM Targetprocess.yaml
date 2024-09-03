@@ -118,5 +118,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess
+  name: Create tickets in Zendesk Service for the bugs retrieved from IBM Targetprocess
 models: {}

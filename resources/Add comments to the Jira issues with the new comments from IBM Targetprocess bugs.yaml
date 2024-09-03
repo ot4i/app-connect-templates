@@ -234,5 +234,5 @@ integration:
                     $ref: '#/block/For each 3/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Add comments to the Jira issues with the new comments from Apptio Targetprocess bugs
+  name: Add comments to the Jira issues with the new comments from IBM Targetprocess bugs
 models: {}

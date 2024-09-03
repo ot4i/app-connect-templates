@@ -285,5 +285,5 @@ integration:
                   projectid:
                     type: string
                 required: []
-  name: Create bugs in Apptio Targetprocess for the issues retrieved from Jira
+  name: Create bugs in IBM Targetprocess for the issues retrieved from Jira
 models: {}
