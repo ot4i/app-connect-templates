@@ -10,5 +10,3 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 Want to see the flow working? Add a new attendee to your Eventbrite event, and then check Insightly and Mailchimp to see that the attendee has been added to those applications.
 
 For more information about this template and to view the associated tutorial, see [IBM App Connect tutorial with Eventbrite, Insightly and Mailchimp](https://youtu.be/6VJTv5QM2TU?si=rXftkVmDCltYhfZn).
-
-video link???!!!
