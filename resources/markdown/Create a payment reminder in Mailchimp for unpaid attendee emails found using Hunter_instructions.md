@@ -7,8 +7,8 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
    * **FirstName**
    * **LastName**
 3. Click **Operations**, then click **Edit flow** to edit the operations.
-4. Click on the Hunter node, and if you're not already connected, connect to your [Hunter](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-hunter) account.
-5. Click on the Mailchimp node, and if you're not already connected, connect to your [Mailchimp](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-mailchimp) account.
+4. Click on the Hunter node, and if you're not already connected, connect to your [Hunter](https://ibm.biz/achunter) account.
+5. Click on the Mailchimp node, and if you're not already connected, connect to your [Mailchimp](https://ibm.biz/acmailchimp) account.
 6. Click **Done**.
 7. To start the flow, in the banner click, **Start flow**.
 

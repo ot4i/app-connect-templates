@@ -44,7 +44,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: MailChimp Retrieve members
+              name: Mailchimp Retrieve members
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
@@ -105,7 +105,7 @@ integration:
               else:
                 execute:
                   - create-action:
-                      name: MailChimp Add subscriber to a list
+                      name: Mailchimp Add subscriber to a list
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-3'
                       map:

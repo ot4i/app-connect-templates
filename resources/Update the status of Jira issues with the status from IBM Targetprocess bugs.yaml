@@ -51,7 +51,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Apptio Targetprocess Retrieve bugs
+              name: IBM Targetprocess Retrieve bugs
               target:
                 $ref: '#/integration/action-interfaces/action-interface-5'
               filter:
@@ -83,7 +83,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Apptio Targetprocess Bugs
+              display-name: IBM Targetprocess Bugs
     assembly-3:
       assembly:
         execute:
@@ -173,5 +173,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Update the status of Jira issues with the status from Apptio Targetprocess bugs
+  name: Update the status of Jira issues with the status from IBM Targetprocess bugs
 models: {}

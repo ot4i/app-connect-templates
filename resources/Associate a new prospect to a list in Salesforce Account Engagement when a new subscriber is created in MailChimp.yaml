@@ -63,7 +63,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: MailChimp Retrieve lists
+              name: Mailchimp Retrieve lists
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
@@ -319,5 +319,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Associate a new prospect to a list in Salesforce Account Engagement when a new subscriber is created in MailChimp
+  name: Associate a new prospect to a list in Salesforce Account Engagement when a new subscriber is created in Mailchimp
 models: {}
