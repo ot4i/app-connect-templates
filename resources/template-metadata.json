@@ -3465,8 +3465,8 @@
     "offerings": ["app connect professional"] 
    },
    {
-    "name": "Create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess",
-    "description": "Use this template to create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess.",
+    "name": "Create tickets in Zendesk Service for the bugs retrieved from IBM Targetprocess",
+    "description": "Use this template to create tickets in Zendesk Service for the bugs retrieved from IBM Targetprocess.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["apptiotargetprocess", "zendeskservice"],
@@ -3474,8 +3474,8 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Update Apptio Targetprocess bugs with the latest status and priority from Zendesk Service tickets",
-    "description": "Use this template to update Apptio Targetprocess bugs with the latest status and priority from Zendesk Service tickets. This is a sequel flow for: Create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess.",
+    "name": "Update IBM Targetprocess bugs with the latest status and priority from Zendesk Service tickets",
+    "description": "Use this template to update IBM Targetprocess bugs with the latest status and priority from Zendesk Service tickets. This is a sequel flow for: Create tickets in Zendesk Service for the bugs retrieved from IBM Targetprocess.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["zendeskservice", "apptiotargetprocess"],
@@ -3483,8 +3483,8 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Assign open tasks to a team from Apptio Targetprocess and send details to the team using Gmail",
-    "description": "Use this template to retrieve open tasks from Apptio Targetprocess, assign to a team and send details to the team using Gmail.",
+    "name": "Assign open tasks to a team from IBM Targetprocess and send details to the team using Gmail",
+    "description": "Use this template to retrieve open tasks from IBM Targetprocess, assign to a team and send details to the team using Gmail.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["apptiotargetprocess", "gmail"],
@@ -3492,8 +3492,8 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Create bugs in Apptio Targetprocess for the issues retrieved from Jira",
-    "description": "Use this template to create bugs in Apptio Targetprocess for the issues retrieved from Jira.",
+    "name": "Create bugs in IBM Targetprocess for the issues retrieved from Jira",
+    "description": "Use this template to create bugs in IBM Targetprocess for the issues retrieved from Jira.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["jira", "apptiotargetprocess"],
@@ -3501,8 +3501,8 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Update the status of Jira issues with the status from Apptio Targetprocess bugs",
-    "description": "Use this template to update the status of Jira issues with the status from Apptio Targetprocess bugs. This is a sequel flow for: Create bugs in Apptio Targetprocess for the issues retrieved from Jira.",
+    "name": "Update the status of Jira issues with the status from IBM Targetprocess bugs",
+    "description": "Use this template to update the status of Jira issues with the status from IBM Targetprocess bugs. This is a sequel flow for: Create bugs in IBM Targetprocess for the issues retrieved from Jira.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["apptiotargetprocess", "jira"],
@@ -3510,8 +3510,8 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Add comments to the Jira issues with the new comments from Apptio Targetprocess bugs",
-    "description": "Use this template to add comments to the Jira issues with the new comments from Apptio Targetprocess bugs. This is a sequel flow for: Create bugs in Apptio Targetprocess for the issues retrieved from Jira.",
+    "name": "Add comments to the Jira issues with the new comments from IBM Targetprocess bugs",
+    "description": "Use this template to add comments to the Jira issues with the new comments from IBM Targetprocess bugs. This is a sequel flow for: Create bugs in IBM Targetprocess for the issues retrieved from Jira.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["apptiotargetprocess", "jira"],
@@ -3519,8 +3519,8 @@
     "offerings": ["app connect professional"]
    },
    {
-    "name": "Add employees of BambooHR as users in Apptio Targetprocess",
-    "description": "Use this template to add employees of BambooHR as users in Apptio Targetprocess.",
+    "name": "Add employees of BambooHR as users in IBM Targetprocess",
+    "description": "Use this template to add employees of BambooHR as users in IBM Targetprocess.",
     "summary": "Scheduler to 2 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["bamboohr", "apptiotargetprocess"],
