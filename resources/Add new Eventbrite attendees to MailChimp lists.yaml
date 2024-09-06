@@ -40,7 +40,7 @@ integration:
                       =: Fill in one of your event IDs
                   execute:
                     - create-action:
-                        name: MailChimp Add member to a list
+                        name: Mailchimp Add member to a list
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-1'
                         map:
@@ -70,7 +70,7 @@ integration:
                       =: Fill in another event ID
                   execute:
                     - create-action:
-                        name: MailChimp Add member to a list 2
+                        name: Mailchimp Add member to a list 2
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-2'
                         map:
@@ -110,5 +110,5 @@ integration:
               output-schema: {}
         tags:
           - incomplete
-  name: Add new Eventbrite attendees to MailChimp lists
+  name: Add new Eventbrite attendees to Mailchimp lists
 models: {}

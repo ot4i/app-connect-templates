@@ -92,5 +92,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Create a list in Microsoft To Do for a new list created in MailChimp
+  name: Create a list in Microsoft To Do for a new list created in Mailchimp
 models: {}

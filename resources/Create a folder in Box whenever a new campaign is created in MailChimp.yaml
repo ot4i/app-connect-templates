@@ -42,5 +42,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a folder in Box whenever a new campaign is created in MailChimp
+  name: Create a folder in Box whenever a new campaign is created in Mailchimp
 models: {}

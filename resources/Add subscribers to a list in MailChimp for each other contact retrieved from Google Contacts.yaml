@@ -97,7 +97,7 @@ integration:
       assembly:
         execute:
           - create-action:
-              name: MailChimp Add subscriber to a list
+              name: Mailchimp Add subscriber to a list
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               map:
@@ -124,5 +124,5 @@ integration:
                     $ref: '#/node-output/MailChimp Retrieve members/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Add subscribers to a list in MailChimp for each other contact retrieved from Google Contacts
+  name: Add subscribers to a list in Mailchimp for each other contact retrieved from Google Contacts
 models: {}

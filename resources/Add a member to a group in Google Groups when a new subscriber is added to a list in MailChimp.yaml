@@ -104,5 +104,5 @@ integration:
                       group/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Add a member to a group in Google Groups when a new subscriber is added to a list in MailChimp
+  name: Add a member to a group in Google Groups when a new subscriber is added to a list in Mailchimp
 models: {}

@@ -143,5 +143,5 @@ integration:
               else:
                 execute: []
               output-schema: {}
-  name: Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in MailChimp
+  name: Append a row in the Microsoft Excel Online spreadsheet when a new subscriber is created in Mailchimp
 models: {}

@@ -109,7 +109,7 @@ integration:
               else:
                 execute:
                   - create-action:
-                      name: MailChimp Add subscriber to a list
+                      name: Mailchimp Add subscriber to a list
                       target:
                         $ref: '#/integration/action-interfaces/action-interface-3'
                       map:

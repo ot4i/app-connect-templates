@@ -47,5 +47,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a quick event in Google Calendar when a new subscriber is created in MailChimp
+  name: Create a quick event in Google Calendar when a new subscriber is created in Mailchimp
 models: {}

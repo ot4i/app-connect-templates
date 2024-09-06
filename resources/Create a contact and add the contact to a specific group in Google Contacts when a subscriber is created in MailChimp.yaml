@@ -77,5 +77,5 @@ integration:
                       contact/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create a contact and add the contact to a specific group in Google Contacts when a subscriber is created in MailChimp
+  name: Create a contact and add the contact to a specific group in Google Contacts when a subscriber is created in Mailchimp
 models: {}
