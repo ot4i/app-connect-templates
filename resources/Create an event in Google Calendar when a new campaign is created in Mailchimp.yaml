@@ -7,19 +7,14 @@ integration:
       triggers:
         CREATED:
           input-context:
-            data: Row
+            data: Campaigns
           assembly:
             $ref: '#/integration/assemblies/assembly-1'
           options:
-            DriveId: b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
-            WorkbookId: 01NODPFITFOPR6AFMSTJFYL7MDYOMUHTQP
-            WorksheetId: '{00000000-0001-0000-0000-000000000000}'
+            list_id: 40277bc9bf
             parentFilter:
-              DriveId: >-
-                b!cj6fpn_rckezu0EVg2oMOgMC0sfPYdFKvhluqpsZkGU5UFn7wDNpRpM91EGWr_sa
-              WorkbookId: 01NODPFITFOPR6AFMSTJFYL7MDYOMUHTQP
-              WorksheetId: '{00000000-0001-0000-0000-000000000000}'
-      connector-type: msexcel
+              list_id: 40277bc9bf
+      connector-type: mailchimp
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -27,16 +22,16 @@ integration:
       connector-type: mailchimp
       actions:
         RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATE: {}
     action-interface-2:
       type: api-action
       business-object: message
       connector-type: slack
-      actions:
-        CREATE: {}
-    action-interface-3:
-      type: api-action
-      business-object: Members
-      connector-type: mailchimp
       actions:
         CREATE: {}
   assemblies:
@@ -49,9 +44,7 @@ integration:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
                 where:
-                  and:
-                    - unique_email_id: '{{$Trigger.rowData.C}}'
-                    - list_id: 6fc8383307
+                  list_id: 40277bc9bf
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -61,9 +54,35 @@ integration:
               allow-truncation: true
               pagination-type: SKIP_LIMIT
               allow-empty-output: true
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: '$MailChimpRetrievemembers '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MailChimpRetrievemembers
+                    $ref: '#/node-output/MailChimp Retrieve members/response/payload'
+                  - variable: MailChimpRetrievemembersMetadata
+                    $ref: '#/node-output/MailChimp Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Mailchimp Members
+    assembly-2:
+      assembly:
+        execute:
           - if:
               name: If
               input:
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
                 - variable: Trigger
                   $ref: '#/trigger/payload'
                 - variable: MailChimpRetrievemembers
@@ -74,22 +93,33 @@ integration:
                   $ref: '#/flowDetails'
               branch:
                 - condition:
-                    '{{$MailChimpRetrievemembersMetadata."status-code"}}': '200'
+                    '{{$Trigger.type}}': Regular
                   execute:
                     - create-action:
-                        name: Slack Send message
+                        name: Google Calendar Create event
                         target:
-                          $ref: '#/integration/action-interfaces/action-interface-2'
+                          $ref: '#/integration/action-interfaces/action-interface-3'
                         map:
                           mappings:
-                            - OBJECT_ID:
-                                template: C04KMH8MALT
-                            - OBJECT_NAME:
-                                template: channel
-                            - text:
-                                template: Subscriber already exist.
+                            - attendees:
+                                foreach:
+                                  input: '[1]'
+                                  iterator: attendeesItem
+                                  mappings:
+                                    - email:
+                                        template: '{{$Foreachitem.email_address}}'
+                            - endTime:
+                                template: '2023-07-20T10:00:00'
+                            - id:
+                                template: ffbld01@ibmappcon.com
+                            - startTime:
+                                template: '2023-07-20T09:00:00'
+                            - summary:
+                                template: '{{$Trigger.settings.title}}'
                           $map: http://ibm.com/appconnect/map/v1
                           input:
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
                             - variable: Trigger
                               $ref: '#/trigger/payload'
                             - variable: MailChimpRetrievemembers
@@ -105,23 +135,21 @@ integration:
               else:
                 execute:
                   - create-action:
-                      name: Mailchimp Add subscriber to a list
+                      name: Slack Send message
                       target:
-                        $ref: '#/integration/action-interfaces/action-interface-3'
+                        $ref: '#/integration/action-interfaces/action-interface-2'
                       map:
                         mappings:
-                          - email_address:
-                              template: '{{$Trigger.rowData.C}}'
-                          - list_id:
-                              template: 6fc8383307
-                          - merge_fields:
-                              mappings:
-                                - FNAME:
-                                    template: '{{$Trigger.rowData.A}}'
-                                - LNAME:
-                                    template: '{{$Trigger.rowData.B}}'
+                          - OBJECT_ID:
+                              template: C04FRCNTLLX
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: '{{$Trigger.type}}  --- --- -- is not regular'
                         $map: http://ibm.com/appconnect/map/v1
                         input:
+                          - variable: Foreachitem
+                            $ref: '#/block/For each/current-item'
                           - variable: Trigger
                             $ref: '#/trigger/payload'
                           - variable: MailChimpRetrievemembers
@@ -133,5 +161,5 @@ integration:
                           - variable: flowDetails
                             $ref: '#/flowDetails'
               output-schema: {}
-  name: Add a subscriber to a list in Mailchimp when a new row is appended in Microsoft Excel Online
+  name: Create an event in Google Calendar when a new campaign is created in Mailchimp
 models: {}

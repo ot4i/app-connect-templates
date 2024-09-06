@@ -1,0 +1,128 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: streaming-connector-scheduler
+      type: event-trigger
+      triggers:
+        SCHEDULE:
+          input-context:
+            data: scheduler
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: getOtherContactssearch_model
+      connector-type: googlecontacts
+      actions:
+        getOtherContactssearch: {}
+    action-interface-2:
+      type: api-action
+      business-object: Members
+      connector-type: mailchimp
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Contacts Retrieve other contacts by search string
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: getOtherContactssearch
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  query: example
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+          - for-each:
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              source:
+                expression: >-
+                  $GoogleContactsRetrieveothercontactsbysearchstring."Other
+                  contacts" 
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleContactsRetrieveothercontactsbysearchstring
+                    $ref: >-
+                      #/node-output/Google Contacts Retrieve other contacts by
+                      search string/response/payload
+                  - variable: MailChimpRetrievemembers
+                    $ref: '#/node-output/MailChimp Retrieve members/response/payload'
+                  - variable: MailChimpRetrievemembersMetadata
+                    $ref: '#/node-output/MailChimp Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              display-name: Google Contacts Other contacts
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Mailchimp Add subscriber to a list
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - email_address:
+                      template: '{{$Foreachitem.person.emailAddress}}'
+                  - list_id:
+                      template: 6fc8383307
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Foreach2item
+                    $ref: '#/block/For each 2/current-item'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleContactsRetrieveothercontactsbysearchstring
+                    $ref: >-
+                      #/node-output/Google Contacts Retrieve other contacts by
+                      search string/response/payload
+                  - variable: MailChimpRetrievemembers
+                    $ref: '#/node-output/MailChimp Retrieve members/response/payload'
+                  - variable: MailChimpRetrievemembersMetadata
+                    $ref: '#/node-output/MailChimp Retrieve members/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Add subscribers to a list in Mailchimp for each other contact retrieved from Google Contacts
+models: {}
