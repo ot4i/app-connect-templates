@@ -63,7 +63,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Apptio Targetprocess Retrieve tasks
+              name: IBM Targetprocess Retrieve tasks
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
@@ -145,7 +145,7 @@ integration:
                               $ApptioTargetprocessCreateorupdatetask._Project_.Id,
                               "Project Name":
                               $ApptioTargetprocessCreateorupdatetask._Project_.Name}]
-              display-name: Apptio Targetprocess Tasks
+              display-name: IBM Targetprocess Tasks
           - if:
               name: If
               input:
@@ -191,7 +191,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Apptio Targetprocess Retrieve projects
+              name: IBM Targetprocess Retrieve projects
               target:
                 $ref: '#/integration/action-interfaces/action-interface-4'
               filter:
@@ -230,7 +230,7 @@ integration:
                     '{{$ApptioTargetprocessRetrieveprojectsMetadata."status-code"}}': '204'
                   execute:
                     - custom-action:
-                        name: Apptio Targetprocess Create or update project
+                        name: IBM Targetprocess Create or update project
                         target:
                           $ref: '#/integration/action-interfaces/action-interface-5'
                         action: postApiV1Projects
@@ -286,7 +286,7 @@ integration:
                 execute: []
               output-schema: {}
           - custom-action:
-              name: Apptio Targetprocess Create or update task
+              name: IBM Targetprocess Create or update task
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               action: postApiV1Tasks
@@ -338,5 +338,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                 limit: 10
-  name: Assign open tasks to a team from Apptio Targetprocess and send details to the team using Gmail
+  name: Assign open tasks to a team from IBM Targetprocess and send details to the team using Gmail
 models: {}

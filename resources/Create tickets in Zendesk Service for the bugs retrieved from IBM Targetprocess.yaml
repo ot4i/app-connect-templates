@@ -45,7 +45,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: Apptio Targetprocess Retrieve bugs
+              name: IBM Targetprocess Retrieve bugs
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
@@ -81,7 +81,7 @@ integration:
               map:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
-              display-name: Apptio Targetprocess Bugs
+              display-name: IBM Targetprocess Bugs
     assembly-2:
       assembly:
         execute:
@@ -118,5 +118,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create tickets in Zendesk Service for the bugs retrieved from Apptio Targetprocess
+  name: Create tickets in Zendesk Service for the bugs retrieved from IBM Targetprocess
 models: {}

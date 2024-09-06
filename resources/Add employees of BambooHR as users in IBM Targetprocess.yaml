@@ -113,7 +113,7 @@ integration:
               allow-truncation: true
               allow-empty-output: true
           - custom-action:
-              name: Apptio Targetprocess Create or update user
+              name: IBM Targetprocess Create or update user
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               action: postApiV1Users
@@ -156,5 +156,5 @@ integration:
                     $ref: '#/flowDetails'
               filter:
                 limit: 10
-  name: Add employees of BambooHR as users in Apptio Targetprocess
+  name: Add employees of BambooHR as users in IBM Targetprocess
 models: {}
