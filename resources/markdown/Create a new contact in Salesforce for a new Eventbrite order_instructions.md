@@ -1,11 +1,11 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20new%20contact%20in%20Salesforce%20for%20a%20new%20Eventbrite%20order_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20new%20contact%20in%20Salesforce%20for%20a%20new%20Eventbrite%20order_instructions.md) (opens in a new window).
 
 1. Before you start this flow, complete the following steps:
 
   a) Create an Eventbrite account and create an event using this account.
   b) Create a Salesforce account.
 
-2. In App Connect, Click **Create flow** to start using the template.
+2. In App Connect, Click **Use this template** to start using the template.
 3. Click the Eventbrite / **New order** node.
 4. Connect to your [Eventbrite](https://ibm.biz/aaseventbrite) account and then select the Organization that you want to use.
 5. Click the Salesforce / **Create contact** node.

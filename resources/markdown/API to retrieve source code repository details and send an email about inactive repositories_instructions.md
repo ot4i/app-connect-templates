@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20to%20retrieve%20source%20code%20repository%20details%20and%20send%20an%20email%20about%20inactive%20repositories_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20to%20retrieve%20source%20code%20repository%20details%20and%20send%20an%20email%20about%20inactive%20repositories_instructions.md) (opens in a new window).
 
 ## Prerequisites
 
@@ -8,7 +8,7 @@ If you do not have access to an API with this kind of information and you want t
 
 ## Using the template
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Click **Operations** &gt; **Edit flow** for the _Retrieve repository with filter_ operation.
 1. Click each node to review its configuration. If necessary:
    - Connect to your [HTTP invoke method](https://ibm.biz/aashttp). (To test this template, you can use the following URL in the **Override the HTTP endpoint host name and port of the URL used in the flow:** field - `https://api.bitbucket.org/2.0/repositories?pagelen=limitValue&after=tokenValue`).

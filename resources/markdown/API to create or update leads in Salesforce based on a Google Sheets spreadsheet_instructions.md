@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20to%20create%20or%20update%20leads%20in%20Salesforce%20based%20on%20a%20Google%20Sheets%20spreadsheet_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20to%20create%20or%20update%20leads%20in%20Salesforce%20based%20on%20a%20Google%20Sheets%20spreadsheet_instructions.md) (opens in a new window).
 
 This API takes an event name and uses that name to compare against data in a Google Sheets spreadsheet. Any leads found in the spreadsheet for the event name specified in the call will be either added to, or updated in Salesforce depending on whether or not a lead with the same email address already exists in Salesforce. The flow does not change the original spreadsheet.
 
@@ -13,7 +13,7 @@ Any other columns after the first five specified here will be ignored by this fl
 
 ## Using the template
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Click **Operations**, then **Edit flow** for the _Create leads_ operation.
 1. Click the **Google Sheets** node, and if you're not already connected, connect to your [Google Sheets account](https://ibm.biz/aasgsheets).
 1. Select the Google Sheets spreadsheet and worksheet to use for this flow. Also, if desired, alter the number of rows processed. This default used in this flow is 25.

@@ -1,10 +1,11 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown//Create%20a%20lead%20in%20Salesforce%20whenever%20a%20new%20row%20that%20contains%20potential%20lead%20data%20is%20appended%20in%20Microsoft%20Excel%20Online_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown//Create%20a%20lead%20in%20Salesforce%20whenever%20a%20new%20row%20that%20contains%20potential%20lead%20data%20is%20appended%20in%20Microsoft%20Excel%20Online_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - **Microsoft Excel Online** 
-   - **Salesforce**
-   - **Slack**
+   - [Microsoft Excel Online](https://ibm.biz/acmsexcel)
+   - [Slack](https://ibm.biz/acslack) 
+   - [Salesforce](https://ibm.biz/ach2salesforce)
+
 3. To start the flow, in the banner click **Start flow**.
 
 The flow is started whenever a new row is appended in Microsoft Excel Online with potential lead data.

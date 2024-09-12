@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Associate%20%candidates%20%with%20%job%20%openings%20%in%20%Zoho%20%Recruit%20%for%20%each%20%new%20%Wufoo%20%form%20%entry_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Associate%20candidates%20with%20job%20openings%20in%20Zoho%20Recruit%20for%20each%20new%20Wufoo%20form%20entry_instructions.md) (opens in a new window).
 
 
 1. Click **Use this template** to start using the template.
