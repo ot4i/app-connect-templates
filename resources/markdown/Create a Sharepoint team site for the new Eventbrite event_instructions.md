@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20Sharepoint%20team%20site%20for%20the%20new%20Eventbrite%20event_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20a%20Sharepoint%20team%20site%20for%20the%20new%20Eventbrite%20event_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Connect to your [Eventbrite account](https://ibm.biz/aaseventbrite).
 1. Connect to your [Microsoft Sharepoint account](https://ibm.biz/aasmssharepoint).
 1. Connect to your [Slack account](http://ibm.biz/aasslack).
