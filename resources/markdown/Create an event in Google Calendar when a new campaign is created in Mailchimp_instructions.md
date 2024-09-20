@@ -3,8 +3,8 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Mailchimp](https://ibm.biz/acmailchimp) 
-   - [Google Calendar](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-googlecalendar)
-   - [Slack](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-slack)
+   - [Google Calendar](https://ibm.biz/acgooglecalendar) 
+   - [Slack](https://ibm.biz/acslack)
 3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to create an event in Google Calendar whenever a new campaign is created in Mailchimp. If the campaign type is regular, an event is sent to each of the Mailchimp members; otherwise, a Slack notification is sent to the intended channel notifying that the new campaign created is not regular.

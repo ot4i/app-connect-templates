@@ -1,10 +1,10 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20an%20issue%20in%20GitLab%20whenever%20a%20new%20incident%20is%20logged%20in%20ServiceNow_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20an%20issue%20in%20GitLab%20whenever%20a%20new%20incident%20is%20logged%20in%20ServiceNow_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - **ServiceNow** 
-   - **GitLab**
-   - **Slack**
+   - [GitLab](https://ibm.biz/acgitlab)
+   - [ServiceNow](https://ibm.biz/acservicenow)
+   - [Slack](https://ibm.biz/acslack)
 3. To start the flow, in the banner click **Start flow**.
 
 Use this template to create a new issue in GitLab whenever a new incident is logged in ServiceNow and the incident is updated in ServiceNow with GitLab detail.

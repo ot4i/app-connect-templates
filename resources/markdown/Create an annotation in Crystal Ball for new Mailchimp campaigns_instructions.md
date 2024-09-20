@@ -3,7 +3,7 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Mailchimp](https://ibm.biz/acmailchimp) 
-   - [Crystal Ball](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-crystal-ball)
+   - [Crystal Ball](https://ibm.biz/accrystalball)
 3. To start the flow, in the banner, click **Start flow**.
 
 
