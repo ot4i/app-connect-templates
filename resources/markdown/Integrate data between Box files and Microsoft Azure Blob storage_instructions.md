@@ -1,9 +1,9 @@
 To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Integrate%20data%20between%20Box%20files%20and%20Microsoft%20Azure%20Blob%20storage_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use the template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Box](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-box)
-   - [Microsoft Azure Blob storage](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-microsoft-azure-blob-storage)
+   - [Box](https://ibm.biz/ach2box)
+   - [Microsoft Azure Blob storage](https://ibm.biz/acmsazureblob)
 3. To start the flow, in the banner, click **Start flow**.
 
 
