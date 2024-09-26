@@ -1,10 +1,11 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Data%20ingestion%20to%20Google%20Cloud%20Storage%20from%20Dropbox_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Data%20ingestion%20to%20Google%20Cloud%20Storage%20from%20Dropbox_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - **Dropbox** 
-   - **Google Cloud Storage**
-   - **Slack**
+   - [Dropbox](https://ibm.biz/acdropbox)
+   - [Google Cloud Storage](https://ibm.biz/acgcloudstorage)
+   - [Slack](https://ibm.biz/acslack) 
+
 3. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve any type of file from the specified Dropbox path, downloads the content, and uploads the metadata and the file to a Google Cloud Storage bucket.

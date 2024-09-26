@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/marion-pdtoslack/resources/markdown/Get%20PagerDuty%20schedule%20and%20update%20Slack%20user%20group%20and%20topic_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Get%20PagerDuty%20schedule%20and%20update%20Slack%20user%20group%20and%20topic_instructions.md) (opens in a new window).
 
 Before you use this flow, you must have:
 
@@ -36,7 +36,7 @@ You can create this from the [Slack apps](https://api.slack.com/apps/) page.
 
 ## Using the template
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Click on the first **HTTP** node, and create a HTTP account.  You do not need to provide any of the optional details, click to connect.
 1. Update the URL to include your PagerDuty schedule ID between `schedule_ids%5B%5D=` and `&earliest`.
 1. Update the Authorization request header to include your PagerDuty API token after `Token token=`.
