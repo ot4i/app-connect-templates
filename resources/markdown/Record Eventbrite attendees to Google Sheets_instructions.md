@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/CMPE-202-Team-11-task2/resources/markdown/Record%20Eventbrite%20attendees%20to%20Google%20Sheets_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Record%20Eventbrite%20attendees%20to%20Google%20Sheets_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Click the Eventbrite / **New attendee** node.
 3. Connect to your [Eventbrite account](https://ibm.biz/aaseventbrite) and then select the Organization that you want to use.
 4. Click the Google Sheets / **Create row** node.

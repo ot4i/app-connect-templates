@@ -1,9 +1,9 @@
-To refer to these instructions while editing the flow, open [the github page](Record%20ServiceNow%20ticket%20details%20to%20Google%20Sheets_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Record%20ServiceNow%20ticket%20details%20to%20Google%20Sheets_instructions.md) (opens in a new window).
 
-1.	Click **Create flow** to start using the template.
+1.	Click **Use this template** to start using the template.
 2.	Connect to the following accounts by using your credentials:
-    - **ServiceNow** 
-    - **Google Sheets**
+   - [ServiceNow](https://ibm.biz/acservicenow) 
+   - [Google Sheets](https://ibm.biz/acgsheets) 
 3.  Select a preferred spreadsheet and worksheet from your Google Sheets account.
 4.	To start the flow, in the banner click **Start flow**.
 

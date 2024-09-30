@@ -1,10 +1,10 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20employees%20from%20Microsoft%20Dynamics%20365%20for%20Finance%20and%20Operations%20and%20create%20users%20in%20Microsoft%20Active%20Directory_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20employees%20from%20Microsoft%20Dynamics%20365%20for%20Finance%20and%20Operations%20and%20create%20users%20in%20Microsoft%20Active%20Directory_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - **Microsoft Dynamics 365 Finance and Operations** 
-   - **Microsoft Active Directory**
-   - **Slack**
+   - [Microsoft Dynamics 365 Finance and Operations](https://ibm.biz/acmsdynamicsfando) 
+   - [Microsoft Active Directory](https://ibm.biz/ach2msad) 
+   - [Slack](https://ibm.biz/acwufoo) 
 3. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve employees from Microsoft Dynamics 365 Finance and Operations and create a new user in Microsoft Active Directory (MSAD).

@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Hunter](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-hunter)
-   - [Salesforce](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-salesforce)
+   - [Hunter](https://ibm.biz/achunter)
+   - [Salesforce](https://ibm.biz/ach2salesforce)
 3. To start the flow, in the banner, click **Start flow**.
 
 
