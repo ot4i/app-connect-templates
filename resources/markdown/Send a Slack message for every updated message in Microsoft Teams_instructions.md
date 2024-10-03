@@ -3,7 +3,7 @@ To refer to these instructions while editing the flow, open [the github page](ht
 1.	Click **Create flow** to start using the template.
 2.	Connect to the following accounts by using your credentials:
     - **Microsoft Teams**
-    - **Slack** 
+   - [Slack](https://ibm.biz/acslack)
 3.	To start the flow, in the banner click **Start flow**.
 
 The flow is started when a message is updated in Microsoft Teams.

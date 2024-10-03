@@ -3,7 +3,7 @@ To refer to these instructions while editing the flow, open [the github page](Se
 1.	Click **Create flow** to start using the template.
 2.	Connect to the following accounts by using your credentials:
     - **Jira** 
-    - **Slack**
+   - [Slack](https://ibm.biz/acslack)
 3.	To start the flow, in the banner click **Start flow**.
 
 The flow is started when a new issue with 'High' or 'Highest' priority is created in Jira.
