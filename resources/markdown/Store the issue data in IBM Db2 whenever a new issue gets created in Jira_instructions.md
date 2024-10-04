@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Store%20the%20issue%20data%20in%20IBM%20Db2%20whenever%20a%20new%20issue%20gets%20created%20in%20Jira_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Connect to your [Jira account](https://ibm.biz/ach2jira).
 1. Connect to your [IBM Db2 for i account](https://ibm.biz/acibmdb2).
 1. Select the IBM Db2 for i table in which you want to store the Jira issues details.
