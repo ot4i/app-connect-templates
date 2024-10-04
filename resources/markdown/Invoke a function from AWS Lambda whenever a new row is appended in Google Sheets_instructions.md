@@ -1,10 +1,10 @@
 To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Invoke%20a%20function%20from%20AWS%20Lambda%20whenever%20a%20new%20row%20is%20appended%20in%20Google%20Sheets_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Google Sheets](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-google-sheets)
-   - [AWS Lambda](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-aws-lambda)
-   - [Gmail](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-gmail)
+   - [Google Sheets](https://ibm.biz/acgsheets)
+   - [AWS Lambda](https://ibm.biz/acamazonlambda)
+   - [Gmail](https://ibm.biz/acgmail)
 3. To start the flow, in the banner, click **Start flow**.
 
 

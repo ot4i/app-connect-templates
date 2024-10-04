@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%203%20-%20Create%20a%20CSV%20file%20in%20Box%20of%20the%20products%20in%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%203%20-%20Create%20a%20CSV%20file%20in%20Box%20of%20the%20products%20in%20Salesforce_instructions.md) (opens in a new window).
 
-This template creates the flow from the [Welcome to IBM App Connect \[Part 3 of  4\]: Visually map and transform your data](https://www.youtube.com/watch?v=ALpxbNq-SkQ&list=PLzpeuWUENMK2Q77xr7QkvLxU5YxOJxVSH) video to extract all the seed products from Salesforce, and put them in a CSV file in Box.
+This template creates the flow from the [Welcome to IBM App Connect Part 3 of 4: Visually map and transform your data](https://youtu.be/G0pbcAbmiKk?si=Cejq9KLjz3j1sQ4S) video to extract all the seed products from Salesforce, and put them in a CSV file in Box.
 
 ## Prerequisites
 

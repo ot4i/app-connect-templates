@@ -2,9 +2,9 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Salesforce](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-hunter)
-   - [IBM watsonx.ai](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-watsonxai)
-   - [Gmail](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-gmail)
+   - [IBM watsonx.ai](https://ibm.biz/acibmwatsonxai)
+   - [Salesforce](https://ibm.biz/ach2salesforce)
+   - [Gmail](https://ibm.biz/acgmail) 
 3. To start the flow, in the banner, click **Start flow**.
 
 

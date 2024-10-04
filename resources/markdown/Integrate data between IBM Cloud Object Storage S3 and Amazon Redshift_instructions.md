@@ -1,10 +1,10 @@
 To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Integrate%20data%20between%20IBM%20Cloud%20Object%20Storage%20S3%20and%20Amazon%20Redshift_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [IBM Cloud Object Storage S3](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-cloud-object-storage-s3)
-   - [Amazon Redshift](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-amazon-redshift)
-   - [Gmail](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-gmail)
+   - [IBM Cloud Object Storage S3](https://ibm.biz/accoss3)
+   - [Amazon Redshift](https://ibm.biz/acamazonredshift)
+   - [Gmail](https://ibm.biz/acgmail)
 3. To start the flow, in the banner, click **Start flow**.
 
 Use this template to create a scheduler-based flow that retrieves object files from a specified IBM Cloud Object Storage S3 (COSS3) bucket and downloads the object content. The content is then parsed using CSV Parser to convert the CSV text into a JSON object. Subsequently, the object details are either created or updated in the specified Amazon Redshift record.

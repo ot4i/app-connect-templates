@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20new%20leads%20in%20Marketo%20by%20capturing%20lead%20names%20and%20details%20in%20Slack_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Create%20new%20leads%20in%20Marketo%20by%20capturing%20lead%20names%20and%20details%20in%20Slack_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Connect to your [Slack account](http://ibm.biz/aasslack).
 1. On the Slack "New message" event, copy the callback URL to the clipboard, and create a custom slash command called '/customer'. For more information about how to do this, see the [Slack "how to" page](http://ibm.biz/aasslack#considerations).
 1. Connect to your [Google Sheets account](http://ibm.biz/aasgsheets).

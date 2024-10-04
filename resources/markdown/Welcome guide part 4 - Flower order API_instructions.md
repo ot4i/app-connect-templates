@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md) (opens in a new window).
 
 This template creates the flow from the [Welcome to IBM App Connect [Part 4 of 4]: Create flows for an API](https://www.youtube.com/watch?v=RgYAIl5lXt4&list=PL_4RxtD-BL5tKxx9GiR2BH146ZUC21cOp) video, which creates an API to update flower orders in Salesforce, and add new orders to a Trello board.
 
@@ -19,7 +19,7 @@ You can use the following templates to help with this setup in Salesforce:
 
 ## Using the template
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Click "Operations", then "Edit flow" next to the "Create order" operation.
 1. Click the Trello "Add New Card to List" action and connect to your [Trello account](https://ibm.biz/aastrello).
 1. On the Trello action select the "Board" and "List" where you'd like the new card created.

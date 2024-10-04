@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open [the Github page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Factorial HR](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-factorial-hr)
-   - [Google Calendar](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-google-calendar) 
+   - [Factorial HR](https://ibm.biz/acfactorialhr)
+   - [Google Calendar](https://ibm.biz/acgooglecalendar) 
    
 3. To start the flow, in the banner click **Start flow**.
 

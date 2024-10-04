@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20setup%201%20-%20Add%20products%20to%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20setup%201%20-%20Add%20products%20to%20Salesforce_instructions.md) (opens in a new window).
 
 This template sets up the products which are used with the following templates:
 * [Welcome guide part 3 - Create a CSV file in Box of the products in Salesforce](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%203%20-%20Create%20a%20CSV%20file%20in%20Box%20of%20the%20products%20in%20Salesforce_instructions.md).
@@ -10,7 +10,7 @@ In Google Sheets, create a sheet with the [products to add to Salesforce](https:
 
 ## Using the template
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Click the Google Sheets "Retrieve rows" action and connect to your [Google Sheets account](http://ibm.biz/aasgsheets).
 1. In the Google Sheets "Retrieve rows" action, select the Spreadsheet and Worksheet you want to use.
 1. Click the Salesforce "Update or create price book" action and connect to your [Salesforce account](http://ibm.biz/aassalesforce).

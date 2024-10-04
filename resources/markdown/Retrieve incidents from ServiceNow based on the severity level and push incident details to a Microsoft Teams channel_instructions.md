@@ -1,10 +1,11 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20incidents%20from%20ServiceNow%20based%20on%20the%20severity%20level%20and%20push%20incident%20details%20to%20a%20Microsoft%20Teams%20channel_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20incidents%20from%20ServiceNow%20based%20on%20the%20severity%20level%20and%20push%20incident%20details%20to%20a%20Microsoft%20Teams%20channel_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Click **Operations**, and then click **Edit flow**.
 3. Connect to the following accounts by using your credentials:
-   - **ServiceNow** 
-   - **Microsoft Teams**
+   - [ServiceNow](https://ibm.biz/acservicenow)
+   - [Microsoft Teams](https://ibm.biz/acmsteams)
+
 4. To start the flow, in the banner click **Start flow**.
 
 Use this template to retrieve incidents from ServiceNow and send those incidents, along with incident details, to a channel in Microsoft Teams.

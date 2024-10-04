@@ -1,9 +1,9 @@
 To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20prospect%20in%20Salesforce%20Account%20Engagement%20whenever%20a%20new%20form%20entry%20is%20created%20in%20Wufoo_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-     - [Wufoo](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-wufoo)
-     - [Salesforce Account Engagement](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-salesforce-account-engagement)
+     - [Wufoo](https://ibm.biz/acwufoo)
+     - [Salesforce Account Engagement](https://ibm.biz/acsalesforceae)
 3. To start the flow, in the banner, click **Start flow**.
   
 Use this template to create a prospect in Salesforce Account Engagement with the prospect's information whenever a new form entry with a campaign attendee's information is created.

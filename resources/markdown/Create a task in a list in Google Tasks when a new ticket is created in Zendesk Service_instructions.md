@@ -1,10 +1,10 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20task%20in%20a%20list%20in%20Google%20Tasks%20when%20a%20new%20ticket%20is%20created%20in%20Zendesk%20Service_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20task%20in%20a%20list%20in%20Google%20Tasks%20when%20a%20new%20ticket%20is%20created%20in%20Zendesk%20Service_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Google Tasks](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-google-tasks) 
-   - [Zendesk Service](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-zendesk-service)
-   - [Slack](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-slack)
+   - [Google Tasks](https://ibm.biz/acgoogletasks) 
+   - [Zendesk Service](https://ibm.biz/aczendeskservice)
+   - [Slack](https://ibm.biz/acslack)
 3. To start the flow, in the banner, click **Start flow**.
 
 
