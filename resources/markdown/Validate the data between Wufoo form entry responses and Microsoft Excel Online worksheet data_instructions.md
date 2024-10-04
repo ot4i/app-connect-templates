@@ -1,10 +1,10 @@
 To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Validate%20the%20data%20between%20Wufoo%20form%20entry%20responses%20and%20Microsoft%20Excel%20Online%20worksheet%20data_instructions.md) (opens in a new window).
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Wufoo](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-wufoo)
-   - [Microsoft Excel Online](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-microsoft-excel-online)
-   - [Slack](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-slack)
+   - [Wufoo](https://ibm.biz/acwufoo)
+   - [Microsoft Excel Online](https://ibm.biz/acmsexcel)
+   - [Slack](https://ibm.biz/acslack) 
 3. To start the flow, in the banner, click **Start flow**.
 
 

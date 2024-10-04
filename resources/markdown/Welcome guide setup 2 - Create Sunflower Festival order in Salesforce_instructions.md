@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20setup%202%20-%20Create%20Sunflower%20Festival%20order%20in%20Salesforce_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20setup%202%20-%20Create%20Sunflower%20Festival%20order%20in%20Salesforce_instructions.md) (opens in a new window).
 
 This template sets up the Salesforce order which is used with the template [Welcome guide part 4 - Flower order API](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Welcome%20guide%20part%204%20-%20Flower%20order%20API_instructions.md).
 
@@ -8,7 +8,7 @@ To run this flow you'll need to create flower products in Salesforce. To do this
 
 ## Using the template
 
-1. Click **Create flow** to start using the template.
+1. Click **Use this template** to start using the template.
 1. Click the Salesforce "Update or create account" action and connect to your [Salesforce account](https://ibm.biz/aassalesforce).
 1. Check that an account has been set for the other "Salesforce" actions.
 1. To start the flow, in the banner click **Start flow**.
