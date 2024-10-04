@@ -2,8 +2,8 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
-   - [Shopify](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-shopify)
-   - [ClickSend](https://www.ibm.com/docs/en/app-connect/containers_cd?topic=apps-clicksend)
+   - [Shopify](https://ibm.biz/acshopify)
+   - [ClickSend](https://ibm.biz/acclicksend)
 3. To start the flow, in the banner click **Start flow**.
 
 Use this template to send an SMS message through ClickSend for each order placed in Shopify.
