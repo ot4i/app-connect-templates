@@ -159,5 +159,5 @@ integration:
               output-schema: {}
         tags:
           - incomplete
-  name: Create a new user in servicenow for MS Dynamics case
+  name: Create a new user in ServiceNow when a new contact is created in Microsoft Dynamics 365
 models: {}
