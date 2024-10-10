@@ -64,5 +64,5 @@ integration:
               output-schema: {}
         tags:
           - incomplete
-  name: Slack notifications for closed won opportunities in MS Dynamics
+  name: Slack notifications for closed won opportunities in Microsoft Dynamics 365 for Sales
 models: {}

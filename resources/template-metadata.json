@@ -405,7 +405,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Slack notifications for closed won opportunities in Microsoft Dynamics 365",
+   "name": "Slack notifications for closed won opportunities in Microsoft Dynamics 365 for Sales",
    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in Microsoft Dynamics 365 for Sales.",
    "summary": "Microsoft Dynamics 365 to Slack",
    "sourceApp": "msdynamicscrmrest",
