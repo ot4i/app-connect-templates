@@ -54,5 +54,5 @@ integration:
                     $ref: '#/flowDetails'
         tags:
           - incomplete
-  name: Create a new Trello card for a MS Dynamics case
+  name: Create a new Trello card when a new case is created in Microsoft Dynamics 365 for Sales
 models: {}

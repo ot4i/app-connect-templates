@@ -405,7 +405,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Slack notifications for Closed Won opportunities in Microsoft Dynamics 365",
+   "name": "Slack notifications for closed won opportunities in Microsoft Dynamics 365 for Sales",
    "description": "This template allows you to receive Slack message with the opportunities details whenever opportunities are updated with 'Closed Won' status in Microsoft Dynamics 365 for Sales.",
    "summary": "Microsoft Dynamics 365 to Slack",
    "sourceApp": "msdynamicscrmrest",
@@ -612,7 +612,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create new Trello card when a new case is created in Microsoft Dynamics 365",
+   "name": "Create a new Trello card when a new case is created in Microsoft Dynamics 365 for Sales",
    "description": "Use this template to create a new Trello card when a new case is created in Microsoft Dynamics 365 for Sales.",
    "summary": "Microsoft Dynamics 365 to Trello",
    "sourceApp": "msdynamicscrmrest",
@@ -621,7 +621,7 @@
    "offerings": ["app connect professional"]
   },
   {
-   "name": "Create new user in ServiceNow when a new contact is created in Microsoft Dynamics 365",
+   "name": "Create a new user in ServiceNow when a new contact is created in Microsoft Dynamics 365 for Sales",
    "description": "Use this template to create a new user in ServiceNow when a new contact is created in Microsoft Dynamics 365 for Sales.",
    "summary": "Microsoft Dynamics 365 to ServiceNow",
    "sourceApp": "msdynamicscrmrest",
