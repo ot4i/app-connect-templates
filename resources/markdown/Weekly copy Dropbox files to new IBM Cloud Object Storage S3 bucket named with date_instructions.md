@@ -10,7 +10,7 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 	* The Create bucket node will create a new bucket in IBM COS S3 with the name defined by the Bucket name field.
 	* The Download file contents nodes download Dropbox files with the content type defined by the File Type field.
 	* The Create object nodes create new file objects in the bucket created earlier.
-    Related tutorial: [Copying files from DropBox to IBM Cloud Object Storage on schedule](http://ibm.biz/aastutdrop2cos)
+    Related tutorial: [Copying files from DropBox to IBM Cloud Object Storage on schedule](https://ibm.biz/actutdrop2cos)
 1. To start the flow, in the banner click **Start flow**.
 
 When the flow has run successfully; you should see a new bucket created in your IBM Cloud Object Storage S3 account, and populated with files copied from your Dropbox account.
