@@ -181,23 +181,22 @@ integration:
                           mappings:
                             - input:
                                 template: >-
-                                  Summarise the given open uncontacted list of
+                                  Summarize the list of open, uncontacted
                                   lead records:
                                   {{$SalesforceRetrieveleads.{'Name':Name,
                                   'Title': Title, 'Company': Company,
                                   'Email':Email,  'Lead Creation Date':
                                   CreatedDate} }}  for {{$Foreach2item.Name}}.
-                                  For context the list provided above contains
-                                  details of customers that need to be reached
-                                  out, and {{$Foreach2item.Name}} is the owner
-                                  and needs to reach out, so write a summary for
-                                  {{$Foreach2item.Name}} so they can get started
-                                  asap. Consider only the data and fields that
+                                  For context, the provided list contains
+                                  details of customers who need to be contacted, and {{$Foreach2item.Name}} is the owner
+                                  who needs to contact them. So write a summary for
+                                  {{$Foreach2item.Name}} so the owner can start
+                                  as soon as possible. Consider only the data and fields that
                                   are mentioned in the list and display them
-                                  clearly in a numbered list, show the 'lead
+                                  clearly in a numbered list. Show the 'lead
                                   creation date' in a user readable format
-                                  (DD/MM/YYYY) and segregate the entries per
-                                  lead record, no salutations/addressing at the
+                                  (DD/MM/YYYY) and separate the entries per
+                                  lead record, with no salutations at the
                                   end and no hints of previous responses and
                                   prompts.
                             - model_id:
@@ -298,5 +297,5 @@ integration:
                 - variable: flowDetails
                   $ref: '#/flowDetails'
   name: >-
-    Summarize the open leads from Salesforce using IBM watsonx ai and send an email
+    Summarize open leads from Salesforce by using IBM watsonx.ai and send an email
 models: {}
