@@ -189,8 +189,8 @@ integration:
                                   CreatedDate} }}  for {{$Foreach2item.Name}}.
                                   For context, the provided list contains
                                   details of customers who need to be contacted, and {{$Foreach2item.Name}} is the owner
-                                  who needs to contact them. So write a summary for
-                                  {{$Foreach2item.Name}} so the owner can start
+                                  who needs to contact them. So, write a summary for
+                                  {{$Foreach2item.Name}} so that the owner can start
                                   as soon as possible. Consider only the data and fields that
                                   are mentioned in the list and display them
                                   clearly in a numbered list. Show the 'lead
