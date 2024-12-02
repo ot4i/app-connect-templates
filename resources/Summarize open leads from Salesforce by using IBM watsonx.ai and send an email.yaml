@@ -297,5 +297,5 @@ integration:
                 - variable: flowDetails
                   $ref: '#/flowDetails'
   name: >-
-    Summarize open leads from Salesforce by using IBM watsonx.ai and send an email
+    Summarize the open leads from Salesforce using IBM watsonx ai and send an email
 models: {}
