@@ -3592,7 +3592,7 @@
  },
  {
     "name": "Summarize the open leads from Salesforce using IBM watsonx ai and send an email",
-    "description": "Use this template to send a scheduled mail to a salesforce user with a summary of their open, not contacted, and unread leads using IBM watsonx.ai.",
+    "description": "Use this template to send a scheduled email to a Salesforce user with a summary of their open, not contacted, and unread leads by using IBM watsonx.ai.",
     "summary": "Scheduler to 3 applications",
     "sourceApp": "streaming-connector-scheduler",
     "targetApps": ["salesforce", "ibmwatsonxai", "gmail"],
