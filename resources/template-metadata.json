@@ -3778,6 +3778,15 @@
    "targetApps": ["slack", "businessmap"],
    "tags": ["streaming-connector-scheduler", "slack", "businessmap"],
    "offerings": ["app connect professional"]
+},
+{
+   "name": "API to implement RAG pattern in IBM watsonx ai using PineconeDB",
+   "description": "This template creates an API to generate embeddings of a question by IBM watsonx.ai,do a query in PineconDB using these embeddings and use the results generated to act as prompt in IBM watsonx.ai to geneearte an answer.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "api",
+   "targetApps": ["ibmwatsonxai", "pineconedb"],
+   "tags": ["api", "ibmwatsonxai", "pineconedb"],
+   "offerings": ["app connect professional"]
 }
 ]
 }
