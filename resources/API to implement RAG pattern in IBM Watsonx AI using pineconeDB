@@ -1,0 +1,473 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createVectors:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-3'
+          input-context:
+            data: createVectors
+          output-context:
+            data: createVectors
+      options:
+        resources:
+          - business-object: vectors
+            triggers:
+              create: createVectors
+            model:
+              $ref: '#/models/vectors'
+      type: api-trigger
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: vectors
+      connector-type: pineconedb
+      actions:
+        postIndexesByIndexHostQuery: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Indexes/{index_host}/Vectors/operations/postIndexesByIndexHostQuery
+          action: custom
+    action-interface-5:
+      type: api-action
+      business-object: vectors
+      connector-type: pineconedb
+      actions:
+        postIndexesByIndexHostQuery: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/indexes/{index_host}/vectors/operations/postIndexesByIndexHostQuery
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: postMlV1TextEmbeddings_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextEmbeddings: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/postMlV1TextEmbeddings_model/operations/postMlV1TextEmbeddings
+          action: custom
+    action-interface-6:
+      type: api-action
+      business-object: Vectors
+      connector-type: pineconedb
+      actions:
+        postIndexesByIndexHostQuery: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Indexes/{index_host}/Vectors/operations/postIndexesByIndexHostQuery
+          action: custom
+    action-interface-7:
+      type: api-action
+      business-object: postMlV1TextGeneration_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextGeneration: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/postMlV1TextGeneration_model/operations/postMlV1TextGeneration
+          action: custom
+  assemblies:
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: PineconeDB Query Vector
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postIndexesByIndexHostQuery
+              map:
+                mappings:
+                  - includeMetadata:
+                      expression: 'true'
+                  - includeValues:
+                      expression: 'false'
+                  - index_host:
+                      template: test-sentences-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                  - topK:
+                      expression: '3'
+                  - vector:
+                      expression: '$Foreachitem.embedding '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              filter:
+                where:
+                  index_host: test-sentences-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: PineconeDBQueryVector
+                    $ref: >-
+                      #/block/For each/node-output/PineconeDB Query
+                      Vector/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      metadata:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - metadata:
+                            template: >-
+                              $join({{$PineconeDBQueryVector.matches.metadata.text}},
+                              "«chars»") 
+              name: Set variable
+    assembly-4:
+      assembly:
+        execute:
+          - custom-action:
+              name: PineconeDB Query Vector
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              action: postIndexesByIndexHostQuery
+              map:
+                mappings:
+                  - includeMetadata:
+                      expression: 'true'
+                  - includeValues:
+                      expression: 'false'
+                  - index_host:
+                      template: test-sentences-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                  - topK:
+                      expression: '3'
+                  - vector:
+                      expression: '$Foreachitem.embedding '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  index_host: test-sentences-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: PineconeDBQueryVector
+                    $ref: >-
+                      #/block/For each/node-output/PineconeDB Query
+                      Vector/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      context:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - context:
+                            template: >-
+                              $join($PineconeDBQueryVector.matches.metadata.text
+                              , "«chars»") 
+              name: Set variable
+    assembly-3:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM watsonx.ai Generate embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: postMlV1TextEmbeddings
+              map:
+                mappings:
+                  - inputs:
+                      expression: '[$Request.question ]'
+                  - model_id:
+                      template: sentence-transformers/all-minilm-l12-v2
+                  - project_id:
+                      template: f5c4b4f1-6c27-4cad-bcc3-8b56df83f335
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      context:
+                        type: string
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: PineconeVectorDatabaseQueryvectors
+                    $ref: >-
+                      #/block/For each/node-output/Pinecone Vector Database
+                      Query vectors/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - context:
+                            template: '{{$Setvariable.variable.metadata}}'
+              source:
+                expression: '$IBMwatsonxaiGenerateembeddings.results '
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-5'
+              display-name: IBM watsonxai results
+          - custom-action:
+              name: IBM watsonx.ai Generate text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              action: postMlV1TextGeneration
+              map:
+                mappings:
+                  - input:
+                      template: >-
+                        context: {{$Foreach.output.context}} Based on the above
+                        context,Answer the below question: {{$Request.question}}
+                        Using just the above context answer the question.
+                  - model_id:
+                      template: codellama/codellama-34b-instruct-hf
+                  - parameters:
+                      mappings:
+                        - max_new_tokens:
+                            expression: '600'
+                        - min_new_tokens:
+                            expression: '200'
+                        - time_limit:
+                            expression: '1000'
+                  - project_id:
+                      template: f5c4b4f1-6c27-4cad-bcc3-8b56df83f335
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - response:
+              name: response
+              reply-maps:
+                - title: vectors successfully created
+                  status-code: 201
+                  map:
+                    mappings:
+                      - answer:
+                          template: '{{$IBMwatsonxaiGeneratetext.results.generated_text}}'
+                      - question:
+                          template: '{{$Request.question}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: IBMwatsonxaiGenerateembeddings
+                        $ref: >-
+                          #/node-output/IBM watsonx.ai Generate
+                          embeddings/response/payload
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: IBMwatsonxaiGeneratetext
+                        $ref: >-
+                          #/node-output/IBM watsonx.ai Generate
+                          text/response/payload
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+    assembly-5:
+      assembly:
+        execute:
+          - custom-action:
+              name: Pinecone Vector Database Query vectors
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              action: postIndexesByIndexHostQuery
+              map:
+                mappings:
+                  - includeMetadata:
+                      expression: 'true'
+                  - includeValues:
+                      expression: 'false'
+                  - index_host:
+                      template: test-sentences-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                  - topK:
+                      expression: '3'
+                  - vector:
+                      expression: '$IBMwatsonxaiGenerateembeddings.results.embedding '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  index_host: test-sentences-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: PineconeVectorDatabaseQueryvectors
+                    $ref: >-
+                      #/block/For each/node-output/Pinecone Vector Database
+                      Query vectors/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      metadata:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - metadata:
+                            template: >-
+                              $join({{$PineconeVectorDatabaseQueryvectors.matches.metadata.text}},
+                              "«chars»") 
+              name: Set variable
+  name: rag-pattern
+models:
+  vectors:
+    name: vectors
+    plural: vectors
+    properties:
+      question:
+        required: false
+        id: true
+        type: string
+      answer:
+        required: false
+        id: false
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-3'
+    description: ''
+    interactions: {}
+errorModels: {}
