@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/API%20flow%20for%20RAG%20pattern%20implementation%20-%20Query%20a%20vector%20in%20Pinecone%20Vector%20Database%20using%20the%20embeddings%20genereated%20by%20IBM%20watsonx%20ai%20and%20use%20the%20results%20to%20generate%20text%20using%20IBM%20watsonx%20ai_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/RAG%20pattern%20flow20-%20Query%20the%20Pinecone%20Vector%20DB%20using%20embeddings%20from%20IBM%20watsonx%20ai%20and%20generate%20text%20with%20the%20results_instructions.md) (opens in a new window).
 
 This API takes a question and IBM WatsonX AI uses this question to generate embeddings.These embeddings are used by pineconeDB to do a query. The results generated from this can be used as a prompt to IBM Watsonx AI to get answer to the question.
 
