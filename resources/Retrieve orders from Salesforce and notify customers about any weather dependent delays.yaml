@@ -65,7 +65,7 @@ integration:
               pagination-type: TOKEN
               allow-empty-output: true
           - custom-action:
-              name: IBM Weather Company Data Limited Edition Retrieve forecasts
+              name: The Weather Company Retrieve forecasts
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               action: RETRIEVEFORECAST
@@ -105,7 +105,7 @@ integration:
                     $ref: '#/node-output/Slack Create message 4/response/payload'
                   - variable: IBMWeatherCompanyDataLimitedEditionRetrieveforecasts
                     $ref: >-
-                      #/node-output/IBM Weather Company Data Limited Edition
+                      #/node-output/The Weather Company
                       Retrieve forecasts/response/payload
                   - variable: SlackCreatemessage
                     $ref: '#/node-output/Slack Create message/response/payload'
@@ -126,12 +126,12 @@ integration:
                     $ref: '#/node-output/Slack Create message 4/response/payload'
                   - variable: IBMWeatherCompanyDataLimitedEditionRetrieveforecasts
                     $ref: >-
-                      #/node-output/IBM Weather Company Data Limited Edition
+                      #/node-output/The Weather Company
                       Retrieve forecasts/response/payload
                   - variable: SlackCreatemessage
                     $ref: '#/node-output/Slack Create message/response/payload'
                 mappings: []
-              display-name: IBM Weather Company Data Limited Edition aggs
+              display-name: The Weather Company aggs
         tags:
           - incomplete
     assembly-2:
@@ -152,7 +152,7 @@ integration:
                   $ref: '#/node-output/Slack Create message 4/response/payload'
                 - variable: IBMWeatherCompanyDataLimitedEditionRetrieveforecasts
                   $ref: >-
-                    #/node-output/IBM Weather Company Data Limited Edition
+                    #/node-output/The Weather Company
                     Retrieve forecasts/response/payload
                 - variable: SlackCreatemessage
                   $ref: '#/node-output/Slack Create message/response/payload'
@@ -206,8 +206,7 @@ integration:
                             - variable: >-
                                 IBMWeatherCompanyDataLimitedEditionRetrieveforecasts
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Retrieve forecasts/response/payload
+                                #/node-output/The Weather Company Retrieve forecasts/response/payload
                             - variable: SlackCreatemessage
                               $ref: >-
                                 #/node-output/Slack Create
