@@ -364,7 +364,7 @@ integration:
                         type: string
                 title: Parsed JSON
           - custom-action:
-              name: IBM Weather Company Data Limited Edition Get forecast
+              name: The Weather Company Get forecast
               target:
                 $ref: '#/integration/action-interfaces/action-interface-3'
               action: RETRIEVEFORECAST
@@ -430,7 +430,7 @@ integration:
                     $ref: '#/node-output/JSON Parser Parse/response/payload'
                   - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                     $ref: >-
-                      #/node-output/IBM Weather Company Data Limited Edition Get
+                      #/node-output/The Weather Company Get
                       forecast/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
@@ -477,7 +477,7 @@ integration:
                   $ref: '#/node-output/JSON Parser Parse/response/payload'
                 - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                   $ref: >-
-                    #/node-output/IBM Weather Company Data Limited Edition Get
+                    #/node-output/The Weather Company Get
                     forecast/response/payload
                 - variable: Setvariable
                   $ref: '#/node-output/Set variable/response/payload'
@@ -525,8 +525,7 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Get forecast/response/payload
+                                #/node-output/The Weather Company Get forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -555,8 +554,7 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Get forecast/response/payload
+                                #/node-output/The Weather Company Get forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -615,8 +613,7 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Get forecast/response/payload
+                                #/node-output/The Weather Company Get forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -652,7 +649,7 @@ integration:
                         $ref: '#/node-output/JSON Parser Parse/response/payload'
                       - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                         $ref: >-
-                          #/node-output/IBM Weather Company Data Limited Edition
+                          #/node-output/The Weather Company
                           Get forecast/response/payload
                       - variable: JSONParserParse2
                         $ref: '#/node-output/JSON Parser Parse 2/response/payload'
@@ -728,8 +725,7 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Get forecast/response/payload
+                                #/node-output/The Weather Company Get forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -758,8 +754,7 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Get forecast/response/payload
+                                #/node-output/The Weather Company Get forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -829,8 +824,7 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/IBM Weather Company Data Limited
-                                Edition Get forecast/response/payload
+                                #/node-output/The Weather Company Get forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -866,7 +860,7 @@ integration:
                         $ref: '#/node-output/JSON Parser Parse/response/payload'
                       - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                         $ref: >-
-                          #/node-output/IBM Weather Company Data Limited Edition
+                          #/node-output/The Weather Company
                           Get forecast/response/payload
                       - variable: Setvariable
                         $ref: '#/node-output/Set variable/response/payload'
@@ -925,8 +919,7 @@ integration:
                             $ref: '#/node-output/JSON Parser Parse/response/payload'
                           - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                             $ref: >-
-                              #/node-output/IBM Weather Company Data Limited
-                              Edition Get forecast/response/payload
+                              #/node-output/The Weather Company Get forecast/response/payload
                           - variable: Setvariable
                             $ref: '#/node-output/Set variable/response/payload'
                           - variable: flowDetails
@@ -951,8 +944,7 @@ integration:
                             $ref: '#/node-output/JSON Parser Parse/response/payload'
                           - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                             $ref: >-
-                              #/node-output/IBM Weather Company Data Limited
-                              Edition Get forecast/response/payload
+                              #/node-output/The Weather Company Get forecast/response/payload
                           - variable: Setvariable
                             $ref: '#/node-output/Set variable/response/payload'
                           - variable: flowDetails
@@ -1018,8 +1010,7 @@ integration:
                             $ref: '#/node-output/JSON Parser Parse/response/payload'
                           - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                             $ref: >-
-                              #/node-output/IBM Weather Company Data Limited
-                              Edition Get forecast/response/payload
+                              #/node-output/The Weather Company Get forecast/response/payload
                           - variable: Setvariable
                             $ref: '#/node-output/Set variable/response/payload'
                           - variable: flowDetails
@@ -1055,7 +1046,7 @@ integration:
                       $ref: '#/node-output/JSON Parser Parse/response/payload'
                     - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                       $ref: >-
-                        #/node-output/IBM Weather Company Data Limited Edition
+                        #/node-output/The Weather Company
                         Get forecast/response/payload
                     - variable: Setvariable
                       $ref: '#/node-output/Set variable/response/payload'
@@ -1122,7 +1113,7 @@ integration:
                         $ref: '#/node-output/JSON Parser Parse/response/payload'
                       - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                         $ref: >-
-                          #/node-output/IBM Weather Company Data Limited Edition
+                          #/node-output/The Weather Company
                           Get forecast/response/payload
                       - variable: JSONParserParse2
                         $ref: '#/node-output/JSON Parser Parse 2/response/payload'
