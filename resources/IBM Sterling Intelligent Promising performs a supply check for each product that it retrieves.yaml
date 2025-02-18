@@ -68,12 +68,10 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: IBMSterlingInventoryVisibilityRetrievesupplies
                     $ref: >-
-                      #/block/For each/node-output/IBM Sterling Inventory
-                      Visibility Retrieve supplies/response/payload
+                      #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response/payload
                   - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
                     $ref: >-
-                      #/block/For each/node-output/IBM Sterling Inventory
-                      Visibility Retrieve supplies/response
+                      #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response
                 mappings: []
               display-name: Request Product
           - response:
@@ -98,7 +96,7 @@ integration:
       assembly:
         execute:
           - retrieve-action:
-              name: IBM Sterling Inventory Visibility Retrieve supplies
+              name: IBM Sterling Intelligent Promising Retrieve supplies
               target:
                 $ref: '#/integration/action-interfaces/action-interface-1'
               filter:
@@ -130,12 +128,10 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: IBMSterlingInventoryVisibilityRetrievesupplies
                     $ref: >-
-                      #/block/For each/node-output/IBM Sterling Inventory
-                      Visibility Retrieve supplies/response/payload
+                      #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response/payload
                   - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
                     $ref: >-
-                      #/block/For each/node-output/IBM Sterling Inventory
-                      Visibility Retrieve supplies/response
+                      #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response
               mode: sequential
               continue-on-error: true
               map:
@@ -149,14 +145,12 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: IBMSterlingInventoryVisibilityRetrievesupplies
                     $ref: >-
-                      #/block/For each/node-output/IBM Sterling Inventory
-                      Visibility Retrieve supplies/response/payload
+                      #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response/payload
                   - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
                     $ref: >-
-                      #/block/For each/node-output/IBM Sterling Inventory
-                      Visibility Retrieve supplies/response
+                      #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response
                 mappings: []
-              display-name: IBM Sterling Inventory Visibility Supply
+              display-name: IBM Sterling Intelligent Promising Supply
     assembly-3:
       assembly:
         execute:
@@ -171,12 +165,10 @@ integration:
                   $ref: '#/trigger/payload'
                 - variable: IBMSterlingInventoryVisibilityRetrievesupplies
                   $ref: >-
-                    #/block/For each/node-output/IBM Sterling Inventory
-                    Visibility Retrieve supplies/response/payload
+                    #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response/payload
                 - variable: IBMSterlingInventoryVisibilityRetrievesuppliesMetadata
                   $ref: >-
-                    #/block/For each/node-output/IBM Sterling Inventory
-                    Visibility Retrieve supplies/response
+                    #/block/For each/node-output/IBM Sterling Intelligent Promising Retrieve supplies/response
               branch:
                 - condition:
                     '{{$Foreach2item.attr_type}}': ONHAND
@@ -298,7 +290,7 @@ integration:
                               #/block/For each/node-output/IBM Sterling
                               Inventory Visibility Retrieve supplies/response
               output-schema: {}
-  name: IBM Sterling Inventory Visibility performs a supply check for each product that it retrieves
+  name: IBM Sterling Intelligent Promising performs a supply check for each product that it retrieves
 models:
   Product:
     name: Product
