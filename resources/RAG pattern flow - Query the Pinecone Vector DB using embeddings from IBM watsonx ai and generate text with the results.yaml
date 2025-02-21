@@ -452,7 +452,7 @@ integration:
                               $join({{$PineconeVectorDatabaseQueryvectors.matches.metadata.text}},
                               "«chars»") 
               name: Set variable
-  name: rag-pattern
+  name: RAG pattern flow - Query the Pinecone Vector DB using embeddings from IBM watsonx ai and generate text with the results
 models:
   vectors:
     name: vectors
