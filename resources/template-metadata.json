@@ -1306,7 +1306,7 @@
   },
   {
    "name": "Retrieve orders from Salesforce and notify customers about any weather dependent delays",
-   "description": "Use this template to retrieve an order from Salesforce, map the shipping address to IBM Weather Company Data to retrieve the forecast, and send a delayed order notification to the customer via Domino. This use case helps you inform your customers when the delivery of an order is going to be delayed due to bad weather conditions.",
+   "description": "Use this template to retrieve an order from Salesforce, map the shipping address to The Weather Company to retrieve the forecast, and send a delayed order notification to the customer via Domino. This use case helps you inform your customers when the delivery of an order is going to be delayed due to bad weather conditions.",
    "summary": "Scheduler to 3 applications",
    "sourceApp": "streaming-connector-scheduler",
    "targetApps": ["salesforce", "ibmtwc", "domino"],
@@ -1332,8 +1332,8 @@
    "offerings": ["app connect professional"] 
   },
   {
-   "name": "IBM Sterling Inventory Visibility performs a supply check for each product that it retrieves",
-   "description": "Use this template to retrieve a list of products from IBM Sterling Inventory Visibility and create a message in a Microsoft Team channel based on the status of the retrieved item and where it is in the delivery process.",
+   "name": "IBM Sterling Intelligent Promising performs a supply check for each product that it retrieves",
+   "description": "Use this template to retrieve a list of products from IBM Sterling Intelligent Promising and create a message in a Microsoft Team channel based on the status of the retrieved item and where it is in the delivery process.",
    "summary": "1 flow using 2 applications",
    "sourceApp": "api",
    "targetApps": ["ibmsterlingiv", "msteams"],
