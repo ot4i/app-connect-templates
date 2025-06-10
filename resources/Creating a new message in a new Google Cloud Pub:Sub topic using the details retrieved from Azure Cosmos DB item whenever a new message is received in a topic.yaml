@@ -22,13 +22,11 @@ integration:
               path: >-
                 resources/topic/{topic}/subscription/{subscription}/newmessage/operations/CREATED/subscribe
               action: created
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Items
       connector-type: azurecosmosdb
-      account-name: Account 1
       actions:
         getanItem: {}
       options:
@@ -41,7 +39,6 @@ integration:
       type: api-action
       business-object: message
       connector-type: googlepubsub
-      account-name: Account 1
       actions:
         CREATE: {}
       options:
