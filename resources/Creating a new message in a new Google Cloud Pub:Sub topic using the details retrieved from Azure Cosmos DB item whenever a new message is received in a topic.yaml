@@ -22,7 +22,6 @@ integration:
               path: >-
                 resources/topic/{topic}/subscription/{subscription}/newmessage/operations/CREATED/subscribe
               action: created
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
