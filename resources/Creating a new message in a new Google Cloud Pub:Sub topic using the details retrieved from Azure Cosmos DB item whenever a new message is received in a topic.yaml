@@ -1,0 +1,121 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: googlepubsub
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: newmessage
+          options:
+            topic: projects/wds-project-225410/topics/amtest
+            subscription: projects/wds-project-225410/subscriptions/endurance_amtest
+            parentFilter:
+              topic: projects/wds-project-225410/topics/amtest
+              subscription: projects/wds-project-225410/subscriptions/endurance_amtest
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/topic/{topic}/subscription/{subscription}/newmessage/operations/CREATED/subscribe
+              action: created
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Items
+      connector-type: azurecosmosdb
+      account-name: Account 1
+      actions:
+        getanItem: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: >-
+            resources/Database/{DatabaseId}/Container/{ContainerId}/Items/operations/getanItem
+          action: retrieve
+    action-interface-2:
+      type: api-action
+      business-object: message
+      connector-type: googlepubsub
+      account-name: Account 1
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/topic/{topic}/message
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Azure Cosmos DB Retrieve item by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: getanItem
+              map:
+                mappings:
+                  - ContainerId:
+                      template: shipments
+                  - DatabaseId:
+                      template: DHL
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - id: '{{$Trigger.attributes.orderId}}'
+                    - partitionKey: '{{$Trigger.attributes.company}}'
+                    - ContainerId: shipments
+                    - DatabaseId: DHL
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Google Cloud Pub Sub Create message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - attributes:
+                      mappings:
+                        - estimatedDelivery:
+                            template: >-
+                              {{$AzureCosmosDBRetrieveitembyID.estimatedDelivery}}
+                        - status:
+                            template: '{{$AzureCosmosDBRetrieveitembyID.currentStatus}}'
+                  - data:
+                      template: '{{$Trigger.data}}'
+                  - topic:
+                      template: projects/wds-project-225410/topics/amtest3
+                customSchemas:
+                  properties.`attributes`:
+                    type: object
+                    properties:
+                      status:
+                        type: string
+                      estimatedDelivery:
+                        type: string
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AzureCosmosDBRetrieveitembyID
+                    $ref: >-
+                      #/node-output/Azure Cosmos DB Retrieve item by
+                      ID/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: usecase
+models: {}
