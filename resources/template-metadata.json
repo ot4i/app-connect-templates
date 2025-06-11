@@ -3787,6 +3787,15 @@
    "targetApps": ["ibmwatsonxai", "pineconedb"],
    "tags": ["api", "ibmwatsonxai", "pineconedb"],
    "offerings": ["app connect professional"]
-}
+},
+{
+   "name": "Route messages from Azure Service Bus queue to Cosmos DB then forward to another queue and acknowledge the message",
+   "description": "Use this template to recieve a message from a routing queue containing ID that can be used to query Azure Cosmos database to obtain routing details contaning which queue or topic to push the message to, and then acknowlege it.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "azureservicebus",
+   "targetApps": ["azureservicebus", "azurecosmosdb"],
+   "tags": ["azureservicebus", "azurecosmosdb"],
+   "offerings": ["app connect professional"]
+}    
 ]
 }
