@@ -3787,6 +3787,15 @@
    "targetApps": ["ibmwatsonxai", "pineconedb"],
    "tags": ["api", "ibmwatsonxai", "pineconedb"],
    "offerings": ["app connect professional"]
-}
+},
+{
+    "name": "Creating a new message in a new Google Cloud Pub/Sub topic using the details retrieved from Azure Cosmos DB item whenever a new message is created in a topic",
+    "description": "Use this template to create a new message in a new Google Cloud Pub/Sub topic using the details retrieved from Azure Cosmos DB item whenever a new message is created in a topic.",
+    "summary": "googlepubsub to 2 applications",
+    "sourceApp": "googlepubsub",
+    "targetApps": ["azurecosmosdb","googlepubsub"],
+    "tags": ["googlepubsub", "azurecosmosdb", "event-driven flow"],
+    "offerings": ["app connect professional"]
+   }    
 ]
 }
