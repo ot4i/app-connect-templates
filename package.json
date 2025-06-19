@@ -4,7 +4,7 @@
   "description": "App Connect Templates",
   "license": "MIT",
   "engines": {
-    "node": "18.x",
+    "node": "22.x",
     "npm": "10.x"
   },
   "scripts": {
