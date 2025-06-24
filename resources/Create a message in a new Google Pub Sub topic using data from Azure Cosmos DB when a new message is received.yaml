@@ -73,7 +73,7 @@ integration:
                     - id: '{{$Trigger.attributes.orderId}}'
                     - partitionKey: '{{$Trigger.attributes.company}}'
                     - ContainerId: shipments
-                    - DatabaseId: DHL
+                    - DatabaseId: SampleID
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -114,5 +114,5 @@ integration:
                       ID/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: usecase
+  name: Create a message in a new Google Pub Sub topic using data from Azure Cosmos DB when a new message is received
 models: {}
