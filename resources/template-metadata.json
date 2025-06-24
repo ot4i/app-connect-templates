@@ -3789,7 +3789,7 @@
    "offerings": ["app connect professional"]
 },
 {
-    "name": "Creating a new message in a new Google Cloud Pub/Sub topic using the details retrieved from Azure Cosmos DB item whenever a new message is created in a topic",
+    "name": "Create a message in a new Google Pub Sub topic using data from Azure Cosmos DB when a new message is received",
     "description": "Use this template to create a new message in a new Google Cloud Pub/Sub topic using the details retrieved from Azure Cosmos DB item whenever a new message is created in a topic.",
     "summary": "googlepubsub to 2 applications",
     "sourceApp": "googlepubsub",
