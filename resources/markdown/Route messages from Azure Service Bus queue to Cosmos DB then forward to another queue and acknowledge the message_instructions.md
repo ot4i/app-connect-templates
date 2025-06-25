@@ -6,7 +6,7 @@ This template is used to recieve a message from a routing queue containing ID th
 
 1. Click **Use this template** to start using the template.
 1. Click on the **Azure Service Bus** node, and if you're not already connected, connect to your [Azure Service Bus Account]().
-1. Click on the **Azure Cosmos DB** node, and if you're not already connected, connect to your [Azure Cosmos DB account]([https://www.ibm.com/docs/en/app-connect/saas?topic=apps-pinecone-vector-database](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-azure-cosmos-db)).
+1. Click on the **Azure Cosmos DB** node, and if you're not already connected, connect to your [Azure Cosmos DB account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-azure-cosmos-db).
 1. Click **Done**.
 1. To start the flow, in the banner click **Start flow**.
 
