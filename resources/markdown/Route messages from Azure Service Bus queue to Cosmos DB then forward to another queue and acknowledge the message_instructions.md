@@ -5,9 +5,8 @@ This template is used to recieve a message from a routing queue containing ID th
 ## Using the template
 
 1. Click **Use this template** to start using the template.
-1. Click on the **Azure Service Bus** node, and if you're not already connected, connect to your [Azure Service Bus Account]().
+1. Click on the **Azure Service Bus** node, and if you're not already connected, connect to your [Azure Service Bus Account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-azure-service-bus).
 1. Click on the **Azure Cosmos DB** node, and if you're not already connected, connect to your [Azure Cosmos DB account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-azure-cosmos-db).
-1. Click **Done**.
-1. To start the flow, in the banner click **Start flow**.
+1. To start the flow, in the banner click **Deploy flow**.
 
-Want to see if working? Click **Manage** in the API flow, then follow the instructions on getting started. Once you're in the API portal, use the Try it link and then **Generate** some test data. Replace the value for `file_url` with the URL for the CSV file you want to use. Replace the value for `event_name` with the event name you want to match in your file, and then click **Call operation**.
+Use this template to route messages from the Azure Service Bus queue to Azure Cosmos DB based on the message content, then send them to another Azure Service Bus queue and acknowledge the message.

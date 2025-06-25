@@ -3791,7 +3791,7 @@
 {
     "name": "Create a message in a new Google Pub Sub topic using data from Azure Cosmos DB when a new message is received",
     "description": "Use this template to create a new message in a new Google Cloud Pub/Sub topic using the details retrieved from Azure Cosmos DB item whenever a new message is created in a topic.",
-    "summary": "googlepubsub to 2 applications",
+    "summary": "Google Cloud Pub Sub to 2 applications",
     "sourceApp": "googlepubsub",
     "targetApps": ["azurecosmosdb","googlepubsub"],
     "tags": ["googlepubsub", "azurecosmosdb", "event-driven flow"],
@@ -3799,11 +3799,11 @@
  },
  {
    "name": "Route messages from Azure Service Bus queue to Cosmos DB then forward to another queue and acknowledge the message",
-   "description": "Use this template to recieve a message from a routing queue containing ID that can be used to query Azure Cosmos database to obtain routing details contaning which queue or topic to push the message to, and then acknowlege it.",
-   "summary": "1 flow using 2 applications",
+   "description": "Use this template to recieve a message from a routing queue containing an ID that can be used to query Azure Cosmos database to obtain routing details of which queue or topic to push the message to, and then acknowlege it.",
+   "summary": "Azure Service Bus to 2 applications",
    "sourceApp": "azureservicebus",
    "targetApps": ["azureservicebus", "azurecosmosdb"],
-   "tags": ["azureservicebus", "azurecosmosdb"],
+   "tags": ["azureservicebus", "JSON parse", "log", "azurecosmosdb"],
    "offerings": ["app connect professional"]
  }    
 ]
