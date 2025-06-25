@@ -115,7 +115,7 @@ integration:
                   and:
                     - id: '{{$JSONParserParse.id}}'
                     - ContainerId: '{{$JSONParserParse.container}}'
-                    - DatabaseId: DHL
+                    - DatabaseId: SampleID
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
