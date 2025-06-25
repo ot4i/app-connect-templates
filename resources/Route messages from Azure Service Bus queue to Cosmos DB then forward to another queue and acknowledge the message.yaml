@@ -1,0 +1,247 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: azureservicebus
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Messages
+          options:
+            entityType: Queues
+            entityType_Id: routingqueue
+            parentFilter:
+              entityType: Queues
+              entityType_Id: routingqueue
+            subscription: {}
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/{entityType}/{entityType_Id}/Messages/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Items
+      connector-type: azurecosmosdb
+      actions:
+        getanItem: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: >-
+            resources/Database/{DatabaseId}/Container/{ContainerId}/Items/operations/getanItem
+          action: retrieve
+    action-interface-2:
+      type: api-action
+      business-object: Messages
+      connector-type: azureservicebus
+      actions:
+        sendMessage: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/{entityType}/{entityType_Id}/Messages/operations/sendMessage
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: Messages
+      connector-type: azureservicebus
+      actions:
+        acknowledgeMessage: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/{entityType}/{entityType_Id}/Messages/operations/acknowledgeMessage
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - parse:
+              parse-format: json
+              source:
+                template: '{{$Trigger.body}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: |-
+                {
+                  "id":"abc",
+                  "container":"shipments",
+                  "message":"message to be send."
+                }
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  id:
+                    type: string
+                  container:
+                    type: string
+                  message:
+                    type: string
+                title: Parsed JSON
+              name: JSON Parser Parse
+          - custom-action:
+              name: Azure Cosmos DB Retrieve item by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: getanItem
+              map:
+                mappings:
+                  - ContainerId:
+                      template: '{{$JSONParserParse.container}}'
+                  - DatabaseId:
+                      template: DHL
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - id: '{{$JSONParserParse.id}}'
+                    - ContainerId: '{{$JSONParserParse.container}}'
+                    - DatabaseId: SampleID
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Azure Service Bus Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: sendMessage
+              map:
+                mappings:
+                  - body:
+                      template: >-
+                        {"message": {{$JSONParserParse.message}},
+                        "data":{{$AzureCosmosDBRetrieveitembyID.Data}}}
+                  - entityType:
+                      template: '{{$AzureCosmosDBRetrieveitembyID.entityType}}'
+                  - entityType_Id:
+                      template: '{{$AzureCosmosDBRetrieveitembyID.entityId}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: AzureCosmosDBRetrieveitembyID
+                    $ref: >-
+                      #/node-output/Azure Cosmos DB Retrieve item by
+                      ID/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - entityType: '{{$AzureCosmosDBRetrieveitembyID.entityType}}'
+                    - entityType_Id: '{{$AzureCosmosDBRetrieveitembyID.entityId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: AzureCosmosDBRetrieveitembyID
+                    $ref: >-
+                      #/node-output/Azure Cosmos DB Retrieve item by
+                      ID/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - logging:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: AzureCosmosDBRetrieveitembyID
+                    $ref: >-
+                      #/node-output/Azure Cosmos DB Retrieve item by
+                      ID/response/payload
+                  - variable: AzureServiceBusSendmessage
+                    $ref: >-
+                      #/node-output/Azure Service Bus Send
+                      message/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: '=====> locktoken???{{$Trigger.lockToken}}'
+              name: Log
+          - custom-action:
+              name: Azure Service Bus Acknowledge a message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: acknowledgeMessage
+              map:
+                mappings:
+                  - acknowledgeType:
+                      template: Acknowledge and Delete
+                  - entityType:
+                      template: Queues
+                  - entityType_Id:
+                      template: routingqueue
+                  - lockToken:
+                      template: '{{$Trigger.lockToken}}'
+                  - messageIdOrSequenceNo:
+                      template: '{{$Trigger.messageId}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: AzureCosmosDBRetrieveitembyID
+                    $ref: >-
+                      #/node-output/Azure Cosmos DB Retrieve item by
+                      ID/response/payload
+                  - variable: AzureServiceBusSendmessage
+                    $ref: >-
+                      #/node-output/Azure Service Bus Send
+                      message/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - entityType: Queues
+                    - entityType_Id: routingqueue
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: AzureCosmosDBRetrieveitembyID
+                    $ref: >-
+                      #/node-output/Azure Cosmos DB Retrieve item by
+                      ID/response/payload
+                  - variable: AzureServiceBusSendmessage
+                    $ref: >-
+                      #/node-output/Azure Service Bus Send
+                      message/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Route messages from Azure Service Bus queue to Cosmos DB then forward to another queue and acknowledge the message
+models: {}
