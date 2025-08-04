@@ -1,0 +1,249 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createRag:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createRag
+          output-context:
+            data: createRag
+      options:
+        resources:
+          - business-object: rag
+            triggers:
+              create: createRag
+            model:
+              $ref: '#/models/rag'
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: postMlV1TextEmbeddings_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextEmbeddings: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/postMlV1TextEmbeddings_model/operations/postMlV1TextEmbeddings
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: postMlV1TextGeneration_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextGeneration: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/postMlV1TextGeneration_model/operations/postMlV1TextGeneration
+          action: custom
+    action-interface-2:
+      type: api-action
+      business-object: Documents
+      connector-type: vespa
+      actions:
+        postSearch: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Documents/operations/postSearch
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM watsonx.ai Generate embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postMlV1TextEmbeddings
+              map:
+                mappings:
+                  - inputs:
+                      expression: '[$Request.question ]'
+                  - model_id:
+                      template: sentence-transformers/all-minilm-l12-v2
+                  - project_id:
+                      template: f5c4b4f1-6c27-4cad-bcc3-8b56df83f335
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - custom-action:
+              name: Vespa Query documents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postSearch
+              map:
+                mappings:
+                  - query:
+                      expression: >-
+                        {  "yql": "select * from doc where
+                        {targetHits:                       
+                        10}nearestNeighbor(embedding, e)",  "ranking":
+                        {                           "profile": "default"  }, 
+                        "input": {   "query(e)": 
+                        $IBMwatsonxaiGenerateembeddings.results.embedding 
+                        },"hits":3}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: VespaQuerydocuments
+                    $ref: '#/node-output/Vespa Query documents/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      context:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - context:
+                            template: >-
+                              {{$join($map($VespaQuerydocuments.root.children ,
+                              function ($v) {$v.fields.text}) , "")}}
+              name: Set variable
+          - logging:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: VespaQuerydocuments
+                    $ref: '#/node-output/Vespa Query documents/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: context to watson -- {{$Setvariable.variable.context}}
+              name: Log
+          - custom-action:
+              name: IBM watsonx.ai Generate text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postMlV1TextGeneration
+              map:
+                mappings:
+                  - input:
+                      template: >-
+                        take this as the context:
+                        {{$Setvariable.variable.context}} . Use only the given
+                        context  and answer the below question:
+                        {{$Request.question}} .
+                  - model_id:
+                      template: ibm/granite-3-8b-instruct
+                  - parameters:
+                      mappings:
+                        - max_new_tokens:
+                            expression: '200'
+                        - min_new_tokens:
+                            expression: '150'
+                        - time_limit:
+                            expression: '1000'
+                  - project_id:
+                      template: f5c4b4f1-6c27-4cad-bcc3-8b56df83f335
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: VespaQuerydocuments
+                    $ref: '#/node-output/Vespa Query documents/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - response:
+              name: response
+              reply-maps:
+                - title: rag successfully created
+                  status-code: 201
+                  map:
+                    mappings:
+                      - answer:
+                          template: '{{$IBMwatsonxaiGeneratetext.results.generated_text}}'
+                      - question:
+                          template: '{{$Request.question}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: IBMwatsonxaiGenerateembeddings
+                        $ref: >-
+                          #/node-output/IBM watsonx.ai Generate
+                          embeddings/response/payload
+                      - variable: vespasearch
+                        $ref: '#/node-output/vespa search/response/payload'
+                      - variable: Setvariable
+                        $ref: '#/node-output/Set variable/response/payload'
+                      - variable: IBMwatsonxaiGeneratetext
+                        $ref: >-
+                          #/node-output/IBM watsonx.ai Generate
+                          text/response/payload
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+  name: RAG pattern flow - Query the Vespa using embeddings from IBM watsonx ai and generate text with the results
+models:
+  rag:
+    name: rag
+    plural: rag
+    properties:
+      question:
+        required: false
+        id: true
+        type: string
+      answer:
+        required: false
+        id: false
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''
+    interactions: {}
