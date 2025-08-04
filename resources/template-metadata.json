@@ -3814,7 +3814,8 @@
    "targetApps": ["ibmwatsonxai", "vespa"],
    "tags": ["api", "ibmwatsonxai", "vespa"],
    "offerings": ["app connect professional"]
-},
+}
 ]
 }
+
 
