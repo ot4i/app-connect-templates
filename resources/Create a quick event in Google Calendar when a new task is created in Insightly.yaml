@@ -1,0 +1,85 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Task
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATEQUICKEVENT: {}
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.COMPLETED}}': 'False'
+                  execute:
+                    - custom-action:
+                        name: Google Calendar Create quick event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: CREATEQUICKEVENT
+                        map:
+                          mappings:
+                            - id:
+                                template: >-
+                                  e05e6c2eded05c420c6a9afc4d50678fd1efac996f65a46a68b034074fee69cd@group.calendar.google.com
+                            - text:
+                                template: '{{$Trigger.TITLE}} --- disucssion'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Slack Send message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - OBJECT_ID:
+                              template: C0436FB797X
+                          - OBJECT_NAME:
+                              template: channel
+                          - text:
+                              template: '{{$Trigger.TITLE}} is complete'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: >-
+    Create a quick event in Google Calendar when a new task is created in
+    Insightly
+models: {}
