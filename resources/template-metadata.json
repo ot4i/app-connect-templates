@@ -3805,6 +3805,24 @@
    "targetApps": ["azureservicebus", "azurecosmosdb"],
    "tags": ["azureservicebus", "JSON parse", "log", "azurecosmosdb"],
    "offerings": ["app connect professional"]
- }    
+ },
+ {
+   "name": "Trigger an IBM Aspera transfer upon receiving transfer approval from Microsoft Exchange",
+   "description": "Use this template to trigger an IBM Aspera transfer upon receiving transfer approval from Microsoft Exchange.",
+   "summary": "1 flow using 3 applications",
+   "sourceApp": "api",
+   "targetApps": ["box", "amazons3", "ibmaspera"],
+   "tags": ["box", "ibmaspera", "amazons3"],
+   "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Retrieve a file from Box upload its contents to Amazon S3 and trigger a transfer in IBM Aspera",
+   "description": "Use this template to retrieve a file from Box upload its contents to Amazon S3 and trigger a transfer in IBM Aspera.",
+   "summary": "msexchange to 2 applications",
+   "sourceApp": "msexchange",
+   "targetApps": ["ibmaspera", "gmail"],
+   "tags": ["msexchange", "ibmaspera", "gmail", "JSON parse", "if"],
+   "offerings": ["app connect professional"]
+ }       
 ]
 }
