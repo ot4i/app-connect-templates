@@ -3807,8 +3807,8 @@
    "offerings": ["app connect professional"]
  },
  {
-   "name": "Trigger an IBM Aspera transfer upon receiving transfer approval from Microsoft Exchange",
-   "description": "Use this template to trigger an IBM Aspera transfer upon receiving transfer approval from Microsoft Exchange.",
+   "name": "Upload Box file to Amazon S3 and transfer it to a target application through IBM Aspera",
+   "description": "Use this template to upload Box file to Amazon S3 and transfer it to a target application through IBM Aspera.",
    "summary": "1 flow using 3 applications",
    "sourceApp": "api",
    "targetApps": ["box", "amazons3", "ibmaspera"],
@@ -3816,8 +3816,8 @@
    "offerings": ["app connect professional"]
  },
  {
-   "name": "Retrieve a file from Box upload its contents to Amazon S3 and trigger a transfer in IBM Aspera",
-   "description": "Use this template to retrieve a file from Box upload its contents to Amazon S3 and trigger a transfer in IBM Aspera.",
+   "name": "Transfer file through IBM Aspera and send transfer status in Gmail when an approval email is received in MS Exchange",
+   "description": "Use this template to transfer file through IBM Aspera and send transfer status in Gmail when an approval email is received in MS Exchange.",
    "summary": "msexchange to 2 applications",
    "sourceApp": "msexchange",
    "targetApps": ["ibmaspera", "gmail"],
