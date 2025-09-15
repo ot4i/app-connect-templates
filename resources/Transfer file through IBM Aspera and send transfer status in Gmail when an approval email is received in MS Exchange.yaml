@@ -86,7 +86,7 @@ integration:
           - if:
               branch:
                 - condition:
-                    '{{$Trigger.subject}}': Aspera file transfer approved
+                    '{{$Trigger.subject}}': IBM Aspera file transfer approved
                   execute:
                     - parse:
                         parse-format: json
@@ -203,17 +203,16 @@ integration:
                         map:
                           mappings:
                             - CC:
-                                template: sarkar.arjun@ibm.com
+                                template: example@gmail.com
                             - Subject:
-                                template: Aspera file transfer initiated!
+                                template: IBM Aspera file transfer initiated!
                             - To:
-                                template: karthika.k.s1@ibm.com
+                                template: example@gmail.com
                             - richTextBody:
                                 mappings:
                                   - content:
                                       template: >-
-                                        Hey, Check your status of aspera file
-                                        tranfer here...Transfer status is
+                                        Hello, you can check the status of the IBM Aspera file transfer here. The transfer status is:
                                         {{$IBMAsperaGetinformationaboutaspecifictransfer.status}}
                                         Transfer id ->
                                         {{$IBMAsperaStartanewtransfer.id}}
@@ -249,5 +248,5 @@ integration:
                   $ref: '#/block/For each/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Trigger an IBM Aspera transfer upon receiving transfer approval from Microsoft Exchange
+  name: Transfer file through IBM Aspera and send transfer status in Gmail when an approval email is received in MS Exchange
 models: {}
