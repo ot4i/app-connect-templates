@@ -224,7 +224,7 @@ integration:
                       $ref: '#/flowDetails'
                     - variable: Request
                       $ref: '#/trigger/payload'
-  name: Upload Box file to Amazon S3 and transfer it to a target application through IBM Aspera
+  name: Upload a Box file to Amazon S3 and transfer it to a target application through IBM Aspera
 models:
   transfer:
     name: transfer
