@@ -248,5 +248,5 @@ integration:
                   $ref: '#/block/For each/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Transfer file through IBM Aspera and send transfer status in Gmail when an approval email is received in MS Exchange
+  name: Transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange
 models: {}
