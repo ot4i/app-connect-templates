@@ -79,7 +79,7 @@ integration:
               name: For each
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
-              display-name: MS exchange emails
+              display-name: Microsoft Exchange email
     assembly-2:
       assembly:
         execute:
