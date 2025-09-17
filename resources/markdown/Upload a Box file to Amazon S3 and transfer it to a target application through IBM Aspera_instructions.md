@@ -1,6 +1,6 @@
 To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Upload%20a%20Box%20file%20to%20Amazon%20S3%20and%20transfer%20it%20to%20a%20target%20application%20through%20IBM%20Aspera_instructions.md) (opens in a new window).
 
-This flow uploads a Box file to Amazon S3 and transfer it to a target application through IBM Aspera
+This flow uploads a Box file to Amazon S3 and transfer it to a target application through IBM Aspera.
 ## Using the template
 
 1. Click **Use this template** to start using the template.
