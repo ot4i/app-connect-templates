@@ -3807,8 +3807,8 @@
    "offerings": ["app connect professional"]
  },
  {
-   "name": "Upload Box file to Amazon S3 and transfer it to a target application through IBM Aspera",
-   "description": "Use this template to upload Box file to Amazon S3 and transfer it to a target application through IBM Aspera.",
+   "name": "Upload a Box file to Amazon S3 and transfer it to a target application through IBM Aspera",
+   "description": "Use this template to upload a Box file to Amazon S3 and transfer it to a target application through IBM Aspera.",
    "summary": "1 flow using 3 applications",
    "sourceApp": "api",
    "targetApps": ["box", "amazons3", "ibmaspera"],
@@ -3826,3 +3826,4 @@
  }       
 ]
 }
+
