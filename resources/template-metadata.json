@@ -3816,9 +3816,9 @@
    "offerings": ["app connect professional"]
  },
  {
-   "name": "Transfer file through IBM Aspera and send transfer status in Gmail when an approval email is received in MS Exchange",
-   "description": "Use this template to transfer file through IBM Aspera and send transfer status in Gmail when an approval email is received in MS Exchange.",
-   "summary": "msexchange to 2 applications",
+   "name": "Transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange",
+   "description": "Use this template to transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange.",
+   "summary": "Microsoft Exchange to 2 applications",
    "sourceApp": "msexchange",
    "targetApps": ["ibmaspera", "gmail"],
    "tags": ["msexchange", "ibmaspera", "gmail", "JSON parse", "if"],
@@ -3826,4 +3826,5 @@
  }       
 ]
 }
+
 
