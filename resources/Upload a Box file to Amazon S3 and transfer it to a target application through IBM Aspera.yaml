@@ -1,0 +1,255 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createTransfer:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createTransfer
+          output-context:
+            data: createTransfer
+      options:
+        resources:
+          - business-object: transfer
+            triggers:
+              create: createTransfer
+            model:
+              $ref: '#/models/transfer'
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        DOWNLOADFILE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/File/operations/DOWNLOADFILE
+          action: custom
+    action-interface-2:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/bucket/{bucketName}/object
+          action: create
+    action-interface-5:
+      type: api-action
+      business-object: Transfers
+      connector-type: ibmaspera
+      actions:
+        postOpsTransfers: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Transfers/operations/postOpsTransfers
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: Transfers
+      connector-type: ibmaspera
+      actions:
+        getOpsTransfersByTransferId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Transfers/operations/getOpsTransfersByTransferId
+          action: retrieve
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Box Retrieve file content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - fileType:
+                      template: Text
+                  - id:
+                      template: '{{$Request.id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - ContentType:
+                      template: text/plain
+                  - Key:
+                      template: folder1/{{$Request.source}}
+                  - bucketName:
+                      template: act-aspera-bucket-dnd
+                  - content:
+                      template: '{{$BoxRetrievefilecontent.content}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - custom-action:
+              name: IBM Aspera Create transfer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              action: postOpsTransfers
+              map:
+                mappings:
+                  - direction:
+                      template: send
+                  - paths:
+                      foreach:
+                        input: '[{}]'
+                        iterator: pathsItem
+                        mappings:
+                          - destination:
+                              template: '{{$Request.destination}}'
+                          - source:
+                              template: '{{$Request.source}}'
+                  - remote_host:
+                      template: '{{$Request.remote_host}}'
+                  - token:
+                      template: '{{$Request.token}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: AmazonS3Createobject
+                    $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - custom-action:
+              name: IBM Aspera Retrieve transfer information by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: getOpsTransfersByTransferId
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: AmazonS3Createobject
+                    $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                  - variable: IBMAsperaCreatetransfer
+                    $ref: '#/node-output/IBM Aspera Create transfer/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings: []
+              filter:
+                where:
+                  id: '{{$IBMAsperaCreatetransfer.id}}'
+                input:
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: AmazonS3Createobject
+                    $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                  - variable: IBMAsperaCreatetransfer
+                    $ref: '#/node-output/IBM Aspera Create transfer/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - response:
+              name: response
+              reply-maps:
+                - title: transfer successfully created
+                  status-code: '200'
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: BoxRetrievefilecontent
+                        $ref: >-
+                          #/node-output/Box Retrieve file
+                          content/response/payload
+                      - variable: AmazonS3Createobject
+                        $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                      - variable: IBMAsperaStartanewtransfer
+                        $ref: >-
+                          #/node-output/IBM Aspera Start a new
+                          transfer/response/payload
+                      - variable: IBMAsperaGetinformationaboutaspecifictransfer
+                        $ref: >-
+                          #/node-output/IBM Aspera Get information about a
+                          specific transfer/response/payload
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - id:
+                          template: >-
+                            Transfer of file {{$Request.id}} is
+                            {{$IBMAsperaGetinformationaboutaspecifictransfer.status}}.Transfer
+                            {{$Request.id}} for the transfer is
+                            {{$IBMAsperaGetinformationaboutaspecifictransfer.id}}
+                  input:
+                    - variable: BoxRetrievefilecontent
+                      $ref: '#/node-output/Box Retrieve file content/response/payload'
+                    - variable: AmazonS3Createobject
+                      $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                    - variable: IBMAsperaStartanewtransfer
+                      $ref: >-
+                        #/node-output/IBM Aspera Start a new
+                        transfer/response/payload
+                    - variable: IBMAsperaGetinformationaboutaspecifictransfer
+                      $ref: >-
+                        #/node-output/IBM Aspera Get information about a
+                        specific transfer/response/payload
+                    - variable: flowDetails
+                      $ref: '#/flowDetails'
+                    - variable: Request
+                      $ref: '#/trigger/payload'
+  name: Upload a Box file to Amazon S3 and transfer it to a target application through IBM Aspera
+models:
+  transfer:
+    name: transfer
+    plural: transfer
+    properties:
+      source:
+        required: false
+        id: false
+        type: string
+      destination:
+        required: false
+        id: false
+        type: string
+      remote_host:
+        required: false
+        id: false
+        type: string
+      token:
+        required: false
+        id: false
+        type: string
+      id:
+        required: false
+        id: true
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''

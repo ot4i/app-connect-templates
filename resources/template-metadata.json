@@ -3805,6 +3805,24 @@
    "targetApps": ["azureservicebus", "azurecosmosdb"],
    "tags": ["azureservicebus", "JSON parse", "log", "azurecosmosdb"],
    "offerings": ["app connect professional"]
- }    
+ },
+ {
+   "name": "Upload a Box file to Amazon S3 and transfer it to a target application through IBM Aspera",
+   "description": "Use this template to upload a Box file to Amazon S3 and transfer it to a target application through IBM Aspera.",
+   "summary": "1 flow using 3 applications",
+   "sourceApp": "api",
+   "targetApps": ["box", "amazons3", "ibmaspera"],
+   "tags": ["box", "ibmaspera", "amazons3"],
+   "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange",
+   "description": "Use this template to transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange.",
+   "summary": "Microsoft Exchange to 2 applications",
+   "sourceApp": "msexchange",
+   "targetApps": ["ibmaspera", "gmail"],
+   "tags": ["msexchange", "ibmaspera", "gmail", "JSON parser", "if"],
+   "offerings": ["app connect professional"]
+ }       
 ]
 }
