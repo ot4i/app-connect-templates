@@ -3821,10 +3821,11 @@
    "summary": "Microsoft Exchange to 2 applications",
    "sourceApp": "msexchange",
    "targetApps": ["ibmaspera", "gmail"],
-   "tags": ["msexchange", "ibmaspera", "gmail", "JSON parse", "if"],
+   "tags": ["msexchange", "ibmaspera", "gmail", "JSON parser", "if"],
    "offerings": ["app connect professional"]
  }       
 ]
 }
+
 
 
