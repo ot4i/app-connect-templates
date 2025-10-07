@@ -1,0 +1,252 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: msexchange
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Messages
+          options:
+            parentFolderId: >-
+              AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwAuAAAAAACA6ugh45R4QKPbS5lwvph5AQD4gXnEhMN7Tr04V9vM_2_9AATiMD3jAAA=
+            parentFilter:
+              parentFolderId: >-
+                AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwAuAAAAAACA6ugh45R4QKPbS5lwvph5AQD4gXnEhMN7Tr04V9vM_2_9AATiMD3jAAA=
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/MailFolders/{parentFolderId}/Messages/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-1:
+      type: api-action
+      business-object: Transfers
+      connector-type: ibmaspera
+      actions:
+        postOpsTransfers: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Transfers/operations/postOpsTransfers
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Transfers
+      connector-type: ibmaspera
+      actions:
+        getOpsTransfersByTransferId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Transfers/operations/getOpsTransfersByTransferId
+          action: retrieve
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '[$Trigger.bodyPreview ]'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: MS exchange emails
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Trigger.subject}}': IBM Aspera file transfer approved
+                  execute:
+                    - parse:
+                        parse-format: json
+                        source:
+                          template: '{{$Foreachitem}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        sample-data: |-
+                          {
+                            "source": "folder2/File_1234",
+                            "destination": "/folder1/usecase1.40",
+                            "remote_host": "ats-aws-us-east-1.aspera.io",
+                            "token": "Basic WjhBbU0wUWVhTVVPYkdHT0NFa3NwdXJoOmJDeWhWdGhoX2NfYjhWVnhiRkY="
+                          }
+                        output-schema:
+                          $schema: http://json-schema.org/draft-04/schema#
+                          type: object
+                          properties:
+                            source:
+                              type: string
+                            destination:
+                              type: string
+                            remote_host:
+                              type: string
+                            token:
+                              type: string
+                          title: Parsed JSON
+                        name: JSON Parser Parse
+                    - custom-action:
+                        name: IBM Aspera Create transfer
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: postOpsTransfers
+                        map:
+                          mappings:
+                            - direction:
+                                template: send
+                            - paths:
+                                foreach:
+                                  input: '[{}]'
+                                  iterator: pathsItem
+                                  mappings:
+                                    - destination:
+                                        template: '{{$JSONParserParse.destination}}'
+                                    - source:
+                                        template: '{{$JSONParserParse.source}}'
+                            - remote_host:
+                                template: '{{$JSONParserParse.remote_host}}'
+                            - token:
+                                template: '{{$JSONParserParse.token}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JSONParserParse
+                              $ref: >-
+                                #/block/If/node-output/JSON Parser
+                                Parse/response/payload
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter: {}
+                    - custom-action:
+                        name: IBM Aspera Retrieve transfer information by ID
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: getOpsTransfersByTransferId
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JSONParserParse
+                              $ref: >-
+                                #/block/If/node-output/JSON Parser
+                                Parse/response/payload
+                            - variable: IBMAsperaCreatetransfer
+                              $ref: >-
+                                #/block/If/node-output/IBM Aspera Create
+                                transfer/response/payload
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          mappings: []
+                        filter:
+                          where:
+                            id: '{{$IBMAsperaCreatetransfer.id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JSONParserParse
+                              $ref: >-
+                                #/block/If/node-output/JSON Parser
+                                Parse/response/payload
+                            - variable: IBMAsperaCreatetransfer
+                              $ref: >-
+                                #/block/If/node-output/IBM Aspera Create
+                                transfer/response/payload
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - CC:
+                                template: example@gmail.com
+                            - Subject:
+                                template: IBM Aspera file transfer initiated!
+                            - To:
+                                template: example@gmail.com
+                            - richTextBody:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Hello, you can check the status of the IBM Aspera file transfer here. The transfer status is:
+                                        {{$IBMAsperaGetinformationaboutaspecifictransfer.status}}
+                                        Transfer id ->
+                                        {{$IBMAsperaStartanewtransfer.id}}
+                                  - contentType:
+                                      template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: JSONParserParse
+                              $ref: >-
+                                #/block/If/node-output/JSON Parser
+                                Parse/response/payload
+                            - variable: IBMAsperaCreatetransfer
+                              $ref: >-
+                                #/block/If/node-output/IBM Aspera Create
+                                transfer/response/payload
+                            - variable: IBMAsperaRetrievetransferinformationbyID
+                              $ref: >-
+                                #/block/If/node-output/IBM Aspera Retrieve
+                                transfer information by ID/response/payload
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+  name: Transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange
+models: {}
