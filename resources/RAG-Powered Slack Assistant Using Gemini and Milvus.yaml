@@ -1,0 +1,192 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: slack
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: RawMessage
+          options:
+            webhookURLSuffix: uU4G8iFpR0iShb_KMOFOF0fRhRbK6azsvxMP7lSR3NAopK2rEQ6jJQEyqA0HfheE
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/RawMessage/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/{OBJECT_NAME}/{OBJECT_ID}/message
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Text embeddings
+      connector-type: googlegemini
+      actions:
+        postEmbedContent: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20embeddings/operations/postEmbedContent
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: Vectors
+      connector-type: milvus
+      actions:
+        searchVector: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Databases/{dbName}/Collections/{collectionName}/Vectors/operations/searchVector
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: Text generation
+      connector-type: googlegemini
+      actions:
+        postGenerateTextByModelId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20generation/operations/postGenerateTextByModelId
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Google Gemini Generate embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postEmbedContent
+              map:
+                mappings:
+                  - content:
+                      mappings:
+                        - parts:
+                            foreach:
+                              input: '[{}]'
+                              iterator: partsItem
+                              mappings:
+                                - text:
+                                    template: '{{$Trigger.messageBody}} '
+                  - modelId:
+                      template: models/embedding-001
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Milvus Search vector
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: searchVector
+              map:
+                mappings:
+                  - annsField:
+                      template: vector
+                  - collectionName:
+                      template: sf
+                  - data:
+                      expression: '[[$GoogleGeminiGenerateembeddings.embedding.values ]]'
+                  - dbName:
+                      template: default
+                  - outputFields:
+                      expression: '["data"]'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGeminiGenerateembeddings
+                    $ref: >-
+                      #/node-output/Google Gemini Generate
+                      embeddings/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - collectionName: sf
+                    - dbName: default
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGeminiGenerateembeddings
+                    $ref: >-
+                      #/node-output/Google Gemini Generate
+                      embeddings/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Google Gemini Generate text with Gemini model
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: postGenerateTextByModelId
+              map:
+                mappings:
+                  - modelId:
+                      template: models/gemini-1.5-pro
+                  - text:
+                      template: >-
+                        Based on the give context
+                        {{$join($MilvusSearchvector.data.data, "\n")}}. Please
+                        answer this question: {{$Trigger.messageBody}} 
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGeminiGenerateembeddings
+                    $ref: >-
+                      #/node-output/Google Gemini Generate
+                      embeddings/response/payload
+                  - variable: MilvusSearchvector
+                    $ref: '#/node-output/Milvus Search vector/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C099ZTD3Q76
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: ' {{$Trigger.messageBody}} : \n {{$GoogleGeminiGeneratetextwithGeminimodel.candidates.content.parts.text}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleGeminiGenerateembeddings
+                    $ref: >-
+                      #/node-output/Google Gemini Generate
+                      embeddings/response/payload
+                  - variable: MilvusSearchvector
+                    $ref: '#/node-output/Milvus Search vector/response/payload'
+                  - variable: GoogleGeminiGeneratetextwithGeminimodel
+                    $ref: >-
+                      #/node-output/Google Gemini Generate text with Gemini
+                      model/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: RAG-Powered Slack Assistant Using Gemini and Milvus
+models: {}
