@@ -3832,7 +3832,17 @@
    "targetApps": ["slack", "googlegemini", "milvus"],
    "tags": ["slack", "googlegemini", "milvus"],
    "offerings": ["app connect professional"]
- }       
+ },
+ {
+   "name": "Daily Meeting Summary Generator Using Google Gemini and Email Notifications",
+   "description": "Use this template for getting daily mails summarizing your meeting transcripts stored in Google Drive.",
+    "summary": "Scheduler to 3 applications",
+    "sourceApp": "streaming-connector-scheduler",
+   "targetApps": ["streaming-connector-scheduler", "googlegemini", "googledrive", "mail"],
+   "tags": ["streaming-connector-scheduler", "googlegemini", "googledrive", "mail"],
+   "offerings": ["app connect professional"]
+ }         
 ]
 }
+
 
