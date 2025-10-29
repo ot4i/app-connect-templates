@@ -9,7 +9,7 @@ Use this template to automatically receive a daily email summarizing your meetin
 1. Connect to your [Google Drive](https://www.ibm.com/docs/en/app-connect/cd?topic=apps-google-drive).
 1. On the Google Drive "Retrieve folder items" node, give the __folder id__ for __parent folder__ where you store meeting transcripts daily.
 1. Click on the **Google Gemini** node, and if you're not already connected, connect to your [Google Gemini account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-google-gemini).
-1. Click on the **Email** node, and if you're not already connected, connect to your [Google Gemini account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-google-gemini).
+1. Click on the **Email** node, and if you're not already connected, connect to your [Email](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-email).
 1. On the Email "Send Email" node, give your __email__ for __To__ field
 1. Click **Done**.
 1. To start the flow, in the banner click **Start flow**.
