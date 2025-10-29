@@ -1,0 +1,333 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 11 * * *
+                  runOnceOncheck: false
+                  timeZone: UTC
+                  every: day
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: folderitem
+      connector-type: googledrive
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/folderitem
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: Files
+      connector-type: googledrive
+      actions:
+        DOWNLOADCONTENT: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Files/operations/DOWNLOADCONTENT
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: Transcript analysis
+      connector-type: googlegemini
+      actions:
+        postTranscriptAnalysisByModelId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Transcript%20analysis/operations/postTranscriptAnalysisByModelId
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: email
+      actions:
+        CREATEEMAIL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail/operations/CREATEEMAIL
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Google Drive Retrieve folder items
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: false
+              filter:
+                where:
+                  parent: xxxxx
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 20
+              allow-truncation: true
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      allTranscripts:
+                        type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleDriveRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve folder
+                      items/response/payload
+                  - variable: GoogleDriveRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Google Drive Retrieve folder items/response'
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - allTranscripts:
+                            template: '{{$Setvariable.variable.meetingTranscripts}}'
+              source:
+                expression: '$GoogleDriveRetrievefolderitems '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleDriveRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve folder
+                      items/response/payload
+                  - variable: GoogleDriveRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Google Drive Retrieve folder items/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: Google Drive folderitem
+          - custom-action:
+              name: Google Gemini Generate transcript summary
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postTranscriptAnalysisByModelId
+              map:
+                mappings:
+                  - modelId:
+                      template: models/gemini-2.5-pro
+                  - prompt:
+                      template: >-
+                        Please summarize the following Teams meeting transcript.
+                        Focus on key updates, action items and to whom the
+                        action items are assigned to, and any identified
+                        blockers or delays. and give me in a formatted HTML that
+                        should look good in mails. Dont say anything just the
+                        HTML content only, i should just link the data to that
+                        email api, and email should sent in very good formatted
+                        mail
+                  - transcript:
+                      template: '{{$join($Foreach.output.allTranscripts, "AND")}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleDriveRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve folder
+                      items/response/payload
+                  - variable: GoogleDriveRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Google Drive Retrieve folder items/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Email Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: CREATEEMAIL
+              map:
+                mappings:
+                  - attachmentForCreate:
+                      foreach:
+                        input: '[{}]'
+                        iterator: attachmentForCreateItem
+                        mappings:
+                          - contentType:
+                              template: text/html
+                  - emailBody:
+                      template: >-
+                        {{$join($GoogleGeminiGeneratetranscriptsummary.candidates.content.parts.text,
+                        "\n\n")}}
+                  - toFilter:
+                      template: Mokshagna.Ram.Teja.Vemula@ibm.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleDriveRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve folder
+                      items/response/payload
+                  - variable: GoogleDriveRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Google Drive Retrieve folder items/response'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: GoogleGeminiGeneratetranscriptsummary
+                    $ref: >-
+                      #/node-output/Google Gemini Generate transcript
+                      summary/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Foreachitem.createdTime}}':
+                      gt: '{{$Trigger.lastEventTime}}'
+                  execute:
+                    - custom-action:
+                        name: Google Drive Download file
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: DOWNLOADCONTENT
+                        map:
+                          mappings:
+                            - id:
+                                template: '{{$Foreachitem.id}}'
+                            - type:
+                                template: Text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: GoogleDriveRetrievefolderitems
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve folder
+                                items/response/payload
+                            - variable: GoogleDriveRetrievefolderitemsMetadata
+                              $ref: >-
+                                #/node-output/Google Drive Retrieve folder
+                                items/response
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter: {}
+                  map:
+                    mappings:
+                      - FileContent:
+                          template: '{{$GoogleDriveDownloadfile.content}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Trigger
+                        $ref: '#/trigger/payload'
+                      - variable: GoogleDriveRetrievefolderitems
+                        $ref: >-
+                          #/node-output/Google Drive Retrieve folder
+                          items/response/payload
+                      - variable: GoogleDriveRetrievefolderitemsMetadata
+                        $ref: >-
+                          #/node-output/Google Drive Retrieve folder
+                          items/response
+                      - variable: Foreachitem
+                        $ref: '#/block/For each/current-item'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: GoogleDriveDownloadfile
+                        $ref: >-
+                          #/block/If/node-output/Google Drive Download
+                          file/response/payload
+                      - variable: Setvariable2
+                        $ref: >-
+                          #/block/For each/node-output/Set variable
+                          2/response/payload
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: GoogleDriveRetrievefolderitems
+                  $ref: >-
+                    #/node-output/Google Drive Retrieve folder
+                    items/response/payload
+                - variable: GoogleDriveRetrievefolderitemsMetadata
+                  $ref: '#/node-output/Google Drive Retrieve folder items/response'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              output-schema:
+                type: object
+                properties:
+                  FileContent:
+                    type: string
+                required:
+                  - FileContent
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleDriveRetrievefolderitems
+                    $ref: >-
+                      #/node-output/Google Drive Retrieve folder
+                      items/response/payload
+                  - variable: GoogleDriveRetrievefolderitemsMetadata
+                    $ref: '#/node-output/Google Drive Retrieve folder items/response'
+                  - variable: If
+                    $ref: '#/block/For each/node-output/If/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      meetingTranscripts:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - meetingTranscripts:
+                            template: '{{$Foreachitem.id}} : {{$If.FileContent}}'
+              name: Set variable
+  name: Daily Meeting Summary Generator Using Google Gemini and Email Notifications
+models: {}
