@@ -1,0 +1,129 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: shopify
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: order
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/order/operations/CREATED_POLLER/subscribe
+              action: created_poller
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: publishMessageToTopic
+      connector-type: apachepulsar
+      account-name: Account 1
+      actions:
+        putMessage: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: put
+          path: >-
+            resources/namespace/{namespace}/topic/{topic}/publishMessageToTopic/operations/putMessage
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      order:
+                        type: object
+                        properties:
+                          channel:
+                            type: string
+                          customer_name:
+                            type: string
+                          customer_email:
+                            type: string
+                          line_items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                title:
+                                  type: string
+                                quantity:
+                                  type: number
+                                price:
+                                  type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - order:
+                            mappings:
+                              - channel:
+                                  template: Shopify
+                              - customer_email:
+                                  template: '{{$Trigger.customer.email}}'
+                              - customer_name:
+                                  template: '{{$Trigger.customer.first_name}}'
+                              - line_items:
+                                  foreach:
+                                    input: '$Trigger.line_items '
+                                    iterator: line_itemsItem
+                                    mappings:
+                                      - price:
+                                          template: '{{$line_itemsItem.price}} '
+                                      - quantity:
+                                          expression: '$line_itemsItem.quantity '
+                                      - title:
+                                          template: '{{$line_itemsItem.title}}'
+              name: Set variable
+          - custom-action:
+              name: Apache Pulsar Publish message to topic
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: putMessage
+              map:
+                mappings:
+                  - message:
+                      template: '{{$Setvariable.variable.order}}'
+                  - namespace:
+                      template: default
+                  - topic:
+                      template: order-created
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - namespace: default
+                    - topic: order-created
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Publish an order message to an Apache Pulsar topic when a new order is
+    created in Shopify
+models: {}
