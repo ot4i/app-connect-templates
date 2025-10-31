@@ -147,13 +147,13 @@ integration:
                       template: models/gemini-2.5-pro
                   - prompt:
                       template: >-
-                        Please summarize the following Teams meeting transcript.
+                        Please summarize the following Microsoft Teams meeting transcript.
                         Focus on key updates, action items and to whom the
                         action items are assigned to, and any identified
-                        blockers or delays. and give me in a formatted HTML that
-                        should look good in mails. Dont say anything just the
-                        HTML content only, i should just link the data to that
-                        email api, and email should sent in very good formatted
+                        blockers or delays. Provide it to me in a formatted HTML that
+                        should look good in emails. Don't mention anything else, just the
+                        HTML content only, it should just link the data to that
+                        email API, and email should sent in very good formatted
                         mail
                   - transcript:
                       template: '{{$join($Foreach.output.allTranscripts, "AND")}}'
