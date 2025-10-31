@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/RAG-powered%20Slack%20knowledge%20assistant%20using%20Google%20Gemini%20and%20Milvus.yaml_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/RAG-powered%20Slack%20knowledge%20assistant%20using%20Google%20Gemini%20and%20Milvus_instructions.md) (opens in a new window).
 
 
 When the flow is running, In Slack, when we post a question using the custom slash command you've defined, Google Gemini uses this question to generate embeddings. These embeddings are used by Milvus to do a query for the context related to the question. The context that we got from Milvus can be used as a prompt to Google Gemini to get answers to the question.
