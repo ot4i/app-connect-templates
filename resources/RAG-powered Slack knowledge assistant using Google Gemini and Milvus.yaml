@@ -188,5 +188,5 @@ integration:
                       model/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: RAG-powered Slack knowledge assistant using Google Gemini and Milvus.yaml
+  name: RAG-powered Slack knowledge assistant using Google Gemini and Milvus
 models: {}
