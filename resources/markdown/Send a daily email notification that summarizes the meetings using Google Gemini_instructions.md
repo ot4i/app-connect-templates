@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/Daily%20Meeting%20Summary%20Generator%20Using%20Google%20Gemini%20and%20Email%20Notifications.yaml) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/Send%20a%20daily%20email%20notification%20that%20summarizes%20the%20meetings%20using%20Google%20Gemini.yaml) (opens in a new window).
 
 
 Use this template to automatically receive a daily email summarizing your meeting transcripts stored in Google Drive. The workflow is powered by a scheduler that runs every day, downloads the latest transcripts from Google Drive, processes them through Google Gemini to generate concise summaries, and then sends the summarized meeting notes directly to your inbox. This integration helps you stay up to date with meeting insights without manually reviewing transcripts.
