@@ -1,0 +1,107 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: apachepulsar
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: subscribeForMessage
+          options:
+            namespace: default
+            topic: order-created
+            subscription:
+              subscriptionType: Exclusive
+            parentFilter:
+              namespace: default
+              topic: order-created
+              subscription: order-subscription
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/namespace/{namespace}/topic/{topic}/subscription/{subscription}/subscribeForMessage/operations/CREATED/subscribe
+              action: created
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+      account-name: Account 1
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - parse:
+              parse-format: json
+              source:
+                template: '{{$Trigger.message}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: "{\n    \"channel\": \"Shopify\",\n    \"customer_email\": \"email@example.com\",\n    \"customer_name\": \"Customer name\",\n    \"line_items\": [\n        {\n            \"price\": \"350.00\",\n            \"title\": \"Laptop\",\n          \t\"quantity\": 1\n        }\n    ]\n}"
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  channel:
+                    type: string
+                  customer_email:
+                    type: string
+                  customer_name:
+                    type: string
+                  line_items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        price:
+                          type: string
+                        title:
+                          type: string
+                        quantity:
+                          type: number
+                title: Parsed JSON
+              name: JSON Parser Parse
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Subject:
+                      template: Order Placed Successfully
+                  - To:
+                      template: '{{$JSONParserParse.customer_email}}'
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: >-
+                              Hello {{$JSONParserParse.customer_name}}, Your
+                              order for {{$JSONParserParse.line_items[0].title}}
+                              is placed successfully.
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Send an email notification to the customer when an order message is received
+models: {}
