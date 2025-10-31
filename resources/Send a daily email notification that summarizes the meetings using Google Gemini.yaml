@@ -329,5 +329,5 @@ integration:
                         - meetingTranscripts:
                             template: '{{$Foreachitem.id}} : {{$If.FileContent}}'
               name: Set variable
-  name: Daily Meeting Summary Generator Using Google Gemini and Email Notifications
+  name: Send a daily email notification that summarizes the meetings using Google Gemini
 models: {}
