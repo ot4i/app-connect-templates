@@ -16,13 +16,11 @@ integration:
               httpMethod: post
               path: resources/order/operations/CREATED_POLLER/subscribe
               action: created_poller
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: publishMessageToTopic
       connector-type: apachepulsar
-      account-name: Account 1
       actions:
         putMessage: {}
       options:
