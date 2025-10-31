@@ -25,7 +25,6 @@ integration:
               path: >-
                 resources/namespace/{namespace}/topic/{topic}/subscription/{subscription}/subscribeForMessage/operations/CREATED/subscribe
               action: created
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -38,7 +37,6 @@ integration:
           httpMethod: post
           path: resources/mail
           action: create
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
