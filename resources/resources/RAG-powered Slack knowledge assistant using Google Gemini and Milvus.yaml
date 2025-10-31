@@ -144,7 +144,7 @@ integration:
                       template: models/gemini-1.5-pro
                   - text:
                       template: >-
-                        Based on the give context
+                        Based on the given context
                         {{$join($MilvusSearchvector.data.data, "\n")}}. Please
                         answer this question: {{$Trigger.messageBody}} 
                 $map: http://ibm.com/appconnect/map/v1
@@ -188,5 +188,5 @@ integration:
                       model/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: RAG-Powered Slack Assistant Using Gemini and Milvus
+  name: RAG-powered Slack knowledge assistant using Google Gemini and Milvus.yaml
 models: {}
