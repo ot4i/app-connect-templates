@@ -3823,6 +3823,25 @@
    "targetApps": ["ibmaspera", "gmail"],
    "tags": ["msexchange", "ibmaspera", "gmail", "JSON parser", "if"],
    "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Publish an order message to an Apache Pulsar topic when a new order is created in Shopify",
+   "description": "Use this template to Publish an order message to an Apache Pulsar topic when a new order is created in Shopify.",
+   "summary": "1 flow using 2 applications",
+   "sourceApp": "shopify",
+   "targetApps": ["apachepulsar"],
+   "tags": ["shopify", "apachepulsar"],
+   "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Send an email notification to the customer when an order message is received using Apache Pulsar",
+   "description": "Use this template to send an email notification to the customer when an order message is received using Apache Pulsar.",
+   "summary": "Apache Pulsar to 1 application",
+   "sourceApp": "apachepulsar",
+   "targetApps": ["gmail"],
+   "tags": ["gmail", "apachepulsar"],
+   "offerings": ["app connect professional"]
  }       
 ]
 }
+
