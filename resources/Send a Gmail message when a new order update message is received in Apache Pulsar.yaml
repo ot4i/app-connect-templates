@@ -90,7 +90,7 @@ integration:
                             template: >-
                               Hello {{$JSONParserParse.customer_name}}, Your
                               order for {{$JSONParserParse.line_items[0].title}}
-                              is placed successfully.
+                              has been placed successfully.
                         - contentType:
                             template: text/plain
                 $map: http://ibm.com/appconnect/map/v1
@@ -101,5 +101,5 @@ integration:
                     $ref: '#/node-output/JSON Parser Parse/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send an email notification to the customer when an order message is received
+  name: Send a Gmail message when a new order update message is received in Apache Pulsar
 models: {}
