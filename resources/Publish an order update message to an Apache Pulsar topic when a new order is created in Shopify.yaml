@@ -122,6 +122,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: >-
-    Publish an order message to an Apache Pulsar topic when a new order is
-    created in Shopify
+    Publish an order update message to an Apache Pulsar topic when a new order is created in Shopify
 models: {}
