@@ -1,4 +1,4 @@
-This template is the first step in the workflow and is followed by “Send a Gmail message when a new order update message is received in Apache Pulsar” template, which continues the process by sending email notifications for the order updates.
+This template is the first step in the workflow and is followed by “Send a Gmail message when a new order update message is received in Apache Pulsar” template, which continues the process by sending Gmail notifications for the order updates.
 
 To refer to these instructions while editing the flow, open [the Github page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Publish%20an%20order%20update%20message%20to%20an%20Apache%20Pulsar%20topic%20when%20a%20new%20order%20is%20created%20in%20Shopify_instructions.md) (opens in a new window).
 
