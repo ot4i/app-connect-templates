@@ -25,7 +25,6 @@ integration:
               path: >-
                 resources/namespace/{namespace}/topic/{topic}/subscription/{subscription}/subscribeForMessage/operations/CREATED/subscribe
               action: created
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -38,7 +37,6 @@ integration:
           httpMethod: post
           path: resources/mail
           action: create
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
@@ -92,7 +90,7 @@ integration:
                             template: >-
                               Hello {{$JSONParserParse.customer_name}}, Your
                               order for {{$JSONParserParse.line_items[0].title}}
-                              is placed successfully.
+                              has been placed successfully.
                         - contentType:
                             template: text/plain
                 $map: http://ibm.com/appconnect/map/v1
@@ -103,5 +101,5 @@ integration:
                     $ref: '#/node-output/JSON Parser Parse/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Send an email notification to the customer when an order message is received
+  name: Send a Gmail message when a new order update message is received in Apache Pulsar
 models: {}
