@@ -31,7 +31,6 @@ integration:
           httpMethod: get
           path: resources/Organization/{organizationID}/Event
           action: retrievewithwhere
-      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: request
@@ -43,7 +42,6 @@ integration:
           httpMethod: post
           path: resources/request/operations/INVOKE
           action: custom
-      account-name: Account 1
     action-interface-3:
       type: api-action
       business-object: Forecasts
@@ -55,7 +53,6 @@ integration:
           httpMethod: post
           path: resources/Forecasts/operations/RETRIEVEFORECAST
           action: custom
-      account-name: Account 1
     action-interface-4:
       type: api-action
       business-object: Event
@@ -67,7 +64,6 @@ integration:
           httpMethod: post
           path: resources/Event/operations/updateWithWhere
           action: updatewithwhere
-      account-name: Account 1
     action-interface-5:
       type: api-action
       business-object: message
@@ -79,7 +75,6 @@ integration:
           httpMethod: post
           path: resources/{OBJECT_NAME}/{OBJECT_ID}/message
           action: create
-      account-name: Account 1
     action-interface-6:
       type: api-action
       business-object: Event
@@ -88,7 +83,6 @@ integration:
         UPDATEALL: {}
       options:
         connectorServiceOptions: *ref_0
-      account-name: Account 1
     action-interface-7:
       type: api-action
       business-object: message
@@ -97,7 +91,6 @@ integration:
         CREATE: {}
       options:
         connectorServiceOptions: *ref_1
-      account-name: Account 1
     action-interface-8:
       type: api-action
       business-object: Event
@@ -106,7 +99,6 @@ integration:
         UPDATEALL: {}
       options:
         connectorServiceOptions: *ref_0
-      account-name: Account 1
     action-interface-9:
       type: api-action
       business-object: message
@@ -115,7 +107,6 @@ integration:
         CREATE: {}
       options:
         connectorServiceOptions: *ref_1
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
