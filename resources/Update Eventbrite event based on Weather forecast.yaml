@@ -26,54 +26,87 @@ integration:
       connector-type: eventbrite
       actions:
         RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Organization/{organizationID}/Event
+          action: retrievewithwhere
     action-interface-2:
       type: api-action
       business-object: request
       connector-type: http
       actions:
         INVOKE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/request/operations/INVOKE
+          action: custom
     action-interface-3:
       type: api-action
       business-object: Forecasts
       connector-type: ibmtwc
       actions:
         RETRIEVEFORECAST: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Forecasts/operations/RETRIEVEFORECAST
+          action: custom
     action-interface-4:
       type: api-action
       business-object: Event
       connector-type: eventbrite
       actions:
         UPDATEALL: {}
+      options:
+        connectorServiceOptions: &ref_0
+          httpMethod: post
+          path: resources/Event/operations/updateWithWhere
+          action: updatewithwhere
     action-interface-5:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
+      options:
+        connectorServiceOptions: &ref_1
+          httpMethod: post
+          path: resources/{OBJECT_NAME}/{OBJECT_ID}/message
+          action: create
     action-interface-6:
       type: api-action
       business-object: Event
       connector-type: eventbrite
       actions:
         UPDATEALL: {}
+      options:
+        connectorServiceOptions: *ref_0
     action-interface-7:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
+      options:
+        connectorServiceOptions: *ref_1
     action-interface-8:
       type: api-action
       business-object: Event
       connector-type: eventbrite
       actions:
         UPDATEALL: {}
+      options:
+        connectorServiceOptions: *ref_0
     action-interface-9:
       type: api-action
       business-object: message
       connector-type: slack
       actions:
         CREATE: {}
+      options:
+        connectorServiceOptions: *ref_1
   assemblies:
     assembly-1:
       assembly:
@@ -88,10 +121,10 @@ integration:
                     - id: '{{$api.event_id}}'
                     - organizationID: '196921718943'
                 input:
-                  - variable: api
-                    $ref: '#/trigger/api/parameters'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
                 limit: 1
               allow-truncation: true
               pagination-type: SKIP_LIMIT
@@ -120,22 +153,21 @@ integration:
                         https://www.eventbriteapi.com/v3/events/{{$api.event_id}}/?expand=venue
                 $map: http://ibm.com/appconnect/map/v1
                 input:
-                  - variable: api
-                    $ref: '#/trigger/api/parameters'
                   - variable: EventbriteRetrieveevents
                     $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
                   - variable: EventbriteRetrieveeventsMetadata
                     $ref: '#/node-output/Eventbrite Retrieve events/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              filter: {}
           - parse:
               name: JSON Parser Parse
               parse-format: json
               source:
-                template: '{{$HTTPInvokemethod.responseBody}}'
+                template: '{{$HTTPInvokemethod.responseBody}} '
                 input:
-                  - variable: api
-                    $ref: '#/trigger/api/parameters'
                   - variable: EventbriteRetrieveevents
                     $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
                   - variable: EventbriteRetrieveeventsMetadata
@@ -146,6 +178,8 @@ integration:
                     $ref: '#/node-output/HTTP Invoke method/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
               sample-data: >-
                 {"name":{"text":"Longshot POC Arrow launch
                 event","html":"Longshot POC Arrow launch
@@ -372,7 +406,7 @@ integration:
                 mappings:
                   - geocode:
                       template: >-
-                        {{$JSONParserParse.venue.latitude}},{{$JSONParserParse.venue.longitude}}
+                        {{$JSONParserParse.venue.address.latitude}},{{$JSONParserParse.venue.address.longitude}}
                   - language:
                       template: en-US
                   - productId:
@@ -383,8 +417,6 @@ integration:
                       template: s
                 $map: http://ibm.com/appconnect/map/v1
                 input:
-                  - variable: api
-                    $ref: '#/trigger/api/parameters'
                   - variable: EventbriteRetrieveevents
                     $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
                   - variable: EventbriteRetrieveeventsMetadata
@@ -397,6 +429,9 @@ integration:
                     $ref: '#/node-output/JSON Parser Parse/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
+              filter: {}
           - set-variable:
               name: Set variable
               map:
@@ -416,8 +451,6 @@ integration:
                       pm-gust-max:
                         type: number
                 input:
-                  - variable: api
-                    $ref: '#/trigger/api/parameters'
                   - variable: EventbriteRetrieveevents
                     $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
                   - variable: EventbriteRetrieveeventsMetadata
@@ -428,43 +461,43 @@ integration:
                     $ref: '#/node-output/HTTP Invoke method/response'
                   - variable: JSONParserParse
                     $ref: '#/node-output/JSON Parser Parse/response/payload'
-                  - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                  - variable: TheWeatherCompanyGetforecast
                     $ref: >-
                       #/node-output/The Weather Company Get
                       forecast/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
+                  - variable: api
+                    $ref: '#/trigger/api/parameters'
                 mappings:
                   - variable:
                       mappings:
                         - am-gust-max:
                             expression: >-
-                              $isNull($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_MORNING.max)
+                              $isNull($TheWeatherCompanyGetforecast.aggs[0].Gust.LOCAL_MORNING.max)
                               ?
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_MORNING.max
+                              $TheWeatherCompanyGetforecast.aggs[0].WindSpeed.LOCAL_MORNING.max
                               :
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_MORNING.max
+                              $TheWeatherCompanyGetforecast.aggs[0].Gust.LOCAL_MORNING.max
                         - am-precipitation-max:
                             expression: >-
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].PrecipAmount.LOCAL_MORNING.max 
+                              $TheWeatherCompanyGetforecast.aggs[0].PrecipAmount.LOCAL_MORNING.max 
                         - am-temperature-min:
                             expression: >-
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Temperature.LOCAL_MORNING.min 
+                              $TheWeatherCompanyGetforecast.aggs[0].Temperature.LOCAL_MORNING.min 
                         - am-windspeed-avg:
                             expression: >-
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_MORNING.avg 
+                              $TheWeatherCompanyGetforecast.aggs[0].WindSpeed.LOCAL_MORNING.avg 
                         - pm-gust-max:
                             expression: >-
-                              $isNull($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_EVENING.max)
+                              $isNull($TheWeatherCompanyGetforecast.aggs[0].Gust.LOCAL_EVENING.max)
                               ?
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.max
+                              $TheWeatherCompanyGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.max
                               :
-                              $IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Gust.LOCAL_EVENING.max
+                              $TheWeatherCompanyGetforecast.aggs[0].Gust.LOCAL_EVENING.max
           - if:
               name: If
               input:
-                - variable: api
-                  $ref: '#/trigger/api/parameters'
                 - variable: EventbriteRetrieveevents
                   $ref: '#/node-output/Eventbrite Retrieve events/response/payload'
                 - variable: EventbriteRetrieveeventsMetadata
@@ -475,7 +508,7 @@ integration:
                   $ref: '#/node-output/HTTP Invoke method/response'
                 - variable: JSONParserParse
                   $ref: '#/node-output/JSON Parser Parse/response/payload'
-                - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                - variable: TheWeatherCompanyGetforecast
                   $ref: >-
                     #/node-output/The Weather Company Get
                     forecast/response/payload
@@ -483,6 +516,8 @@ integration:
                   $ref: '#/node-output/Set variable/response/payload'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
+                - variable: api
+                  $ref: '#/trigger/api/parameters'
               branch:
                 - condition:
                     and:
@@ -505,8 +540,6 @@ integration:
                                 template: ' {{$substringBefore($EventbriteRetrieveevents.summary  , " UPDATE")}} UPDATE: Weather forecast is OK.  Event is to proceed.'
                           $map: http://ibm.com/appconnect/map/v1
                           input:
-                            - variable: api
-                              $ref: '#/trigger/api/parameters'
                             - variable: EventbriteRetrieveevents
                               $ref: >-
                                 #/node-output/Eventbrite Retrieve
@@ -523,13 +556,16 @@ integration:
                               $ref: '#/node-output/HTTP Invoke method/response'
                             - variable: JSONParserParse
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
-                            - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                            - variable: TheWeatherCompanyGetforecast
                               $ref: >-
-                                #/node-output/The Weather Company Get forecast/response/payload
+                                #/node-output/The Weather Company Get
+                                forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
                               $ref: '#/flowDetails'
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
                         filter:
                           where:
                             id: '{{$api.event_id}}'
@@ -554,7 +590,8 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/The Weather Company Get forecast/response/payload
+                                #/node-output/The Weather Company Get
+                                forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -566,12 +603,14 @@ integration:
                           $ref: '#/integration/action-interfaces/action-interface-5'
                         map:
                           mappings:
-                            - channel:
-                                template: C3HECF803
+                            - OBJECT_ID:
+                                template: C0436FB797X
+                            - OBJECT_NAME:
+                                template: channel
                             - text:
                                 template: >-
                                   Forecast date:
-                                  {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Date}}
+                                  {{$TheWeatherCompanyGetforecast.aggs[0].Date}}
                                   - {{$EventbriteRetrieveevents.name.text}}
                                   ({{$api.event_id}}) : Weather forecast is good
                                   for the morning...- Gust maximum:
@@ -585,16 +624,6 @@ integration:
                                   , 2)}} m/s
                           $map: http://ibm.com/appconnect/map/v1
                           input:
-                            - variable: api
-                              $ref: '#/trigger/api/parameters'
-                            - variable: EventbriteUpdateevent
-                              $ref: >-
-                                #/block/If/node-output/Eventbrite Update
-                                event/response/payload
-                            - variable: EventbriteUpdateeventMetadata
-                              $ref: >-
-                                #/block/If/node-output/Eventbrite Update
-                                event/response
                             - variable: EventbriteRetrieveevents
                               $ref: >-
                                 #/node-output/Eventbrite Retrieve
@@ -611,13 +640,24 @@ integration:
                               $ref: '#/node-output/HTTP Invoke method/response'
                             - variable: JSONParserParse
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
-                            - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                            - variable: TheWeatherCompanyGetforecast
                               $ref: >-
-                                #/node-output/The Weather Company Get forecast/response/payload
+                                #/node-output/The Weather Company Get
+                                forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
+                            - variable: EventbriteUpdateevent
+                              $ref: >-
+                                #/block/If/node-output/Eventbrite Update
+                                event/response/payload
+                            - variable: EventbriteUpdateeventMetadata
+                              $ref: >-
+                                #/block/If/node-output/Eventbrite Update
+                                event/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
                   map:
                     $map: http://ibm.com/appconnect/map/v1
                     input:
@@ -649,8 +689,8 @@ integration:
                         $ref: '#/node-output/JSON Parser Parse/response/payload'
                       - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                         $ref: >-
-                          #/node-output/The Weather Company
-                          Get forecast/response/payload
+                          #/node-output/The Weather Company Get
+                          forecast/response/payload
                       - variable: JSONParserParse2
                         $ref: '#/node-output/JSON Parser Parse 2/response/payload'
                       - variable: Setvariable
@@ -677,11 +717,11 @@ integration:
                     and:
                       - '{{$Setvariable.variable."pm-gust-max"}}':
                           lt: '18'
-                      - '{{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}':
+                      - '{{$TheWeatherCompanyGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}':
                           lte: '1.0'
-                      - '{{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Temperature.LOCAL_EVENING.max}}':
+                      - '{{$TheWeatherCompanyGetforecast.aggs[0].Temperature.LOCAL_EVENING.max}}':
                           gt: '276'
-                      - '{{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.avg}}':
+                      - '{{$TheWeatherCompanyGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.avg}}':
                           lt: '13.4'
                   execute:
                     - update-action:
@@ -705,8 +745,6 @@ integration:
                                 template: ' {{$substringBefore($JSONParserParse.summary , " UPDATE")}} UPDATE: Morning weather forecast is not OK.  Event is rescheduled to the evening.'
                           $map: http://ibm.com/appconnect/map/v1
                           input:
-                            - variable: api
-                              $ref: '#/trigger/api/parameters'
                             - variable: EventbriteRetrieveevents
                               $ref: >-
                                 #/node-output/Eventbrite Retrieve
@@ -723,13 +761,16 @@ integration:
                               $ref: '#/node-output/HTTP Invoke method/response'
                             - variable: JSONParserParse
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
-                            - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                            - variable: TheWeatherCompanyGetforecast
                               $ref: >-
-                                #/node-output/The Weather Company Get forecast/response/payload
+                                #/node-output/The Weather Company Get
+                                forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
                               $ref: '#/flowDetails'
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
                         filter:
                           where:
                             id: '{{$api.event_id}}'
@@ -754,7 +795,8 @@ integration:
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
                             - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                               $ref: >-
-                                #/node-output/The Weather Company Get forecast/response/payload
+                                #/node-output/The Weather Company Get
+                                forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
                             - variable: flowDetails
@@ -766,12 +808,14 @@ integration:
                           $ref: '#/integration/action-interfaces/action-interface-7'
                         map:
                           mappings:
-                            - channel:
-                                template: C3HECF803
+                            - OBJECT_ID:
+                                template: C0436FB797X
+                            - OBJECT_NAME:
+                                template: channel
                             - text:
                                 template: >-
                                   Forecast date:
-                                  {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Date}}
+                                  {{$TheWeatherCompanyGetforecast.aggs[0].Date}}
                                   - {{$EventbriteRetrieveevents.name.text}}
                                   ({{$api.event_id}}) : Event weather criteria
                                   not met for the morning.  Event is rescheduled
@@ -788,24 +832,14 @@ integration:
                                   - Gust maximum:
                                   {{$Setvariable.variable."pm-gust-max"}} m/s -
                                   Precipitation maximum:
-                                  {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}
+                                  {{$TheWeatherCompanyGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}
                                   mm - Temperature minimum:
-                                  {{$round($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Temperature.LOCAL_EVENING.max
+                                  {{$round($TheWeatherCompanyGetforecast.aggs[0].Temperature.LOCAL_EVENING.max
                                   - 273.15, 2)}} Celsius - Wind speed average:
-                                  {{$round($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.avg
+                                  {{$round($TheWeatherCompanyGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.avg
                                   , 2)}} m/s ...  
                           $map: http://ibm.com/appconnect/map/v1
                           input:
-                            - variable: api
-                              $ref: '#/trigger/api/parameters'
-                            - variable: EventbriteUpdateevent2
-                              $ref: >-
-                                #/block/If/node-output/Eventbrite Update event
-                                2/response/payload
-                            - variable: EventbriteUpdateevent2Metadata
-                              $ref: >-
-                                #/block/If/node-output/Eventbrite Update event
-                                2/response
                             - variable: EventbriteRetrieveevents
                               $ref: >-
                                 #/node-output/Eventbrite Retrieve
@@ -822,13 +856,24 @@ integration:
                               $ref: '#/node-output/HTTP Invoke method/response'
                             - variable: JSONParserParse
                               $ref: '#/node-output/JSON Parser Parse/response/payload'
-                            - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                            - variable: TheWeatherCompanyGetforecast
                               $ref: >-
-                                #/node-output/The Weather Company Get forecast/response/payload
+                                #/node-output/The Weather Company Get
+                                forecast/response/payload
                             - variable: Setvariable
                               $ref: '#/node-output/Set variable/response/payload'
+                            - variable: EventbriteUpdateevent2
+                              $ref: >-
+                                #/block/If/node-output/Eventbrite Update event
+                                2/response/payload
+                            - variable: EventbriteUpdateevent2Metadata
+                              $ref: >-
+                                #/block/If/node-output/Eventbrite Update event
+                                2/response
                             - variable: flowDetails
                               $ref: '#/flowDetails'
+                            - variable: api
+                              $ref: '#/trigger/api/parameters'
                   map:
                     $map: http://ibm.com/appconnect/map/v1
                     input:
@@ -860,8 +905,8 @@ integration:
                         $ref: '#/node-output/JSON Parser Parse/response/payload'
                       - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                         $ref: >-
-                          #/node-output/The Weather Company
-                          Get forecast/response/payload
+                          #/node-output/The Weather Company Get
+                          forecast/response/payload
                       - variable: Setvariable
                         $ref: '#/node-output/Set variable/response/payload'
                       - variable: flowDetails
@@ -903,8 +948,6 @@ integration:
                               template: 'Event to launch the Longshot POC Arrow.  '
                         $map: http://ibm.com/appconnect/map/v1
                         input:
-                          - variable: api
-                            $ref: '#/trigger/api/parameters'
                           - variable: EventbriteRetrieveevents
                             $ref: >-
                               #/node-output/Eventbrite Retrieve
@@ -917,13 +960,16 @@ integration:
                             $ref: '#/node-output/HTTP Invoke method/response'
                           - variable: JSONParserParse
                             $ref: '#/node-output/JSON Parser Parse/response/payload'
-                          - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                          - variable: TheWeatherCompanyGetforecast
                             $ref: >-
-                              #/node-output/The Weather Company Get forecast/response/payload
+                              #/node-output/The Weather Company Get
+                              forecast/response/payload
                           - variable: Setvariable
                             $ref: '#/node-output/Set variable/response/payload'
                           - variable: flowDetails
                             $ref: '#/flowDetails'
+                          - variable: api
+                            $ref: '#/trigger/api/parameters'
                       filter:
                         where:
                           id: '{{$api.event_id}}'
@@ -944,7 +990,8 @@ integration:
                             $ref: '#/node-output/JSON Parser Parse/response/payload'
                           - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                             $ref: >-
-                              #/node-output/The Weather Company Get forecast/response/payload
+                              #/node-output/The Weather Company Get
+                              forecast/response/payload
                           - variable: Setvariable
                             $ref: '#/node-output/Set variable/response/payload'
                           - variable: flowDetails
@@ -956,13 +1003,15 @@ integration:
                         $ref: '#/integration/action-interfaces/action-interface-9'
                       map:
                         mappings:
-                          - channel:
-                              template: C3HECF803
+                          - OBJECT_ID:
+                              template: C0436FB797X
+                          - OBJECT_NAME:
+                              template: channel
                           - text:
                               template: >-
                                 Forecast date:
-                                {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Date}}
-                                - {{$EventbriteRetrieveevents.name.text}}
+                                {{$TheWeatherCompanyGetforecast.aggs[0].Date}} -
+                                {{$EventbriteRetrieveevents.name.text}}
                                 ({{$api.event_id}}) : Event weather criteria not
                                 met for am nor pm of scheduled day.  Event is
                                 postponed until new date is confirmed. //
@@ -978,24 +1027,14 @@ integration:
                                 Gust maximum:
                                 {{$Setvariable.variable."pm-gust-max"}} m/s -
                                 Precipitation maximum:
-                                {{$IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}
+                                {{$TheWeatherCompanyGetforecast.aggs[0].PrecipAmount.LOCAL_EVENING.max}}
                                 mm - Temperature minimum:
-                                {{$round($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].Temperature.LOCAL_EVENING.max
+                                {{$round($TheWeatherCompanyGetforecast.aggs[0].Temperature.LOCAL_EVENING.max
                                 - 273.15, 2)}} Celsius - Wind speed average:
-                                {{$round($IBMWeatherCompanyDataLimitedEditionGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.avg
+                                {{$round($TheWeatherCompanyGetforecast.aggs[0].WindSpeed.LOCAL_EVENING.avg
                                 , 2)}} m/s
                         $map: http://ibm.com/appconnect/map/v1
                         input:
-                          - variable: api
-                            $ref: '#/trigger/api/parameters'
-                          - variable: EventbriteUpdateevent3
-                            $ref: >-
-                              #/block/If/node-output/Eventbrite Update event
-                              3/response/payload
-                          - variable: EventbriteUpdateevent3Metadata
-                            $ref: >-
-                              #/block/If/node-output/Eventbrite Update event
-                              3/response
                           - variable: EventbriteRetrieveevents
                             $ref: >-
                               #/node-output/Eventbrite Retrieve
@@ -1008,13 +1047,24 @@ integration:
                             $ref: '#/node-output/HTTP Invoke method/response'
                           - variable: JSONParserParse
                             $ref: '#/node-output/JSON Parser Parse/response/payload'
-                          - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
+                          - variable: TheWeatherCompanyGetforecast
                             $ref: >-
-                              #/node-output/The Weather Company Get forecast/response/payload
+                              #/node-output/The Weather Company Get
+                              forecast/response/payload
                           - variable: Setvariable
                             $ref: '#/node-output/Set variable/response/payload'
+                          - variable: EventbriteUpdateevent3
+                            $ref: >-
+                              #/block/If/node-output/Eventbrite Update event
+                              3/response/payload
+                          - variable: EventbriteUpdateevent3Metadata
+                            $ref: >-
+                              #/block/If/node-output/Eventbrite Update event
+                              3/response
                           - variable: flowDetails
                             $ref: '#/flowDetails'
+                          - variable: api
+                            $ref: '#/trigger/api/parameters'
                 map:
                   $map: http://ibm.com/appconnect/map/v1
                   input:
@@ -1046,8 +1096,8 @@ integration:
                       $ref: '#/node-output/JSON Parser Parse/response/payload'
                     - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                       $ref: >-
-                        #/node-output/The Weather Company
-                        Get forecast/response/payload
+                        #/node-output/The Weather Company Get
+                        forecast/response/payload
                     - variable: Setvariable
                       $ref: '#/node-output/Set variable/response/payload'
                     - variable: flowDetails
@@ -1113,8 +1163,8 @@ integration:
                         $ref: '#/node-output/JSON Parser Parse/response/payload'
                       - variable: IBMWeatherCompanyDataLimitedEditionGetforecast
                         $ref: >-
-                          #/node-output/The Weather Company
-                          Get forecast/response/payload
+                          #/node-output/The Weather Company Get
+                          forecast/response/payload
                       - variable: JSONParserParse2
                         $ref: '#/node-output/JSON Parser Parse 2/response/payload'
                       - variable: Setvariable
@@ -1125,7 +1175,6 @@ integration:
                         $ref: '#/flowDetails'
                   input: []
   name: Update Eventbrite event based on IBM Weather forecast
-  description: An API to get the weather forecast for an Eventbrite event and take different actions based on weather criteria.
 models:
   event_forecast:
     name: event_forecast
