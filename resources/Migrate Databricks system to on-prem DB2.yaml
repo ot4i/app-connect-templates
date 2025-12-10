@@ -1,0 +1,72 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: databricks
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: TABLE ecommerce_orders
+          options:
+            subscription:
+              createdField: CREATEDAT
+              updatedField: CREATEDAT
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/TABLE%20ecommerce_orders/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: DB2INST1_ECOMMERCE_ORDERS
+      connector-type: db2
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/DB2INST1_ECOMMERCE_ORDERS
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: IBM Db2 Create ECOMMERCE_ORDERS record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - CREATEDAT:
+                      template: '{{$Trigger.CREATEDAT}}'
+                  - CUSTOMER_ID:
+                      template: '{{$Trigger.CUSTOMER_ID}}'
+                  - ORDER_ID:
+                      template: '{{$Trigger.ORDER_ID}}'
+                  - PRICE:
+                      expression: '$Trigger.PRICE '
+                  - PRODUCT_NAME:
+                      template: '{{$Trigger.PRODUCT_NAME}}'
+                  - QUANTITY:
+                      expression: '$Trigger.QUANTITY '
+                  - REMARKS:
+                      template: '{{$Trigger.REMARKS}}'
+                  - STATUS:
+                      template: '{{$Trigger.STATUS}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Migrate Databricks Systems to on-prem DB2
+models: {}

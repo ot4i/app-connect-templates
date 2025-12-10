@@ -3859,7 +3859,52 @@
    "targetApps": ["gmail"],
    "tags": ["gmail", "JSON parser", "apachepulsar"],
    "offerings": ["app connect professional"]
- } 
+ } ,
+ {
+  "name": "Migrate on-prem Oracle systems to Databricks",
+  "description": "Use this template to insert multiple records retrieved from Oracle into Databricks.",
+  "summary": "streaming-connector-scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["oracle", "databricks"],
+  "tags": ["streaming-connector-scheduler", "oracle", "databricks"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Migrate Databricks systems to on-prem DB2",
+  "description": "Use this template to create a new record in DB2 whenever a record is created in Databricks.",
+  "summary": "databricks to db2",
+  "sourceApp": "databricks",
+  "targetApps": ["db2"],
+  "tags": ["databricks","db2"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Cross-cloud data sync for unified analytics",
+  "description": "Use this template to retrieve records from Snowflake and perform a bulk insert in Databricks.",
+  "summary": "streaming-connector-scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["snowflake", "databricks"],
+  "tags": ["streaming-connector-scheduler","snowflake", "databricks"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "API to expose Databricks data via REST APIs to other applications",
+  "description": "Use this template to retrieve records from Snowflake and perform a bulk insert in Databricks.",
+  "summary": "1 flow using databricks",
+  "sourceApp": "api",
+  "targetApps": ["databricks"],
+  "tags": ["api","snowflake", "databricks"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Enable GenAI use cases with vector database integration",
+  "description": "Use this template to create or update vectors in pinecondb with embeddings generated from ibmwatsonxai using data from a table in Databricks",
+  "summary": "streaming-connector-scheduler to 3 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["databricks","ibmwatsonxai","pineconedb"],
+  "tags": ["streaming-connector-scheduler","databricks","ibmwatsonxai","pineconedb"],
+  "offerings": ["app connect professional"]
+}
 ]
 }
 

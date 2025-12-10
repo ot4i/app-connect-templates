@@ -1,0 +1,118 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: CCTUSER_EcommerceOrders
+      connector-type: oracle
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/CCTUSER_EcommerceOrders
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: TABLE ecommerce_orders
+      connector-type: databricks
+      actions:
+        bulkInsertRows: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/TABLE%20ecommerce_orders/operations/bulkInsertRows
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Oracle Database
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: true
+              filter:
+                limit: 15
+                where:
+                  CREATEDAT:
+                    gte: '{{$Trigger.lastEventTime}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+          - custom-action:
+              name: Databricks Insert Multiple records into ecommerce_orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: bulkInsertRows
+              map:
+                mappings:
+                  - records:
+                      foreach:
+                        input: '$OracleDatabase '
+                        iterator: recordsItem
+                        mappings:
+                          - CREATEDAT:
+                              template: '{{$recordsItem.CREATEDAT}}'
+                          - CUSTOMER_ID:
+                              template: '{{$recordsItem.CUSTOMER_ID}}'
+                          - ORDER_ID:
+                              template: '{{$recordsItem.ORDER_ID}}'
+                          - PRICE:
+                              expression: '$recordsItem.PRICE '
+                          - PRODUCT_NAME:
+                              template: '{{$recordsItem.PRODUCT_NAME}}'
+                          - QUANTITY:
+                              expression: '$recordsItem.QUANTITY '
+                          - REMARKS:
+                              template: '{{$recordsItem.REMARKS}}'
+                          - STATUS:
+                              template: '{{$recordsItem.STATUS}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: OracleDatabase
+                    $ref: '#/node-output/Oracle Database/response/payload'
+                  - variable: OracleDatabaseMetadata
+                    $ref: '#/node-output/Oracle Database/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Migrate on-prem Oracle systems to Databricks
+models: {}
