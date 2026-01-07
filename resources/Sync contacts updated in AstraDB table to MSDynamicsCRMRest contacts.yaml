@@ -1,0 +1,145 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: astradb
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: TABLE Contact360
+          options:
+            subscription:
+              createdField: created_at
+              updatedField: created_at
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+              isCreatedQueryable: true
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/TABLE%20Contact360/operations/CREATED_POLLER/subscribe
+              action: created_poller
+      account-name: Account 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: msdynamicscrmrest
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Contact
+          action: create
+      account-name: Account 1
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+      account-name: Account 1
+    action-interface-2:
+      type: api-action
+      business-object: TABLE Contact360
+      connector-type: astradb
+      account-name: Account 1
+      actions:
+        createRow: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/TABLE%20Contact360/operations/createRow
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Dynamics 365 for Sales Create contact
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - emailaddress1:
+                      template: '{{$Trigger.email}}'
+                  - firstname:
+                      template: '{{$Trigger.firstname}}'
+                  - lastname:
+                      template: '{{$Trigger.lastname}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Astra DB Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: createRow
+              map:
+                mappings:
+                  - astraid:
+                      template: '{{$Trigger.astraid}}'
+                  - created_at:
+                      template: '{{$Trigger.created_at}}'
+                  - crmrestid:
+                      template: '{{$MicrosoftDynamics365forSalesCreatecontact.contactid}}'
+                  - email:
+                      template: '{{$Trigger.email}}'
+                  - firstname:
+                      template: '{{$Trigger.firstname}}'
+                  - lastname:
+                      template: '{{$Trigger.lastname}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Subject:
+                      template: Astra Contact Synced with Dynamnic CRM
+                  - To:
+                      template: csprod2box@gmail.com
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: >-
+                              New user Added in Dynamic CRM Rest:
+
+                              NAME: {{$Trigger.firstname}} {{$Trigger.lastname}}
+
+                              CRM Contact ID:
+                              {{$MicrosoftDynamics365forSalesCreatecontact.contactid}}
+
+                              Astra ID: {{$Trigger.astraid}}
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AstraDBCreaterow
+                    $ref: '#/node-output/Astra DB Create row/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Contacts Astra - CRM
+models: {}
