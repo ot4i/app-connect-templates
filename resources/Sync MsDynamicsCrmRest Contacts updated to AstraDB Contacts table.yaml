@@ -1,0 +1,195 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: msdynamicscrmrest
+      triggers:
+        UPDATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Contact
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Contact/operations/UPDATED_POLLER/subscribe
+              action: updated_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: TABLE Contact360
+      connector-type: astradb
+      actions:
+        updateRow: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/TABLE%20Contact360/operations/updateRow
+          action: upsertwithwhere
+    action-interface-3:
+      type: api-action
+      business-object: TABLE Contact360
+      connector-type: astradb
+      actions:
+        getAllRows: {}
+      options:
+        connectorServiceOptions: &ref_0
+          httpMethod: get
+          path: resources/TABLE%20Contact360/operations/getAllRows
+          action: retrievewithwhere
+    action-interface-4:
+      type: api-action
+      business-object: TABLE Contact360
+      connector-type: astradb
+      actions:
+        getAllRows: {}
+      options:
+        connectorServiceOptions: *ref_0
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Astra DB Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              allow-empty-output: true
+              filter:
+                limit: 10
+                where:
+                  crmrestid: '{{$Trigger.contactid}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+              action: getAllRows
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+          - custom-action:
+              name: Astra DB Update or create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: updateRow
+              map:
+                mappings:
+                  - email:
+                      template: '{{$Trigger.emailaddress1}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AstraDBRetrieverows
+                    $ref: '#/node-output/Astra DB Retrieve rows/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  astraid: '{{$AstraDBRetrieverows[0].astraid}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AstraDBRetrieverows
+                    $ref: '#/node-output/Astra DB Retrieve rows/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: true
+          - custom-action:
+              name: Astra DB Retrieve rows 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              allow-empty-output: true
+              filter:
+                limit: 10
+                where:
+                  crmrestid: '{{$Trigger.contactid}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AstraDBRetrieverows
+                    $ref: '#/node-output/Astra DB Retrieve rows/response/payload'
+                  - variable: AstraDBUpdateorcreaterow
+                    $ref: >-
+                      #/node-output/Astra DB Update or create
+                      row/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+              action: getAllRows
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AstraDBRetrieverows
+                    $ref: '#/node-output/Astra DB Retrieve rows/response/payload'
+                  - variable: AstraDBUpdateorcreaterow
+                    $ref: >-
+                      #/node-output/Astra DB Update or create
+                      row/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Subject:
+                      template: Dynamic 365 Contact Sync with Astra DB
+                  - To:
+                      template: csprod2box@gmail.com
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: >
+                              User Synced in Astra DB:
+
+                              Name: {{$AstraDBRetrieverows2[0].firstname}}
+                              {{$AstraDBRetrieverows2[0].lastname}}
+
+                              Email: {{$AstraDBRetrieverows2[0].email}}
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AstraDBRetrieverows
+                    $ref: '#/node-output/Astra DB Retrieve rows/response/payload'
+                  - variable: AstraDBUpdateorcreaterow
+                    $ref: >-
+                      #/node-output/Astra DB Update or create
+                      row/response/payload
+                  - variable: AstraDBRetrieverows2
+                    $ref: '#/node-output/Astra DB Retrieve rows 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Dynamic CRM Rest to Astra
+models: {}
