@@ -23,7 +23,6 @@ integration:
               httpMethod: post
               path: resources/TABLE%20Contact360/operations/CREATED_POLLER/subscribe
               action: created_poller
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -36,7 +35,6 @@ integration:
           httpMethod: post
           path: resources/Contact
           action: create
-      account-name: Account 1
     action-interface-3:
       type: api-action
       business-object: mail
@@ -48,12 +46,10 @@ integration:
           httpMethod: post
           path: resources/mail
           action: create
-      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: TABLE Contact360
       connector-type: astradb
-      account-name: Account 1
       actions:
         createRow: {}
       options:

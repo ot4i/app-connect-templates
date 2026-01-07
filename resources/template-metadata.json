@@ -3859,7 +3859,25 @@
    "targetApps": ["gmail"],
    "tags": ["gmail", "JSON parser", "apachepulsar"],
    "offerings": ["app connect professional"]
- } 
+ },
+ {
+   "name": "Sync contacts from AstraDB contact table to contacts of MsDynamicsCrmRest",
+   "description": "Use this template to sync contacts with MsDynamicCrmRest when new contact is added in AstraDB and get update on contact added sucessfuly via Gmail.",
+   "summary": "AstraDB to MsDynamicsCrmRest to Gmail",
+   "sourceApp": "astradb",
+   "targetApps": ["astradb"],
+   "tags": ["astradb", "msdynamicscrmrest", "gmail"],
+   "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Sync MsDynamicCRmRest Contacts updated to AstraDB Contacts table",
+   "description": "Use this template to send a Gmail message when a new contact is created in msDynamicCrmRest and same user is created in AstraDB too.",
+   "summary": "MsDynamicsCrmRest to AstraDb to Gmail",
+   "sourceApp": "msdynamicscrmrest",
+   "targetApps": ["msdynamicscrmrest", "astradb", "gmail"],
+   "tags": ["gmail", "JSON parser", "apachepulsar"],
+   "offerings": ["app connect professional"]
+ }  
 ]
 }
 

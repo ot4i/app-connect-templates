@@ -19,7 +19,6 @@ integration:
               httpMethod: post
               path: resources/Contact/operations/UPDATED_POLLER/subscribe
               action: updated_poller
-      account-name: Account 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -32,7 +31,6 @@ integration:
           httpMethod: post
           path: resources/mail
           action: create
-      account-name: Account 1
     action-interface-2:
       type: api-action
       business-object: TABLE Contact360
@@ -44,7 +42,6 @@ integration:
           httpMethod: post
           path: resources/TABLE%20Contact360/operations/updateRow
           action: upsertwithwhere
-      account-name: Account 1
     action-interface-3:
       type: api-action
       business-object: TABLE Contact360
@@ -56,7 +53,6 @@ integration:
           httpMethod: get
           path: resources/TABLE%20Contact360/operations/getAllRows
           action: retrievewithwhere
-      account-name: Account 1
     action-interface-4:
       type: api-action
       business-object: TABLE Contact360
@@ -65,7 +61,6 @@ integration:
         getAllRows: {}
       options:
         connectorServiceOptions: *ref_0
-      account-name: Account 1
   assemblies:
     assembly-1:
       assembly:
