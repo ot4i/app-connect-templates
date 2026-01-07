@@ -8,4 +8,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 3. To start the flow, in the banner click **Start flow**.
 
 
-In this example, the flow triggers when new contact is added in AstraDb and this flow will add same contact to MsDynamicCrmRest and once contact is added sucessfully as a notification mail will be sent with contact details. It helps you keep the contacts records in sync from AstraDb to MsDynamicsCrmRest.
+In this example, the flow triggers when new contact is added in AstraDb and this flow will add same contact to MsDynamicsCrmRest and once contact is added sucessfully as a notification mail will be sent with contact details. It helps you keep the contacts records in sync from AstraDb to MsDynamicsCrmRest.
