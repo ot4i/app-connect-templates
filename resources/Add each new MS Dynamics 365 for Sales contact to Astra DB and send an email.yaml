@@ -164,7 +164,7 @@ integration:
                   - Subject:
                       template: Dynamic 365 Contact Sync with Astra DB
                   - To:
-                      template: csprod2box@gmail.com
+                      template: example@gmail.com
                   - richTextBody:
                       mappings:
                         - content:
@@ -191,5 +191,5 @@ integration:
                     $ref: '#/node-output/Astra DB Retrieve rows 2/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Dynamic CRM Rest to Astra
+  name: Add each new MS Dynamics 365 for Sales contact to Astra DB and send an email
 models: {}
