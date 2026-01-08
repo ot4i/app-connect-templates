@@ -8,4 +8,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 3. To start the flow, in the banner, click **Start flow**.
 
 
-In this example, the flow triggers when a new contact is added in MS Dynamics 365 for Sales. This flow will add the same contact to Astra DB, and once the contact is added successfully, a notification email will be sent with the contact details. It helps you keep contact records in sync between MS Dynamics 365 for Sales and Astra DB.
+In this example, the flow triggers when a new contact is added in Astra DB. This flow will add the same contact to MS Dynamics 365 for Sales, and once the contact is added successfully, a notification email will be sent with the contact details. It helps you keep contact records in sync between Astra DB and MS Dynamics 365 for Sales.
