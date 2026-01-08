@@ -137,5 +137,5 @@ integration:
                     $ref: '#/node-output/Astra DB Create row/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Contacts Astra - CRM
+  name: Add each new MS Dynamics 365 for Sales contact to Astra DB and send an email
 models: {}
