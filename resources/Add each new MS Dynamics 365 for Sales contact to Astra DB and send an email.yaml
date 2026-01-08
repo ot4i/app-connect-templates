@@ -114,7 +114,7 @@ integration:
                   - Subject:
                       template: Astra Contact Synced with Dynamnic CRM
                   - To:
-                      template: csprod2box@gmail.com
+                      template: example@gmail.com
                   - richTextBody:
                       mappings:
                         - content:

@@ -164,7 +164,7 @@ integration:
                   - Subject:
                       template: Dynamic 365 Contact Sync with Astra DB
                   - To:
-                      template: csprod2box@gmail.com
+                      template: example@gmail.com
                   - richTextBody:
                       mappings:
                         - content:
