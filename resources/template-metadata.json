@@ -3859,7 +3859,24 @@
    "targetApps": ["gmail"],
    "tags": ["gmail", "JSON parser", "apachepulsar"],
    "offerings": ["app connect professional"]
- } 
+ },
+ {
+   "name": "Add each new Astra DB contact to MS Dynamics 365 for Sales and send an email",
+   "description": "Use this template to sync contacts with MS Dynamics 365 for Sales when a new contact is added in Astra DB and get updates on contact added successfully via Gmail.",
+   "summary": "Astra DB to 3 applications",
+   "sourceApp": "astradb",
+   "targetApps": ["msdynamicscrmrest", "astradb", "gmail"],
+   "tags": ["astradb", "msdynamicscrmrest", "gmail"],
+   "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Add each new MS Dynamics 365 for Sales contact to Astra DB and send an email",
+   "description": "Use this template to send a Gmail message when a new contact is created in MS Dynamics 365 for Sales, and the same user is created in Astra DB too.",
+   "summary": "MS Dynamics 365 for Sales to 2 applications",
+   "sourceApp": "msdynamicscrmrest",
+   "targetApps": ["astradb", "gmail"],
+   "tags": ["astradb", "msdynamicscrmrest", "gmail"],
+   "offerings": ["app connect professional"]
+ }  
 ]
 }
-
