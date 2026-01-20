@@ -114,5 +114,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter: {}
-  name: Migrate on-prem Oracle systems to Databricks
+  name: Sync data between Oracle Database and Databricks
 models: {}
