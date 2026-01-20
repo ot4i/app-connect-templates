@@ -103,5 +103,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter: {}
-  name: Cross-cloud data sync for unified analytics
+  name: Sync data between Snowflake and Databricks
 models: {}

@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Cross-cloud%20data%20sync%20for%20unified%20analytics_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Retrieve%20data%20from%20Databricks%20and%20create%20or%20update%20vectors%20in%20Pinecone%20Vector%20DB%20using%20embeddings%20from%20IBM%20watsonx%20ai_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:

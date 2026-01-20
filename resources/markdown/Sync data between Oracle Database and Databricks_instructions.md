@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Migrate%20on-prem%20Oracle%20systems%20to%20Databricks_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open the [GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Sync%20data%20between%20Oracle%20Database%20and%20Databricks_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:

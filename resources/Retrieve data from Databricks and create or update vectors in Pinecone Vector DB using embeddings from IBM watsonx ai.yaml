@@ -249,5 +249,6 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Enable GenAI use cases with vector database integration
+  name: Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai
+
 models: {}

@@ -68,5 +68,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Migrate Databricks Systems to on-prem DB2
+  name: Migrate data from Databricks to IBM Db2
 models: {}
