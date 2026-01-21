@@ -7,4 +7,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 3. To start the flow, in the banner click **Start flow** or **Deploy flow**.
 
-Use this template to retrieve rows from a Snowflake table and bulk‑insert the data into a Databricks table.
+For example, use this template to retrieve rows from a Snowflake table and bulk‑insert the data into a Databricks table.
