@@ -3877,6 +3877,46 @@
    "targetApps": ["astradb", "gmail"],
    "tags": ["astradb", "msdynamicscrmrest", "gmail"],
    "offerings": ["app connect professional"]
- }  
+ },
+ {
+  "name": "Sync data between Oracle Database and Databricks",
+  "description": "Use this template to sync data between Oracle Database and Databricks.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["oracle", "databricks"],
+  "tags": ["streaming-connector-scheduler", "oracle", "databricks"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Migrate data from Databricks to IBM Db2",
+  "description": "Use this template to migrate data from Databricks to IBM Db2.",
+  "summary": "Databricks to Db2",
+  "sourceApp": "databricks",
+  "targetApps": ["db2"],
+  "tags": ["databricks","db2"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Sync data between Snowflake and Databricks",
+  "description": "Use this template to sync data between Snowflake and Databricks.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["snowflake", "databricks"],
+  "tags": ["streaming-connector-scheduler", "snowflake", "databricks"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai",
+  "description": "Use this template to retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx.ai.",
+  "summary": "Scheduler to 3 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
+  "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
+  "offerings": ["app connect professional"]
+ }               
 ]
 }
+
+
+
+

@@ -1,0 +1,254 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: TABLE student_marks
+      connector-type: databricks
+      actions:
+        getAllRows: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/TABLE%20student_marks/operations/getAllRows
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: postMlV1TextEmbeddings_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextEmbeddings: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/postMlV1TextEmbeddings_model/operations/postMlV1TextEmbeddings
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: Vectors
+      connector-type: pineconedb
+      actions:
+        postIndexesByIndexHostVectorsUpsert: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Indexes/{index_host}/Vectors/operations/postIndexesByIndexHostVectorsUpsert
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Databricks Retrieve student_marks record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: false
+              filter:
+                limit: 15
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              action: getAllRows
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      records:
+                        type: object
+                        properties: {}
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatabricksRetrievestudentmarksrecord
+                    $ref: >-
+                      #/node-output/Databricks Retrieve student_marks
+                      record/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              source:
+                expression: '$DatabricksRetrievestudentmarksrecord '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatabricksRetrievestudentmarksrecord
+                    $ref: >-
+                      #/node-output/Databricks Retrieve student_marks
+                      record/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: Databricks TABLE student_marks
+    assembly-2:
+      assembly:
+        execute:
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatabricksRetrievestudentmarksrecord
+                    $ref: >-
+                      #/node-output/Databricks Retrieve student_marks
+                      record/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      combinedString:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - combinedString:
+                            template: >-
+                              [student name:{{$Foreachitem.name}}
+                              ,marks:{{$Foreachitem.marks}}
+                              ,remarks:{{$Foreachitem.remarks}}].join(" ")
+              name: Set variable
+          - custom-action:
+              name: IBM watsonx.ai Generate embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postMlV1TextEmbeddings
+              map:
+                mappings:
+                  - inputs:
+                      expression: '[$Setvariable.variable.combinedString ]'
+                  - model_id:
+                      template: ibm/slate-30m-english-rtrvr-v2
+                  - project_id:
+                      template: f5c4b4f1-6c27-4cad-bcc3-8b56df83f335
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatabricksRetrievestudentmarksrecord
+                    $ref: >-
+                      #/node-output/Databricks Retrieve student_marks
+                      record/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Pinecone Vector Database Update or create vector
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postIndexesByIndexHostVectorsUpsert
+              map:
+                mappings:
+                  - index_host:
+                      template: students-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                  - vectors:
+                      foreach:
+                        input: '[{}]'
+                        iterator: vectorsItem
+                        mappings:
+                          - id:
+                              template: '{{$Foreachitem.student_id}}'
+                          - metadata:
+                              expression: >-
+                                {"name":$Foreachitem.name,"marks":$Foreachitem.marks
+                                ,"remarks":$Foreachitem.remarks }
+                          - values:
+                              expression: >-
+                                $IBMwatsonxaiGenerateembeddings.results.embedding 
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatabricksRetrievestudentmarksrecord
+                    $ref: >-
+                      #/node-output/Databricks Retrieve student_marks
+                      record/response/payload
+                  - variable: Setvariable
+                    $ref: '#/block/For each/node-output/Set variable/response/payload'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/block/For each/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  index_host: students-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatabricksRetrievestudentmarksrecord
+                    $ref: >-
+                      #/node-output/Databricks Retrieve student_marks
+                      record/response/payload
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: >-
+                      #/block/For each/node-output/IBM watsonx.ai Generate
+                      embeddings/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai
+
+models: {}

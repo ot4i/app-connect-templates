@@ -1,0 +1,107 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: hour
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: row
+      connector-type: snowflake
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/table/{tablename}/row
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: TABLE appconn
+      connector-type: databricks
+      actions:
+        bulkInsertRows: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/TABLE%20appconn/operations/bulkInsertRows
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Snowflake Retrieve rows
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: false
+              filter:
+                limit: 6
+                where:
+                  tablename: Persons
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+          - custom-action:
+              name: Databricks Insert Multiple records into appconn
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: bulkInsertRows
+              map:
+                mappings:
+                  - records:
+                      foreach:
+                        input: '$SnowflakeRetrieverows '
+                        iterator: recordsItem
+                        mappings:
+                          - id:
+                              template: '{{$recordsItem.ID}}'
+                          - name:
+                              template: >-
+                                {{$recordsItem.FIRSTNAME}}
+                                {{$recordsItem.LASTNAME}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SnowflakeRetrieverows
+                    $ref: '#/node-output/Snowflake Retrieve rows/response/payload'
+                  - variable: SnowflakeRetrieverowsMetadata
+                    $ref: '#/node-output/Snowflake Retrieve rows/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Sync data between Snowflake and Databricks
+models: {}
