@@ -8,4 +8,4 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
 3. To start the flow, in the banner click **Start flow** or **Deploy flow**.
 
-Use this template to retrieve data from a Databricks table and generate embeddings using IBM watsonx.ai. These embeddings are used to create or update vectors in the Pinecone Vector Database. You can use an existing template, *‘RAG pattern flow – Query the Pinecone Vector DB using embeddings from IBM watsonx.ai and generate text with the results’*, to query these vectors and generate responses using IBM watsonx.ai.
+For example, use this template to retrieve data from a Databricks table and generate embeddings using IBM watsonx.ai. These embeddings are used to create or update vectors in the Pinecone Vector Database. You can use an existing template, *‘RAG pattern flow – Query the Pinecone Vector DB using embeddings from IBM watsonx.ai and generate text with the results’*, to query these vectors and generate responses using IBM watsonx.ai.
