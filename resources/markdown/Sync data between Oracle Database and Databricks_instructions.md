@@ -6,6 +6,6 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
    - [Databricks](https://ibm.biz/acdatabricks) 
 3. To start the flow, in the banner, click **Start flow** or **Deploy flow**.
 
-Use this template to retrieve rows from an Oracle Database table where the created time is greater than or equal to the previous event time from the scheduler. All retrieved rows are inserted as a single entry for bulk insertion into a Databricks table.
+For example, use this template to retrieve rows from an Oracle Database table where the created time is greater than or equal to the previous event time from the scheduler. All retrieved rows are inserted as a single entry for bulk insertion into a Databricks table.
 
 
