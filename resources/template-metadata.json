@@ -3862,8 +3862,8 @@
  } ,
  {
   "name": "Sync data between Oracle Database and Databricks",
-  "description": "Use this template to insert multiple records retrieved from Oracle into Databricks.",
-  "summary": "streaming-connector-scheduler to 2 applications",
+  "description": "Use this template to sync data between Oracle Database and Databricks.",
+  "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["oracle", "databricks"],
   "tags": ["streaming-connector-scheduler", "oracle", "databricks"],
@@ -3871,7 +3871,7 @@
 },
 {
   "name": "Migrate data from Databricks to IBM Db2",
-  "description": "Use this template to create a new record in DB2 whenever a record is created in Databricks.",
+  "description": "Use this template to migrate data from Databricks to IBM Db2.",
   "summary": "databricks to db2",
   "sourceApp": "databricks",
   "targetApps": ["db2"],
@@ -3881,7 +3881,7 @@
 {
   "name": "Sync data between Snowflake and Databricks",
   "description": "Use this template to sync data between Snowflake and Databricks.",
-  "summary": "streaming-connector-scheduler to 2 applications",
+  "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["snowflake", "databricks"],
   "tags": ["streaming-connector-scheduler","snowflake", "databricks"],
@@ -3890,7 +3890,7 @@
 {
   "name": "Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai",
   "description": "Use this template to retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai.",
-  "summary": "streaming-connector-scheduler to 3 applications",
+  "summary": "Scheduler to 3 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["databricks","ibmwatsonxai","pineconedb"],
   "tags": ["streaming-connector-scheduler","databricks","ibmwatsonxai","pineconedb"],
@@ -3898,4 +3898,5 @@
 }
 ]
 }
+
 
