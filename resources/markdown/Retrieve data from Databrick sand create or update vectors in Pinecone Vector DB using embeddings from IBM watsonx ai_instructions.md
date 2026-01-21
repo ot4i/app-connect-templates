@@ -3,9 +3,9 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Databricks](https://ibm.biz/acdatabricks) 
-   - [IBM watsonx.ai account](https://www.ibm.biz/acibmwatsonxai).
-   - [Pinecone Vector Database account](https://www.ibm.biz/acpineconevectordatabase)
+   - [IBM watsonx.ai](https://www.ibm.biz/acibmwatsonxai).
+   - [Pinecone Vector Database](https://www.ibm.biz/acpineconevectordatabase)
 
-3. To start the flow, in the banner click **Start flow**.
+3. To start the flow, in the banner click **Start flow** or **Deploy flow**.
 
-Use this template to retrieve student record informations from a table in Databricks . Use this to create embeddings using IBM watsonx ai of the information which include name, marks and remarks of each student.These embeddings are used to create or update vector in Pinecone DB.An existing template flow , `RAG pattern flow - Query the Pinecone Vector DB using embeddings from IBM watsonx ai and generate text with the results` can be used to test the above flow.
+Use this template to retrieve data from a Databricks table and generate embeddings using IBM watsonx.ai. These embeddings are used to create or update vectors in the Pinecone Vector Database. You can use an existing template, *‘RAG pattern flow – Query the Pinecone Vector DB using embeddings from IBM watsonx.ai and generate text with the results’*, to query these vectors and generate responses using IBM watsonx.ai.
