@@ -3,11 +3,11 @@ To refer to these instructions while editing the flow, open the [GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Databricks](https://ibm.biz/acdatabricks) 
-   - [DB2](https://ibm.biz/acibmdb2)
-3. To start the flow, in the banner, click **Start flow**.
+   - [IBM Db2](https://ibm.biz/acibmdb2)
+3. To start the flow, in the banner, click **Start flow** or **Deploy flow**.
 
 The flow is started whenever a new record is created in Databricks.
 
-Use this template to create a new record in a table in DB2 whenever a new record is inserted in a table in Databricks.
+Use this template to create a new record in an IBM Db2 table whenever a new record is added to a Databricks table.
 
 
