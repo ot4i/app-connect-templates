@@ -3906,7 +3906,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai",
+  "name": "Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx.ai",
   "description": "Use this template to retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx.ai.",
   "summary": "Scheduler to 3 applications",
   "sourceApp": "streaming-connector-scheduler",
@@ -3916,5 +3916,6 @@
  }               
 ]
 }
+
 
 
