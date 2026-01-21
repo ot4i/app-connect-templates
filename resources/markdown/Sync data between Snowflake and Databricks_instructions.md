@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
    - [Snowflake](https://ibm.biz//acsnowflake) 
    - [Databricks](https://ibm.biz/acdatabricks) 
 
-3. To start the flow, in the banner click **Start flow**.
+3. To start the flow, in the banner click **Start flow** or **Deploy flow**.
 
-Use this template to retrieve rows from a table in Snowflake and use this data to insert rows in bulk to a table in Databricks.
+Use this template to retrieve rows from a Snowflake table and bulk‑insert the data into a Databricks table.
