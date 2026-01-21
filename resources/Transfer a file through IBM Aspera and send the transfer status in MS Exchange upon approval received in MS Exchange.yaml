@@ -13,10 +13,10 @@ integration:
             data: Messages
           options:
             parentFolderId: >-
-              AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwAuAAAAAACA6ugh45R4QKPbS5lwvph5AQD4gXnEhMN7Tr04V9vM_2_9AATiMD3jAAA=
+              AQMkAGMxN2U4OAAzZC00M2I2LTQ3YTItOTUwZi0yMzJhYQIzMmZhZQAuAAADacCmxt3ODku6zaia3Yk2pgEATzLmfCxekkuGl87dVgFJTAAGY1El4wAAAA==
             parentFilter:
               parentFolderId: >-
-                AAMkADZmZTI0YzlkLTQ0NWEtNGEyYy04M2U4LTg5ODlmZDAzNTIzMwAuAAAAAACA6ugh45R4QKPbS5lwvph5AQD4gXnEhMN7Tr04V9vM_2_9AATiMD3jAAA=
+                AQMkAGMxN2U4OAAzZC00M2I2LTQ3YTItOTUwZi0yMzJhYQIzMmZhZQAuAAADacCmxt3ODku6zaia3Yk2pgEATzLmfCxekkuGl87dVgFJTAAGY1El4wAAAA==
             subscription:
               timeZone: UTC
               pollingInterval: 1
@@ -26,17 +26,6 @@ integration:
                 resources/MailFolders/{parentFolderId}/Messages/operations/CREATED_POLLER/subscribe
               action: created_poller
   action-interfaces:
-    action-interface-4:
-      type: api-action
-      business-object: mail
-      connector-type: gmail
-      actions:
-        CREATE: {}
-      options:
-        connectorServiceOptions:
-          httpMethod: post
-          path: resources/mail
-          action: create
     action-interface-1:
       type: api-action
       business-object: Transfers
@@ -59,6 +48,17 @@ integration:
           httpMethod: get
           path: resources/Transfers/operations/getOpsTransfersByTransferId
           action: retrieve
+    action-interface-3:
+      type: api-action
+      business-object: Messages
+      connector-type: msexchange
+      actions:
+        SENDEMAIL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Messages/operations/SENDEMAIL
+          action: custom
   assemblies:
     assembly-1:
       assembly:
@@ -101,10 +101,10 @@ integration:
                               $ref: '#/flowDetails'
                         sample-data: |-
                           {
-                            "source": "folder2/File_1234",
-                            "destination": "/folder1/usecase1.40",
-                            "remote_host": "ats-aws-us-east-1.aspera.io",
-                            "token": "Basic WjhBbU0wUWVhTVVPYkdHT0NFa3NwdXJoOmJDeWhWdGhoX2NfYjhWVnhiRkY="
+                            "source": "source folder",
+                            "destination": "destination folder",
+                            "remote_host": "remote host",
+                            "token": "token"
                           }
                         output-schema:
                           $schema: http://json-schema.org/draft-04/schema#
@@ -196,28 +196,29 @@ integration:
                               $ref: '#/block/For each/current-item'
                             - variable: flowDetails
                               $ref: '#/flowDetails'
-                    - create-action:
-                        name: Gmail Send email
+                    - custom-action:
+                        name: Microsoft Exchange Send email
                         target:
-                          $ref: '#/integration/action-interfaces/action-interface-4'
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: SENDEMAIL
                         map:
                           mappings:
-                            - CC:
-                                template: example@gmail.com
-                            - Subject:
-                                template: IBM Aspera file transfer initiated!
-                            - To:
-                                template: example@gmail.com
-                            - richTextBody:
+                            - body:
                                 mappings:
                                   - content:
                                       template: >-
-                                        Hello, you can check the status of the IBM Aspera file transfer here. The transfer status is:
-                                        {{$IBMAsperaGetinformationaboutaspecifictransfer.status}}
+                                        Hello, you can check the status of the
+                                        IBM Aspera file transfer here. The
+                                        transfer status is:
+                                        {{$IBMAsperaRetrievetransferinformationbyID.status}}
                                         Transfer id ->
-                                        {{$IBMAsperaStartanewtransfer.id}}
-                                  - contentType:
-                                      template: text/plain
+                                        {{$IBMAsperaRetrievetransferinformationbyID.id}}
+                            - ccRecipientsRequested:
+                                template: example@gmail.com
+                            - subject:
+                                template: IBM Aspera file transfer initiated!
+                            - toRecipientsRequested:
+                                template: example@gmail.com
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: Trigger
@@ -238,6 +239,7 @@ integration:
                               $ref: '#/block/For each/current-item'
                             - variable: flowDetails
                               $ref: '#/flowDetails'
+                        filter: {}
               else:
                 execute: []
               name: If
@@ -248,5 +250,5 @@ integration:
                   $ref: '#/block/For each/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange
+  name: Transfer a file through IBM Aspera and send the transfer status in MS Exchange upon approval received in MS Exchange
 models: {}

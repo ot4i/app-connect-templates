@@ -3816,12 +3816,12 @@
    "offerings": ["app connect professional"]
  },
  {
-   "name": "Transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange",
-   "description": "Use this template to transfer a file through IBM Aspera and send the transfer status in Gmail upon approval received in Microsoft Exchange.",
+   "name": "Transfer a file through IBM Aspera and send the transfer status in MS Exchange upon approval received in MS Exchange",
+   "description": "Use this template to transfer a file through IBM Aspera and send the transfer status in MS Exchange upon approval received in MS Exchange.",
    "summary": "Microsoft Exchange to 2 applications",
    "sourceApp": "msexchange",
-   "targetApps": ["ibmaspera", "gmail"],
-   "tags": ["msexchange", "ibmaspera", "gmail", "JSON parser", "if"],
+   "targetApps": ["ibmaspera"],
+   "tags": ["msexchange", "ibmaspera", "JSON parser", "if"],
    "offerings": ["app connect professional"]
  }, 
  {
@@ -3859,7 +3859,25 @@
    "targetApps": ["gmail"],
    "tags": ["gmail", "JSON parser", "apachepulsar"],
    "offerings": ["app connect professional"]
- } ,
+ },
+ {
+   "name": "Add each new Astra DB contact to MS Dynamics 365 for Sales and send an email",
+   "description": "Use this template to sync contacts with MS Dynamics 365 for Sales when a new contact is added in Astra DB and get updates on contact added successfully via Gmail.",
+   "summary": "Astra DB to 3 applications",
+   "sourceApp": "astradb",
+   "targetApps": ["msdynamicscrmrest", "astradb", "gmail"],
+   "tags": ["astradb", "msdynamicscrmrest", "gmail"],
+   "offerings": ["app connect professional"]
+ },
+ {
+   "name": "Add each new MS Dynamics 365 for Sales contact to Astra DB and send an email",
+   "description": "Use this template to send a Gmail message when a new contact is created in MS Dynamics 365 for Sales, and the same user is created in Astra DB too.",
+   "summary": "MS Dynamics 365 for Sales to 2 applications",
+   "sourceApp": "msdynamicscrmrest",
+   "targetApps": ["astradb", "gmail"],
+   "tags": ["astradb", "msdynamicscrmrest", "gmail"],
+   "offerings": ["app connect professional"]
+ },
  {
   "name": "Sync data between Oracle Database and Databricks",
   "description": "Use this template to sync data between Oracle Database and Databricks.",
@@ -3868,8 +3886,8 @@
   "targetApps": ["oracle", "databricks"],
   "tags": ["streaming-connector-scheduler", "oracle", "databricks"],
   "offerings": ["app connect professional"]
-},
-{
+ },
+ {
   "name": "Migrate data from Databricks to IBM Db2",
   "description": "Use this template to migrate data from Databricks to IBM Db2.",
   "summary": "databricks to db2",
@@ -3877,8 +3895,8 @@
   "targetApps": ["db2"],
   "tags": ["databricks","db2"],
   "offerings": ["app connect professional"]
-},
-{
+ },
+ {
   "name": "Sync data between Snowflake and Databricks",
   "description": "Use this template to sync data between Snowflake and Databricks.",
   "summary": "Scheduler to 2 applications",
@@ -3886,8 +3904,8 @@
   "targetApps": ["snowflake", "databricks"],
   "tags": ["streaming-connector-scheduler","snowflake", "databricks"],
   "offerings": ["app connect professional"]
-},
-{
+ },
+ {
   "name": "Retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai",
   "description": "Use this template to retrieve data from Databricks and create or update vectors in Pinecone Vector DB using embeddings from IBM watsonx ai.",
   "summary": "Scheduler to 3 applications",
@@ -3895,8 +3913,7 @@
   "targetApps": ["databricks","ibmwatsonxai","pineconedb"],
   "tags": ["streaming-connector-scheduler","databricks","ibmwatsonxai","pineconedb"],
   "offerings": ["app connect professional"]
-}
+ }               
 ]
 }
-
 
