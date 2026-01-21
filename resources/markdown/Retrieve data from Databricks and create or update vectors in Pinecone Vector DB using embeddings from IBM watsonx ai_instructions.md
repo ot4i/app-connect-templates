@@ -3,7 +3,7 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [Databricks](https://ibm.biz/acdatabricks) 
-   - [IBM watsonx.ai](https://www.ibm.biz/acibmwatsonxai).
+   - [IBM watsonx.ai](https://www.ibm.biz/acibmwatsonxai)
    - [Pinecone Vector Database](https://www.ibm.biz/acpineconevectordatabase)
 
 3. To start the flow, in the banner click **Start flow** or **Deploy flow**.
