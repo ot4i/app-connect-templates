@@ -1,0 +1,47 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: googlecalendar
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: events
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            id: gfplbid440ao25vsd7hk2fu7b4@group.calendar.google.com
+            parentFilter:
+              id: gfplbid440ao25vsd7hk2fu7b4@group.calendar.google.com
+            subscription:
+              pollingInterval: 5
+              updatedField: updated
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: folders
+      connector-type: dropbox
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Dropbox Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - path:
+                      template: '{{$Trigger.source.title}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a folder in Dropbox for new events created in Google Calendar
+models: {}
