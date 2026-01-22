@@ -1,0 +1,254 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createTest:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+          input-context:
+            data: Test
+          output-context:
+            data: Test
+      options:
+        resources:
+          - business-object: Test
+            model:
+              $ref: '#/models/Test'
+            triggers:
+              create: createTest
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: employees
+      connector-type: freshteam
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: employees
+      connector-type: freshteam
+      actions:
+        RETRIEVEALL: {}
+    action-interface-3:
+      type: api-action
+      business-object: row
+      connector-type: smartsheet
+      actions:
+        CREATE: {}
+    action-interface-4:
+      type: api-action
+      business-object: search
+      connector-type: smartsheet
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: Freshteam Create employee
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - first_name:
+                      template: '{{$Request.first_name}}'
+                  - last_name:
+                      template: '{{$Request.last_name}}'
+                  - official_email:
+                      template: '{{$Request.official_email}}'
+                  - role_ids:
+                      expression: '$Request.role_ids '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Freshteam Retrieve employees
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              filter:
+                where:
+                  id: '{{$FreshteamCreateemployee.id}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FreshteamCreateemployee
+                    $ref: '#/node-output/Freshteam Create employee/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - create-action:
+              name: Smartsheet Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - '2556783815878532':
+                      template: '{{$FreshteamRetrieveemployees.official_email}}'
+                  - '304984002193284':
+                      template: '{{$FreshteamRetrieveemployees.first_name}}'
+                  - '4808583629563780':
+                      template: '{{$FreshteamRetrieveemployees.last_name}}'
+                  - '8467758326802308':
+                      template: '{{$FreshteamCreateemployee.id}}'
+                  - sheetsid:
+                      template: '7397199765104516'
+                  - toTop:
+                      expression: 'true'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FreshteamCreateemployee
+                    $ref: '#/node-output/Freshteam Create employee/response/payload'
+                  - variable: FreshteamRetrieveemployees
+                    $ref: >-
+                      #/node-output/Freshteam Retrieve
+                      employees/response/payload
+                  - variable: FreshteamRetrieveemployeesMetadata
+                    $ref: '#/node-output/Freshteam Retrieve employees/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Smartsheet Search all
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              filter:
+                where:
+                  and:
+                    - query: '{{$Request.query}}'
+                    - id: '{{$Request.sheetId}}'
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: FreshteamCreateemployee
+                    $ref: '#/node-output/Freshteam Create employee/response/payload'
+                  - variable: FreshteamRetrieveemployees
+                    $ref: >-
+                      #/node-output/Freshteam Retrieve
+                      employees/response/payload
+                  - variable: FreshteamRetrieveemployeesMetadata
+                    $ref: '#/node-output/Freshteam Retrieve employees/response'
+                  - variable: SmartsheetCreaterow
+                    $ref: '#/node-output/Smartsheet Create row/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: false
+              allow-empty-output: false
+          - response:
+              name: response-1
+              reply-maps:
+                - title: Test successfully created
+                  status-code: 201
+                  map:
+                    mappings:
+                      - first_name:
+                          template: '{{$FreshteamRetrieveemployees.first_name}}'
+                      - id:
+                          expression: $FreshteamCreateemployee.id
+                      - last_name:
+                          template: '{{$FreshteamRetrieveemployees.last_name}}'
+                      - official_email:
+                          template: '{{$FreshteamRetrieveemployees.official_email}}'
+                      - role_ids:
+                          expression: $FreshteamRetrieveemployees.role_ids
+                      - sheetsid:
+                          template: '{{$SmartsheetRetrieverows.sheetsid}}'
+                      - totalCount:
+                          expression: '$SmartsheetSearchall.totalCount '
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: FreshteamCreateemployee
+                        $ref: >-
+                          #/node-output/Freshteam Create
+                          employee/response/payload
+                      - variable: FreshteamRetrieveemployees
+                        $ref: >-
+                          #/node-output/Freshteam Retrieve
+                          employees/response/payload
+                      - variable: FreshteamRetrieveemployeesMetadata
+                        $ref: '#/node-output/Freshteam Retrieve employees/response'
+                      - variable: SmartsheetCreaterow
+                        $ref: '#/node-output/Smartsheet Create row/response/payload'
+                      - variable: SmartsheetSearchall
+                        $ref: '#/node-output/Smartsheet Search all/response/payload'
+                      - variable: SmartsheetSearchallMetadata
+                        $ref: '#/node-output/Smartsheet Search all/response'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                  input: []
+        catch:
+          - default:
+              - response:
+                  name: response-1
+                  reply-maps:
+                    - title: Bad request
+                      status-code: 400
+                      map:
+                        mappings:
+                          - message:
+                              template: '{{$errorDetails.message}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Request
+                            $ref: '#/trigger/payload'
+                          - variable: errorDetails
+                            $ref: '#/error'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                      input: []
+  name: Smartsheet External UseCase
+models:
+  Test:
+    name: Test
+    properties:
+      id:
+        required: false
+        id: true
+        type: number
+      first_name:
+        required: false
+        id: false
+        type: string
+      last_name:
+        required: false
+        id: false
+        type: string
+      official_email:
+        required: false
+        id: false
+        type: string
+      role_ids:
+        required: false
+        id: false
+        type:
+          - number
+      sheetId:
+        required: false
+        id: false
+        type: string
+      totalCount:
+        required: false
+        id: false
+        type: number
+      query:
+        required: false
+        id: false
+        type: string
+    plural: Test
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-2'
+    methods: {}
