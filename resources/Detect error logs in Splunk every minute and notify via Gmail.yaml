@@ -1,0 +1,163 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+      account-name: Account 2
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Search
+      connector-type: splunk
+      account-name: Account 1
+      actions:
+        postServicesNSByUserByAppSearchJobs: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Search/operations/postServicesNSByUserByAppSearchJobs
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Search
+      connector-type: splunk
+      account-name: Account 1
+      actions:
+        getServicesNSByUserByAppSearchV2JobsBySearchIDResults: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: >-
+            resources/Search/operations/getServicesNSByUserByAppSearchV2JobsBySearchIDResults
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      account-name: Account 1
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Splunk Create search
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postServicesNSByUserByAppSearchJobs
+              map:
+                mappings:
+                  - search:
+                      template: >-
+                        search index=main  earliest=-1m("error" OR "exception"
+                        OR "fail")
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - app: '-'
+                    - user: '-'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Splunk Get search by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: getServicesNSByUserByAppSearchV2JobsBySearchIDResults
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkCreatesearch
+                    $ref: '#/node-output/Splunk Create search/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  and:
+                    - app: '-'
+                    - search_ID: '{{$SplunkCreatesearch.sid}}'
+                    - user: '-'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkCreatesearch
+                    $ref: '#/node-output/Splunk Create search/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 11
+              allow-truncation: true
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - CC:
+                      template: Mokshagna.Ram.Teja.Vemula@ibm.com
+                  - Subject:
+                      template: appconnect error
+                  - To:
+                      template: Adil.Ahammed.P@ibm.com
+                  - richTextBody:
+                      mappings:
+                        - content:
+                            template: '{{$SplunkGetsearchbyID}}'
+                        - contentType:
+                            template: text/plain
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkCreatesearch
+                    $ref: '#/node-output/Splunk Create search/response/payload'
+                  - variable: SplunkGetsearchbyID
+                    $ref: '#/node-output/Splunk Get search by ID/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Detect error logs in Splunk every minute and notify via Gmail
+models: {}
