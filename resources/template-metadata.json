@@ -3913,7 +3913,34 @@
   "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
   "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
   "offerings": ["app connect professional"]
- }               
+ },
+ {
+    "name": "Create Sales Order in SAP S4HANA from Salesforce Opportunity",
+    "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce.",
+    "summary": "Salesforce to SAP S/4HANA",
+    "sourceApp": "salesforce",
+    "targetApps": ["saps4hana", "gmail"],
+    "tags": ["salesforce", "saps4hana", "gmail", "sales order"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Predictive Cash Flow and Payment Risk Analysis",
+    "description": "Use this template to perform predictive cash flow and payment risk analysis by analyzing customer sales orders and updating credit worthiness scores in SAP S/4HANA.",
+    "summary": "SAP S/4HANA to Google Gemini AI",
+    "sourceApp": "saps4hana",
+    "targetApps": ["googlegemini", "saps4hana"],
+    "tags": ["saps4hana", "googlegemini", "AI", "credit analysis", "risk assessment"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Supplier Onboarding Sync from ZohoCRM to SAP Vendors",
+    "description": "Use this template to sync supplier onboarding data from Zoho CRM leads to SAP S/4HANA business partner records.",
+    "summary": "Zoho CRM to SAP S/4HANA",
+    "sourceApp": "zohocrm",
+    "targetApps": ["saps4hana", "gmail"],
+    "tags": ["zohocrm", "saps4hana", "gmail"],
+    "offerings": ["app connect professional"]
+  }
 ]
 }
 
