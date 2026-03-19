@@ -1,0 +1,233 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Opportunity
+          options:
+            subscription:
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Opportunity/operations/CREATEDORUPDATED_POLLER/subscribe
+              action: createdorupdated_poller
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: OpportunityLineItem
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/OpportunityLineItem
+          action: retrievewithwhere
+    action-interface-5:
+      type: api-action
+      business-object: Product2
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Product2
+          action: retrievewithwhere
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: API_PRODUCT_SRV__A_Product
+      connector-type: saps4hana
+      actions:
+        Create_A_Product: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/API_PRODUCT_SRV__A_Product/operations/Create_A_Product
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: API_SALES_ORDER_SRV__A_SalesOrder
+      connector-type: saps4hana
+      actions:
+        Create_A_SalesOrder: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/API_SALES_ORDER_SRV__A_SalesOrder/operations/Create_A_SalesOrder
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Trigger.StageName}}': Closed Won
+                  execute: []
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    info:
+                      input:
+                        - variable: Trigger
+                          $ref: '#/trigger/payload'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                      message: done
+                      status-code: 200
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Salesforce Retrieve opportunity products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              allow-empty-output: false
+              filter:
+                where:
+                  OpportunityId: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+          - retrieve-action:
+              name: Salesforce Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  Id: '{{$SalesforceRetrieveopportunityproducts.Product2Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveopportunityproducts
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response/payload'
+                  - variable: SalesforceRetrieveopportunityproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+          - custom-action:
+              name: SAP S 4HANA Create product master record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: Create_A_Product
+              map:
+                mappings:
+                  - BaseUnit:
+                      template: EA
+                  - ProductOldID:
+                      template: '{{$SalesforceRetrieveproducts.Id}}'
+                  - ProductType:
+                      template: FERT
+                  - to_Description:
+                      foreach:
+                        input: '[0]'
+                        iterator: to_DescriptionItem
+                        mappings:
+                          - Language:
+                              template: EN
+                          - ProductDescription:
+                              template: Salesforce Opportunity Product
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveopportunityproducts
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response/payload'
+                  - variable: SalesforceRetrieveopportunityproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: '#/node-output/Salesforce Retrieve products/response/payload'
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: SAP S 4HANA Create a sales order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: Create_A_SalesOrder
+              map:
+                mappings:
+                  - DistributionChannel:
+                      template: '10'
+                  - OrganizationDivision:
+                      template: '00'
+                  - SalesOrderType:
+                      template: OR
+                  - SalesOrganization:
+                      template: '1710'
+                  - SoldToParty:
+                      template: '17100005'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveopportunityproducts
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response/payload'
+                  - variable: SalesforceRetrieveopportunityproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: '#/node-output/Salesforce Retrieve products/response/payload'
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Subject:
+                      template: salesorder creation Opportunity
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrieveopportunityproducts
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response/payload'
+                  - variable: SalesforceRetrieveopportunityproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve opportunity products/response'
+                  - variable: SalesforceRetrieveproducts
+                    $ref: '#/node-output/Salesforce Retrieve products/response/payload'
+                  - variable: SalesforceRetrieveproductsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve products/response'
+                  - variable: SAPS4HANACreateasalesorder
+                    $ref: '#/node-output/SAP S 4HANA Create a sales order/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create Sales Order in SAP S4HANA from Salesforce Opportunity
+models: {}
