@@ -1,0 +1,87 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: zohocrm
+      triggers:
+        CREATEDORUPDATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: getLeads_model
+          options:
+            subscription:
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/getLeads_model/operations/CREATEDORUPDATED_POLLER/subscribe
+              action: createdorupdated_poller
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: API_BUSINESS_PARTNER__A_BusinessPartner
+      connector-type: saps4hana
+      actions:
+        Create_A_BusinessPartner: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/API_BUSINESS_PARTNER__A_BusinessPartner/operations/Create_A_BusinessPartner
+          action: create
+    action-interface-1:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP S 4HANA Create a new business partner record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: Create_A_BusinessPartner
+              map:
+                mappings:
+                  - BusinessPartnerCategory:
+                      template: '1'
+                  - BusinessPartnerGrouping:
+                      template: BPEE
+                  - FirstName:
+                      template: '{{$Trigger.First_Name}}'
+                  - LastName:
+                      template: '{{$Trigger.Last_Name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$SAPS4HANACreateanewbusinesspartnerrecord}}'
+                  - Subject:
+                      template: PROCUREMENT
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Supplier Onboarding Sync from ZohoCRM to SAP Vendors
+models: {}

@@ -1,0 +1,292 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createBusinesspartner:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createBusinesspartner
+          output-context:
+            data: createBusinesspartner
+      options:
+        resources:
+          - business-object: businesspartner
+            triggers:
+              create: createBusinesspartner
+            model:
+              $ref: '#/models/businesspartner'
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: API_SALES_ORDER_SRV__A_SalesOrder
+      connector-type: saps4hana
+      actions:
+        ReadAll_A_SalesOrder: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/API_SALES_ORDER_SRV__A_SalesOrder/operations/ReadAll_A_SalesOrder
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: API_BUSINESS_PARTNER__A_CustomerCompany
+      connector-type: saps4hana
+      actions:
+        Get_A_CustomerCompany: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/API_BUSINESS_PARTNER__A_CustomerCompany/operations/Get_A_CustomerCompany
+          action: retrieve
+    action-interface-3:
+      type: api-action
+      business-object: Text generation
+      connector-type: googlegemini
+      actions:
+        postGenerateTextByModelId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20generation/operations/postGenerateTextByModelId
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: API_BUSINESS_PARTNER__A_BPCreditWorthiness
+      connector-type: saps4hana
+      actions:
+        Update_A_BPCreditWorthiness: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: patch
+          path: resources/API_BUSINESS_PARTNER__A_BPCreditWorthiness/operations/Update_A_BPCreditWorthiness
+          action: update
+    action-interface-5:
+      type: api-action
+      business-object: API_BUSINESS_PARTNER__A_BPCreditWorthiness
+      connector-type: saps4hana
+      actions:
+        ReadAll_A_BPCreditWorthiness: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/API_BUSINESS_PARTNER__A_BPCreditWorthiness/operations/ReadAll_A_BPCreditWorthiness
+          action: retrievewithwhere
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP S 4HANA Retrieve all sales order headers.
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  and:
+                    - SoldToParty: '{{$Request.customerId}}'
+                    - PaymentMethod: '{{$Request.paymentMethod}}'
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              action: ReadAll_A_SalesOrder
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings: []
+          - custom-action:
+              name: SAP S 4HANA Retrieves customer company data by using key fields.
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: Get_A_CustomerCompany
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings: []
+              filter:
+                where:
+                  and:
+                    - CompanyCode: '{{$SAPS4HANARetrieveallsalesorderheaders.SalesOrganization}}'
+                    - Customer: '{{$SAPS4HANARetrieveallsalesorderheaders.SoldToParty}}'
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - custom-action:
+              name: Google Gemini Generate text with Gemini model
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postGenerateTextByModelId
+              map:
+                mappings:
+                  - modelId:
+                      template: models/gemini-2.5-pro
+                  - text:
+                      template: >-
+                        Role: SAP S/4HANA Credit Analyst.Objective: Calculate a BusPartCreditStanding value (integer
+                        1-6) based on real-time transactional risk.Input Variables:TotalNetAmount:
+                        {{$SAPS4HANARetrieveallsalesorderheaders.TotalNetAmount}} Master_PaymentTerms:
+                        {{$SAPS4HANARetrievescustomercompanydatabyusingkeyfields.PaymentTerms}} Order_PaymentTerms:
+                        {{$SAPS4HANARetrieveallsalesorderheaders.CustomerPaymentTerms}}Algorithm:Base Score: Start with
+                        1.0.Exposure Risk: Add (TotalNetAmount / 5000) * 2.Terms Discrepancy: If Order_PaymentTerms is
+                        NOT EQUAL to Master_PaymentTerms, add 1.5.Normalization: Round the final sum to the nearest
+                        whole integer.Bounds: If the result is greater than 6, set to 6. If less than 1, set to
+                        1.Constraint: Return ONLY the resulting integer. Do not include text, labels, or explanations.
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: SAPS4HANARetrievescustomercompanydatabyusingkeyfields
+                    $ref: '#/node-output/SAP S 4HANA Retrieves customer company data by using key fields./response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - custom-action:
+              name: SAP S 4HANA Updates business partner credit worthiness data.
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: Update_A_BPCreditWorthiness
+              map:
+                mappings:
+                  - BusPartCreditStanding:
+                      template: '{{$GoogleGeminiGeneratetextwithGeminimodel.candidates.content.parts.text[0]}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: SAPS4HANARetrievescustomercompanydatabyusingkeyfields
+                    $ref: '#/node-output/SAP S 4HANA Retrieves customer company data by using key fields./response/payload'
+                  - variable: GoogleGeminiGeneratetextwithGeminimodel
+                    $ref: '#/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  BusinessPartner: '{{$SAPS4HANARetrievescustomercompanydatabyusingkeyfields.Customer}}'
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: SAPS4HANARetrievescustomercompanydatabyusingkeyfields
+                    $ref: '#/node-output/SAP S 4HANA Retrieves customer company data by using key fields./response/payload'
+                  - variable: GoogleGeminiGeneratetextwithGeminimodel
+                    $ref: '#/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - custom-action:
+              name: SAP S 4HANA Retrieves business partner credit worthiness data.
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  BusinessPartner: '{{$SAPS4HANARetrievescustomercompanydatabyusingkeyfields.Customer}}'
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: SAPS4HANARetrievescustomercompanydatabyusingkeyfields
+                    $ref: '#/node-output/SAP S 4HANA Retrieves customer company data by using key fields./response/payload'
+                  - variable: GoogleGeminiGeneratetextwithGeminimodel
+                    $ref: '#/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                  - variable: SAPS4HANAUpdatesbusinesspartnercreditworthinessdata
+                    $ref: '#/node-output/SAP S 4HANA Updates business partner credit worthiness data./response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              action: ReadAll_A_BPCreditWorthiness
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SAPS4HANARetrieveallsalesorderheaders
+                    $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                  - variable: SAPS4HANARetrievescustomercompanydatabyusingkeyfields
+                    $ref: '#/node-output/SAP S 4HANA Retrieves customer company data by using key fields./response/payload'
+                  - variable: GoogleGeminiGeneratetextwithGeminimodel
+                    $ref: '#/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                  - variable: SAPS4HANAUpdatesbusinesspartnercreditworthinessdata
+                    $ref: '#/node-output/SAP S 4HANA Updates business partner credit worthiness data./response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings: []
+          - response:
+              name: response
+              reply-maps:
+                - title: businesspartner successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: SAPS4HANARetrieveallsalesorderheaders
+                        $ref: '#/node-output/SAP S 4HANA Retrieve all sales order headers./response/payload'
+                      - variable: SAPS4HANARetrievescustomercompanydatabyusingkeyfields
+                        $ref: >-
+                          #/node-output/SAP S 4HANA Retrieves customer company data by using key
+                          fields./response/payload
+                      - variable: GoogleGeminiGeneratetextwithGeminimodel
+                        $ref: '#/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                      - variable: SAPS4HANAUpdatesbusinesspartnercreditworthinessdata
+                        $ref: '#/node-output/SAP S 4HANA Updates business partner credit worthiness data./response/payload'
+                      - variable: SAPS4HANARetrievesbusinesspartnercreditworthinessdata
+                        $ref: '#/node-output/SAP S 4HANA Retrieves business partner credit worthiness data./response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - customerId:
+                          template: >-
+                            Response from Gemini model
+                            :{{$GoogleGeminiGeneratetextwithGeminimodel.candidates.content.parts.text[0]}}
+                            --------updated businesspartner:
+                            {{$SAPS4HANARetrievesbusinesspartnercreditworthinessdata.BusPartCreditStanding}}
+                            -------------- ----------For Reference:
+                            {{$SAPS4HANARetrievesbusinesspartnercreditworthinessdata}}
+  name: Predictive Cash Flow and Payment Risk Analysis
+models:
+  businesspartner:
+    name: businesspartner
+    plural: businesspartner
+    properties:
+      customerId:
+        required: false
+        id: true
+        type: string
+      paymentMethod:
+        required: false
+        id: false
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''
