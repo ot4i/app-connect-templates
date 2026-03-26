@@ -3913,7 +3913,34 @@
   "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
   "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
   "offerings": ["app connect professional"]
- }               
+ },
+ {
+  "name": "Aggregated Salesforce and sapsuccessfactor data is used to generate narrative and sends to Sharepoint and email",
+  "description": "Use this template to get contact data from Salesforce, add it to SAP SuccessFactors as a candidate, generate a narrative about the candidate with contact details using Azure OpenAI, and send it to SharePoint and email. This template automates the process of executing summaries aligned with enterprise recruitment data.",
+  "summary": "Salesforce to 5 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["salesforce", "sapsuccessfactors", "azureopenai", "microsoftsharepoint", "gmail"],
+  "tags": ["salesforce", "sapsuccessfactors", "azureopenai", "microsoftsharepoint", "gmail", "ai", "recruitment", "narrative", "automation"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Generate a draft resolution for a servicenow problem using Azure OpenAI and send it through mail",
+  "description": "Use this template to get ServiceNow problems, generate a draft resolution using Azure OpenAI, and send it through Gmail. This template automates the process of customer service assistance with a draft resolution for issues being sent to users.",
+  "summary": "ServiceNow to 2 applications",
+  "sourceApp": "servicenow",
+  "targetApps": ["azureopenai", "gmail"],
+  "tags": ["servicenow", "azureopenai", "gmail", "ai", "customer service", "problem resolution", "automation"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Generate content similarity insights by create or update vectors in Pinecone Vector DB using embeddings of Azure OpenAI",
+  "description": "Use this template to get campaign details from Salesforce, create embeddings using Azure OpenAI, and save them in Pinecone Vector Database. This template generates content similarity insights using Azure OpenAI embeddings and stores them in Pinecone Vector DB.",
+  "summary": "Salesforce to 3 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["azureopenai", "pineconedb", "gmail"],
+  "tags": ["salesforce", "azureopenai", "pineconedb", "gmail", "ai", "embeddings", "vector database", "similarity", "campaign"],
+  "offerings": ["app connect professional"]
+ }
 ]
 }
 
