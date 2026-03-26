@@ -1,0 +1,99 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: freshservice
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Tickets
+          options:
+            subscription:
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Tickets/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: '{{$Trigger}}'
+                  - channelId:
+                      template: 19:04c4aecedbc6460a8c69317c27a75113@thread.tacv2
+                  - subject:
+                      template: '{{$Trigger.subject}}'
+                  - teamId:
+                      template: 94c30026-bd4b-47b4-9af4-a8f93cf0b877
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$Trigger}}'
+                  - CC:
+                      template: example@gmail.com
+                  - Subject:
+                      template: >-
+                        Ticket
+                        Received:{{$MicrosoftTeamsSendmessagetochannel.id}}  ::
+                        {{$Trigger.subject}}
+                  - To:
+                      template: example@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftTeamsSendmessagetochannel
+                    $ref: >-
+                      #/node-output/Microsoft Teams Send message to
+                      channel/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Notify teams via Microsoft Teams for new Freshservice Tickets
+models: {}

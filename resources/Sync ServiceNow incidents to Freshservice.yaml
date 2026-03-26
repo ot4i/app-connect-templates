@@ -1,0 +1,99 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: servicenow
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: incident
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/incident/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tickets
+      connector-type: freshservice
+      actions:
+        createTicket: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Tickets/operations/createTicket
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Freshservice Create ticket
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: createTicket
+              map:
+                mappings:
+                  - description:
+                      template: '{{$Trigger.description}}'
+                  - impact:
+                      expression: '2'
+                  - priority:
+                      expression: '2'
+                  - requester_id:
+                      expression: '30001196232'
+                  - status:
+                      expression: '3'
+                  - subject:
+                      template: '{{$Trigger.short_description}}'
+                  - urgency:
+                      expression: '2'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$FreshserviceCreateticket}} :: {{$Trigger}}'
+                  - CC:
+                      template: example@gmail.com
+                  - Subject:
+                      template: >-
+                        Ticket Received from
+                        ServiceNow-FreshService:{{$FreshserviceCreateticket.subject}}
+                  - To:
+                      template: example@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: FreshserviceCreateticket
+                    $ref: '#/node-output/Freshservice Create ticket/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Sync ServiceNow incidents to Freshservice
+models: {}
