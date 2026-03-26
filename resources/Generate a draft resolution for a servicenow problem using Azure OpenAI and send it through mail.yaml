@@ -1,0 +1,136 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: servicenow
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: problem
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/problem/operations/CREATED/subscribe
+              action: created
+      account-name: ServiceNow 1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Chat completions
+      connector-type: azureopenai
+      account-name: MicrosoftAzureOpenAI 1
+      actions:
+        postOpenaiV1ChatCompletions: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Chat%20completions/operations/postOpenaiV1ChatCompletions
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      account-name: Gmail 1
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: request
+      connector-type: http
+      actions:
+        INVOKE: {}
+      account-name: HTTP 1
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/request/operations/INVOKE
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: azureopenai Create Chat completion
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postOpenaiV1ChatCompletions
+              map:
+                mappings:
+                  - messages:
+                      foreach:
+                        input: '[{}]'
+                        iterator: messagesItem
+                        mappings:
+                          - content:
+                              template: 'Can you give me a draft resolution of the query : {{$Trigger.short_description}}'
+                          - role:
+                              template: user
+                  - model:
+                      template: gpt-4o-mini
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: HTTP Invoke method
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: INVOKE
+              map:
+                mappings:
+                  - method:
+                      template: POST
+                  - requestBody:
+                      template: >-
+                        {{$Trigger.assigned_to.value}}, {{$azureopenaiCreateChatcompletion.choices.message.role}},
+                        {{$azureopenaiCreateChatcompletion.choices.message.content}} ||||
+                        {{$Trigger.short_description}} 
+                  - url:
+                      template: https://usecasesflows.free.beeceptor.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: azureopenaiCreateChatcompletion
+                    $ref: '#/node-output/azureopenai Create Chat completion/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$azureopenaiCreateChatcompletion.choices.message.content}}'
+                  - Subject:
+                      template: 'Summary of the {{$azureopenaiCreateChatcompletion.choices.message.role}} Issue:'
+                  - To:
+                      template: '{{$Trigger.assigned_to.value}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: azureopenaiCreateChatcompletion
+                    $ref: '#/node-output/azureopenai Create Chat completion/response/payload'
+                  - variable: HTTPInvokemethod
+                    $ref: '#/node-output/HTTP Invoke method/response/payload'
+                  - variable: HTTPInvokemethodMetadata
+                    $ref: '#/node-output/HTTP Invoke method/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Customer Service Assistant
+models: {}
