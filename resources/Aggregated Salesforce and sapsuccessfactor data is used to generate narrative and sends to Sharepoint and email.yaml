@@ -16,7 +16,6 @@ integration:
               httpMethod: post
               path: resources/Contact/operations/CREATED/subscribe
               action: created
-      account-name: Salesforce 1
   action-interfaces:
     action-interface-3:
       type: api-action
@@ -29,7 +28,6 @@ integration:
           httpMethod: post
           path: resources/File
           action: create
-      account-name: MicrosoftSharePoint 1
     action-interface-1:
       type: api-action
       business-object: postCandidate_model
@@ -41,12 +39,10 @@ integration:
           httpMethod: post
           path: resources/postCandidate_model/operations/postCandidate
           action: custom
-      account-name: SAPSuccessFactors 1
     action-interface-4:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Gmail 1
       actions:
         CREATE: {}
       options:
@@ -58,7 +54,6 @@ integration:
       type: api-action
       business-object: Responses
       connector-type: azureopenai
-      account-name: MicrosoftAzureOpenAI 1
       actions:
         postOpenaiV1Responses: {}
       options:
@@ -77,7 +72,6 @@ integration:
           httpMethod: get
           path: resources/Contact
           action: retrievewithwhere
-      account-name: Salesforce 1
   assemblies:
     assembly-1:
       assembly:
