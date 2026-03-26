@@ -1,0 +1,230 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Search
+      connector-type: splunk
+      actions:
+        postServicesNSByUserByAppSearchJobs: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Users/{user}/Applications/{app}/Search/operations/postServicesNSByUserByAppSearchJobs
+          action: upsertwithwhere
+    action-interface-2:
+      type: api-action
+      business-object: Search
+      connector-type: splunk
+      actions:
+        getServicesNSByUserByAppSearchV2JobsBySearchIDResults: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: >-
+            resources/Users/{user}/Applications/{app}/Search/operations/getServicesNSByUserByAppSearchV2JobsBySearchIDResults
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: Tickets
+      connector-type: freshservice
+      actions:
+        createTicket: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Tickets/operations/createTicket
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Splunk Create search
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postServicesNSByUserByAppSearchJobs
+              map:
+                mappings:
+                  - app:
+                      template: 000-self-service
+                  - search:
+                      template: >-
+                        search index=main earliest=-5m ("Critical Error" OR
+                        "Exception")| stats count as error_count, values(_raw)
+                        as _raw, values(_time) as _time, values(host) as host,
+                        values(source) as source| where error_count > 2| eval
+                        threshold_exceeded = "true" 
+                  - user:
+                      template: moksh
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - app: application
+                    - user: user
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Splunk Get search by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: getServicesNSByUserByAppSearchV2JobsBySearchIDResults
+              map:
+                mappings:
+                  - app:
+                      template: application
+                  - user:
+                      template: user
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkCreatesearch
+                    $ref: '#/node-output/Splunk Create search/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - search_ID: '{{$SplunkCreatesearch.sid}}'
+                    - app: application
+                    - user: user
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkCreatesearch
+                    $ref: '#/node-output/Splunk Create search/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 11
+              allow-truncation: true
+              allow-empty-output: true
+              pagination-type: SKIP_LIMIT
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkCreatesearch
+                    $ref: '#/node-output/Splunk Create search/response/payload'
+                  - variable: SplunkGetsearchbyID
+                    $ref: '#/node-output/Splunk Get search by ID/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      ThresholdExceeded:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - ThresholdExceeded:
+                            template: >-
+                              {{$boolean($SplunkGetsearchbyID[0].threshold_exceeded)}}
+              name: Set variable
+          - if:
+              branch:
+                - condition:
+                    '{{$Setvariable.variable.ThresholdExceeded}}':
+                      '=': 'true'
+                  execute:
+                    - custom-action:
+                        name: Freshservice Create ticket
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        action: createTicket
+                        map:
+                          mappings:
+                            - description:
+                                template: '{{$SplunkGetsearchbyID}}'
+                            - priority:
+                                expression: '2'
+                            - requester_id:
+                                expression: '30001192810'
+                            - splunk_deeplink:
+                                template: >-
+                                  https://{{$substring($SplunkGetsearchbyID.host
+                                  , 12, $length($SplunkGetsearchbyID.host )
+                                  )}}/en-US/app/search/search?sid={{$SplunkCreatesearch.sid}}
+                            - status:
+                                expression: '2'
+                            - subject:
+                                template: Ticket created for Splunk Threshold exceeded
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: SplunkCreatesearch
+                              $ref: >-
+                                #/node-output/Splunk Create
+                                search/response/payload
+                            - variable: SplunkGetsearchbyID
+                              $ref: >-
+                                #/node-output/Splunk Get search by
+                                ID/response/payload
+                            - variable: Setvariable
+                              $ref: '#/node-output/Set variable/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter: {}
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: SplunkCreatesearch
+                  $ref: '#/node-output/Splunk Create search/response/payload'
+                - variable: SplunkGetsearchbyID
+                  $ref: '#/node-output/Splunk Get search by ID/response/payload'
+                - variable: Setvariable
+                  $ref: '#/node-output/Set variable/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+  name: Create a Freshservice incident from Splunk search results
+models: {}
+
