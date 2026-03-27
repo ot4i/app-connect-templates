@@ -3913,7 +3913,34 @@
   "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
   "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
   "offerings": ["app connect professional"]
- }               
+ },
+ {
+  "name": "Create a Freshservice incident from Splunk search results",
+  "description": "Use this template to create a Freshservice incident from Splunk search results",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["freshservice","splunk"],
+  "tags": ["streaming-connector-scheduler", "freshservice", "splunk"],
+  "offerings": ["app connect professional"]
+ }, 
+ {
+  "name": "Sync ServiceNow incidents to Freshservice",
+  "description": "Use this template to sync ServiceNow incidents to Freshservice",
+  "summary": "ServiceNow to 2 applications ",
+  "sourceApp": "servicenow",
+  "targetApps": ["freshservice","gmail"],
+  "tags": ["servicenow", "freshservice", "gmail"],
+  "offerings": ["app connect professional"]
+ },  
+ {
+  "name": "Notify teams via Microsoft Teams for new Freshservice Tickets",
+  "description": "Use this template to notify teams via Microsoft Teams for new Freshservice Tickets",
+  "summary": "Freshservice to 2 applications ",
+  "sourceApp": "freshservice",
+  "targetApps": ["msteams","gmail"],
+  "tags": ["freshservice", "msteams", "gmail"],
+  "offerings": ["app connect professional"]
+ }              
 ]
 }
 
