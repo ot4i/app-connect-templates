@@ -3913,7 +3913,25 @@
   "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
   "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
   "offerings": ["app connect professional"]
- }               
+ },
+ {
+  "name": "Consume IBM MQ messages and send them to Splunk over HEC",
+  "description": "Use this template to consume events from IBM MQ and send them to Splunk using HEC",
+  "summary": "IBM MQ to Splunk",
+  "sourceApp": "IBM MQ",
+  "targetApps": ["MQ", "splunk"],
+  "tags": ["MQ", "splunk"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Detect error logs in Splunk every minute and notify via Gmail",
+  "description": "Use this template to receive emails for error or exception events that occur in Splunk",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["streaming-connector-scheduler", "splunk","gmail"],
+  "tags": ["streaming-connector-scheduler", "splunk","gmail"],
+  "offerings": ["app connect professional"]
+ }
 ]
 }
 
