@@ -1,0 +1,109 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: mq
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: message
+          options:
+            subscription:
+              queueName: DEV.CCT.QUEUE.1
+              browseOnly: 'Yes'
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/message/operations/CREATED/subscribe
+              action: created
+      account-name: Account 1
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: HTTP Event Collector (HEC)
+      connector-type: splunk
+      account-name: Account 1
+      actions:
+        postServicesCollectorRaw: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/HTTP%20Event%20Collector%20(HEC)/operations/postServicesCollectorRaw
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: HTTP Event Collector (HEC)
+      connector-type: splunk
+      account-name: Account 1
+      actions:
+        getServicesNSByUserByAppDataInputsHttpById: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: >-
+            resources/Users/{user}/Applications/{app}/HTTP%20Event%20Collector%20(HEC)/operations/getServicesNSByUserByAppDataInputsHttpById
+          action: retrievewithwhere
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Splunk Retrieve HEC token by ID 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: getServicesNSByUserByAppDataInputsHttpById
+              map:
+                mappings:
+                  - app:
+                      template: 000-self-service
+                  - user:
+                      template: moksh
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - id: hecfordemo
+                    - app: 000-self-service
+                    - user: moksh
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkRetrieveHECtoken
+                    $ref: '#/node-output/Splunk Retrieve HEC token/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 11
+              allow-truncation: true
+          - custom-action:
+              name: Splunk Send HEC data
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postServicesCollectorRaw
+              map:
+                mappings:
+                  - Authorization:
+                      template: '{{$SplunkRetrieveHECtokenbyID2.content.token}}'
+                  - event:
+                      template: '{{$Trigger.message}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SplunkRetrieveHECtokenbyID2
+                    $ref: >-
+                      #/node-output/Splunk Retrieve HEC token by ID
+                      2/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Consume IBM MQ messages and send them to Splunk over HEC
+models: {}
