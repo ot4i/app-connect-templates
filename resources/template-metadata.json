@@ -3913,7 +3913,34 @@
   "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
   "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
   "offerings": ["app connect professional"]
- }               
+ },
+ {
+  "name": "Aggregate Salesforce and SAP SuccessFactors data to generate a narrative and send it to Microsoft SharePoint and Gmail",
+  "description": "Use this template to get contact data from Salesforce, add it to SAP SuccessFactors as a candidate, generate a narrative about the candidate with contact details using Azure OpenAI, and send it to SharePoint and email. This template automates the process of executing summaries aligned with enterprise recruitment data.",
+  "summary": "Salesforce to 5 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["salesforce", "sapsuccessfactors", "azureopenai", "gmail", "mssharepoint"],
+  "tags": ["salesforce", "sapsuccessfactors", "azureopenai", "mssharepoint", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Generate a draft resolution for a ServiceNow problem using Azure OpenAI and send it through Gmail",
+  "description": "Use this template to get ServiceNow problems, generate a draft resolution using Azure OpenAI, and send it through Gmail. This template automates the process of customer service assistance with a draft resolution for issues being sent to users.",
+  "summary": "ServiceNow to 3 applications",
+  "sourceApp": "servicenow",
+  "targetApps": ["azureopenai", "http", "gmail"],
+  "tags": ["azureopenai", "http", "gmail", "servicenow"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Generate content similarity insights by creating or updating vectors in Pinecone Vector DB using Azure OpenAI embeddings",
+  "description": "Use this template to get campaign details from Salesforce, create embeddings using Azure OpenAI, and save them in Pinecone Vector Database. This template generates content similarity insights using Azure OpenAI embeddings and stores them in Pinecone Vector Database.",
+  "summary": "Salesforce to 2 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["azureopenai", "pineconedb"],
+  "tags": ["salesforce", "azureopenai", "pineconedb"],
+  "offerings": ["app connect professional"]
+ }
 ]
 }
 
