@@ -1,0 +1,233 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Contact
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Contact/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: File
+      connector-type: mssharepoint
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/File
+          action: create
+    action-interface-1:
+      type: api-action
+      business-object: postCandidate_model
+      connector-type: sapsuccessfactors
+      actions:
+        postCandidate: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/postCandidate_model/operations/postCandidate
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-5:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Contact
+          action: retrievewithwhere
+    action-interface-6:
+      type: api-action
+      business-object: Responses
+      connector-type: azureopenai
+      actions:
+        postOpenaiV1Responses: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Responses/operations/postOpenaiV1Responses
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              allow-empty-output: true
+              filter:
+                limit: 10
+                where:
+                  Id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+          - custom-action:
+              name: SAP SuccessFactors Create candidate 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postCandidate
+              map:
+                mappings:
+                  - address:
+                      template: '{{$SalesforceRetrievecontacts.MailingStreet}}'
+                  - cellPhone:
+                      template: '{{$SalesforceRetrievecontacts.MobilePhone}}'
+                  - city:
+                      template: '{{$SalesforceRetrievecontacts.MailingCity}}'
+                  - contactEmail:
+                      template: '{{$Trigger.Email}}'
+                  - country:
+                      template: '{{$SalesforceRetrievecontacts.MailingCountry}}'
+                  - firstName:
+                      template: '{{$Trigger.FirstName}}'
+                  - lastName:
+                      template: '{{$Trigger.LastName}}'
+                  - primaryEmail:
+                      template: '{{$Trigger.Email}}'
+                  - zip:
+                      template: '{{$SalesforceRetrievecontacts.MailingPostalCode}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Microsoft Azure OpenAI Create response
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              action: postOpenaiV1Responses
+              map:
+                mappings:
+                  - input:
+                      foreach:
+                        input: '[{}]'
+                        iterator: inputItem
+                        mappings:
+                          - content:
+                              foreach:
+                                input: '[{}]'
+                                iterator: contentItem
+                                mappings:
+                                  - text:
+                                      template: >-
+                                        Genarate a summary narrative of {{$Trigger.FirstName}} {{$Trigger.LastName}}  by
+                                        understand all user basic details : {{$SalesforceRetrievecontacts}} and
+                                        professional detaits {{$SalesforceRetrievecontacts.Description}}
+                                  - type_text:
+                                      template: input_text
+                          - role:
+                              template: user
+                  - model:
+                      template: gpt-4o-mini
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: SAPSuccessFactorsCreatecandidate2
+                    $ref: '#/node-output/SAP SuccessFactors Create candidate 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$azureopenaiCreateResponse.output[0].content[0].text}}'
+                  - Subject:
+                      template: 'Summary of candidate profile '
+                  - To:
+                      template: '{{$SalesforceRetrievecontacts.Email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: SAPSuccessFactorsCreatecandidate2
+                    $ref: '#/node-output/SAP SuccessFactors Create candidate 2/response/payload'
+                  - variable: MicrosoftAzureOpenAICreateresponse
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create response/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft SharePoint Create file 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Name:
+                      template: Candidate Report
+                  - Overwrite:
+                      expression: 'true'
+                  - ParentFolderPath:
+                      template: /sites/CCTTEST/Shared Documents/StreamUpload
+                  - SitePath:
+                      template: /sites/CCTTEST
+                  - content:
+                      template: '{{$azureopenaiCreateResponse.output[0].content[0].text}}'
+                  - fileType:
+                      template: Text
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: SAPSuccessFactorsCreatecandidate2
+                    $ref: '#/node-output/SAP SuccessFactors Create candidate 2/response/payload'
+                  - variable: MicrosoftAzureOpenAICreateresponse
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create response/response/payload'
+                  - variable: GmailSendemail
+                    $ref: '#/node-output/Gmail Send email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Automated Executive Reporting_1
+models: {}
