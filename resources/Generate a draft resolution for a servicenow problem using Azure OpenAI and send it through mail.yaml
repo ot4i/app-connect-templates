@@ -16,13 +16,11 @@ integration:
               httpMethod: post
               path: resources/problem/operations/CREATED/subscribe
               action: created
-      account-name: ServiceNow 1
   action-interfaces:
     action-interface-2:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Gmail 1
       actions:
         CREATE: {}
       options:
@@ -36,7 +34,6 @@ integration:
       connector-type: http
       actions:
         INVOKE: {}
-      account-name: HTTP 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -46,7 +43,6 @@ integration:
       type: api-action
       business-object: Chat completions
       connector-type: azureopenai
-      account-name: MicrosoftAzureOpenAI 2
       actions:
         postOpenaiV1ChatCompletions: {}
       options:
