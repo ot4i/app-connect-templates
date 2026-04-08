@@ -16,6 +16,7 @@ integration:
               httpMethod: post
               path: resources/Contact/operations/CREATED/subscribe
               action: created
+      account-name: Salesforce 1
   action-interfaces:
     action-interface-3:
       type: api-action
@@ -28,6 +29,7 @@ integration:
           httpMethod: post
           path: resources/File
           action: create
+      account-name: MicrosoftSharePoint 1
     action-interface-1:
       type: api-action
       business-object: postCandidate_model
@@ -39,27 +41,18 @@ integration:
           httpMethod: post
           path: resources/postCandidate_model/operations/postCandidate
           action: custom
+      account-name: SAPSuccessFactors 1
     action-interface-4:
       type: api-action
       business-object: mail
       connector-type: gmail
+      account-name: Gmail 1
       actions:
         CREATE: {}
       options:
         connectorServiceOptions:
           httpMethod: post
           path: resources/mail
-          action: create
-    action-interface-2:
-      type: api-action
-      business-object: Responses
-      connector-type: azureopenai
-      actions:
-        postOpenaiV1Responses: {}
-      options:
-        connectorServiceOptions:
-          httpMethod: post
-          path: resources/Responses/operations/postOpenaiV1Responses
           action: create
     action-interface-5:
       type: api-action
@@ -72,6 +65,19 @@ integration:
           httpMethod: get
           path: resources/Contact
           action: retrievewithwhere
+      account-name: Salesforce 1
+    action-interface-6:
+      type: api-action
+      business-object: Responses
+      connector-type: azureopenai
+      account-name: MicrosoftAzureOpenAI 2
+      actions:
+        postOpenaiV1Responses: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Responses/operations/postOpenaiV1Responses
+          action: create
   assemblies:
     assembly-1:
       assembly:
@@ -129,9 +135,9 @@ integration:
                     $ref: '#/flowDetails'
               filter: {}
           - custom-action:
-              name: azureopenai Create Response
+              name: Microsoft Azure OpenAI Create response
               target:
-                $ref: '#/integration/action-interfaces/action-interface-2'
+                $ref: '#/integration/action-interfaces/action-interface-6'
               action: postOpenaiV1Responses
               map:
                 mappings:
@@ -191,8 +197,8 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve contacts/response'
                   - variable: SAPSuccessFactorsCreatecandidate2
                     $ref: '#/node-output/SAP SuccessFactors Create candidate 2/response/payload'
-                  - variable: azureopenaiCreateResponse
-                    $ref: '#/node-output/azureopenai Create Response/response/payload'
+                  - variable: MicrosoftAzureOpenAICreateresponse
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create response/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
           - create-action:
@@ -223,11 +229,11 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve contacts/response'
                   - variable: SAPSuccessFactorsCreatecandidate2
                     $ref: '#/node-output/SAP SuccessFactors Create candidate 2/response/payload'
-                  - variable: azureopenaiCreateResponse
-                    $ref: '#/node-output/azureopenai Create Response/response/payload'
+                  - variable: MicrosoftAzureOpenAICreateresponse
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create response/response/payload'
                   - variable: GmailSendemail
                     $ref: '#/node-output/Gmail Send email/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Automated Executive Reporting
+  name: Automated Executive Reporting_1
 models: {}

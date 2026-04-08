@@ -16,22 +16,13 @@ integration:
               httpMethod: post
               path: resources/problem/operations/CREATED/subscribe
               action: created
+      account-name: ServiceNow 1
   action-interfaces:
-    action-interface-1:
-      type: api-action
-      business-object: Chat completions
-      connector-type: azureopenai
-      actions:
-        postOpenaiV1ChatCompletions: {}
-      options:
-        connectorServiceOptions:
-          httpMethod: post
-          path: resources/Chat%20completions/operations/postOpenaiV1ChatCompletions
-          action: create
     action-interface-2:
       type: api-action
       business-object: mail
       connector-type: gmail
+      account-name: Gmail 1
       actions:
         CREATE: {}
       options:
@@ -45,19 +36,32 @@ integration:
       connector-type: http
       actions:
         INVOKE: {}
+      account-name: HTTP 1
       options:
         connectorServiceOptions:
           httpMethod: post
           path: resources/request/operations/INVOKE
           action: custom
+    action-interface-4:
+      type: api-action
+      business-object: Chat completions
+      connector-type: azureopenai
+      account-name: MicrosoftAzureOpenAI 2
+      actions:
+        postOpenaiV1ChatCompletions: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Chat%20completions/operations/postOpenaiV1ChatCompletions
+          action: create
   assemblies:
     assembly-1:
       assembly:
         execute:
           - custom-action:
-              name: azureopenai Create Chat completion
+              name: Microsoft Azure OpenAI Create chat completion
               target:
-                $ref: '#/integration/action-interfaces/action-interface-1'
+                $ref: '#/integration/action-interfaces/action-interface-4'
               action: postOpenaiV1ChatCompletions
               map:
                 mappings:
@@ -99,8 +103,8 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: azureopenaiCreateChatcompletion
-                    $ref: '#/node-output/azureopenai Create Chat completion/response/payload'
+                  - variable: MicrosoftAzureOpenAICreatechatcompletion
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create chat completion/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter: {}
@@ -120,8 +124,8 @@ integration:
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
-                  - variable: azureopenaiCreateChatcompletion
-                    $ref: '#/node-output/azureopenai Create Chat completion/response/payload'
+                  - variable: MicrosoftAzureOpenAICreatechatcompletion
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create chat completion/response/payload'
                   - variable: HTTPInvokemethod
                     $ref: '#/node-output/HTTP Invoke method/response/payload'
                   - variable: HTTPInvokemethodMetadata

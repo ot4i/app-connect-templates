@@ -18,11 +18,13 @@ integration:
               httpMethod: post
               path: resources/Campaign/operations/CREATED_POLLER/subscribe
               action: created_poller
+      account-name: Salesforce 1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Embeddings
       connector-type: azureopenai
+      account-name: MicrosoftAzureOpenAI 1
       actions:
         postOpenaiV1Embeddings: {}
       options:
@@ -36,6 +38,7 @@ integration:
       connector-type: pineconedb
       actions:
         postIndexesByIndexHostVectorsUpsert: {}
+      account-name: PineconeVectorDatabase 1
       options:
         connectorServiceOptions:
           httpMethod: post
