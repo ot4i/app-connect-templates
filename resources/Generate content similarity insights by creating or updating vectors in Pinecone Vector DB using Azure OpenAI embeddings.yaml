@@ -99,5 +99,5 @@ integration:
                     $ref: '#/node-output/Microsoft Azure OpenAI Create embeddings/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Generate content similarity insights
+  name: Generate content similarity insights by creating or updating vectors in Pinecone Vector DB using Azure OpenAI embeddings
 models: {}
