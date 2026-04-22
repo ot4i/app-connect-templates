@@ -229,5 +229,5 @@ integration:
                     $ref: '#/node-output/Gmail Send email/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Automated Executive Reporting_1
+  name: Aggregate Salesforce and SAP SuccessFactors data to generate a narrative and send it to Microsoft SharePoint and Gmail
 models: {}
