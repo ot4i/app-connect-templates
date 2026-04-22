@@ -128,5 +128,5 @@ integration:
                     $ref: '#/node-output/HTTP Invoke method/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Customer Service Assistant
+  name: Generate a draft resolution for a ServiceNow problem using Azure OpenAI and send it through Gmail
 models: {}
