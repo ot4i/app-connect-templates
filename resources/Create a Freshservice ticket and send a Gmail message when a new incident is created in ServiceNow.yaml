@@ -95,5 +95,5 @@ integration:
                     $ref: '#/node-output/Freshservice Create ticket/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Sync ServiceNow incidents to Freshservice
+  name: Create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow
 models: {}

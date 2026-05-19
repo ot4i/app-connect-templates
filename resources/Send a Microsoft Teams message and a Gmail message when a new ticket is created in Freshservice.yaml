@@ -95,5 +95,5 @@ integration:
                       channel/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Notify teams via Microsoft Teams for new Freshservice Tickets
+  name: Send a Microsoft Teams message and a Gmail message when a new ticket is created in Freshservice
 models: {}
