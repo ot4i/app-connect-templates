@@ -225,6 +225,6 @@ integration:
                   $ref: '#/node-output/Set variable/response/payload'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Create a Freshservice incident from Splunk search results
+  name: Create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded
 models: {}
 

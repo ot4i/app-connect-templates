@@ -3915,8 +3915,8 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Create a Freshservice incident from Splunk search results",
-  "description": "Use this template to create a Freshservice incident from Splunk search results",
+  "name": "Create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded",
+  "description": "Use this template to create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["freshservice","splunk"],
@@ -3924,8 +3924,8 @@
   "offerings": ["app connect professional"]
  }, 
  {
-  "name": "Sync ServiceNow incidents to Freshservice",
-  "description": "Use this template to sync ServiceNow incidents to Freshservice",
+  "name": "Create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow",
+  "description": "Use this template to create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow",
   "summary": "ServiceNow to 2 applications ",
   "sourceApp": "servicenow",
   "targetApps": ["freshservice","gmail"],
@@ -3933,8 +3933,8 @@
   "offerings": ["app connect professional"]
  },  
  {
-  "name": "Notify teams via Microsoft Teams for new Freshservice Tickets",
-  "description": "Use this template to notify teams via Microsoft Teams for new Freshservice Tickets",
+  "name": "Send a Microsoft Teams message and a Gmail message when a new ticket is created in Freshservice",
+  "description": "Use this template to send a Microsoft Teams message and a Gmail message when a new ticket is created in Freshservice",
   "summary": "Freshservice to 2 applications ",
   "sourceApp": "freshservice",
   "targetApps": ["msteams","gmail"],
