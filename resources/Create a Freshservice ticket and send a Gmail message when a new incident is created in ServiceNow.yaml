@@ -84,7 +84,7 @@ integration:
                   - Subject:
                       template: >-
                         Ticket Received from
-                        ServiceNow-FreshService:{{$FreshserviceCreateticket.subject}}
+                        ServiceNow-Freshservice:{{$FreshserviceCreateticket.subject}}
                   - To:
                       template: example@gmail.com
                 $map: http://ibm.com/appconnect/map/v1
