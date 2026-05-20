@@ -3941,7 +3941,7 @@
   "tags": ["freshservice", "msteams", "gmail"],
   "offerings": ["app connect professional"]
  },
- }   
+ {   
   "name": "Aggregate Salesforce and SAP SuccessFactors data to generate a narrative and send it to Microsoft SharePoint and Gmail",
   "description": "Use this template to get contact data from Salesforce, add it to SAP SuccessFactors as a candidate, generate a narrative about the candidate with contact details using Azure OpenAI, and send it to SharePoint and email. This template automates the process of executing summaries aligned with enterprise recruitment data.",
   "summary": "Salesforce to 5 applications",
