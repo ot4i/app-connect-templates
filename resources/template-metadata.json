@@ -3915,6 +3915,33 @@
   "offerings": ["app connect professional"]
  },
  {
+  "name": "Create a sales order in SAP S4HANA from a Salesforce opportunity and send a notification through Gmail",
+  "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce and send a notification through Gmail.",
+  "summary": "Salesforce to 3 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["saps4hana", "gmail"],
+  "tags": ["salesforce", "saps4hana", "gmail", "if", "sales order", "notification"],
+  "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Perform predictive cash flow and payment risk analysis using SAP S4HANA and Google Gemini",
+    "description": "Use this template to perform predictive cash flow and payment risk analysis using SAP S/4HANA and Google Gemini by analyzing customer sales orders and updating credit worthiness scores.",
+    "summary": "1 flow to 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["saps4hana", "googlegemini", "saps4hana"],
+    "tags": ["api", "saps4hana", "googlegemini", "AI", "credit analysis", "risk assessment", "predictive analytics"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Synchronize supplier onboarding data from Zoho CRM to SAP S4HANA vendors and send a notification through Gmail",
+    "description": "Use this template to synchronize supplier onboarding data from Zoho CRM to SAP S/4HANA vendors and send a notification through Gmail.",
+    "summary": "Zoho CRM to 2 applications",
+    "sourceApp": "zohocrm",
+    "targetApps": ["saps4hana", "gmail"],
+    "tags": ["zohocrm", "saps4hana", "gmail", "supplier onboarding", "notification"],
+    "offerings": ["app connect professional"]
+  },
+  {  
   "name": "Create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded",
   "description": "Use this template to create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded.",
   "summary": "Scheduler to 2 applications",
@@ -3922,7 +3949,7 @@
   "targetApps": ["freshservice", "splunk"],
   "tags": ["streaming-connector-scheduler", "freshservice", "splunk", "setVariable", "if"],
   "offerings": ["app connect professional"]
- }, 
+  }, 
  {
   "name": "Create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow",
   "description": "Use this template to create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow.",
