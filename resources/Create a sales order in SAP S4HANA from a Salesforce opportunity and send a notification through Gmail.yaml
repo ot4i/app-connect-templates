@@ -229,5 +229,5 @@ integration:
                     $ref: '#/node-output/SAP S 4HANA Create a sales order/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Create Sales Order in SAP S4HANA from Salesforce Opportunity
+  name: Create a sales order in SAP S4HANA from a Salesforce opportunity and send a notification through Gmail
 models: {}

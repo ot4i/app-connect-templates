@@ -83,5 +83,5 @@ integration:
                     $ref: '#/trigger/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Supplier Onboarding Sync from ZohoCRM to SAP Vendors
+  name: Synchronize supplier onboarding data from Zoho CRM to SAP S4HANA vendors and send a notification through Gmail
 models: {}

@@ -3915,30 +3915,30 @@
   "offerings": ["app connect professional"]
  },
  {
-    "name": "Create Sales Order in SAP S4HANA from Salesforce Opportunity",
-    "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce.",
-    "summary": "Salesforce to SAP S/4HANA",
+    "name": "Create a sales order in SAP S4HANA from a Salesforce opportunity and send a notification through Gmail",
+    "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce and send a notification through Gmail.",
+    "summary": "Salesforce to SAP S/4HANA and Gmail",
     "sourceApp": "salesforce",
     "targetApps": ["saps4hana", "gmail"],
-    "tags": ["salesforce", "saps4hana", "gmail", "sales order"],
+    "tags": ["salesforce", "saps4hana", "gmail", "sales order", "notification"],
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Predictive Cash Flow and Payment Risk Analysis",
-    "description": "Use this template to perform predictive cash flow and payment risk analysis by analyzing customer sales orders and updating credit worthiness scores in SAP S/4HANA.",
+    "name": "Perform predictive cash flow and payment risk analysis using SAP S4HANA and Google Gemini",
+    "description": "Use this template to perform predictive cash flow and payment risk analysis using SAP S/4HANA and Google Gemini by analyzing customer sales orders and updating credit worthiness scores.",
     "summary": "SAP S/4HANA to Google Gemini AI",
     "sourceApp": "saps4hana",
     "targetApps": ["googlegemini", "saps4hana"],
-    "tags": ["saps4hana", "googlegemini", "AI", "credit analysis", "risk assessment"],
+    "tags": ["saps4hana", "googlegemini", "AI", "credit analysis", "risk assessment", "predictive analytics"],
     "offerings": ["app connect professional"]
   },
   {
-    "name": "Supplier Onboarding Sync from ZohoCRM to SAP Vendors",
-    "description": "Use this template to sync supplier onboarding data from Zoho CRM leads to SAP S/4HANA business partner records.",
-    "summary": "Zoho CRM to SAP S/4HANA",
+    "name": "Synchronize supplier onboarding data from Zoho CRM to SAP S4HANA vendors and send a notification through Gmail",
+    "description": "Use this template to synchronize supplier onboarding data from Zoho CRM to SAP S/4HANA vendors and send a notification through Gmail.",
+    "summary": "Zoho CRM to SAP S/4HANA and Gmail",
     "sourceApp": "zohocrm",
     "targetApps": ["saps4hana", "gmail"],
-    "tags": ["zohocrm", "saps4hana", "gmail"],
+    "tags": ["zohocrm", "saps4hana", "gmail", "supplier onboarding", "notification"],
     "offerings": ["app connect professional"]
   },
   "name": "Create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded",

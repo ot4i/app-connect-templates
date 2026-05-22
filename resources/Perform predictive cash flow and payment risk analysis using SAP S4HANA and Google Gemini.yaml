@@ -273,7 +273,7 @@ integration:
                             {{$SAPS4HANARetrievesbusinesspartnercreditworthinessdata.BusPartCreditStanding}}
                             -------------- ----------For Reference:
                             {{$SAPS4HANARetrievesbusinesspartnercreditworthinessdata}}
-  name: Predictive Cash Flow and Payment Risk Analysis
+  name: Perform predictive cash flow and payment risk analysis using SAP S4HANA and Google Gemini
 models:
   businesspartner:
     name: businesspartner
