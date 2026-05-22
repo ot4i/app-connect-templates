@@ -3920,7 +3920,7 @@
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["freshservice", "splunk"],
-  "tags": ["streaming-connector-scheduler", "freshservice", "splunk"],
+  "tags": ["streaming-connector-scheduler", "freshservice", "splunk", "setVariable", "if"],
   "offerings": ["app connect professional"]
  }, 
  {
@@ -3970,7 +3970,5 @@
  }
 ]
 }
-
-
 
 
