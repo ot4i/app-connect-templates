@@ -3915,13 +3915,13 @@
   "offerings": ["app connect professional"]
  },
  {
-    "name": "Create a sales order in SAP S4HANA from a Salesforce opportunity and send a notification through Gmail",
-    "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce and send a notification through Gmail.",
-    "summary": "Salesforce to SAP S/4HANA and Gmail",
-    "sourceApp": "salesforce",
-    "targetApps": ["saps4hana", "gmail"],
-    "tags": ["salesforce", "saps4hana", "gmail", "sales order", "notification"],
-    "offerings": ["app connect professional"]
+  "name": "Create a sales order in SAP S4HANA from a Salesforce opportunity and send a notification through Gmail",
+  "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce and send a notification through Gmail.",
+  "summary": "Salesforce to SAP S/4HANA and Gmail",
+  "sourceApp": "salesforce",
+  "targetApps": ["saps4hana", "gmail"],
+  "tags": ["salesforce", "saps4hana", "gmail", "sales order", "notification"],
+  "offerings": ["app connect professional"]
   },
   {
     "name": "Perform predictive cash flow and payment risk analysis using SAP S4HANA and Google Gemini",
@@ -3941,6 +3941,7 @@
     "tags": ["zohocrm", "saps4hana", "gmail", "supplier onboarding", "notification"],
     "offerings": ["app connect professional"]
   },
+  {  
   "name": "Create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded",
   "description": "Use this template to create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded.",
   "summary": "Scheduler to 2 applications",
