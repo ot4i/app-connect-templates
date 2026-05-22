@@ -3928,7 +3928,7 @@
     "description": "Use this template to perform predictive cash flow and payment risk analysis using SAP S/4HANA and Google Gemini by analyzing customer sales orders and updating credit worthiness scores.",
     "summary": "1 flow to 2 applications",
     "sourceApp": "api",
-    "targetApps": ["saps4hana, "googlegemini"],
+    "targetApps": ["saps4hana", "googlegemini", "saps4hana"],
     "tags": ["api", "saps4hana", "googlegemini", "AI", "credit analysis", "risk assessment", "predictive analytics"],
     "offerings": ["app connect professional"]
   },
