@@ -1,0 +1,94 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: folders
+      actions:
+        CREATE: {}
+      connector-type: dropbox
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      actions:
+        CREATEEMAIL: {}
+      connector-type: email
+    action-interface-3:
+      type: api-action
+      business-object: folders
+      connector-type: dropbox
+      actions:
+        RETRIEVEALL: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Email Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CREATEEMAIL
+              map:
+                mappings:
+                  - attachmentForCreate:
+                      foreach:
+                        input: $Trigger.CUSTOMFIELDS
+                        iterator: attachmentForCreateItem
+                        mappings:
+                          - contentType:
+                              template: application/octet-stream
+                  - emailBody:
+                      template: '{{$Trigger.VISIBLE_TO}}'
+                  - subjectFilter:
+                      template: hello from Insightly
+                  - toFilter:
+                      template: thanutalent103@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Dropbox Retrieve folders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              filter:
+                limit: 1
+              allow-truncation: true
+              allow-empty-output: true
+          - create-action:
+              name: Dropbox Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - path:
+                      template: '{{$DropboxRetrievefolders.path}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailSendemail
+                    $ref: '#/node-output/Email Send email/response/payload'
+                  - variable: DropboxRetrievefolders
+                    $ref: '#/node-output/Dropbox Retrieve folders/response/payload'
+                  - variable: DropboxRetrievefoldersMetadata
+                    $ref: '#/node-output/Dropbox Retrieve folders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Create folder in Dropbox when new opportunity created in Insightly
+models: {}
