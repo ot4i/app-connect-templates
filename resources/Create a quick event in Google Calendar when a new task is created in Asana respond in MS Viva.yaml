@@ -1,0 +1,86 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      connector-type: asana
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '1160305558369131'
+            team-id: '1160305558369133'
+            project: '1160915618874788'
+            parentFilter:
+              workspace-id: '1160305558369131'
+              team-id: '1160305558369133'
+              project: '1160915618874788'
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: events
+      connector-type: googlecalendar
+      actions:
+        CREATEQUICKEVENT: {}
+    action-interface-1:
+      type: api-action
+      business-object: Message
+      connector-type: yammer
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    '{{$Trigger.completed}}': 'False'
+                  execute:
+                    - custom-action:
+                        name: Google Calendar Create quick event
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: CREATEQUICKEVENT
+                        map:
+                          mappings:
+                            - id:
+                                template: >-
+                                  e05e6c2eded05c420c6a9afc4d50678fd1efac996f65a46a68b034074fee69cd@group.calendar.google.com
+                            - text:
+                                template: '{{$Trigger.name}} --- disucssion'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Microsoft Viva Engage Create message
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-1'
+                      map:
+                        mappings:
+                          - message_body:
+                              template: '{{$Trigger.name}} is complete'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              output-schema: {}
+  name: >-
+    Create a quick event in Google Calendar when a new task is created in Asana
+    respond in MS Viva
+models: {}
