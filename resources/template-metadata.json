@@ -3994,6 +3994,24 @@
   "targetApps": ["azureopenai", "pineconedb"],
   "tags": ["salesforce", "azureopenai", "pineconedb"],
   "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Batch retrieve customer numbers from Hive, enrich with SAP S4HANA customer details, and load into BigQuery",
+  "description": "Use this template to batch retrieve customer numbers from Hive, enrich with SAP S4HANA customer details, and load into BigQuery",
+  "summary": "Hive to 2 applications",
+  "sourceApp": "Google big query",
+  "targetApps": ["hive", "saps4hana","googlebigquery"],
+  "tags": ["hive", "saps4hana","googlebigquery"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Batch retrieves pension schemas from Hive and loads them into DB2 tables based on the is_working property",
+  "description": "Use this template to batch retrieves pension schemas from Hive and loads them into DB2 tables based on the is_working property",
+  "summary": "Hive to 2 applications",
+  "sourceApp": "IBM Db2",
+  "targetApps": ["hive", "IBM Db2"],
+  "tags": ["hive", "IBM Db2"],
+  "offerings": ["app connect professional"]
  }
 ]
 }

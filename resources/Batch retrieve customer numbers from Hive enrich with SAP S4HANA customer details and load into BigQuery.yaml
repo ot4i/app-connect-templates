@@ -1,0 +1,196 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createTest:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createTest
+          output-context:
+            data: createTest
+      options:
+        resources:
+          - business-object: test
+            triggers:
+              create: createTest
+            model:
+              $ref: '#/models/test'
+      type: api-trigger
+    trigger-interface-2:
+      type: extract-trigger
+      connector-type: hive
+      triggers:
+        read_customer_order_history:
+          input-context:
+            data: customer_order_history
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+          options:
+            connectorServiceOptions:
+              httpMethod: get
+              path: resources/customer_order_history/operations/read_customer_order_history
+              action: retrievewithwhere
+      account-name: ApacheHive 1
+    trigger-interface-3:
+      type: batch-completion-trigger
+      triggers:
+        COMPLETE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-3'
+  action-interfaces:
+    action-interface-1:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
+        completion:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-3'
+    action-interface-2:
+      type: api-action
+      business-object: API_BUSINESS_PARTNER__A_Customer
+      connector-type: saps4hana
+      account-name: SAPS4HANA 1
+      actions:
+        Get_A_Customer: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/API_BUSINESS_PARTNER__A_Customer/operations/Get_A_Customer
+          action: retrieve
+    action-interface-3:
+      type: api-action
+      business-object: customer_hive_nalytics
+      connector-type: googlebigquery
+      account-name: GoogleCloudBigQuery 4
+      actions:
+        INSERTTABLEDATA: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/customer_hive_nalytics/operations/INSERTTABLEDATA
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - batch-retrieve-action:
+              name: Batch process
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 300
+              pagination-type: SKIP_LIMIT
+          - response:
+              name: response
+              reply-maps:
+                - title: test successfully created
+                  status-code: 201
+                  map:
+                    mappings:
+                      - test:
+                          template: '{{$flowDetails}}'
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP S 4HANA Retrieve customer data by using customer number
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: Get_A_Customer
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings: []
+              filter:
+                where:
+                  Customer: '{{$Batchprocess.customer_id}}'
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - custom-action:
+              name: Google Cloud BigQuery Insert customer_hive_nalytics record
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: INSERTTABLEDATA
+              map:
+                mappings:
+                  - customer_id:
+                      template: '{{$Batchprocess.customer_id}}'
+                  - customer_name:
+                      template: '{{$SAPS4HANARetrievecustomerdatabyusingcustomernumber.CustomerName}}'
+                  - order_amount:
+                      template: '{{$Batchprocess.order_amount}}'
+                  - order_date:
+                      template: '{{$Batchprocess.order_date}}'
+                  - order_id:
+                      template: '{{$Batchprocess.order_id}}'
+                  - order_status:
+                      template: '{{$Batchprocess.order_status}}'
+                  - product_category:
+                      template: '{{$Batchprocess.product_category}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Batchprocess
+                    $ref: '#/block/Batch process/current-item'
+                  - variable: SAPS4HANARetrievecustomerdatabyusingcustomernumber
+                    $ref: >-
+                      #/block/Batch process/node-output/SAP S 4HANA Retrieve customer data by using customer
+                      number/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+    assembly-3:
+      assembly:
+        execute:
+          - logging:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BatchprocessOutput
+                    $ref: '#/node-output/Batch process/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: '{{$BatchprocessOutput}}'
+              name: Log
+  name: batchusecase3
+models:
+  test:
+    name: test
+    plural: test
+    properties:
+      test:
+        required: false
+        id: true
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''
