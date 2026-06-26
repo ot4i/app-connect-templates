@@ -24,7 +24,6 @@ integration:
       type: api-action
       business-object: Products
       connector-type: sapcommercecloud
-      account-name: SAPCommerceCloud 1
       actions:
         getProducts: {}
       options:
@@ -38,7 +37,6 @@ integration:
       connector-type: gmail
       actions:
         CREATE: {}
-      account-name: Gmail 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -48,7 +46,6 @@ integration:
       type: api-action
       business-object: Text generation
       connector-type: googlegemini
-      account-name: GoogleGemini 1
       actions:
         postGenerateTextByModelId: {}
       options:
@@ -62,7 +59,6 @@ integration:
       connector-type: shopify
       actions:
         CREATE: {}
-      account-name: Shopify 1
       options:
         connectorServiceOptions:
           httpMethod: post
