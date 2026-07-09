@@ -3996,7 +3996,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Issue PKI certificate with role in HashiCorp Vault and send via Gmail",
+  "name": "Issue a PKI certificate using a role in HashiCorp Vault and send an email via Gmail",
   "description": "Use this template to automatically issue PKI certificates with a specific role in HashiCorp Vault on a scheduled basis and send the certificate details via Gmail.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
@@ -4005,7 +4005,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Rotate Azure service principal credentials in HashiCorp Vault and send via Gmail",
+  "name": "Rotate Azure service principal credentials in HashiCorp Vault and send an email via Gmail",
   "description": "Use this template to automatically rotate Azure service principal credentials in HashiCorp Vault on a scheduled basis and send the new credentials via Gmail.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
@@ -4014,7 +4014,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Rotate database static role credentials in HashiCorp Vault and send via Gmail",
+  "name": "Rotate database static role credentials in HashiCorp Vault and send an email via Gmail",
   "description": "Use this template to automatically rotate database static role credentials in HashiCorp Vault on a scheduled basis and send the new credentials via Gmail.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
