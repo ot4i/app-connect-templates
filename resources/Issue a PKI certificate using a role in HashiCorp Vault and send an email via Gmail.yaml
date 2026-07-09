@@ -31,13 +31,11 @@ integration:
               httpMethod: post
               path: resources/scheduler/operations/SCHEDULE/subscribe
               action: schedule
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Issue
       connector-type: hashicorpvault
-      account-name: Account 4
       actions:
         pki_issue_with_role: {}
       options:
@@ -49,7 +47,6 @@ integration:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
       options:
@@ -107,7 +104,7 @@ integration:
                   - Subject:
                       template: new cerificate
                   - To:
-                      template: ravula.deeraj.reddy@ibm.com
+                      template: user@example.com
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
