@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Rotate%20Azure%20service%20principal%20credentials%20in%20HashiCorp%20Vault%20and%20send%20via%20Gmail_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Rotate%20Azure%20service%20principal%20credentials%20in%20HashiCorp%20Vault%20and%20send%20an%20email%20via%20Gmail_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
