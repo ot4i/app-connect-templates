@@ -24,6 +24,7 @@ integration:
       type: api-action
       business-object: Products
       connector-type: sapcommercecloud
+      account-name: SAPCommerceCloud 1
       actions:
         getProducts: {}
       options:
@@ -37,6 +38,7 @@ integration:
       connector-type: gmail
       actions:
         CREATE: {}
+      account-name: Gmail 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -46,6 +48,7 @@ integration:
       type: api-action
       business-object: Text generation
       connector-type: googlegemini
+      account-name: GoogleGemini 1
       actions:
         postGenerateTextByModelId: {}
       options:
@@ -59,6 +62,7 @@ integration:
       connector-type: shopify
       actions:
         CREATE: {}
+      account-name: Shopify 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -245,7 +249,7 @@ integration:
                   $ref: '#/flowDetails'
                 - variable: Request
                   $ref: '#/trigger/payload'
-  name: Product Catalogue Syndication and AI Content Enrichment Flow
+  name: Retrieve low-rated products from SAP Commerce Cloud enrich descriptions with Google Gemini and create products in Shopify
 models:
   campaign:
     name: campaign
