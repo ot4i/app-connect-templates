@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/AI-Driven%20Promotional%20Campaign%20Content%20Generation%20Flow_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Retrieve%20products%20from%20SAP%20Commerce%20Cloud%20and%20generate%20AI%20campaign%20descriptions%20and%20create%20campaigns%20in%20Zoho%20CRM_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
