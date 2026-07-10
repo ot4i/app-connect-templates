@@ -3996,7 +3996,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "AI-Driven Promotional Campaign Content Generation Flow",
+  "name": "Retrieve products from SAP Commerce Cloud and generate AI campaign descriptions and create campaigns in Zoho CRM",
   "description": "Use this template to automatically generate AI-driven promotional campaign content for high-rated products in your SAP Commerce Cloud catalogue, create the campaigns in Zoho CRM using Google Gemini-generated descriptions, and send a Gmail notification for each campaign created.",
   "summary": "SAP Commerce Cloud to 3 applications",
   "sourceApp": "sapcommercecloud",
@@ -4005,7 +4005,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Product Catalogue Syndication and AI Content Enrichment Flow",
+  "name": "Retrieve low-rated products from SAP Commerce Cloud enrich descriptions with Google Gemini and create products in Shopify",
   "description": "Use this template to automatically syndicate your SAP Commerce Cloud product catalogue to Shopify, enriching low-rated product descriptions with AI-generated content from Google Gemini, and sending a Gmail notification on each product creation.",
   "summary": "SAP Commerce Cloud to 3 applications",
   "sourceApp": "sapcommercecloud",
