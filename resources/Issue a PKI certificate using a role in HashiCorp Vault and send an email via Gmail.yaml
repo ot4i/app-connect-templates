@@ -1,0 +1,120 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Issue
+      connector-type: hashicorpvault
+      actions:
+        pki_issue_with_role: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Issue/operations/pki_issue_with_role
+          action: custom
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: HashiCorp Vault (IBM Vault) Issue with role
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: pki_issue_with_role
+              map:
+                mappings:
+                  - common_name:
+                      template: test.example.com
+                  - exclude_cn_from_sans:
+                      expression: 'false'
+                  - format:
+                      template: pem
+                  - issuer_ref:
+                      template: default
+                  - private_key_format:
+                      template: der
+                  - remove_roots_from_chain:
+                      expression: 'false'
+                  - ttl:
+                      template: 24h
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  role: example-dot-com
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$HashiCorpVaultIBMVaultIssuewithrole}}'
+                  - Subject:
+                      template: New PKI certificate issued
+                  - To:
+                      template: user@example.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: HashiCorpVaultIBMVaultIssuewithrole
+                    $ref: >-
+                      #/node-output/HashiCorp Vault (IBM Vault) Issue with
+                      role/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Issue a PKI certificate using a role in HashiCorp Vault and send an email via Gmail
+models: {}
