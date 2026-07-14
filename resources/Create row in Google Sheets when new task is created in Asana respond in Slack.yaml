@@ -1,0 +1,130 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Tasks
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            workspace-id: '1160305558369131'
+            team-id: '1160305558369133'
+            project: '1160915618874788'
+            parentFilter:
+              workspace-id: '1160305558369131'
+              team-id: '1160305558369133'
+              project: '1160915618874788'
+      connector-type: asana
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: worksheetRow
+      actions:
+        CREATE: {}
+      connector-type: googlesheet
+    action-interface-2:
+      type: api-action
+      business-object: message
+      actions:
+        CREATE: {}
+      connector-type: slack
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Sheets Create row
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - fields:
+                      mappings:
+                        - '1':
+                            template: '{{$Trigger.notes}}'
+                        - '10':
+                            template: '{{$Trigger.response.name}}'
+                        - '11':
+                            template: '{{$Trigger.num_hearts}}'
+                        - '12':
+                            template: '{{$Trigger.response.name}}'
+                        - '13':
+                            template: '{{$Trigger.response.resource_subtype}}'
+                        - '14':
+                            template: '{{$Trigger.notes}}'
+                        - '15':
+                            template: '32432434'
+                        - '16':
+                            template: '3432324324'
+                        - '17':
+                            template: '32432'
+                        - '18':
+                            template: '32432'
+                        - '19':
+                            template: '343244'
+                        - '2':
+                            template: '{{$Trigger.response.parent.name}}'
+                        - '20':
+                            template: '234234234'
+                        - '21':
+                            template: '#344 bellary'
+                        - '22':
+                            template: '#31 bellary'
+                        - '23':
+                            template: '#32 bellary'
+                        - '24':
+                            template: '#33 bellary'
+                        - '25':
+                            template: '#34 bellary'
+                        - '26':
+                            template: '560097'
+                        - '3':
+                            template: '{{$Trigger.response.resource_subtype}}'
+                        - '4':
+                            template: '{{$Trigger.response.name}}'
+                        - '5':
+                            template: '{{$Trigger.notes}}'
+                        - '6':
+                            template: '{{$Trigger.notes}}'
+                        - '7':
+                            template: '{{$Trigger.notes}}'
+                        - '8':
+                            template: '{{$Trigger.created_at}}'
+                        - '9':
+                            template: '{{$Trigger.response.name}}'
+                  - spreadsheetID:
+                      template: 1caCPDz7f4Tn6izIXV2dGBXlq3wBPYM8Mfyl90FsZ56s
+                  - worksheetID:
+                      template: Sheet1
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C0436FB797X
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: '{{$Trigger.notes}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GoogleSheetsCreaterow
+                    $ref: '#/node-output/Google Sheets Create row/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create row in Google Sheets when new task is created in Asana respond in Slack
+models: {}
