@@ -4012,8 +4012,8 @@
   "targetApps": ["googlegemini", "shopify", "gmail"],
   "tags": ["sapcommercecloud", "googlegemini", "shopify", "gmail"],
   "offerings": ["app connect professional"]
- }               
- {
+ },
+{
   "name": "Issue a PKI certificate using a role in HashiCorp Vault and send an email via Gmail",
   "description": "Use this template to automatically issue PKI certificates with a specific role in HashiCorp Vault on a scheduled basis and send the certificate details via Gmail.",
   "summary": "Scheduler to 2 applications",
