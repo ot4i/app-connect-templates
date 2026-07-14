@@ -24,7 +24,6 @@ integration:
       type: api-action
       business-object: Products
       connector-type: sapcommercecloud
-      account-name: SAPCommerceCloud 1
       actions:
         getProducts: {}
       options:
@@ -38,7 +37,6 @@ integration:
       connector-type: gmail
       actions:
         CREATE: {}
-      account-name: Gmail 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -48,7 +46,6 @@ integration:
       type: api-action
       business-object: Text generation
       connector-type: googlegemini
-      account-name: GoogleGemini 1
       actions:
         postGenerateTextByModelId: {}
       options:
@@ -62,7 +59,6 @@ integration:
       connector-type: shopify
       actions:
         CREATE: {}
-      account-name: Shopify 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -121,7 +117,7 @@ integration:
           - response:
               name: response
               reply-maps:
-                - title: campaign successfully created
+                - title: product successfully created
                   status-code: 201
                   map:
                     $map: http://ibm.com/appconnect/map/v1
@@ -136,7 +132,7 @@ integration:
                         $ref: '#/trigger/payload'
                     mappings:
                       - id:
-                          template: 'Product created '
+                          template: Product created
     assembly-2:
       assembly:
         execute:
@@ -208,7 +204,7 @@ integration:
                             - Subject:
                                 template: Product created {{$ShopifyCreateproduct.id}}
                             - To:
-                                template: Calisha.Noronha@ibm.com
+                                template: your@email.com
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: SAPCommerceCloudRetrieveproducts
@@ -249,7 +245,7 @@ integration:
                   $ref: '#/flowDetails'
                 - variable: Request
                   $ref: '#/trigger/payload'
-  name: Product Catalogue Syndication and AI Content Enrichment Flow
+  name: Retrieve low-rated products from SAP Commerce Cloud enrich with Google Gemini and create products in Shopify
 models:
   campaign:
     name: campaign

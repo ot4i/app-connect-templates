@@ -24,7 +24,6 @@ integration:
       type: api-action
       business-object: Products
       connector-type: sapcommercecloud
-      account-name: SAPCommerceCloud 1
       actions:
         getProducts: {}
       options:
@@ -38,7 +37,6 @@ integration:
       connector-type: zohocrm
       actions:
         postCampaigns: {}
-      account-name: ZohoCRM 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -50,7 +48,6 @@ integration:
       connector-type: gmail
       actions:
         CREATE: {}
-      account-name: Gmail 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -60,7 +57,6 @@ integration:
       type: api-action
       business-object: Text generation
       connector-type: googlegemini
-      account-name: GoogleGemini 1
       actions:
         postGenerateTextByModelId: {}
       options:
@@ -215,7 +211,7 @@ integration:
                             - Subject:
                                 template: '{{$ZohoCRMCreatecampaign._data_.details.Modified_By.name}}'
                             - To:
-                                template: Calisha.Noronha@ibm.com
+                                template: your@email.com
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: SAPCommerceCloudRetrieveproducts
@@ -256,7 +252,7 @@ integration:
                   $ref: '#/flowDetails'
                 - variable: Request
                   $ref: '#/trigger/payload'
-  name: AI-Driven Promotional Campaign Content Generation Flow
+  name: Retrieve products from SAP Commerce Cloud and generate AI campaign descriptions and create campaigns in Zoho CRM
 models:
   campaign:
     name: campaign
