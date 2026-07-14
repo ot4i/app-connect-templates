@@ -209,7 +209,7 @@ integration:
                             - Body:
                                 template: 'Campaign: {{$ZohoCRMCreatecampaign._data_}}'
                             - Subject:
-                                template: '{{$ZohoCRMCreatecampaign._data_.details.Modified_By.name}}'
+                                template: 'New campaign created: {{$ZohoCRMCreatecampaign._data_.Campaign_Name}}'
                             - To:
                                 template: your@email.com
                           $map: http://ibm.com/appconnect/map/v1

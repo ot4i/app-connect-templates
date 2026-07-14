@@ -89,8 +89,8 @@ integration:
                   status-code: 201
                   map:
                     mappings:
-                      - test:
-                          template: '{{$flowDetails}}'
+                      - id:
+                          template: Batch process started
                     $map: http://ibm.com/appconnect/map/v1
                     input:
                       - variable: flowDetails
@@ -101,7 +101,7 @@ integration:
       assembly:
         execute:
           - custom-action:
-              name: SAP S 4HANA Retrieve customer data by using customer number
+              name: SAP S/4HANA Retrieve customer data by using customer number
               target:
                 $ref: '#/integration/action-interfaces/action-interface-2'
               action: Get_A_Customer
@@ -152,7 +152,7 @@ integration:
                     $ref: '#/block/Batch process/current-item'
                   - variable: SAPS4HANARetrievecustomerdatabyusingcustomernumber
                     $ref: >-
-                      #/block/Batch process/node-output/SAP S 4HANA Retrieve customer data by using customer
+                      #/block/Batch process/node-output/SAP S/4HANA Retrieve customer data by using customer
                       number/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'

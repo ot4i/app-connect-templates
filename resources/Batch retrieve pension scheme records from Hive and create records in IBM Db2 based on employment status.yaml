@@ -95,8 +95,8 @@ integration:
                       - variable: Request
                         $ref: '#/trigger/payload'
                     mappings:
-                      - test:
-                          template: '{{$flowDetails}}'
+                      - id:
+                          template: Batch process started
     assembly-2:
       assembly:
         execute:
@@ -130,7 +130,7 @@ integration:
                             - H_NO:
                                 template: '{{$Batchprocess.address.h_no}}'
                             - INDEX_NUM:
-                                expression: '$Batchprocess.index_num '
+                                expression: '$Batchprocess.index_num'
                             - IS_MARRIED:
                                 expression: $Batchprocess.is_married ?1:0
                             - IS_WORKING:
@@ -188,7 +188,7 @@ integration:
                           - H_NO:
                               template: '{{$Batchprocess.address.h_no}}'
                           - INDEX_NUM:
-                              expression: '$Batchprocess.index_num '
+                              expression: '$Batchprocess.index_num'
                           - IS_MARRIED:
                               expression: $Batchprocess.is_married ?1:0
                           - IS_WORKING:
