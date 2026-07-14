@@ -33,7 +33,6 @@ integration:
               httpMethod: get
               path: resources/customer_order_history/operations/read_customer_order_history
               action: retrievewithwhere
-      account-name: ApacheHive 1
     trigger-interface-3:
       type: batch-completion-trigger
       triggers:
@@ -54,7 +53,6 @@ integration:
       type: api-action
       business-object: API_BUSINESS_PARTNER__A_Customer
       connector-type: saps4hana
-      account-name: SAPS4HANA 1
       actions:
         Get_A_Customer: {}
       options:
@@ -66,7 +64,6 @@ integration:
       type: api-action
       business-object: customer_hive_nalytics
       connector-type: googlebigquery
-      account-name: GoogleCloudBigQuery 4
       actions:
         INSERTTABLEDATA: {}
       options:
@@ -88,7 +85,7 @@ integration:
           - response:
               name: response
               reply-maps:
-                - title: test successfully created
+                - title: batch process successfully started
                   status-code: 201
                   map:
                     mappings:
@@ -181,7 +178,7 @@ integration:
                   - logMessage:
                       template: '{{$BatchprocessOutput}}'
               name: Log
-  name: batchusecase3
+  name: Batch retrieve customer order history from Hive and enrich with SAP S4HANA customer data and insert into Google BigQuery
 models:
   test:
     name: test

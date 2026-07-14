@@ -4040,24 +4040,24 @@
   "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
   "offerings": ["app connect professional"]
  },
- {               
-  "name": "Batch retrieve customer numbers from Hive, enrich with SAP S4HANA customer details, and load into BigQuery",
-  "description": "Use this template to batch retrieve customer numbers from Hive, enrich with SAP S4HANA customer details, and load into BigQuery",
+ {
+  "name": "Batch retrieve customer order history from Hive and enrich with SAP S4HANA customer data and insert into Google BigQuery",
+  "description": "Use this template to batch retrieve customer order history from Hive, enrich with SAP S/4HANA customer data, and insert the combined records into Google BigQuery.",
   "summary": "Hive to 2 applications",
-  "sourceApp": "Google big query",
-  "targetApps": ["hive", "saps4hana","googlebigquery"],
-  "tags": ["hive", "saps4hana","googlebigquery"],
+  "sourceApp": "hive",
+  "targetApps": ["saps4hana", "googlebigquery"],
+  "tags": ["hive", "saps4hana", "googlebigquery"],
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Batch retrieves pension schemas from Hive and loads them into DB2 tables based on the is_working property",
-  "description": "Use this template to batch retrieves pension schemas from Hive and loads them into DB2 tables based on the is_working property",
-  "summary": "Hive to 2 applications",
-  "sourceApp": "IBM Db2",
-  "targetApps": ["hive", "IBM Db2"],
-  "tags": ["hive", "IBM Db2"],
+  "name": "Batch retrieve pension scheme records from Hive and create records in IBM Db2 based on employment status",
+  "description": "Use this template to batch retrieve pension scheme records from Hive and create records in IBM Db2 based on employment status.",
+  "summary": "Hive to IBM Db2",
+  "sourceApp": "hive",
+  "targetApps": ["db2"],
+  "tags": ["hive", "db2"],
   "offerings": ["app connect professional"]
- } 
+ }
 ]
 }
 
