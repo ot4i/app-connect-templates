@@ -215,7 +215,7 @@ integration:
                             - Subject:
                                 template: '{{$ZohoCRMCreatecampaign._data_.details.Modified_By.name}}'
                             - To:
-                                template: Calisha.Noronha@ibm.com
+                                template: your@email.com
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: SAPCommerceCloudRetrieveproducts
