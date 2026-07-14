@@ -1,6 +1,6 @@
 Use this template to automatically syndicate your SAP Commerce Cloud product catalogue to Shopify, enriching low-rated product descriptions with AI-generated content from Google Gemini, and sending a Gmail notification on each product creation.
 
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20low-rated%20products%20from%20SAP%20Commerce%20Cloud%20enrich%20descriptions%20with%20Google%20Gemini%20and%20create%20products%20in%20Shopify_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Retrieve%20low-rated%20products%20from%20SAP%20Commerce%20Cloud%20enrich%20with%20Google%20Gemini%20and%20create%20products%20in%20Shopify_instructions.md) (opens in a new window).
 
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:

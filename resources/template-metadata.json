@@ -4005,7 +4005,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Retrieve low-rated products from SAP Commerce Cloud enrich descriptions with Google Gemini and create products in Shopify",
+  "name": "Retrieve low-rated products from SAP Commerce Cloud enrich with Google Gemini and create products in Shopify",
   "description": "Use this template to automatically syndicate your SAP Commerce Cloud product catalogue to Shopify, enriching low-rated product descriptions with AI-generated content from Google Gemini, and sending a Gmail notification on each product creation.",
   "summary": "SAP Commerce Cloud to 3 applications",
   "sourceApp": "sapcommercecloud",
