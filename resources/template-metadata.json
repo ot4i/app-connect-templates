@@ -3996,12 +3996,30 @@
   "offerings": ["app connect professional"]
  },
  {
+  "name": "Retrieve products from SAP Commerce Cloud and generate AI campaign descriptions and create campaigns in Zoho CRM",
+  "description": "Use this template to automatically generate AI-driven promotional campaign content for high-rated products in your SAP Commerce Cloud catalogue, create the campaigns in Zoho CRM using Google Gemini-generated descriptions, and send a Gmail notification for each campaign created.",
+  "summary": "SAP Commerce Cloud to 3 applications",
+  "sourceApp": "sapcommercecloud",
+  "targetApps": ["googlegemini", "zohocrm", "gmail"],
+  "tags": ["sapcommercecloud", "googlegemini", "zohocrm", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Retrieve low-rated products from SAP Commerce Cloud enrich with Google Gemini and create products in Shopify",
+  "description": "Use this template to automatically syndicate your SAP Commerce Cloud product catalogue to Shopify, enriching low-rated product descriptions with AI-generated content from Google Gemini, and sending a Gmail notification on each product creation.",
+  "summary": "SAP Commerce Cloud to 3 applications",
+  "sourceApp": "sapcommercecloud",
+  "targetApps": ["googlegemini", "shopify", "gmail"],
+  "tags": ["sapcommercecloud", "googlegemini", "shopify", "gmail"],
+  "offerings": ["app connect professional"]
+ }               
+ {
   "name": "Issue a PKI certificate using a role in HashiCorp Vault and send an email via Gmail",
   "description": "Use this template to automatically issue PKI certificates with a specific role in HashiCorp Vault on a scheduled basis and send the certificate details via Gmail.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["hashicorpvault", "gmail"],
-  "tags": ["scheduler", "hashicorpvault", "gmail"],
+  "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
   "offerings": ["app connect professional"]
  },
  {
@@ -4010,7 +4028,7 @@
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["hashicorpvault", "gmail"],
-  "tags": ["scheduler", "hashicorpvault", "gmail"],
+  "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
   "offerings": ["app connect professional"]
  },
  {
@@ -4019,7 +4037,7 @@
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["hashicorpvault", "gmail"],
-  "tags": ["scheduler", "hashicorpvault", "gmail"],
+  "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
   "offerings": ["app connect professional"]
  }
 ]
