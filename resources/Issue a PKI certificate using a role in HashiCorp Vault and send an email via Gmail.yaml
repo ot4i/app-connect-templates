@@ -31,6 +31,7 @@ integration:
               httpMethod: post
               path: resources/scheduler/operations/SCHEDULE/subscribe
               action: schedule
+
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -102,7 +103,7 @@ integration:
                   - Body:
                       template: '{{$HashiCorpVaultIBMVaultIssuewithrole}}'
                   - Subject:
-                      template: new cerificate
+                      template: New PKI certificate issued
                   - To:
                       template: user@example.com
                 $map: http://ibm.com/appconnect/map/v1
@@ -115,5 +116,5 @@ integration:
                       role/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: pki flow
+  name: Issue a PKI certificate using a role in HashiCorp Vault and send an email via Gmail
 models: {}
