@@ -1,0 +1,134 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesloft
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Calls
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 5
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Calls/operations/CREATED_POLLER/subscribe
+              action: created_poller
+      account-name: Salesloft 1
+  action-interfaces:
+    action-interface-5:
+      type: api-action
+      business-object: People
+      connector-type: salesloft
+      account-name: Salesloft 1
+      actions:
+        getPersonById: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/People/operations/getPersonById
+          action: retrieve
+    action-interface-6:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      account-name: Salesforce1
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Contact
+          action: retrievewithwhere
+    action-interface-1:
+      type: api-action
+      business-object: Task
+      connector-type: salesforce
+      account-name: Salesforce1
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Task
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Salesloft Retrieve person by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              action: getPersonById
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  id: '{{$Trigger.called_person.id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  Email: '{{$SalesloftRetrievepersonbyID.data.email_address}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesloftRetrievepersonbyID
+                    $ref: '#/node-output/Salesloft Retrieve person by ID/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: false
+              pagination-type: TOKEN
+          - create-action:
+              name: Salesforce Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - CallDisposition:
+                      template: '{{$Trigger.sentiment}}'
+                  - CallDurationInSeconds:
+                      expression: '$Trigger.duration '
+                  - CallType:
+                      template: Internal
+                  - Description:
+                      template: '{{$Trigger.disposition}}'
+                  - Subject:
+                      template: Call
+                  - WhoId:
+                      template: '{{$SalesforceRetrievecontacts[0].Id}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesloftRetrievepersonbyID
+                    $ref: '#/node-output/Salesloft Retrieve person by ID/response/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Logging to Salesforce task when a call is completed in Salesloft
+models: {}

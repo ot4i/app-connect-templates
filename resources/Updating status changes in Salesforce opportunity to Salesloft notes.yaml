@@ -1,0 +1,137 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        UPDATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Opportunity
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Opportunity/operations/UPDATED/subscribe
+              action: updated
+      account-name: Salesforce1
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      account-name: Salesforce1
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Contact
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: People
+      connector-type: salesloft
+      account-name: Salesloft 1
+      actions:
+        listPeople: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/People/operations/listPeople
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: Notes
+      connector-type: salesloft
+      account-name: Salesloft 1
+      actions:
+        createNote: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Notes/operations/createNote
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: false
+              filter:
+                limit: 1
+                where:
+                  Id: '{{$Trigger.ContactId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: false
+              pagination-type: TOKEN
+          - custom-action:
+              name: Salesloft Retrieve people
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  email_addresses: '{{$SalesforceRetrievecontacts[0].Email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              action: listPeople
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+          - custom-action:
+              name: Salesloft Create note
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: createNote
+              map:
+                mappings:
+                  - associated_with_id:
+                      expression: '$SalesloftRetrievepeople[0].id '
+                  - associated_with_type:
+                      template: person
+                  - content:
+                      template: 'Salesforce oppurtunity has a new update. Updated oppurtunity details are: {{$Trigger}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: SalesloftRetrievepeople
+                    $ref: '#/node-output/Salesloft Retrieve people/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Updating status changes in Salesforce opportunity to Salesloft notes
+models: {}
