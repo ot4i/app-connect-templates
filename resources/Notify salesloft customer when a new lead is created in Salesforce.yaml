@@ -16,13 +16,11 @@ integration:
               httpMethod: post
               path: resources/Lead/operations/CREATED/subscribe
               action: created
-      account-name: Salesforce1
   action-interfaces:
     action-interface-2:
       type: api-action
       business-object: Cadence memberships
       connector-type: salesloft
-      account-name: Salesloft 1
       actions:
         createCadenceMembership: {}
       options:
