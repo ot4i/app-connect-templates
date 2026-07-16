@@ -29,13 +29,11 @@ integration:
               httpMethod: post
               path: resources/scheduler/operations/SCHEDULE/subscribe
               action: schedule
-      account-name: Account 2
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Tickets
       connector-type: freshservice
-      account-name: Freshservice 1
       actions:
         getTickets: {}
       options:
@@ -47,7 +45,6 @@ integration:
       type: api-action
       business-object: Requesters
       connector-type: freshservice
-      account-name: Freshservice 1
       actions:
         getRequester: {}
       options:
@@ -59,7 +56,6 @@ integration:
       type: api-action
       business-object: People
       connector-type: salesloft
-      account-name: Salesloft 1
       actions:
         listPeople: {}
       options:
@@ -71,7 +67,6 @@ integration:
       type: api-action
       business-object: Cadence memberships
       connector-type: salesloft
-      account-name: Salesloft 1
       actions:
         createCadenceMembership: {}
       options:
