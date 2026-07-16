@@ -16,13 +16,11 @@ integration:
               httpMethod: post
               path: resources/Opportunity/operations/UPDATED/subscribe
               action: updated
-      account-name: Salesforce1
   action-interfaces:
     action-interface-1:
       type: api-action
       business-object: Contact
       connector-type: salesforce
-      account-name: Salesforce1
       actions:
         RETRIEVEALL: {}
       options:
@@ -34,7 +32,6 @@ integration:
       type: api-action
       business-object: People
       connector-type: salesloft
-      account-name: Salesloft 1
       actions:
         listPeople: {}
       options:
@@ -46,7 +43,6 @@ integration:
       type: api-action
       business-object: Notes
       connector-type: salesloft
-      account-name: Salesloft 1
       actions:
         createNote: {}
       options:
