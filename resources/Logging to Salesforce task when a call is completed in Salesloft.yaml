@@ -19,13 +19,11 @@ integration:
               httpMethod: post
               path: resources/Calls/operations/CREATED_POLLER/subscribe
               action: created_poller
-      account-name: Salesloft 1
   action-interfaces:
     action-interface-5:
       type: api-action
       business-object: People
       connector-type: salesloft
-      account-name: Salesloft 1
       actions:
         getPersonById: {}
       options:
@@ -37,7 +35,6 @@ integration:
       type: api-action
       business-object: Contact
       connector-type: salesforce
-      account-name: Salesforce1
       actions:
         RETRIEVEALL: {}
       options:
@@ -49,7 +46,6 @@ integration:
       type: api-action
       business-object: Task
       connector-type: salesforce
-      account-name: Salesforce1
       actions:
         CREATE: {}
       options:
