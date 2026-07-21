@@ -1,0 +1,111 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: zendeskservice
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Ticket
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Ticket/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Work items
+      connector-type: azuredevops
+      actions:
+        createWorkItem: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Organizations/{organization}/Projects/{project}/Work%20item%20types/{name}/Work%20items/operations/createWorkItem
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      mappedPriority:
+                        type: number
+                      mappedWorkItemType:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - mappedPriority:
+                            expression: >-
+                              $number($Trigger.priority= "urgent" ? 1 : ($Trigger.priority = "high" ? 2 :
+                              ($Trigger.priority= "normal" ? 3 : 4)))
+                        - mappedWorkItemType:
+                            template: >-
+                              {{$Trigger.type}} = "problem" ? "Bug" : ( {{$Trigger.type}}= "incident" ? "Task" :
+                              ({{$Trigger.type}} = "task" ? "Task" : ({{$Trigger.type}} = "question" ? "Issue" :
+                              "Task")))
+              name: Set variable
+          - custom-action:
+              name: Microsoft Azure DevOps Create work item
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: createWorkItem
+              map:
+                mappings:
+                  - '`Microsoft.VSTS.Common.Priority`':
+                      expression: '$Setvariable.variable.mappedPriority '
+                  - '`System.Description`':
+                      template: '{{$Trigger.description}}'
+                  - '`System.Tags`':
+                      template: '{{$join($Trigger.tags , "; ")}}'
+                  - '`System.Title`':
+                      template: '{{$Trigger.subject}}'
+                  - name:
+                      template: '{{$Setvariable.variable.mappedWorkItemType}}'
+                  - organization:
+                      template: appconnakash
+                  - project:
+                      template: cloud-integration
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - name: '{{$Setvariable.variable.mappedWorkItemType}}'
+                    - organization: appconnakash
+                    - project: cloud-integration
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create Azure DevOps work items from new Zendesk ticket
+models: {}
