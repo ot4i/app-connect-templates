@@ -28,7 +28,6 @@ integration:
               path: >-
                 resources/Organizations/{organization}/Projects/{project}/Work%20item%20types/{name}/Work%20items/operations/CREATED_POLLER/subscribe
               action: created_poller
-      account-name: MicrosoftAzureDevOps 1
   action-interfaces:
     action-interface-1:
       type: api-action
@@ -36,7 +35,6 @@ integration:
       connector-type: msexchange
       actions:
         SENDEMAIL: {}
-      account-name: MicrosoftExchange 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -53,22 +51,11 @@ integration:
               action: SENDEMAIL
               map:
                 mappings:
-                  - attachments:
-                      foreach:
-                        mappings:
-                          - contentType:
-                              template: Text
-                          - fileContent:
-                              template: sample details
-                          - name:
-                              template: sample.txt
-                        input: '[{}]'
-                        iterator: attachmentsItem
                   - body:
                       mappings:
                         - content:
                             template: >-
-                              A new  work item of type {{$Trigger.fields.`System.WorkItemType`}} has been created that
+                              A new work item of type {{$Trigger.fields.`System.WorkItemType`}} has been created that
                               requires your attention:
 
 
@@ -78,21 +65,21 @@ integration:
                               - Title: {{$Trigger.fields.`System.Title`}}
 
 
-                              - Reported By: {{$Trigger.fields.`System.CreatedBy`.displayName}}
+                              - Reported by: {{$Trigger.fields.`System.CreatedBy`.displayName}}
 
 
-                              - Priority: {{$Trigger.fields.`Microsoft.VSTS.Common.Priority`}} 
+                              - Priority: {{$Trigger.fields.`Microsoft.VSTS.Common.Priority`}}
 
 
-                              -CreatedOn: {{$Trigger.fields.`System.CreatedDate`}}
+                              - Created on: {{$Trigger.fields.`System.CreatedDate`}}
 
 
-                              The work item can be accessed via:- {{$replace($Trigger.url, "_apis/wit/workItems/",
+                              The work item can be accessed via: {{$replace($Trigger.url, "_apis/wit/workItems/",
                               "_workitems/edit/")}}
                   - subject:
-                      template: New Work Item Assigned -{{$Trigger.fields.`System.Title`}}
+                      template: 'New work item assigned - {{$Trigger.fields.`System.Title`}}'
                   - toRecipientsRequested:
-                      template: Neena.P.K@ibm.com
+                      template: user@example.com
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
@@ -100,5 +87,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter: {}
-  name: Send Email Notifications for New Azure DevOps Work Items
+  name: Send email notifications for new Azure DevOps work items
 models: {}
