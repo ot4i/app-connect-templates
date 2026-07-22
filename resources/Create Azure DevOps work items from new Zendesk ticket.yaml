@@ -60,9 +60,9 @@ integration:
                               $number($Trigger.priority= "urgent" ? 1 : ($Trigger.priority = "high" ? 2 :
                               ($Trigger.priority= "normal" ? 3 : 4)))
                         - mappedWorkItemType:
-                            template: >-
-                              {{$Trigger.type}} = "problem" ? "Bug" : ( {{$Trigger.type}}= "incident" ? "Task" :
-                              ({{$Trigger.type}} = "task" ? "Task" : ({{$Trigger.type}} = "question" ? "Issue" :
+                            expression: >-
+                              $Trigger.type = "problem" ? "Bug" : ($Trigger.type = "incident" ? "Task" :
+                              ($Trigger.type = "task" ? "Task" : ($Trigger.type = "question" ? "Issue" :
                               "Task")))
               name: Set variable
           - custom-action:
@@ -73,7 +73,7 @@ integration:
               map:
                 mappings:
                   - '`Microsoft.VSTS.Common.Priority`':
-                      expression: '$Setvariable.variable.mappedPriority '
+                      expression: '$Setvariable.variable.mappedPriority'
                   - '`System.Description`':
                       template: '{{$Trigger.description}}'
                   - '`System.Tags`':

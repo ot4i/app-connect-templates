@@ -60,12 +60,12 @@ integration:
                               $number($Trigger.fields.priority.name = "Highest" ? 1 : ($Trigger.fields.priority.name =
                               "High" ? 2 : ($Trigger.fields.priority.name = "Medium" ? 3 : 4)))
                         - mappedType:
-                            template: >-
-                              ({{$Trigger.fields.issuetype.name}} = "Epic" ? "Epic" :
-                              ({{$Trigger.fields.issuetype.name}} = "Story" ? "User Story" :
-                              ({{$Trigger.fields.issuetype.name}} = "Bug" ? "Bug" : ({{$Trigger.fields.issuetype.name}}
-                              = "Task" ? "Task" : ({{$Trigger.fields.issuetype.name}} = "Sub-task" ? "Task" :
-                              "Feature")))))
+                            expression: >-
+                              $Trigger.fields.issuetype.name = "Epic" ? "Epic" :
+                              ($Trigger.fields.issuetype.name = "Story" ? "User Story" :
+                              ($Trigger.fields.issuetype.name = "Bug" ? "Bug" : ($Trigger.fields.issuetype.name
+                              = "Task" ? "Task" : ($Trigger.fields.issuetype.name = "Sub-task" ? "Task" :
+                              "Feature"))))
               name: Set variable
           - custom-action:
               name: Microsoft Azure DevOps Create work item
@@ -75,7 +75,7 @@ integration:
               map:
                 mappings:
                   - '`Microsoft.VSTS.Common.Priority`':
-                      expression: '$Setvariable.variable.mappedPriority '
+                      expression: '$Setvariable.variable.mappedPriority'
                   - '`System.Description`':
                       template: '{{$Trigger.fields.description}}'
                   - '`System.Title`':
