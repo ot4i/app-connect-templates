@@ -16,7 +16,6 @@ integration:
               httpMethod: post
               path: resources/Lead/operations/CREATED/subscribe
               action: created
-      account-name: Salesforce1
   action-interfaces:
     action-interface-2:
       type: api-action
@@ -29,14 +28,12 @@ integration:
           httpMethod: post
           path: resources/Cadence%20memberships/operations/createCadenceMembership
           action: create
-      account-name: Salesloft 1
     action-interface-1:
       type: api-action
       business-object: Contact
       connector-type: salesforce
       actions:
         RETRIEVEALL: {}
-      account-name: Salesforce1
       options:
         connectorServiceOptions:
           httpMethod: get
@@ -46,7 +43,6 @@ integration:
       type: api-action
       business-object: People
       connector-type: salesloft
-      account-name: Oauth
       actions:
         listPeople: {}
       options:
