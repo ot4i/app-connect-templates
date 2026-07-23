@@ -4058,6 +4058,42 @@
   "tags": ["hive", "db2"],
   "offerings": ["app connect professional"]
  },
+ {
+  "name": "Logging to Salesforce task when a call is completed in Salesloft",
+  "description": "Use this template to log the call activity in Salesloft into Salesforce task.",
+  "summary": "Salesloft to Salesforce",
+  "sourceApp": "salesloft",
+  "targetApps": ["salesforce"],
+  "tags": ["salesloft", "salesforce"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Notify salesloft customer when a new lead is created in Salesforce",
+  "description": "Use this template to notify Salesloft customer when a new lead is created in Salesforce.",
+  "summary": "Salesforce to Salesloft",
+  "sourceApp": "salesforce",
+  "targetApps": ["salesloft"],
+  "tags": ["salesforce", "salesloft"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Send a mail requesting feedback when a Freshservice ticket is resolved",
+  "description": "Use this template to trigger a mail from Salesloft requesting feedback when a Freshservice ticket is resolved.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["freshservice", "salesloft"],
+  "tags": ["streaming-connector-scheduler", "freshservice", "salesloft"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Updating status changes in Salesforce opportunity to Salesloft notes",
+  "description": "Use this template to sync the status changes in Salesforce opportunity to Salesloft notes.",
+  "summary": "Salesforce to Salesloft",
+  "sourceApp": "hive",
+  "targetApps": ["salesforce"],
+  "tags": ["salesforce", "salesloft"],
+  "offerings": ["app connect professional"]
+ },
 {
  "name": "Create Azure DevOps work items from ServiceNow incidents",
  "description": "Use this template to automatically create Azure DevOps work items when new incidents are created in ServiceNow, mapping incident priority and type to the corresponding Azure DevOps work item fields.",
