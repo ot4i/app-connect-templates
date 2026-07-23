@@ -4093,7 +4093,43 @@
   "targetApps": ["salesforce"],
   "tags": ["salesforce", "salesloft"],
   "offerings": ["app connect professional"]
- }
+ },
+{
+ "name": "Create Azure DevOps work items from ServiceNow incidents",
+ "description": "Use this template to automatically create Azure DevOps work items when new incidents are created in ServiceNow, mapping incident priority and type to the corresponding Azure DevOps work item fields.",
+ "summary": "ServiceNow to Azure DevOps",
+ "sourceApp": "servicenow",
+ "targetApps": ["azuredevops"],
+ "tags": ["servicenow", "azuredevops"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Create Azure DevOps work items from new Zendesk ticket",
+ "description": "Use this template to automatically create Azure DevOps work items when new tickets are created in Zendesk Service, mapping ticket priority and type to the corresponding Azure DevOps work item fields.",
+ "summary": "Zendesk Service to Azure DevOps",
+ "sourceApp": "zendeskservice",
+ "targetApps": ["azuredevops"],
+ "tags": ["zendeskservice", "azuredevops"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Send email notifications for new Azure DevOps work items",
+ "description": "Use this template to automatically send an email notification through Microsoft Exchange when a new work item is created in Azure DevOps.",
+ "summary": "Azure DevOps to Microsoft Exchange",
+ "sourceApp": "azuredevops",
+ "targetApps": ["msexchange"],
+ "tags": ["azuredevops", "msexchange"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Sync Jira issues to Azure DevOps work items",
+ "description": "Use this template to automatically create Azure DevOps work items when new issues are created in Jira, mapping issue priority and type to the corresponding Azure DevOps work item fields.",
+ "summary": "Jira to Azure DevOps",
+ "sourceApp": "jira",
+ "targetApps": ["azuredevops"],
+ "tags": ["jira", "azuredevops"],
+ "offerings": ["app connect professional"]
+}
 ]
 }
 
