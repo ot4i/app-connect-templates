@@ -1,0 +1,135 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Lead
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Lead/operations/CREATED/subscribe
+              action: created
+      account-name: Salesforce1
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Cadence memberships
+      connector-type: salesloft
+      actions:
+        createCadenceMembership: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Cadence%20memberships/operations/createCadenceMembership
+          action: create
+      account-name: Salesloft 1
+    action-interface-1:
+      type: api-action
+      business-object: Contact
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      account-name: Salesforce1
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Contact
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: People
+      connector-type: salesloft
+      account-name: Oauth
+      actions:
+        listPeople: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/People/operations/listPeople
+          action: retrievewithwhere
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve contacts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 8
+                where:
+                  Id: '{{$Trigger.recordsToConvert[0].contactId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              pagination-type: TOKEN
+              allow-truncation: true
+              allow-empty-output: true
+          - custom-action:
+              name: Salesloft Retrieve people
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  email_addresses: '{{$SalesforceRetrievecontacts[0].Email}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: false
+              pagination-type: SKIP_LIMIT
+              action: listPeople
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+          - custom-action:
+              name: Salesloft Create cadence membership
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: createCadenceMembership
+              map:
+                mappings:
+                  - cadence_id:
+                      expression: sampleCadenceId
+                  - person_id:
+                      expression: '$SalesloftRetrievepeople[0].id '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecontacts
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response/payload'
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: SalesloftRetrievepeople
+                    $ref: '#/node-output/Salesloft Retrieve people/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Notify salesloft customer when new lead is created in Salesforce
+models: {}
