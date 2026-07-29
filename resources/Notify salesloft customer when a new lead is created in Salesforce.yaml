@@ -111,9 +111,9 @@ integration:
               map:
                 mappings:
                   - cadence_id:
-                      expression: Cadence ID
+                      expression: 'Cadence ID'
                   - person_id:
-                      expression: '$SalesloftRetrievepeople[0].id '
+                      expression: '$SalesloftRetrievepeople[0].id'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
