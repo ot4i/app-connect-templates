@@ -205,7 +205,7 @@ integration:
                         map:
                           mappings:
                             - cadence_id:
-                                expression: '123456'
+                                expression: 'Cadence ID'
                             - person_id:
                                 expression: '$SalesloftRetrievepeople[0].id '
                           $map: http://ibm.com/appconnect/map/v1
