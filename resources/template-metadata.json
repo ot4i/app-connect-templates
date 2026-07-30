@@ -4060,7 +4060,7 @@
  },
  {
   "name": "Create a task in Salesforce when a new call is received in Salesloft",
-  "description": "Use this template to log the call activity in Salesloft into Salesforce task.",
+  "description": "Use this template to create a task in Salesforce when a new call is received in Salesloft.",
   "summary": "Salesloft to Salesforce",
   "sourceApp": "salesloft",
   "targetApps": ["salesforce"],
@@ -4069,7 +4069,7 @@
  },
  {
   "name": "Create a cadence membership in Salesloft when a new lead is created in Salesforce",
-  "description": "Use this template to notify Salesloft customer when a new lead is created in Salesforce.",
+  "description": "Use this template to create a cadence membership in Salesloft when a new lead is created in Salesforce.",
   "summary": "Salesforce to Salesloft",
   "sourceApp": "salesforce",
   "targetApps": ["salesloft"],
@@ -4078,19 +4078,19 @@
  },
  {
   "name": "Request customer feedback through a Salesloft cadence when a Freshservice ticket is resolved",
-  "description": "Use this template to trigger a mail from Salesloft requesting feedback when a Freshservice ticket is resolved.",
+  "description": "Use this template to request customer feedback through a Salesloft cadence when a Freshservice ticket is resolved.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
   "targetApps": ["freshservice", "salesloft"],
-  "tags": ["streaming-connector-scheduler", "freshservice", "salesloft"],
+  "tags": ["streaming-connector-scheduler", "freshservice", "salesloft", "foreach", "if"],
   "offerings": ["app connect professional"]
  },
  {
   "name": "Create a note in Salesloft when an opportunity status is updated in Salesforce",
-  "description": "Use this template to sync the status changes in Salesforce opportunity to Salesloft notes.",
+  "description": "Use this template to create a note in Salesloft when an opportunity status is updated in Salesforce.",
   "summary": "Salesforce to Salesloft",
-  "sourceApp": "hive",
-  "targetApps": ["salesforce"],
+  "sourceApp": "salesforce",
+  "targetApps": ["salesloft"],
   "tags": ["salesforce", "salesloft"],
   "offerings": ["app connect professional"]
  },
