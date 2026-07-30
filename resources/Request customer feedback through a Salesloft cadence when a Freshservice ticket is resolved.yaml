@@ -235,5 +235,5 @@ integration:
                   $ref: '#/block/For each/current-item'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Send a mail requesting feedback when a Freshservice ticket is resolved
+  name: Request customer feedback through a Salesloft cadence when a Freshservice ticket is resolved
 models: {}
