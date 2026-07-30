@@ -105,7 +105,7 @@ integration:
                   - CallDisposition:
                       template: '{{$Trigger.sentiment}}'
                   - CallDurationInSeconds:
-                      expression: '$Trigger.duration '
+                      expression: '$Trigger.duration'
                   - CallType:
                       template: Internal
                   - Description:
