@@ -4059,7 +4059,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Logging to Salesforce task when a call is completed in Salesloft",
+  "name": "Create a task in Salesforce when a new call is received in Salesloft",
   "description": "Use this template to log the call activity in Salesloft into Salesforce task.",
   "summary": "Salesloft to Salesforce",
   "sourceApp": "salesloft",
@@ -4068,7 +4068,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Notify salesloft customer when a new lead is created in Salesforce",
+  "name": "Create a cadence membership in Salesloft when a new lead is created in Salesforce",
   "description": "Use this template to notify Salesloft customer when a new lead is created in Salesforce.",
   "summary": "Salesforce to Salesloft",
   "sourceApp": "salesforce",
@@ -4077,7 +4077,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Send a mail requesting feedback when a Freshservice ticket is resolved",
+  "name": "Request customer feedback through a Salesloft cadence when a Freshservice ticket is resolved",
   "description": "Use this template to trigger a mail from Salesloft requesting feedback when a Freshservice ticket is resolved.",
   "summary": "Scheduler to 2 applications",
   "sourceApp": "streaming-connector-scheduler",
@@ -4086,7 +4086,7 @@
   "offerings": ["app connect professional"]
  },
  {
-  "name": "Updating status changes in Salesforce opportunity to Salesloft notes",
+  "name": "Create a note in Salesloft when an opportunity status is updated in Salesforce",
   "description": "Use this template to sync the status changes in Salesforce opportunity to Salesloft notes.",
   "summary": "Salesforce to Salesloft",
   "sourceApp": "hive",
