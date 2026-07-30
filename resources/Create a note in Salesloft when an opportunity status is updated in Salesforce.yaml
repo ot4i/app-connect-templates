@@ -129,5 +129,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter: {}
-  name: Updating status changes in Salesforce opportunity to Salesloft notes
+  name: Create a note in Salesloft when an opportunity status is updated in Salesforce
 models: {}
