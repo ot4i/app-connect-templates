@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Updating%20status%20changes%20in%20Salesforce%20opportunity%20to%20Salesloft%20notes_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/tree/main/resources/markdown/Create%20a%20note%20in%20Salesloft%20when%20an%20opportunity%20status%20is%20updated%20in%20Salesforce_instructions.md) (opens in a new window).
 
 This flow creates a Salesloft note for a corresponding customer when there is a status change in Salesforce oppurtunity.
 
