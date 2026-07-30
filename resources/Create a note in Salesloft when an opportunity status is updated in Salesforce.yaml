@@ -111,11 +111,11 @@ integration:
               map:
                 mappings:
                   - associated_with_id:
-                      expression: '$SalesloftRetrievepeople[0].id '
+                      expression: '$SalesloftRetrievepeople[0].id'
                   - associated_with_type:
                       template: person
                   - content:
-                      template: 'Salesforce oppurtunity has a new update. Updated oppurtunity details are: {{$Trigger}}'
+                      template: 'Salesforce opportunity has a new update. Updated opportunity details are: {{$Trigger}}'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
