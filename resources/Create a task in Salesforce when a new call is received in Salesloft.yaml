@@ -126,5 +126,5 @@ integration:
                     $ref: '#/node-output/Salesforce Retrieve contacts/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Logging to Salesforce task when a call is completed in Salesloft
+  name: Create a task in Salesforce when a new call is received in Salesloft
 models: {}
