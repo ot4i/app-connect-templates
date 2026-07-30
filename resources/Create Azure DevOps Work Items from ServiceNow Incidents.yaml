@@ -1,0 +1,106 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: servicenow
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: incident
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/incident/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Work items
+      connector-type: azuredevops
+      actions:
+        createWorkItem: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Organizations/{organization}/Projects/{project}/Work%20item%20types/{name}/Work%20items/operations/createWorkItem
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      mappedPriority:
+                        type: number
+                      mappedType:
+                        type: string
+                mappings:
+                   - variable:
+                       mappings:
+                         - mappedPriority:
+                             expression: '$Trigger.priority = 1 ? 1 : ($Trigger.priority = 2 ? 2 : ($Trigger.priority = 3 ? 3 : 4))'
+                         - mappedType:
+                             expression: >-
+                               $Trigger.sys_class_name = "problem" ? "Bug" : ($Trigger.sys_class_name = "incident" ?
+                               "Task" : ($Trigger.sys_class_name = "change_request" ? "Task" : ($Trigger.sys_class_name =
+                               "universal_request" ? "Issue" : "Task")))
+              name: Set variable
+          - custom-action:
+              name: Microsoft Azure DevOps Create work item
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: createWorkItem
+              map:
+                mappings:
+                  - '`Microsoft.VSTS.Common.Priority`':
+                      expression: '$Setvariable.variable.mappedPriority'
+                  - '`System.Description`':
+                      template: '{{$Trigger.description}}'
+                  - '`System.Tags`':
+                      template: '{{$Trigger.category}}; {{$Trigger.subcategory}}'
+                  - '`System.Title`':
+                      template: '{{$Trigger.short_description}}'
+                  - name:
+                      template: Issue
+                  - organization:
+                      template: appconnakash
+                  - project:
+                      template: cloud-integration
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - name: Issue
+                    - organization: appconnakash
+                    - project: cloud-integration
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create Azure DevOps work items from ServiceNow incidents
+models: {}

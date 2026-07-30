@@ -1,0 +1,111 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: jira
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: IssueV2
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/IssueV2/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Work items
+      connector-type: azuredevops
+      actions:
+        createWorkItem: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: >-
+            resources/Organizations/{organization}/Projects/{project}/Work%20item%20types/{name}/Work%20items/operations/createWorkItem
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      mappedPriority:
+                        type: number
+                      mappedType:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - mappedPriority:
+                            expression: >-
+                              $number($Trigger.fields.priority.name = "Highest" ? 1 : ($Trigger.fields.priority.name =
+                              "High" ? 2 : ($Trigger.fields.priority.name = "Medium" ? 3 : 4)))
+                        - mappedType:
+                            expression: >-
+                              $Trigger.fields.issuetype.name = "Epic" ? "Epic" :
+                              ($Trigger.fields.issuetype.name = "Story" ? "User Story" :
+                              ($Trigger.fields.issuetype.name = "Bug" ? "Bug" : ($Trigger.fields.issuetype.name
+                              = "Task" ? "Task" : ($Trigger.fields.issuetype.name = "Sub-task" ? "Task" :
+                              "Feature"))))
+              name: Set variable
+          - custom-action:
+              name: Microsoft Azure DevOps Create work item
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: createWorkItem
+              map:
+                mappings:
+                  - '`Microsoft.VSTS.Common.Priority`':
+                      expression: '$Setvariable.variable.mappedPriority'
+                  - '`System.Description`':
+                      template: '{{$Trigger.fields.description}}'
+                  - '`System.Title`':
+                      template: '{{$Trigger.fields.summary}}'
+                  - name:
+                      template: '{{$Setvariable.variable.mappedType}}'
+                  - organization:
+                      template: appconnakash
+                  - project:
+                      template: cloud-integration
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - name: '{{$Setvariable.variable.mappedType}}'
+                    - organization: appconnakash
+                    - project: cloud-integration
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Sync Jira issues to Azure DevOps work items
+models: {}
