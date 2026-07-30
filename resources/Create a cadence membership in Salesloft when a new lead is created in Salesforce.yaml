@@ -127,5 +127,5 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
               filter: {}
-  name: Notify salesloft customer when new lead is created in Salesforce
+  name: Create a cadence membership in Salesloft when a new lead is created in Salesforce
 models: {}
