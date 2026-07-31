@@ -4129,6 +4129,24 @@
  "targetApps": ["azuredevops"],
  "tags": ["jira", "azuredevops"],
  "offerings": ["app connect professional"]
+},
+{
+ "name": "Summarize ServiceNow incident tickets using Amazon Bedrock and send email via Gmail",
+ "description": "Use this template to automatically summarize new ServiceNow incident tickets using Amazon Bedrock (Amazon Nova Pro model). When a ticket is created, the flow sends the ticket details to Amazon Bedrock which generates a concise professional analysis covering the incident summary, business impact, likely root cause, recommended resolution steps, and a customer-facing response. The AI-generated summary is then emailed via Gmail to the support team.",
+ "summary": "ServiceNow to 2 applications",
+ "sourceApp": "servicenow",
+ "targetApps": ["awsbedrock", "gmail"],
+ "tags": ["servicenow", "awsbedrock", "gmail", "ai", "support", "ticket", "summarization", "incident", "email"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Generate personalized Salesforce account anniversary emails using Amazon Bedrock and send via Gmail",
+ "description": "Use this template to generate and send personalized Salesforce account anniversary emails at scale. Triggered via an API call, the flow retrieves account details from Salesforce, uses Amazon Bedrock (Amazon Nova Pro model) to compose a warm, tailored anniversary email body celebrating the customer relationship, and delivers it to the customer via Gmail.",
+ "summary": "API to 3 applications",
+ "sourceApp": "salesforce",
+ "targetApps": ["awsbedrock", "gmail", "salesforce"],
+ "tags": ["salesforce", "awsbedrock", "gmail", "ai", "email", "personalization", "anniversary", "customer engagement"],
+ "offerings": ["app connect professional"]
 }
 ]
 }
