@@ -1,0 +1,156 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: servicenow
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: ticket
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/ticket/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: models
+      connector-type: awsbedrock
+      actions:
+        converse: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/models/operations/converse
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon Bedrock Converse with model
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: converse
+              map:
+                mappings:
+                  - inferenceConfig:
+                      mappings:
+                        - maxTokens:
+                            expression: '800'
+                        - temperature:
+                            expression: '0.2'
+                        - topP:
+                            expression: '0.9'
+                  - messages:
+                      foreach:
+                        input: '[{}]'
+                        iterator: messagesItem
+                        mappings:
+                          - content:
+                              foreach:
+                                input: '[{}]'
+                                iterator: contentItem
+                                mappings:
+                                  - text:
+                                      template: >-
+                                        Analyze the following ServiceNow
+                                        incident.Ticket
+                                        Number:                                       
+                                        {{$Trigger.number}}Description:
+                                        {{$Trigger.description}}Write one
+                                        concise                                       
+                                        professional paragraph that naturally
+                                        includes:- a summary of the incident,-
+                                        its                                       
+                                        business impact,- the most likely root
+                                        cause,- recommended troubleshooting
+                                        or                                       
+                                        resolution steps,- a customer-facing
+                                        response, and- the confidence level of
+                                        the                                       
+                                        analysis.Return only the paragraph as
+                                        plain text.
+                          - role:
+                              template: user
+                  - system:
+                      foreach:
+                        input: '[{}]'
+                        iterator: systemItem
+                        mappings:
+                          - text:
+                              template: >-
+                                You are an experienced IT Service Desk
+                                Assistant.Analyze ServiceNow incidents
+                                and                                produce a
+                                single professional paragraph.Requirements:-
+                                Return plain text only.-
+                                Return                                exactly
+                                one paragraph.- Do not use markdown.- Do not use
+                                headings, labels, prefixes,
+                                or                                field names.-
+                                Do not start sentences with words like
+                                "Summary:", "Business
+                                Impact:",                                "Likely
+                                Root Cause:", "Recommended Actions:", "Customer
+                                Response:", or
+                                "Confidence:".-                               
+                                Seamlessly combine the incident summary,
+                                business impact, likely root cause,
+                                recommended                               
+                                actions, customer communication, and confidence
+                                into a natural narrative.
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  modelId: amazon.nova-pro-v1:0
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$AWSBedrockConverse.output.message.content[0].text}}'
+                  - Subject:
+                      template: A new ServiceNow ticket is created!!
+                  - To:
+                      template: himani.bhardwaj1@ibm.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonBedrockConversewithmodel
+                    $ref: >-
+                      #/node-output/Amazon Bedrock Converse with
+                      model/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Summarize ServiceNow incident tickets using Amazon Bedrock and send email via Gmail
+models: {}

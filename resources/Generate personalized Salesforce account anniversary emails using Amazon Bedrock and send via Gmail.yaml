@@ -1,0 +1,201 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createDemo:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createDemo
+          output-context:
+            data: createDemo
+      options:
+        resources:
+          - business-object: demo
+            triggers:
+              create: createDemo
+            model:
+              $ref: '#/models/demo'
+      type: api-trigger
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-5:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Account
+          action: retrievewithwhere
+    action-interface-1:
+      type: api-action
+      business-object: models
+      connector-type: awsbedrock
+      actions:
+        invokeModel: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/models/operations/invokeModel
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve accounts
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              allow-empty-output: false
+              filter:
+                where:
+                  CreatedDate: 2026-07-22T11:48:31.000+0000
+                input:
+                  - variable: SalesforceRetrievecontacts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      contacts/response/payload
+                  - variable: SalesforceRetrievecontactsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              allow-truncation: true
+              pagination-type: TOKEN
+          - custom-action:
+              name: Amazon Bedrock Invoke model
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: invokeModel
+              map:
+                mappings:
+                  - inputPayload:
+                      expression: >-
+                        {  "schemaVersion": "messages-v1",  "system": [   
+                        {      "text": "You are a
+                        professional                        customer engagement
+                        assistant. Generate warm, personalized, and concise
+                        customer emails. Return                        only the
+                        email body. Do not include a subject line, markdown,
+                        greetings outside the email, or                       
+                        explanations."    }  ],  "messages": [    {      "role":
+                        "user",      "content": [                              
+                        {          "text": "Customer Name: Himani. Write a
+                        professional and friendly
+                        congratulatory                        email celebrating
+                        their anniversary. Thank them for being a valued
+                        customer, express                        appreciation
+                        for their trust, and mention that you look forward to
+                        continuing to serve them.                        Keep
+                        the email between 120 and 180 words. Return only the
+                        email body."        }      ]    } 
+                        ],                         "inferenceConfig": {   
+                        "maxTokens": 300,    "temperature": 0.7,    "topP": 0.9 
+                        }}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter:
+                where:
+                  modelId: amazon.nova-pro-v1:0
+                input:
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        {{$AWSBedrockInvokeModel.model.output.message.content[0].text}}
+                  - Subject:
+                      template: Here's to Another Great Year Together!
+                  - To:
+                      template: '{{$Request.email}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SalesforceRetrieveaccounts
+                    $ref: >-
+                      #/node-output/Salesforce Retrieve
+                      accounts/response/payload
+                  - variable: SalesforceRetrieveaccountsMetadata
+                    $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                  - variable: AmazonBedrockInvokemodel
+                    $ref: '#/node-output/Amazon Bedrock Invoke model/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - response:
+              name: response
+              reply-maps:
+                - title: demo successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: SalesforceRetrieveaccounts
+                        $ref: >-
+                          #/node-output/Salesforce Retrieve
+                          accounts/response/payload
+                      - variable: SalesforceRetrieveaccountsMetadata
+                        $ref: '#/node-output/Salesforce Retrieve accounts/response'
+                      - variable: AWSBedrockInvokeModel
+                        $ref: '#/node-output/AWS Bedrock InvokeModel/response/payload'
+                      - variable: GmailSendemail
+                        $ref: '#/node-output/Gmail Send email/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - email:
+                          template: Email sent!!
+  name: Generate personalized Salesforce account anniversary emails using Amazon Bedrock and send via Gmail
+models:
+  demo:
+    name: demo
+    plural: demo
+    properties:
+      email:
+        required: false
+        id: true
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''
