@@ -26,7 +26,6 @@ integration:
       connector-type: gmail
       actions:
         CREATE: {}
-      account-name: Account 1
       options:
         connectorServiceOptions:
           httpMethod: post
@@ -36,7 +35,6 @@ integration:
       type: api-action
       business-object: Account
       connector-type: salesforce
-      account-name: Account 1
       actions:
         RETRIEVEALL: {}
       options:
@@ -48,7 +46,6 @@ integration:
       type: api-action
       business-object: models
       connector-type: awsbedrock
-      account-name: Account 1
       actions:
         invokeModel: {}
       options:

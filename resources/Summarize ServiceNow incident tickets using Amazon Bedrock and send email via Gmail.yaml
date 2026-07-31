@@ -16,13 +16,11 @@ integration:
               httpMethod: post
               path: resources/ticket/operations/CREATED/subscribe
               action: created
-      account-name: Account 1
   action-interfaces:
     action-interface-2:
       type: api-action
       business-object: mail
       connector-type: gmail
-      account-name: Account 1
       actions:
         CREATE: {}
       options:
@@ -34,7 +32,6 @@ integration:
       type: api-action
       business-object: models
       connector-type: awsbedrock
-      account-name: Account 1
       actions:
         converse: {}
       options:
