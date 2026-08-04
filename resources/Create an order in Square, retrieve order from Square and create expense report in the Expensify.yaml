@@ -1,0 +1,216 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCreate_order:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: create_order
+          output-context:
+            data: create_order
+      options:
+        resources:
+          - business-object: create_order
+            model:
+              $ref: '#/models/create_order'
+            triggers:
+              create: createCreate_order
+      type: api-trigger
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: orders
+      connector-type: square
+      actions:
+        CREATE: {}
+    action-interface-1:
+      type: api-action
+      business-object: orders
+      connector-type: square
+      actions:
+        RETRIEVEALL: {}
+    action-interface-2:
+      type: api-action
+      business-object: postCreateReport_model
+      connector-type: expensify
+      actions:
+        postCreateReport: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Square Create order
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - customer_id:
+                      template: '{{$Request.idempotency_key}}'
+                  - idempotency_key:
+                      template: '{{$Request.idempotency_key}}'
+                  - line_items:
+                      foreach:
+                        input: '[{}]'
+                        iterator: line_itemsItem
+                        mappings:
+                          - base_price_money:
+                              mappings:
+                                - amount:
+                                    expression: '$Request.line_items.amount '
+                                - currency:
+                                    template: '{{$Request.line_items.currency}}'
+                          - name:
+                              template: xyz
+                          - quantity:
+                              template: '{{$Request.line_items.quantity}}'
+                  - location_id:
+                      template: LJ21W5C350JKN
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: Square Retrieve orders
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                where:
+                  and:
+                    - order_id: '{{$SquareCreateorder.order_id}}'
+                    - location_id: LJ21W5C350JKN
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: SquareCreateorder
+                    $ref: '#/node-output/Square Create order/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: TOKEN
+              allow-empty-output: false
+          - custom-action:
+              name: Expensify Create report
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postCreateReport
+              map:
+                mappings:
+                  - inputSettings:
+                      mappings:
+                        - employeeEmail:
+                            template: '{{$Request.email}}'
+                        - expenses:
+                            foreach:
+                              input: '$SquareRetrieveorders.line_items '
+                              iterator: expensesItem
+                              mappings:
+                                - amount:
+                                    expression: $expensesItem.total_money.amount
+                                - currency:
+                                    template: '{{$expensesItem.total_money.currency}}'
+                                - date:
+                                    template: '{{$Request.date}}'
+                                - merchant:
+                                    template: '{{$Request.email}}'
+                        - policyID:
+                            template: '{{$Request.policy_id}}'
+                        - report:
+                            mappings:
+                              - title:
+                                  template: '{{$Request.line_items.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: SquareCreateorder
+                    $ref: '#/node-output/Square Create order/response/payload'
+                  - variable: SquareRetrieveorders
+                    $ref: '#/node-output/Square Retrieve orders/response/payload'
+                  - variable: SquareRetrieveordersMetadata
+                    $ref: '#/node-output/Square Retrieve orders/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: create_order successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: SquareCreateorder
+                        $ref: '#/node-output/Square Create order/response/payload'
+                      - variable: SquareRetrieveorders
+                        $ref: '#/node-output/Square Retrieve orders/response/payload'
+                      - variable: SquareRetrieveordersMetadata
+                        $ref: '#/node-output/Square Retrieve orders/response'
+                      - variable: ExpensifyCreatereport
+                        $ref: '#/node-output/Expensify Create report/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - id:
+                          template: '{{$ExpensifyCreatereport.reportID}}'
+                  input: []
+  name: Usecase1
+models:
+  create_order:
+    name: create_order
+    properties:
+      id:
+        required: false
+        id: true
+        type: string
+      idempotency_key:
+        required: false
+        id: false
+        type: string
+      customer_id:
+        required: false
+        id: false
+        type: string
+      line_items:
+        required: false
+        id: false
+        type:
+          name:
+            required: false
+            id: false
+            type: string
+          quantity:
+            required: false
+            id: false
+            type: number
+          amount:
+            required: false
+            id: false
+            type: string
+          currency:
+            required: false
+            id: false
+            type: string
+      email:
+        required: false
+        id: false
+        type: string
+      date:
+        required: false
+        id: false
+        type: string
+      policy_id:
+        required: false
+        id: false
+        type: string
+    plural: create_order
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
