@@ -4144,7 +4144,7 @@
   "description": "Use this template to automatically generate AI-powered chat responses via Hugging Face whenever a new message is posted to a Microsoft Teams channel.",
   "summary": "Microsoft Teams to 2 applications",
   "sourceApp": "msteams",
-  "targetApps": ["huggingface", "msteams"],
+  "targetApps": ["huggingface", "msteams","json-parser"],
   "tags": ["msteams", "huggingface"],
   "offerings": ["app connect professional"]
 },
