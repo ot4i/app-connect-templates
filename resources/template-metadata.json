@@ -4129,6 +4129,33 @@
  "targetApps": ["azuredevops"],
  "tags": ["jira", "azuredevops"],
  "offerings": ["app connect professional"]
+},
+{
+  "name": "Classify Slack messages sentiment using Hugging Face and post results to Slack channel",
+  "description": "Use this template to classify the sentiment of Slack messages using Hugging Face and post the analysis results to a Slack channel.",
+  "summary": "1 flow to 2 applications",
+  "sourceApp": "api",
+  "targetApps": ["huggingface", "slack"],
+  "tags": ["slack", "huggingface"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Generate AI chat response via Hugging Face for new Microsoft Teams channel message",
+  "description": "Use this template to automatically generate AI-powered chat responses via Hugging Face whenever a new message is posted to a Microsoft Teams channel.",
+  "summary": "Microsoft Teams to 2 applications",
+  "sourceApp": "msteams",
+  "targetApps": ["huggingface", "msteams"],
+  "tags": ["msteams", "huggingface"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Summarize Box file content using Hugging Face and send summary via Gmail",
+  "description": "Use this template to summarize the content of a Box file using Hugging Face and deliver the summary to a recipient via Gmail.",
+  "summary": "1 flow to 3 applications",
+  "sourceApp": "api",
+  "targetApps": ["box", "huggingface", "gmail"],
+  "tags": ["box", "huggingface", "gmail"],
+  "offerings": ["app connect professional"]
 }
 ]
 }
