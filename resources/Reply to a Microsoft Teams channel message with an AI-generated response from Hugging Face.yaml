@@ -1,0 +1,135 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: msteams
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Message
+          options:
+            teamId: 00000000-0000-0000-0000-000000000001
+            channelId: 19:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@thread.tacv2
+            parentFilter:
+              teamId: 00000000-0000-0000-0000-000000000001
+              channelId: 19:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@thread.tacv2
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/Team/{teamId}/Channel/{channelId}/Message/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Text generation
+      connector-type: huggingface
+      actions:
+        postChatCompletion: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20generation/operations/postChatCompletion
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - parse:
+              parse-format: json
+              source:
+                template: "[{\n\t\t\t\"role\": \"system\",\n\t\t\t\t\t\t\"content\": \"You are a helpful support assistant for our team. Be concise and professional\"\n\t\t},\n\t\t{\n\t\t\t\"role\": \"user\",\n\t\t\t\t\t\t\"content\": \"{{$Trigger.body.content}}\"\n\t\t}\n\t]"
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: "[{\n\t\t\t\"role\": \"system\",\n\t\t\t\t\t\t\"content\": \"you are a hindi ai assistant\"\n\t\t},\n\t\t{\n\t\t\t\"role\": \"user\",\n\t\t\t\t\t\t\"content\": \"what is your name, why do you exist, give details\"\n\t\t}\n\t]"
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: array
+                items:
+                  type: object
+                  properties:
+                    role:
+                      type: string
+                    content:
+                      type: string
+                title: Parsed JSON
+              name: JSON Parser Parse
+          - custom-action:
+              name: Hugging Face Generate chat response
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postChatCompletion
+              map:
+                customSchemas: {}
+                mappings:
+                  - messages:
+                      foreach:
+                        mappings:
+                          - content:
+                              template: '{{$messagesItem.content}}'
+                          - role:
+                              template: '{{$messagesItem.role}}'
+                        input: '$JSONParserParse '
+                        iterator: messagesItem
+                  - model:
+                      template: meta-llama/Llama-3.1-8B-Instruct
+                  - provider:
+                      template: auto
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              {{$HuggingFaceGeneratechatresponse.choices.message.content}}
+                  - channelId:
+                      template: >-
+                        19:xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@thread.tacv2
+                  - subject:
+                      template: AI bot response
+                  - teamId:
+                      template: 00000000-0000-0000-0000-000000000001
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: HuggingFaceGeneratechatresponse
+                    $ref: >-
+                      #/node-output/Hugging Face Generate chat
+                      response/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Reply to a Microsoft Teams channel message with an AI-generated response from Hugging Face
+models: {}
