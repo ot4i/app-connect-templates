@@ -67,8 +67,6 @@ integration:
                 where:
                   id: C0XXXXXXXXXX
                 input:
-                  - variable: DropboxDownloadfile
-                    $ref: '#/node-output/Dropbox Download file/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                   - variable: Request
