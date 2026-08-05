@@ -1,0 +1,178 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        textsummarisationTextOperation:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: TextOperation
+          output-context:
+            data: TextOperation
+      options:
+        resources:
+          - business-object: TextOperation
+            triggers:
+              textsummarisation: textsummarisationTextOperation
+            model:
+              $ref: '#/models/TextOperation'
+      type: api-trigger
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: Text generation
+      connector-type: huggingface
+      actions:
+        postTextSummarization: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20generation/operations/postTextSummarization
+          action: custom
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-1:
+      type: api-action
+      business-object: File
+      connector-type: box
+      actions:
+        DOWNLOADFILE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/File/operations/DOWNLOADFILE
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Box Retrieve file content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - fileType:
+                      template: Text
+                  - id:
+                      template: '0000000000000'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - custom-action:
+              name: Hugging Face Summarize text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: postTextSummarization
+              map:
+                mappings:
+                  - inputs:
+                      template: '{{$BoxRetrievefilecontent.content}}'
+                  - model:
+                      template: sshleifer/distilbart-cnn-12-6
+                  - provider:
+                      template: auto
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$HuggingFaceSummarizetext.summary_text}}'
+                  - To:
+                      template: example.user@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BoxRetrievefilecontent
+                    $ref: '#/node-output/Box Retrieve file content/response/payload'
+                  - variable: HuggingFaceSummarizetext
+                    $ref: '#/node-output/Hugging Face Summarize text/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - response:
+              name: response
+              reply-maps:
+                - title: TextOperation successfully add custom operation
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: JiraRetrieveissue
+                        $ref: '#/node-output/Jira Retrieve issue/response/payload'
+                      - variable: JiraRetrieveissueMetadata
+                        $ref: '#/node-output/Jira Retrieve issue/response'
+                      - variable: HuggingFaceSummarizetext
+                        $ref: >-
+                          #/node-output/Hugging Face Summarize
+                          text/response/payload
+                      - variable: GmailSendemail
+                        $ref: '#/node-output/Gmail Send email/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - text:
+                          template: >-
+                            ::
+                            sent:{{$HuggingFaceSummarizetext.summary_text}}>>>
+                            email ID {{$GmailSendemail.id}}
+  name: Summarize the content of a Box file using Hugging Face and send the summary in a Gmail message
+models:
+  TextOperation:
+    name: TextOperation
+    plural: TextOperation
+    properties:
+      text:
+        required: false
+        id: true
+        type: string
+    operations:
+      textsummarisation: '#/integration/assemblies/assembly-1'
+    description: ''
+    methods:
+      textsummarisation:
+        name: textSummarisation
+        display:
+          name: Text Summarisation
+        accessType: WRITE
+        accepts:
+          - arg: data
+            type: TextOperation
+            http:
+              source: body
+        returns:
+          arg: data
+          type: TextOperation
+          root: true
+        http:
+          verb: POST
+          path: /textSummarisation
