@@ -125,10 +125,6 @@ integration:
                   map:
                     $map: http://ibm.com/appconnect/map/v1
                     input:
-                      - variable: JiraRetrieveissue
-                        $ref: '#/node-output/Jira Retrieve issue/response/payload'
-                      - variable: JiraRetrieveissueMetadata
-                        $ref: '#/node-output/Jira Retrieve issue/response'
                       - variable: HuggingFaceSummarizetext
                         $ref: >-
                           #/node-output/Hugging Face Summarize
