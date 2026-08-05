@@ -4132,7 +4132,7 @@
 },
 {
   "name": "Analyze the sentiment of Slack messages using Hugging Face and post the results to a Slack channel",
-  "description": "Use this template to classify the sentiment of Slack messages using Hugging Face and post the analysis results to a Slack channel.",
+  "description": "Use this template to analyze the sentiment of Slack messages using Hugging Face and post the results to a Slack channel.",
   "summary": "1 flow to 2 applications",
   "sourceApp": "api",
   "targetApps": ["huggingface", "slack"],
@@ -4150,7 +4150,7 @@
 },
 {
   "name": "Summarize the content of a Box file using Hugging Face and send the summary in a Gmail message",
-  "description": "Use this template to summarize the content of a Box file using Hugging Face and deliver the summary to a recipient via Gmail.",
+  "description": "Use this template to summarize the content of a Box file using Hugging Face and send the summary in a Gmail message.",
   "summary": "1 flow to 3 applications",
   "sourceApp": "api",
   "targetApps": ["box", "huggingface", "gmail"],
