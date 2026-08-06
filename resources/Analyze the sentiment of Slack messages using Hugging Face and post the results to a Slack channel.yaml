@@ -1,0 +1,185 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        classifytextTextOperation:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: TextOperation
+          output-context:
+            data: TextOperation
+      options:
+        resources:
+          - business-object: TextOperation
+            triggers:
+              classifytext: classifytextTextOperation
+            model:
+              $ref: '#/models/TextOperation'
+      type: api-trigger
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/{OBJECT_NAME}/{OBJECT_ID}/message
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Text generation
+      connector-type: huggingface
+      actions:
+        postTextClassification: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20generation/operations/postTextClassification
+          action: custom
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/message
+          action: retrievewithwhere
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Slack Retrieve messages
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  id: C0XXXXXXXXXX
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              allow-truncation: true
+              pagination-type: TOKEN
+          - custom-action:
+              name: Hugging Face Classify text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postTextClassification
+              map:
+                mappings:
+                  - inputs:
+                      template: '{{$SlackRetrievemessages.text}}'
+                  - model:
+                      template: >-
+                        distilbert/distilbert-base-uncased-finetuned-sst-2-english
+                  - provider:
+                      template: auto
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SlackRetrievemessages
+                    $ref: '#/node-output/Slack Retrieve messages/response/payload'
+                  - variable: SlackRetrievemessagesMetadata
+                    $ref: '#/node-output/Slack Retrieve messages/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              filter: {}
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C0YYYYYYYYYY
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        Sentiment analysis score :
+                        {{$HuggingFaceClassifytext.classifications}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: SlackRetrievemessages
+                    $ref: '#/node-output/Slack Retrieve messages/response/payload'
+                  - variable: SlackRetrievemessagesMetadata
+                    $ref: '#/node-output/Slack Retrieve messages/response'
+                  - variable: HuggingFaceClassifytext
+                    $ref: '#/node-output/Hugging Face Classify text/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - response:
+              name: response
+              reply-maps:
+                - title: TextOperation successfully add custom operation
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: SlackRetrievemessages
+                        $ref: '#/node-output/Slack Retrieve messages/response/payload'
+                      - variable: SlackRetrievemessagesMetadata
+                        $ref: '#/node-output/Slack Retrieve messages/response'
+                      - variable: HuggingFaceClassifytext
+                        $ref: >-
+                          #/node-output/Hugging Face Classify
+                          text/response/payload
+                      - variable: SlackSendmessage
+                        $ref: '#/node-output/Slack Send message/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - text:
+                          template: >-
+                            score
+                            -{{$HuggingFaceClassifytext.classifications}}::
+                            sent:>>>> timestamp {{$SlackSendmessage.ts}}
+  name: Analyze the sentiment of Slack messages using Hugging Face and post the results to a Slack channel
+models:
+  TextOperation:
+    name: TextOperation
+    plural: TextOperation
+    properties:
+      text:
+        required: false
+        id: true
+        type: string
+    operations:
+      classifytext: '#/integration/assemblies/assembly-1'
+    description: ''
+    methods:
+      classifytext:
+        name: ClassifyText
+        display:
+          name: Sentiment analysis on customer feedback
+        accessType: WRITE
+        accepts:
+          - arg: data
+            type: TextOperation
+            http:
+              source: body
+        returns:
+          arg: data
+          type: TextOperation
+          root: true
+        http:
+          verb: POST
+          path: /ClassifyText
