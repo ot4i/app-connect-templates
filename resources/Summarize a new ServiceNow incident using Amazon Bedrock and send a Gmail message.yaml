@@ -152,5 +152,5 @@ integration:
                       model/response/payload
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Summarize ServiceNow incident tickets using Amazon Bedrock and send email via Gmail
+  name: Summarize a new ServiceNow incident using Amazon Bedrock and send a Gmail message
 models: {}
