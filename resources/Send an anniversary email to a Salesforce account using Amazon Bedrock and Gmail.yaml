@@ -186,7 +186,7 @@ integration:
                     mappings:
                       - email:
                           template: Email sent!!
-  name: Generate personalized Salesforce account anniversary emails using Amazon Bedrock and send via Gmail
+  name: Send an anniversary email to a Salesforce account using Amazon Bedrock and Gmail
 models:
   demo:
     name: demo
