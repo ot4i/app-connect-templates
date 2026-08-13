@@ -86,7 +86,7 @@ integration:
                               template: '{{$messagesItem.content}}'
                           - role:
                               template: '{{$messagesItem.role}}'
-                        input: '$JSONParserParse '
+                        input: '$JSONParserParse'
                         iterator: messagesItem
                   - model:
                       template: meta-llama/Llama-3.1-8B-Instruct
