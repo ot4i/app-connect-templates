@@ -110,7 +110,7 @@ integration:
                       template: channel
                   - text:
                       template: >-
-                        Sentimental analysis score :
+                        Sentiment analysis score :
                         {{$HuggingFaceClassifytext.classifications}}
                 $map: http://ibm.com/appconnect/map/v1
                 input:
