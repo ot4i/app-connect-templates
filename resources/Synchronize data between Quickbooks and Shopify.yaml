@@ -1,0 +1,109 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCustomer:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: customer
+          output-context:
+            data: customer
+      options:
+        resources:
+          - business-object: customer
+            model:
+              $ref: '#/models/customer'
+            triggers:
+              create: createCustomer
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: customer
+      connector-type: quickbooks
+      actions:
+        CREATE: {}
+    action-interface-2:
+      type: api-action
+      business-object: customer
+      connector-type: shopify
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Quickbooks1 Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - DisplayName:
+                      template: '{{$Request.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Shopify Create customer
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - first_name:
+                      template: '{{$Request.name}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                  - variable: Quickbooks1Createcustomer
+                    $ref: '#/node-output/Quickbooks1 Create customer/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - response:
+              name: response-1
+              reply-maps:
+                - title: customer successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                      - variable: Quickbooks1Createcustomer
+                        $ref: >-
+                          #/node-output/Quickbooks1 Create
+                          customer/response/payload
+                      - variable: ShopifyCreatecustomer
+                        $ref: '#/node-output/Shopify Create customer/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                    mappings:
+                      - id:
+                          template: >-
+                            {{$Quickbooks1Createcustomer.Id}},
+                            {{$ShopifyCreatecustomer.id}}
+                  input: []
+  name: Quickbooks X Shopify
+models:
+  customer:
+    name: customer
+    properties:
+      name:
+        required: false
+        id: false
+        type: string
+      id:
+        required: false
+        id: true
+        type: string
+    plural: customer
+    description: ' '
+    operations:
+      create: '#/integration/assemblies/assembly-1'
