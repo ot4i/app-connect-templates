@@ -1,0 +1,69 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+              branch:
+                - condition:
+                    and:
+                      - '{{$Trigger.ACTUAL_CLOSE_DATE}}':
+                          lte: '{{$now() }}'
+                        hashKey: object:465
+                      - '{{$Trigger.BID_TYPE}}': New Customer
+                        hashKey: object:807
+                  execute:
+                    - create-action:
+                        name: Slack Send message
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        map:
+                          mappings:
+                            - OBJECT_ID:
+                                template: C04KMH8MALT
+                            - OBJECT_NAME:
+                                template: channel
+                            - text:
+                                template: >-
+                                  New Oppotunity with
+                                  {{$Trigger.OPPORTUNITY_NAME}} has been created
+                                  in Insightly
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              output-schema: {}
+  name: >-
+    Send Slack message when new Insightly opportunity is created for a new
+    customer has been closed
+models: {}
