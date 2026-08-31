@@ -1,0 +1,68 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: insightly
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: folder
+      actions:
+        CREATE: {}
+      connector-type: ibmopenpages
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      actions:
+        CREATE: {}
+      connector-type: gmail
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$Trigger.OPPORTUNITY_FIELD_2}}'
+                  - To:
+                      template: abc@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: IBM OpenPages with Watson Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Trigger.OPPORTUNITY_NAME}}'
+                  - parentFolderId:
+                      template: '1'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: GmailSendemail
+                    $ref: '#/node-output/Gmail Send email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Create folder in IBM OpenPages with Watson when new opportunity is created in Insightly
+models: {}
