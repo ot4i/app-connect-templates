@@ -4129,7 +4129,25 @@
  "targetApps": ["azuredevops"],
  "tags": ["jira", "azuredevops"],
  "offerings": ["app connect professional"]
-}
+},
+ {
+  "name": "Facilities Work Order Triage Flow",
+  "description": "This template runs on a schedule to retrieve corrective work orders from IBM Maximo Real Estate and Facilities, creates a corresponding incident in ServiceNow for each work order, updates the Maximo work order with the ServiceNow incident ID, and sends a summary email via Gmail.",
+  "summary": "Scheduler to 3 applications",
+  "sourceApp": "scheduler",
+  "targetApps": ["ibmmref", "servicenow", "gmail"],
+  "tags": ["ibmmaximo", "servicenow", "gmail", "scheduler"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "HR Onboarding Workplace Provisioning Flow",
+  "description": "This template triggers when a new candidate is created in Zoho Recruit. It creates a person record in IBM Maximo Real Estate and Facilities, retrieves the employee record, finds an available workstation, creates a move work task to assign the workstation, and sends a confirmation email via Gmail.",
+  "summary": "IBM MREF to 2 applications",
+  "sourceApp": "zohorecruit",
+  "targetApps": ["ibmmref", "gmail"],
+  "tags": ["zohorecruit", "ibmmaximo"],
+  "offerings": ["app connect professional"]
+ }
 ]
 }
 
