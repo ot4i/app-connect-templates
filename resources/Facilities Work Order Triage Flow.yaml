@@ -1,0 +1,366 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: triWorkManagementSP___WorkOrder
+      connector-type: ibmmref
+      actions:
+        retrieveall_WorkOrder: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/triWorkManagementSP___WorkOrder/operations/retrieveall_WorkOrder
+          action: retrievewithwhere
+    action-interface-1:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/incident
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: triWorkManagementSP___WorkOrder
+      connector-type: ibmmref
+      actions:
+        update_WorkOrder: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: put
+          path: resources/triWorkManagementSP___WorkOrder/operations/update_WorkOrder
+          action: update
+    action-interface-5:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/incident
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: triWorkManagementSP___WorkOrder
+      connector-type: ibmmref
+      actions:
+        retrieve_WorkOrder: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/triWorkManagementSP___WorkOrder/operations/retrieve_WorkOrder
+          action: retrieve
+    action-interface-6:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Retrieve all work task resource
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: retrieveall_WorkOrder
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - QueryCapability: triAllWorkTasksQC
+                    - spi:triCreatedSY:
+                        gte: '{{$Trigger.lastEventTime}}'
+                    - spi:triTaskTypeCL: Corrective
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '$IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: parallel
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: IBM Maximo Real Estate and Facilities triWorkManagementSP___WorkOrder
+    assembly-2:
+      assembly:
+        execute:
+          - create-action:
+              name: ServiceNow Create incident 2
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - business_service:
+                      template: MREF Corrective Work Task
+                  - caller_id:
+                      template: MREF
+                  - cmdb_ci:
+                      template: '{{$Foreachitem."rdf:about"}}'
+                  - priority:
+                      expression: '5'
+                  - short_description:
+                      template: '{{$Foreachitem."dcterms:description"}}'
+                  - state:
+                      expression: '1'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - retrieve-action:
+              name: ServiceNow Retrieve incidents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              allow-empty-output: false
+              filter:
+                limit: 1
+                where:
+                  sys_id: '{{$ServiceNowCreateincident2.sys_id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: ServiceNowCreateincident2
+                    $ref: '#/block/For each/node-output/ServiceNow Create incident 2/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Update work task resource
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: update_WorkOrder
+              map:
+                mappings:
+                  - spi_triUserMessageTX:
+                      template: 'Service Now ID: {{$ServiceNowCreateincident2.sys_id}}'
+                  - spi_wm_schedstart:
+                      template: '{{$ServiceNowRetrieveincidents.sys_created_on}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: ServiceNowCreateincident2
+                    $ref: '#/block/For each/node-output/ServiceNow Create incident 2/response/payload'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response/payload'
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  recordId: '{{$Foreachitem."dcterms:identifier"}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: ServiceNowCreateincident2
+                    $ref: '#/block/For each/node-output/ServiceNow Create incident 2/response/payload'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response/payload'
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Retrieve work task resource
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: retrieve_WorkOrder
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: ServiceNowCreateincident2
+                    $ref: '#/block/For each/node-output/ServiceNow Create incident 2/response/payload'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response/payload'
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response'
+                  - variable: IBMMaximoRealEstateandFacilitiesUpdateworktaskresource
+                    $ref: >-
+                      #/block/For each/node-output/IBM Maximo Real Estate and Facilities Update work task
+                      resource/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  recordId: '{{$Foreachitem."dcterms:identifier"}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: HTTPInvokemethod
+                    $ref: '#/node-output/HTTP Invoke method/response/payload'
+                  - variable: HTTPInvokemethodMetadata
+                    $ref: '#/node-output/HTTP Invoke method/response'
+                  - variable: HTTPInvokemethod2
+                    $ref: '#/node-output/HTTP Invoke method 2/response/payload'
+                  - variable: HTTPInvokemethod2Metadata
+                    $ref: '#/node-output/HTTP Invoke method 2/response'
+                  - variable: ServiceNowCreateincident2
+                    $ref: '#/block/For each/node-output/ServiceNow Create incident 2/response/payload'
+                  - variable: HTTPInvokemethod3
+                    $ref: '#/node-output/HTTP Invoke method 3/response/payload'
+                  - variable: HTTPInvokemethod3Metadata
+                    $ref: '#/node-output/HTTP Invoke method 3/response'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response/payload'
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response'
+                  - variable: IBMMaximoRealEstateandFacilitiesUpdateworktaskresource
+                    $ref: >-
+                      #/block/For each/node-output/IBM Maximo Real Estate and Facilities Update work task
+                      resource/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              map:
+                mappings:
+                  - Body:
+                      template: >-
+                        {{$IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource}}------ SERVICE NOW
+                        INCIDENT:{{$ServiceNowCreateincident2}}
+                  - Subject:
+                      template: '{{$IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource."dcterms:title"}}'
+                  - To:
+                      template: calisha.noronha@ibm.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource
+                    $ref: >-
+                      #/node-output/IBM Maximo Real Estate and Facilities Retrieve all work task
+                      resource/response/payload
+                  - variable: ServiceNowCreateincident2
+                    $ref: '#/block/For each/node-output/ServiceNow Create incident 2/response/payload'
+                  - variable: ServiceNowRetrieveincidents
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response/payload'
+                  - variable: ServiceNowRetrieveincidentsMetadata
+                    $ref: '#/block/For each/node-output/ServiceNow Retrieve incidents/response'
+                  - variable: IBMMaximoRealEstateandFacilitiesUpdateworktaskresource
+                    $ref: >-
+                      #/block/For each/node-output/IBM Maximo Real Estate and Facilities Update work task
+                      resource/response/payload
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource
+                    $ref: >-
+                      #/block/For each/node-output/IBM Maximo Real Estate and Facilities Retrieve work task
+                      resource/response/payload
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Facilities Work Order Triage Flow
+models: {}
