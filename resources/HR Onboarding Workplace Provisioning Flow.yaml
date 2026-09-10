@@ -1,0 +1,284 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: zohorecruit
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: getCandidates_model
+          options:
+            subscription:
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/getCandidates_model/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: triFriendOfAFriendSP___ibmTbiPeople
+      connector-type: ibmmref
+      actions:
+        create_ibmTbiPeople: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/triFriendOfAFriendSP___ibmTbiPeople/operations/create_ibmTbiPeople
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: triFriendOfAFriendSP___Employee
+      connector-type: ibmmref
+      actions:
+        retrieve_Employee: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/triFriendOfAFriendSP___Employee/operations/retrieve_Employee
+          action: retrieve
+    action-interface-3:
+      type: api-action
+      business-object: triWorkManagementSP___WorkOrder
+      connector-type: ibmmref
+      actions:
+        create_triWorkTaskCF: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/triWorkManagementSP___WorkOrder/operations/create_triWorkTaskCF
+          action: create
+    action-interface-4:
+      type: api-action
+      business-object: ibmTbiSpaceManagement___ibmTbiSpace
+      connector-type: ibmmref
+      actions:
+        retrieveall_ibmTbiSpace: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/ibmTbiSpaceManagement___ibmTbiSpace/operations/retrieveall_ibmTbiSpace
+          action: retrievewithwhere
+    action-interface-5:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-6:
+      type: api-action
+      business-object: triWorkManagementSP___WorkOrder
+      connector-type: ibmmref
+      actions:
+        retrieve_WorkOrder: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/triWorkManagementSP___WorkOrder/operations/retrieve_WorkOrder
+          action: retrieve
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Create ibmtbi people
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: create_ibmTbiPeople
+              map:
+                mappings:
+                  - spi_action:
+                      template: Activate
+                  - spi_customid:
+                      template: '{{$Trigger.Phone}}'
+                  - spi_email:
+                      template: '{{$Trigger.Email}}'
+                  - spi_fullname:
+                      template: '{{$Trigger.Full_Name}}'
+                  - spi_triFirstNameTX:
+                      template: '{{$Trigger.First_Name}}'
+                  - spi_triLastNameTX:
+                      template: '{{$Trigger.Last_Name}}'
+                  - spi_triUserLanguageLI:
+                      template: US English
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Retrieve employee resource
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: retrieve_Employee
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  recordId: '{{$IBMMaximoRealEstateandFacilitiesCreateibmtbipeople.recordId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Retrieve all ibmtbi space
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: retrieveall_ibmTbiSpace
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve employee resource/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  and:
+                    - QueryCapability: ibmTbiSpace
+                    - spi:usable: 'true'
+                    - spi:className: Workstation
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve employee resource/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 1
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Create work task resource
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: create_triWorkTaskCF
+              map:
+                mappings:
+                  - dcterms_description:
+                      template: >-
+                        Allocate Workstation for new employee
+                        {{$IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource."spi:triUserNameTX"}} Employee ID:
+                        {{$IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource."dcterms:identifier"}}
+                  - dcterms_title:
+                      template: >-
+                        Onboarding Move:
+                        {{$IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource."spi:triFirstNameTX"}}{{$IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource."spi:triLastNameTX"}}
+                        to {{$IBMMaximoRealEstateandFacilitiesRetrieveallibmtbispace[0]."spi:spacePath"}}
+                  - spi_action:
+                      template: Activate
+                  - spi_triTaskTypeCL:
+                      template: Move
+                  - spi_triWorkingLocationTX:
+                      template: '{{$IBMMaximoRealEstateandFacilitiesRetrieveallibmtbispace[0]."spi:spacePath"}}'
+                  - spi_wm_wopriority:
+                      template: Medium
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve employee resource/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallibmtbispace
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve all ibmtbi space/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: IBM Maximo Real Estate and Facilities Retrieve work task resource
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-6'
+              action: retrieve_WorkOrder
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve employee resource/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallibmtbispace
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve all ibmtbi space/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateworktaskresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create work task resource/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  recordId: '{{$IBMMaximoRealEstateandFacilitiesCreateworktaskresource.recordId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve employee resource/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallibmtbispace
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve all ibmtbi space/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateworktaskresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create work task resource/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - Body:
+                      template: '{{$IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource."dcterms:description"}}'
+                  - Subject:
+                      template: '{{$IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource."dcterms:title"}}'
+                  - To:
+                      template: calisha.noronha@ibm.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateibmtbipeople
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create ibmtbi people/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveemployeeresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve employee resource/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveallibmtbispace
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve all ibmtbi space/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesCreateworktaskresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Create work task resource/response/payload'
+                  - variable: IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource
+                    $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve work task resource/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: HR Onboarding Workplace Provisioning Flow
+models: {}
