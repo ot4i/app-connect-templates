@@ -3913,9 +3913,47 @@
   "targetApps": ["databricks", "ibmwatsonxai", "pineconedb"],
   "tags": ["streaming-connector-scheduler", "databricks", "ibmwatsonxai", "pineconedb"],
   "offerings": ["app connect professional"]
- }               
+ },
+ {
+  "name": "Use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices",
+  "description": "Use this template to use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices.",
+  "summary": "gmail to 5 applications",
+  "sourceApp": "gmail",
+  "targetApps": ["amazonsagemaker", "gmail", "servicenow", "salesforce", "coupa"],
+  "tags": ["amazonsagemaker", "gmail", "servicenow", "salesforce", "coupa", "JSON parse", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Classify new Salesforce leads as Hot or Warm or Cold using Amazon SageMaker then update probability and create a task",
+  "description": "Use this template to classify new Salesforce leads as Hot or Warm or Cold using Amazon SageMaker then update probability and create a task.",
+  "summary": "salesforce to 3 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["amazonsagemaker", "salesforce", "msteams"],
+  "tags": ["amazonsagemaker", "salesforce", "msteams", "JSON parse", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Retrieve customer usage support and billing data from Amazon S3 then invoke SageMaker for churn probability scoring",
+  "description": "Use this template to retrieve customer usage support and billing data from Amazon S3 then invoke SageMaker for churn probability scoring.",
+  "summary": "streaming connector scheduler to amazonsagemaker",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["amazonsagemaker"],
+  "tags": ["amazonsagemaker", "scheduler"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Process SageMaker inference results to write churn scores to Salesforce and alert high-risk accounts via MS Teams alerts",
+  "description": "Use this template to process SageMaker inference results to write churn scores to Salesforce and alert high-risk accounts via MS Teams alerts.",
+  "summary": "amazoneventbridge to 3 applications",
+  "sourceApp": "amazoneventbridge",
+  "targetApps": ["amazons3", "salesforce", "msteams"],
+  "tags": ["amazons3", "salesforce", "msteams", "amazoneventbridge", "CSV parser", "for each", "if"],
+  "offerings": ["app connect professional"]
+ }                    
 ]
 }
+
+
 
 
 

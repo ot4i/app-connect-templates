@@ -1,0 +1,338 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Lead
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Lead/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-6:
+      type: api-action
+      business-object: Task
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Task
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: Lead
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Lead/operations/updateWithWhere
+          action: updatewithwhere
+    action-interface-4:
+      type: api-action
+      business-object: Task
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Task
+          action: create
+    action-interface-5:
+      type: api-action
+      business-object: Task
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Task
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+    action-interface-7:
+      type: api-action
+      business-object: Endpoints
+      connector-type: amazonsagemaker
+      actions:
+        InvokeEndpoint: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Endpoints/operations/InvokeEndpoint
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon SageMaker Invoke endpoint
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              action: InvokeEndpoint
+              map:
+                mappings:
+                  - Accept:
+                      template: application/json
+                  - Content:
+                      template: '{{$Trigger}}'
+                  - ContentType:
+                      template: text
+                  - EndpointName:
+                      template: DND-salesforce-lead-endpoint
+                  - MimeType:
+                      template: application/json
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - parse:
+              parse-format: json
+              source:
+                template: '{{$base64decode($AmazonSageMakerInvokeendpoint.Body)}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonSageMakerInvokeendpoint
+                    $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: '{"probability":0.9996,"label":"Hot"}'
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  probability:
+                    type: number
+                  label:
+                    type: string
+                title: Parsed JSON
+              name: JSON Parser Parse
+          - update-action:
+              name: Salesforce Update lead
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Rating:
+                      template: '{{$JSONParserParse.label}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonSageMakerInvokeendpoint
+                    $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonSagemakerInvokeendpoint
+                    $ref: '#/node-output/Amazon Sagemaker Invoke endpoint/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: true
+          - if:
+              branch:
+                - condition:
+                    '{{$JSONParserParse.label}}': Hot
+                  execute:
+                    - create-action:
+                        name: Salesforce Create task
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        map:
+                          mappings:
+                            - ActivityDate:
+                                template: '{{$formatDate($toMillis($now()), "YYYY-MM-DD")}}'
+                            - Description:
+                                template: 'HOT LEAD — Call immediately: {{$Trigger.Name}} at {{$Trigger.Company}}'
+                            - IsReminderSet:
+                                expression: 'true'
+                            - OwnerId:
+                                template: '{{$Trigger.recordsToConvert.ownerId}}'
+                            - Priority:
+                                template: High
+                            - ReminderDateTime:
+                                template: '{{$formatDate($toMillis($now()), "YYYY-MM-DD") & "T03:30:00.000Z"}}'
+                            - Status:
+                                template: Not Started
+                            - Subject:
+                                template: Call
+                            - WhoId:
+                                template: '{{$Trigger.Id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AmazonSageMakerInvokeendpoint
+                              $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                            - variable: JSONParserParse
+                              $ref: '#/node-output/JSON Parser Parse/response/payload'
+                            - variable: SalesforceUpdatelead
+                              $ref: '#/node-output/Salesforce Update lead/response/payload'
+                            - variable: SalesforceUpdateleadMetadata
+                              $ref: '#/node-output/Salesforce Update lead/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                - condition:
+                    '{{$JSONParserParse.label}}': Warm
+                  execute:
+                    - create-action:
+                        name: Salesforce Create task 2
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-5'
+                        map:
+                          mappings:
+                            - ActivityDate:
+                                template: '{{$formatDate($toMillis($now()) + 259200000, "YYYY-MM-DD")}}'
+                            - Description:
+                                template: ' WARM LEAD — Follow up within 3 days: {{$Trigger.Name}} at {{$Trigger.Company}}'
+                            - IsReminderSet:
+                                expression: 'true'
+                            - Priority:
+                                template: Normal
+                            - ReminderDateTime:
+                                template: '{{$formatDate($toMillis($now()) + 259200000, "YYYY-MM-DD") & "T04:00:00.000Z"}}'
+                            - Status:
+                                template: Not Started
+                            - Subject:
+                                template: Email
+                            - WhoId:
+                                template: '{{$Trigger.Id}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: AmazonSageMakerInvokeendpoint
+                              $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                            - variable: JSONParserParse
+                              $ref: '#/node-output/JSON Parser Parse/response/payload'
+                            - variable: SalesforceUpdatelead
+                              $ref: '#/node-output/Salesforce Update lead/response/payload'
+                            - variable: SalesforceUpdateleadMetadata
+                              $ref: '#/node-output/Salesforce Update lead/response'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute:
+                  - create-action:
+                      name: Salesforce Create task 3
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-6'
+                      map:
+                        mappings:
+                          - ActivityDate:
+                              template: '{{$formatDate($toMillis($now()) + 1209600000, "YYYY-MM-DD")}}'
+                          - Description:
+                              template: 'COLD LEAD — Enrol in nurture sequence: {{$Trigger.Name}} at {{$Trigger.Company}}'
+                          - IsRecurrence:
+                              expression: 'false'
+                          - IsReminderSet:
+                              expression: 'true'
+                          - OwnerId:
+                              template: '{{$Trigger.recordsToConvert.ownerId}}'
+                          - Priority:
+                              template: Low
+                          - ReminderDateTime:
+                              template: '{{$formatDate($toMillis($now()) + 1209600000, "YYYY-MM-DD") & "T04:30:00.000Z"}}'
+                          - Status:
+                              template: Not Started
+                          - Subject:
+                              template: Email
+                          - WhoId:
+                              template: '{{$Trigger.Id}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: AmazonSageMakerInvokeendpoint
+                            $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                          - variable: JSONParserParse
+                            $ref: '#/node-output/JSON Parser Parse/response/payload'
+                          - variable: SalesforceUpdatelead
+                            $ref: '#/node-output/Salesforce Update lead/response/payload'
+                          - variable: SalesforceUpdateleadMetadata
+                            $ref: '#/node-output/Salesforce Update lead/response'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: AmazonSageMakerInvokeendpoint
+                  $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                - variable: JSONParserParse
+                  $ref: '#/node-output/JSON Parser Parse/response/payload'
+                - variable: SalesforceUpdatelead
+                  $ref: '#/node-output/Salesforce Update lead/response/payload'
+                - variable: SalesforceUpdateleadMetadata
+                  $ref: '#/node-output/Salesforce Update lead/response'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: A new {{$JSONParserParse.label}} lead added. Please check the salesforce task
+                  - channelId:
+                      template: 19:406c1c85266b468685b82aca1d9022af@thread.tacv2
+                  - subject:
+                      template: A new {{$JSONParserParse.label}} lead added
+                  - teamId:
+                      template: ced480f6-8c97-4eb6-9a0f-3ef2654d8ade
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AmazonSageMakerInvokeendpoint
+                    $ref: '#/node-output/Amazon SageMaker Invoke endpoint/response/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: SalesforceUpdatelead
+                    $ref: '#/node-output/Salesforce Update lead/response/payload'
+                  - variable: SalesforceUpdateleadMetadata
+                    $ref: '#/node-output/Salesforce Update lead/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Classify new Salesforce leads as Hot or Warm or Cold using Amazon SageMaker then update probability and create a task
+models: {}

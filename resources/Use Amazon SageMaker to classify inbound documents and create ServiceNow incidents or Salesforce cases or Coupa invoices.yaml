@@ -1,0 +1,426 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: gmail
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: mail
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/mail/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Case
+          action: create
+    action-interface-4:
+      type: api-action
+      business-object: invoices
+      connector-type: coupa
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/suppliers/{supplier_id}/invoices
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-6:
+      type: api-action
+      business-object: Endpoints
+      connector-type: amazonsagemaker
+      actions:
+        InvokeEndpoint: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Endpoints/operations/InvokeEndpoint
+          action: custom
+    action-interface-1:
+      type: api-action
+      business-object: incident
+      connector-type: servicenow
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/incident
+          action: create
+    action-interface-5:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-7:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Trigger.Subject}}': New Document Submission
+                  execute:
+                    - custom-action:
+                        name: Amazon SageMaker Invoke endpoint
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-6'
+                        action: InvokeEndpoint
+                        map:
+                          mappings:
+                            - Content:
+                                template: '{{$Trigger.Body}}'
+                            - ContentType:
+                                template: text
+                            - EndpointName:
+                                template: enterprise-unified-router
+                            - MimeType:
+                                template: text/plain
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter: {}
+                    - parse:
+                        parse-format: json
+                        source:
+                          template: >-
+                            {{$base64decode($AmazonSageMakerInvokeendpoint.Body,
+                            utf8 )}}
+                          input:
+                            - variable: AmazonSageMakerInvokeendpoint
+                              $ref: >-
+                                #/block/If/node-output/Amazon SageMaker Invoke
+                                endpoint/response/payload
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        sample-data: >-
+                          {"document_type":"CASE","common":{"reference_id":"CS-2026-99412","entity_name":"Horizon
+                          Financial Services LLC","contact_person":"Sneha
+                          Patel","email":"sneha.patel@horizonfin.example","priority":"High","subject":"Payment
+                          gateway integration timeout during
+                          checkout","description":"Since 14:00 UTC today,
+                          customer checkouts are intermittently failing with
+                          error code 504 Gateway Timeout. Multiple end customers
+                          have reported failed transactions, but funds are being
+                          temporarily held. Requesting immediate
+                          investigation.","date":"05-Sep-2026","status":"New"},"target_payload":{"SuppliedName":"Sneha
+                          Patel","SuppliedEmail":"sneha.patel@horizonfin.example","SuppliedPhone":"+1-415-555-0198","SuppliedCompany":"Horizon
+                          Financial Services
+                          LLC","Type":"Incident","Status":"New","Reason":"Performance","Origin":"Web
+                          Portal","Priority":"High","Subject":"Payment gateway
+                          integration timeout during
+                          checkout","Description":"Since 14:00 UTC today,
+                          customer checkouts are intermittently failing with
+                          error code 504 Gateway Timeout. Multiple end customers
+                          have reported failed transactions, but funds are being
+                          temporarily held. Requesting immediate
+                          investigation."}}
+                        output-schema:
+                          $schema: http://json-schema.org/draft-04/schema#
+                          type: object
+                          properties:
+                            document_type:
+                              type: string
+                            common:
+                              type: object
+                              properties:
+                                reference_id:
+                                  type: string
+                                entity_name:
+                                  type: string
+                                contact_person:
+                                  type: string
+                                email:
+                                  type: string
+                                priority:
+                                  type: string
+                                subject:
+                                  type: string
+                                description:
+                                  type: string
+                                date:
+                                  type: string
+                                status:
+                                  type: string
+                            target_payload:
+                              type: object
+                              properties:
+                                SuppliedName:
+                                  type: string
+                                SuppliedEmail:
+                                  type: string
+                                SuppliedPhone:
+                                  type: string
+                                SuppliedCompany:
+                                  type: string
+                                Type:
+                                  type: string
+                                Status:
+                                  type: string
+                                Reason:
+                                  type: string
+                                Origin:
+                                  type: string
+                                Priority:
+                                  type: string
+                                Subject:
+                                  type: string
+                                Description:
+                                  type: string
+                          title: Parsed JSON
+                        name: JSON Parser Parse
+                    - if:
+                        branch:
+                          - condition:
+                              '{{$JSONParserParse.document_type}}': INCIDENT
+                            execute:
+                              - create-action:
+                                  name: ServiceNow Create incident
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-1'
+                                  map:
+                                    mappings:
+                                      - cmdb_ci:
+                                          template: '{{$JSONParserParse.common.reference_id}}'
+                                      - opened_at:
+                                          template: '{{$now()}}'
+                                      - priority:
+                                          expression: '2'
+                                      - short_description:
+                                          template: '{{$JSONParserParse.common.subject}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: AmazonSageMakerInvokeendpoint
+                                        $ref: >-
+                                          #/block/If/node-output/Amazon SageMaker
+                                          Invoke endpoint/response/payload
+                                      - variable: JSONParserParse
+                                        $ref: >-
+                                          #/block/If/node-output/JSON Parser
+                                          Parse/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Gmail Send email 2
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-5'
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            A new incident has been created .Please
+                                            check incident id -->
+                                            {{$ServiceNowCreateincident.sys_id}}
+                                      - Subject:
+                                          template: Incidentt created
+                                      - To:
+                                          template: xxx@gmail.com
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: AmazonSageMakerInvokeendpoint
+                                        $ref: >-
+                                          #/block/If/node-output/Amazon SageMaker
+                                          Invoke endpoint/response/payload
+                                      - variable: JSONParserParse
+                                        $ref: >-
+                                          #/block/If/node-output/JSON Parser
+                                          Parse/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                          - condition:
+                              '{{$JSONParserParse.document_type}}': CASE
+                            execute:
+                              - create-action:
+                                  name: Salesforce Create case
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-3'
+                                  map:
+                                    mappings:
+                                      - Description:
+                                          template: '{{$JSONParserParse.target_payload.Description}}'
+                                      - Reason:
+                                          template: '{{$JSONParserParse.target_payload.Reason}}'
+                                      - Status:
+                                          template: New
+                                      - Subject:
+                                          template: '{{$JSONParserParse.common.subject}}'
+                                      - SuppliedCompany:
+                                          template: '{{$JSONParserParse.target_payload.SuppliedCompany}}'
+                                      - SuppliedEmail:
+                                          template: '{{$JSONParserParse.common.email}}'
+                                      - SuppliedName:
+                                          template: '{{$JSONParserParse.common.contact_person}}'
+                                      - SuppliedPhone:
+                                          template: '{{$JSONParserParse.target_payload.SuppliedPhone}}'
+                                      - Type:
+                                          template: '{{$JSONParserParse.target_payload.Type}}'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: AmazonSageMakerInvokeendpoint
+                                        $ref: >-
+                                          #/block/If/node-output/Amazon SageMaker
+                                          Invoke endpoint/response/payload
+                                      - variable: JSONParserParse
+                                        $ref: >-
+                                          #/block/If/node-output/JSON Parser
+                                          Parse/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Gmail Send email
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-2'
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            A new case has been created.Please
+                                            check.Case id is --->
+                                            {{$SalesforceCreatecase.Id}}
+                                      - Subject:
+                                          template: 'Case created '
+                                      - To:
+                                          template: xxx@gmail.com
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: AmazonSageMakerInvokeendpoint
+                                        $ref: >-
+                                          #/block/If/node-output/Amazon SageMaker
+                                          Invoke endpoint/response/payload
+                                      - variable: JSONParserParse
+                                        $ref: >-
+                                          #/block/If/node-output/JSON Parser
+                                          Parse/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                          - condition:
+                              '{{$JSONParserParse.document_type}}': INVOICE
+                            execute:
+                              - create-action:
+                                  name: Coupa Create invoice
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-4'
+                                  map:
+                                    mappings:
+                                      - comments:
+                                          template: '{{$JSONParserParse.common.description}}'
+                                      - currency:
+                                          mappings:
+                                            - code:
+                                                template: INR
+                                      - invoice-date:
+                                          template: '{{$now()}}'
+                                      - invoice-number:
+                                          template: '{{$JSONParserParse.common.reference_id}}'
+                                      - requested-by:
+                                          mappings:
+                                            - email:
+                                                template: '{{$JSONParserParse.common.email}}'
+                                      - supplier_id:
+                                          template: '5'
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: AmazonSageMakerInvokeendpoint
+                                        $ref: >-
+                                          #/block/If/node-output/Amazon SageMaker
+                                          Invoke endpoint/response/payload
+                                      - variable: JSONParserParse
+                                        $ref: >-
+                                          #/block/If/node-output/JSON Parser
+                                          Parse/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Gmail Send email 3
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-7'
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            A new invoice has been created ,Please
+                                            check invoice id -->
+                                            {{$CoupaCreateinvoice.id}}
+                                      - Subject:
+                                          template: Invoice created
+                                      - To:
+                                          template: xxx@gmail.com
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: AmazonSageMakerInvokeendpoint
+                                        $ref: >-
+                                          #/block/If/node-output/Amazon SageMaker
+                                          Invoke endpoint/response/payload
+                                      - variable: JSONParserParse
+                                        $ref: >-
+                                          #/block/If/node-output/JSON Parser
+                                          Parse/response/payload
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute: []
+                        name: If 2
+                        input:
+                          - variable: AmazonSageMakerInvokeendpoint
+                            $ref: >-
+                              #/block/If/node-output/Amazon SageMaker Invoke
+                              endpoint/response/payload
+                          - variable: JSONParserParse
+                            $ref: >-
+                              #/block/If/node-output/JSON Parser
+                              Parse/response/payload
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+        tags:
+          - incomplete
+  name: Use Amazon SageMaker to classify and extract information from inbound documents, then automatically create incidents in ServiceNow, cases in Salesforce, or invoices in Coupa
+models: {}
