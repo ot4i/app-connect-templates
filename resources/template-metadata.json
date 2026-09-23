@@ -4129,6 +4129,33 @@
  "targetApps": ["azuredevops"],
  "tags": ["jira", "azuredevops"],
  "offerings": ["app connect professional"]
+},
+{
+ "name": "Retrieve New Relic issues and transaction error data using NRQL when an alert event occurs and send an email via Gmail",
+ "description": "Use this template to retrieve New Relic issues and transaction error data using NRQL when an alert event occurs and send an email via Gmail.",
+ "summary": "New Relic to 2 applications",
+ "sourceApp": "newrelic",
+ "targetApps": ["gmail"],
+ "tags": ["newrelic", "gmail"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Retrieve New Relic issues and incident details on a schedule and send enrichment emails via Gmail",
+ "description": "Use this template to retrieve New Relic issues and incident details on a schedule and send enrichment emails via Gmail.",
+ "summary": "Scheduler to 2 applications",
+ "sourceApp": "streaming-connector-scheduler",
+ "targetApps": ["newrelic", "gmail"],
+ "tags": ["streaming-connector-scheduler", "newrelic", "gmail", "foreach"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Retrieve New Relic issues and error metrics using NRQL when an incident occurs and send an email via Gmail",
+ "description": "Use this template to retrieve New Relic issues and error metrics using NRQL when an incident occurs and send an email via Gmail.",
+ "summary": "New Relic to 2 applications",
+ "sourceApp": "newrelic",
+ "targetApps": ["gmail"],
+ "tags": ["newrelic", "gmail"],
+ "offerings": ["app connect professional"]
 }
 ]
 }
