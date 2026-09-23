@@ -1,0 +1,97 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 03 * * *
+                  runOnceOncheck: false
+                  timeZone: UTC
+                  every: day
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Transform jobs
+      connector-type: amazonsagemaker
+      actions:
+        CreateTransformJob: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Transform%20jobs/operations/CreateTransformJob
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Amazon SageMaker Start transform job
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: CreateTransformJob
+              map:
+                mappings:
+                  - DataProcessing:
+                      mappings:
+                        - InputFilter:
+                            template: $[1:]
+                        - JoinSource:
+                            template: Input
+                        - OutputFilter:
+                            template: $[0,-2,-1]
+                  - ModelName:
+                      template: xgb-risk-v4-model-1xxxxxxx
+                  - TransformInput:
+                      mappings:
+                        - ContentType:
+                            template: text/csv
+                        - DataSource:
+                            mappings:
+                              - S3DataSource:
+                                  mappings:
+                                    - S3DataType:
+                                        template: S3Prefix
+                                    - S3Uri:
+                                        template: s3://sagemaker-churn-probability/churn-salesforce-poc-v2/data/batch_input_accounts.csv
+                        - SplitType:
+                            template: Line
+                  - TransformJobName:
+                      template: churn-probality-score-job
+                  - TransformOutput:
+                      mappings:
+                        - Accept:
+                            template: text/csv
+                        - AssembleWith:
+                            template: Line
+                        - S3OutputPath:
+                            template: 's3://sagemaker-churn-probability/churn-salesforce-poc-v2/churn-risk-job-demo15/ '
+                  - TransformResources:
+                      mappings:
+                        - InstanceCount:
+                            expression: '1'
+                        - InstanceType:
+                            template: ml.m5.xlarge
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Retrieve customer usage support and billing data from Amazon S3 then invoke SageMaker for churn probability scoring
+models: {}
