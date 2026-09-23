@@ -1,0 +1,91 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: azuredevops
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Work items
+          options:
+            organization: appconnakash
+            project: cloud-integration
+            name: Task
+            parentFilter:
+              organization: appconnakash
+              project: cloud-integration
+              name: Task
+            subscription:
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: >-
+                resources/Organizations/{organization}/Projects/{project}/Work%20item%20types/{name}/Work%20items/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Messages
+      connector-type: msexchange
+      actions:
+        SENDEMAIL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Messages/operations/SENDEMAIL
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Exchange Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: SENDEMAIL
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: >-
+                              A new work item of type {{$Trigger.fields.`System.WorkItemType`}} has been created that
+                              requires your attention:
+
+
+                              - ID: {{$Trigger.id}}
+
+
+                              - Title: {{$Trigger.fields.`System.Title`}}
+
+
+                              - Reported by: {{$Trigger.fields.`System.CreatedBy`.displayName}}
+
+
+                              - Priority: {{$Trigger.fields.`Microsoft.VSTS.Common.Priority`}}
+
+
+                              - Created on: {{$Trigger.fields.`System.CreatedDate`}}
+
+
+                              The work item can be accessed via: {{$replace($Trigger.url, "_apis/wit/workItems/",
+                              "_workitems/edit/")}}
+                  - subject:
+                      template: 'New work item assigned - {{$Trigger.fields.`System.Title`}}'
+                  - toRecipientsRequested:
+                      template: user@example.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Send email notifications for new Azure DevOps work items
+models: {}

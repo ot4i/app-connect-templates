@@ -3915,6 +3915,222 @@
   "offerings": ["app connect professional"]
  },
  {
+  "name": "Create a sales order in SAP S4HANA from a Salesforce opportunity and send a notification through Gmail",
+  "description": "Use this template to create a sales order in SAP S/4HANA when an opportunity is marked as closed won in Salesforce and send a notification through Gmail.",
+  "summary": "Salesforce to 3 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["saps4hana", "gmail"],
+  "tags": ["salesforce", "saps4hana", "gmail", "if", "sales order", "notification"],
+  "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Perform predictive cash flow and payment risk analysis using SAP S4HANA and Google Gemini",
+    "description": "Use this template to perform predictive cash flow and payment risk analysis using SAP S/4HANA and Google Gemini by analyzing customer sales orders and updating credit worthiness scores.",
+    "summary": "1 flow to 2 applications",
+    "sourceApp": "api",
+    "targetApps": ["saps4hana", "googlegemini", "saps4hana"],
+    "tags": ["api", "saps4hana", "googlegemini", "AI", "credit analysis", "risk assessment", "predictive analytics"],
+    "offerings": ["app connect professional"]
+  },
+  {
+    "name": "Synchronize supplier onboarding data from Zoho CRM to SAP S4HANA vendors and send a notification through Gmail",
+    "description": "Use this template to synchronize supplier onboarding data from Zoho CRM to SAP S/4HANA vendors and send a notification through Gmail.",
+    "summary": "Zoho CRM to 2 applications",
+    "sourceApp": "zohocrm",
+    "targetApps": ["saps4hana", "gmail"],
+    "tags": ["zohocrm", "saps4hana", "gmail", "supplier onboarding", "notification"],
+    "offerings": ["app connect professional"]
+  },
+  {  
+  "name": "Create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded",
+  "description": "Use this template to create a Freshservice ticket based on Splunk search results when a defined threshold is exceeded.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["freshservice", "splunk"],
+  "tags": ["streaming-connector-scheduler", "freshservice", "splunk", "setVariable", "if"],
+  "offerings": ["app connect professional"]
+  }, 
+ {
+  "name": "Create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow",
+  "description": "Use this template to create a Freshservice ticket and send a Gmail message when a new incident is created in ServiceNow.",
+  "summary": "ServiceNow to 2 applications ",
+  "sourceApp": "servicenow",
+  "targetApps": ["freshservice", "gmail"],
+  "tags": ["servicenow", "freshservice", "gmail"],
+  "offerings": ["app connect professional"]
+ },  
+ {
+  "name": "Send a Microsoft Teams message and a Gmail message when a new ticket is created in Freshservice",
+  "description": "Use this template to send a Microsoft Teams message and a Gmail message when a new ticket is created in Freshservice.",
+  "summary": "Freshservice to 2 applications ",
+  "sourceApp": "freshservice",
+  "targetApps": ["msteams", "gmail"],
+  "tags": ["freshservice", "msteams", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {   
+  "name": "Aggregate Salesforce and SAP SuccessFactors data to generate a narrative and send it to Microsoft SharePoint and Gmail",
+  "description": "Use this template to get contact data from Salesforce, add it to SAP SuccessFactors as a candidate, generate a narrative about the candidate with contact details using Azure OpenAI, and send it to SharePoint and email. This template automates the process of executing summaries aligned with enterprise recruitment data.",
+  "summary": "Salesforce to 5 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["salesforce", "sapsuccessfactors", "azureopenai", "gmail", "mssharepoint"],
+  "tags": ["salesforce", "sapsuccessfactors", "azureopenai", "mssharepoint", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Generate a draft resolution for a ServiceNow problem using Azure OpenAI and send it through Gmail",
+  "description": "Use this template to get ServiceNow problems, generate a draft resolution using Azure OpenAI, and send it through Gmail. This template automates the process of customer service assistance with a draft resolution for issues being sent to users.",
+  "summary": "ServiceNow to 3 applications",
+  "sourceApp": "servicenow",
+  "targetApps": ["azureopenai", "http", "gmail"],
+  "tags": ["azureopenai", "http", "gmail", "servicenow"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Generate content similarity insights by creating or updating vectors in Pinecone Vector DB using Azure OpenAI embeddings",
+  "description": "Use this template to get campaign details from Salesforce, create embeddings using Azure OpenAI, and save them in Pinecone Vector Database. This template generates content similarity insights using Azure OpenAI embeddings and stores them in Pinecone Vector Database.",
+  "summary": "Salesforce to 2 applications",
+  "sourceApp": "salesforce",
+  "targetApps": ["azureopenai", "pineconedb"],
+  "tags": ["salesforce", "azureopenai", "pineconedb"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Retrieve products from SAP Commerce Cloud and generate AI campaign descriptions and create campaigns in Zoho CRM",
+  "description": "Use this template to automatically generate AI-driven promotional campaign content for high-rated products in your SAP Commerce Cloud catalogue, create the campaigns in Zoho CRM using Google Gemini-generated descriptions, and send a Gmail notification for each campaign created.",
+  "summary": "SAP Commerce Cloud to 3 applications",
+  "sourceApp": "sapcommercecloud",
+  "targetApps": ["googlegemini", "zohocrm", "gmail"],
+  "tags": ["sapcommercecloud", "googlegemini", "zohocrm", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Retrieve low-rated products from SAP Commerce Cloud enrich with Google Gemini and create products in Shopify",
+  "description": "Use this template to automatically syndicate your SAP Commerce Cloud product catalogue to Shopify, enriching low-rated product descriptions with AI-generated content from Google Gemini, and sending a Gmail notification on each product creation.",
+  "summary": "SAP Commerce Cloud to 3 applications",
+  "sourceApp": "sapcommercecloud",
+  "targetApps": ["googlegemini", "shopify", "gmail"],
+  "tags": ["sapcommercecloud", "googlegemini", "shopify", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+{
+  "name": "Issue a PKI certificate using a role in HashiCorp Vault and send an email via Gmail",
+  "description": "Use this template to automatically issue PKI certificates with a specific role in HashiCorp Vault on a scheduled basis and send the certificate details via Gmail.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["hashicorpvault", "gmail"],
+  "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Rotate Azure service principal credentials in HashiCorp Vault and send an email via Gmail",
+  "description": "Use this template to automatically rotate Azure service principal credentials in HashiCorp Vault on a scheduled basis and send the new credentials via Gmail.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["hashicorpvault", "gmail"],
+  "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Rotate database static role credentials in HashiCorp Vault and send an email via Gmail",
+  "description": "Use this template to automatically rotate database static role credentials in HashiCorp Vault on a scheduled basis and send the new credentials via Gmail.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["hashicorpvault", "gmail"],
+  "tags": ["streaming-connector-scheduler", "hashicorpvault", "gmail"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Batch retrieve customer order history from Hive and enrich with SAP S4HANA customer data and insert into Google BigQuery",
+  "description": "Use this template to batch retrieve customer order history from Hive, enrich with SAP S/4HANA customer data, and insert the combined records into Google BigQuery.",
+  "summary": "Hive to 2 applications",
+  "sourceApp": "hive",
+  "targetApps": ["saps4hana", "googlebigquery"],
+  "tags": ["hive", "saps4hana", "googlebigquery"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Batch retrieve pension scheme records from Hive and create records in IBM Db2 based on employment status",
+  "description": "Use this template to batch retrieve pension scheme records from Hive and create records in IBM Db2 based on employment status.",
+  "summary": "Hive to IBM Db2",
+  "sourceApp": "hive",
+  "targetApps": ["db2"],
+  "tags": ["hive", "db2"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a task in Salesforce when a new call is received in Salesloft",
+  "description": "Use this template to create a task in Salesforce when a new call is received in Salesloft.",
+  "summary": "Salesloft to Salesforce",
+  "sourceApp": "salesloft",
+  "targetApps": ["salesforce"],
+  "tags": ["salesloft", "salesforce"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a cadence membership in Salesloft when a new lead is created in Salesforce",
+  "description": "Use this template to create a cadence membership in Salesloft when a new lead is created in Salesforce.",
+  "summary": "Salesforce to Salesloft",
+  "sourceApp": "salesforce",
+  "targetApps": ["salesloft"],
+  "tags": ["salesforce", "salesloft"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Request customer feedback through a Salesloft cadence when a Freshservice ticket is resolved",
+  "description": "Use this template to request customer feedback through a Salesloft cadence when a Freshservice ticket is resolved.",
+  "summary": "Scheduler to 2 applications",
+  "sourceApp": "streaming-connector-scheduler",
+  "targetApps": ["freshservice", "salesloft"],
+  "tags": ["streaming-connector-scheduler", "freshservice", "salesloft", "foreach", "if"],
+  "offerings": ["app connect professional"]
+ },
+ {
+  "name": "Create a note in Salesloft when an opportunity status is updated in Salesforce",
+  "description": "Use this template to create a note in Salesloft when an opportunity status is updated in Salesforce.",
+  "summary": "Salesforce to Salesloft",
+  "sourceApp": "salesforce",
+  "targetApps": ["salesloft"],
+  "tags": ["salesforce", "salesloft"],
+  "offerings": ["app connect professional"]
+ },
+{
+ "name": "Create Azure DevOps work items from ServiceNow incidents",
+ "description": "Use this template to automatically create Azure DevOps work items when new incidents are created in ServiceNow, mapping incident priority and type to the corresponding Azure DevOps work item fields.",
+ "summary": "ServiceNow to Azure DevOps",
+ "sourceApp": "servicenow",
+ "targetApps": ["azuredevops"],
+ "tags": ["servicenow", "azuredevops"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Create Azure DevOps work items from new Zendesk ticket",
+ "description": "Use this template to automatically create Azure DevOps work items when new tickets are created in Zendesk Service, mapping ticket priority and type to the corresponding Azure DevOps work item fields.",
+ "summary": "Zendesk Service to Azure DevOps",
+ "sourceApp": "zendeskservice",
+ "targetApps": ["azuredevops"],
+ "tags": ["zendeskservice", "azuredevops"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Send email notifications for new Azure DevOps work items",
+ "description": "Use this template to automatically send an email notification through Microsoft Exchange when a new work item is created in Azure DevOps.",
+ "summary": "Azure DevOps to Microsoft Exchange",
+ "sourceApp": "azuredevops",
+ "targetApps": ["msexchange"],
+ "tags": ["azuredevops", "msexchange"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Sync Jira issues to Azure DevOps work items",
+ "description": "Use this template to automatically create Azure DevOps work items when new issues are created in Jira, mapping issue priority and type to the corresponding Azure DevOps work item fields.",
+ "summary": "Jira to Azure DevOps",
+ "sourceApp": "jira",
+ "targetApps": ["azuredevops"],
+ "tags": ["jira", "azuredevops"],
+ "offerings": ["app connect professional"]
+},
+{
   "name": "Use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices",
   "description": "Use this template to use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices.",
   "summary": "gmail to 5 applications",
@@ -3949,12 +4165,6 @@
   "targetApps": ["amazons3", "salesforce", "msteams"],
   "tags": ["amazons3", "salesforce", "msteams", "amazoneventbridge", "CSV parser", "for each", "if"],
   "offerings": ["app connect professional"]
- }                    
+ } 
 ]
 }
-
-
-
-
-
-

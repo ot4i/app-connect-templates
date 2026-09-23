@@ -1,0 +1,261 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createTest:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createTest
+          output-context:
+            data: createTest
+      options:
+        resources:
+          - business-object: test
+            triggers:
+              create: createTest
+            model:
+              $ref: '#/models/test'
+      type: api-trigger
+    trigger-interface-2:
+      type: extract-trigger
+      connector-type: hive
+      triggers:
+        read_pension_scheme_people:
+          input-context:
+            data: pension_scheme_people
+          assembly:
+            $ref: '#/integration/assemblies/assembly-2'
+          options:
+            connectorServiceOptions:
+              httpMethod: get
+              path: resources/pension_scheme_people/operations/read_pension_scheme_people
+              action: retrievewithwhere
+    trigger-interface-3:
+      type: batch-completion-trigger
+      triggers:
+        COMPLETE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-3'
+  action-interfaces:
+    action-interface-1:
+      type: batch-action
+      actions:
+        START: {}
+      options:
+        extract:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-2'
+        completion:
+          $ref: '#/integration/trigger-interfaces/trigger-interface-3'
+    action-interface-2:
+      type: api-action
+      business-object: DB2INST1_HIVE_PENSION_WORKING
+      connector-type: db2
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/DB2INST1_HIVE_PENSION_WORKING
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: DB2INST1_HIVE_PENSION_NON_WORKING
+      connector-type: db2
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/DB2INST1_HIVE_PENSION_NON_WORKING
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - batch-retrieve-action:
+              name: Batch process
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              filter:
+                limit: 300
+              pagination-type: SKIP_LIMIT
+          - response:
+              name: response
+              reply-maps:
+                - title: batch process successfully started
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - id:
+                          template: Batch process started
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Batchprocess.is_working}}': 'true'
+                  execute:
+                    - create-action:
+                        name: IBM Db2 Create HIVE_PENSION_WORKING record
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - BLOOD_GROUP:
+                                template: '{{$Batchprocess.blood_group}}'
+                            - CREATED_ON:
+                                template: '{{$Batchprocess.created_on}}'
+                            - DISTRICT:
+                                template: '{{$Batchprocess.address.district}}'
+                            - EMAIL:
+                                template: '{{$Batchprocess.contacts.email}}'
+                            - EMERGENCY_CONTACT_NAME:
+                                template: '{{$Batchprocess.contacts.emergency_contact_name}}'
+                            - EMERGENCY_CONTACT_NO:
+                                template: '{{$Batchprocess.contacts.emergency_contact_no}}'
+                            - EMPLOYMENT_STATUS:
+                                template: '{{$Batchprocess.occupation.employment_status}}'
+                            - FIRST_NAME:
+                                template: '{{$Batchprocess.first_name}}'
+                            - H_NO:
+                                template: '{{$Batchprocess.address.h_no}}'
+                            - INDEX_NUM:
+                                expression: '$Batchprocess.index_num'
+                            - IS_MARRIED:
+                                expression: $Batchprocess.is_married ?1:0
+                            - IS_WORKING:
+                                expression: $Batchprocess.is_working ?1:0
+                            - JOB_TITLE:
+                                template: '{{$Batchprocess.occupation.job_title}}'
+                            - LAST_NAME:
+                                template: '{{$Batchprocess.last_name}}'
+                            - MIDDLE_NAME:
+                                template: '{{$Batchprocess.middle_name}}'
+                            - PERSON_ID:
+                                template: '{{$Batchprocess.person_id}}'
+                            - PHONE_NO:
+                                template: '{{$Batchprocess.contacts.phone_no}}'
+                            - PIN:
+                                template: '{{$Batchprocess.address.pin}}'
+                            - STATE:
+                                template: '{{$Batchprocess.address.state}}'
+                            - STREET1:
+                                template: '{{$Batchprocess.address.street1}}'
+                            - STREET2:
+                                template: '{{$Batchprocess.address.street2}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Batchprocess
+                              $ref: '#/block/Batch process/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+              else:
+                execute:
+                  - create-action:
+                      name: IBM Db2 Create HIVE_PENSION_NON_WORKING record
+                      target:
+                        $ref: '#/integration/action-interfaces/action-interface-3'
+                      map:
+                        mappings:
+                          - BLOOD_GROUP:
+                              template: '{{$Batchprocess.blood_group}}'
+                          - CREATED_ON:
+                              template: '{{$Batchprocess.created_on}}'
+                          - DISTRICT:
+                              template: '{{$Batchprocess.address.district}}'
+                          - EMAIL:
+                              template: '{{$Batchprocess.contacts.email}}'
+                          - EMERGENCY_CONTACT_NAME:
+                              template: '{{$Batchprocess.contacts.emergency_contact_name}}'
+                          - EMERGENCY_CONTACT_NO:
+                              template: '{{$Batchprocess.contacts.emergency_contact_no}}'
+                          - EMPLOYMENT_STATUS:
+                              template: '{{$Batchprocess.occupation.employment_status}}'
+                          - FIRST_NAME:
+                              template: '{{$Batchprocess.first_name}}'
+                          - H_NO:
+                              template: '{{$Batchprocess.address.h_no}}'
+                          - INDEX_NUM:
+                              expression: '$Batchprocess.index_num'
+                          - IS_MARRIED:
+                              expression: $Batchprocess.is_married ?1:0
+                          - IS_WORKING:
+                              expression: $Batchprocess.is_working ?1:0
+                          - JOB_TITLE:
+                              template: '{{$Batchprocess.occupation.job_title}}'
+                          - LAST_NAME:
+                              template: '{{$Batchprocess.last_name}}'
+                          - MIDDLE_NAME:
+                              template: '{{$Batchprocess.middle_name}}'
+                          - PERSON_ID:
+                              template: '{{$Batchprocess.person_id}}'
+                          - PHONE_NO:
+                              template: '{{$Batchprocess.contacts.phone_no}}'
+                          - PIN:
+                              template: '{{$Batchprocess.address.pin}}'
+                          - STATE:
+                              template: '{{$Batchprocess.address.state}}'
+                          - STREET1:
+                              template: '{{$Batchprocess.address.street1}}'
+                          - STREET2:
+                              template: '{{$Batchprocess.address.street2}}'
+                        $map: http://ibm.com/appconnect/map/v1
+                        input:
+                          - variable: Batchprocess
+                            $ref: '#/block/Batch process/current-item'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+                          - variable: Request
+                            $ref: '#/trigger/payload'
+              name: If
+              input:
+                - variable: Batchprocess
+                  $ref: '#/block/Batch process/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+    assembly-3:
+      assembly:
+        execute:
+          - logging:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: BatchprocessOutput
+                    $ref: '#/node-output/Batch process/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: '{{$BatchprocessOutput}}'
+              name: Log
+  name: Batch retrieve pension scheme records from Hive and create records in IBM Db2 based on employment status
+models:
+  test:
+    name: test
+    plural: test
+    properties:
+      test:
+        required: false
+        id: true
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''

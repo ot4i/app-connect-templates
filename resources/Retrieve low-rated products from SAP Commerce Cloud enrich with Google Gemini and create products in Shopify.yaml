@@ -1,0 +1,260 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: api
+  trigger-interfaces:
+    trigger-interface-1:
+      triggers:
+        createCampaign:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: createCampaign
+          output-context:
+            data: createCampaign
+      options:
+        resources:
+          - business-object: campaign
+            triggers:
+              create: createCampaign
+            model:
+              $ref: '#/models/campaign'
+      type: api-trigger
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Products
+      connector-type: sapcommercecloud
+      actions:
+        getProducts: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Base%20sites/{baseSiteId}/Products/operations/getProducts
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-4:
+      type: api-action
+      business-object: Text generation
+      connector-type: googlegemini
+      actions:
+        postGenerateTextByModelId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Text%20generation/operations/postGenerateTextByModelId
+          action: custom
+    action-interface-2:
+      type: api-action
+      business-object: product
+      connector-type: shopify
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/product
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: SAP Commerce Cloud Retrieve products
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  baseSiteId: electronics
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              allow-truncation: true
+              pagination-type: SKIP_LIMIT
+              action: getProducts
+              map:
+                mappings:
+                  - baseSiteId:
+                      template: electronics
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '$SAPCommerceCloudRetrieveproducts '
+                input:
+                  - variable: SAPCommerceCloudRetrieveproducts
+                    $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                  - variable: Request
+                    $ref: '#/trigger/payload'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: SAP Commerce Cloud Products
+          - response:
+              name: response
+              reply-maps:
+                - title: product successfully created
+                  status-code: 201
+                  map:
+                    $map: http://ibm.com/appconnect/map/v1
+                    input:
+                      - variable: SAPCommerceCloudRetrieveproducts
+                        $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                      - variable: Foreach
+                        $ref: '#/node-output/For each/response/payload'
+                      - variable: flowDetails
+                        $ref: '#/flowDetails'
+                      - variable: Request
+                        $ref: '#/trigger/payload'
+                    mappings:
+                      - id:
+                          template: Product created
+    assembly-2:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    '{{$Foreachitem.averageRating}}':
+                      lte: '3.5'
+                  execute:
+                    - custom-action:
+                        name: Google Gemini Generate text with Gemini model
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        action: postGenerateTextByModelId
+                        map:
+                          mappings:
+                            - modelId:
+                                template: models/gemini-2.5-pro
+                            - text:
+                                template: >-
+                                  You are a marketing copywriter. Based on the following product details, generate only
+                                  a compelling product description. The description should be persuasive, engaging, and
+                                  highlight the product's key benefits and value. Naturally incorporate the product's
+                                  price as part of the messaging where appropriate. Do not include a campaign name,
+                                  tagline, headings, bullet points, or any additional text. Return only the product
+                                  description.Input:Product Name: {{$Foreachitem.name}} Product Description:
+                                  {{$Foreachitem.description}} Price: {{$Foreachitem.price.value}}
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SAPCommerceCloudRetrieveproducts
+                              $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                        filter: {}
+                    - create-action:
+                        name: Shopify Create product
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        map:
+                          mappings:
+                            - body_html:
+                                template: '{{$GoogleGeminiGeneratetextwithGeminimodel.candidates.content.parts[0].text}}'
+                            - status:
+                                template: active
+                            - title:
+                                template: '{{$Foreachitem.name}}'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SAPCommerceCloudRetrieveproducts
+                              $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                            - variable: GoogleGeminiGeneratetextwithGeminimodel
+                              $ref: '#/block/If/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+                    - create-action:
+                        name: Gmail Send email
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - Subject:
+                                template: Product created {{$ShopifyCreateproduct.id}}
+                            - To:
+                                template: your@email.com
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: SAPCommerceCloudRetrieveproducts
+                              $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                            - variable: GoogleGeminiGeneratetextwithGeminimodel
+                              $ref: '#/block/If/node-output/Google Gemini Generate text with Gemini model/response/payload'
+                            - variable: ShopifyCreateproduct
+                              $ref: '#/block/If/node-output/Shopify Create product/response/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                            - variable: Request
+                              $ref: '#/trigger/payload'
+              else:
+                execute: []
+                completion-action:
+                  terminate:
+                    error:
+                      input:
+                        - variable: SAPCommerceCloudRetrieveproducts
+                          $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                        - variable: Foreachitem
+                          $ref: '#/block/For each/current-item'
+                        - variable: flowDetails
+                          $ref: '#/flowDetails'
+                        - variable: Request
+                          $ref: '#/trigger/payload'
+                      message: not required
+                      status-code: 404
+              name: If
+              input:
+                - variable: SAPCommerceCloudRetrieveproducts
+                  $ref: '#/node-output/SAP Commerce Cloud Retrieve products/response/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+                - variable: Request
+                  $ref: '#/trigger/payload'
+  name: Retrieve low-rated products from SAP Commerce Cloud enrich with Google Gemini and create products in Shopify
+models:
+  campaign:
+    name: campaign
+    plural: campaign
+    properties:
+      id:
+        required: false
+        id: true
+        type: string
+    operations:
+      create: '#/integration/assemblies/assembly-1'
+    description: ''

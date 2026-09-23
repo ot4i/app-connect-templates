@@ -1,0 +1,103 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Campaign
+          options:
+            subscription:
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Campaign/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Embeddings
+      connector-type: azureopenai
+      actions:
+        postOpenaiV1Embeddings: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Embeddings/operations/postOpenaiV1Embeddings
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Vectors
+      connector-type: pineconedb
+      actions:
+        postIndexesByIndexHostVectorsUpsert: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Indexes/{index_host}/Vectors/operations/postIndexesByIndexHostVectorsUpsert
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Microsoft Azure OpenAI Create embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postOpenaiV1Embeddings
+              map:
+                mappings:
+                  - input:
+                      template: Salesforce campaign name is {{$Trigger.Name}} and description is {{$Trigger.Description}}
+                  - model:
+                      template: text-embedding-3-small
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Pinecone Vector Database Update or create vector
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postIndexesByIndexHostVectorsUpsert
+              map:
+                mappings:
+                  - index_host:
+                      template: dimension1536-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                  - vectors:
+                      foreach:
+                        input: '[{}]'
+                        iterator: vectorsItem
+                        mappings:
+                          - id:
+                              template: vec5
+                          - values:
+                              expression: '$MicrosoftAzureOpenAICreateembeddings.data.embedding '
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureOpenAICreateembeddings
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create embeddings/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  index_host: dimension1536-iplxk9d.svc.aped-4627-b74a.pinecone.io
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: MicrosoftAzureOpenAICreateembeddings
+                    $ref: '#/node-output/Microsoft Azure OpenAI Create embeddings/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Generate content similarity insights by creating or updating vectors in Pinecone Vector DB using Azure OpenAI embeddings
+models: {}
