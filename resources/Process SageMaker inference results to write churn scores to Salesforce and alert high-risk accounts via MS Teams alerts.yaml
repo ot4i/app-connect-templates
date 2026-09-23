@@ -1,0 +1,318 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: amazoneventbridge
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: customEvents
+          options:
+            eventBus: arn:aws:events:us-east-1:871715985317:event-bus/default
+            parentFilter:
+              eventBus: arn:aws:events:us-east-1:871715985317:event-bus/default
+            webhookURLSuffix: trhMPh9x0gzHa2cHcu_NvmxP89MPSbW7PMH1DLcKSrQRBRJa05XrXViKbvZG1P1A-1G_fA63nQSYjZ7eBSNlhoylw5xejBWTwxHbzMrlVEk
+            subscription:
+              roleArn: arn:aws:iam::871715985317:role/Eventbridge-Apidestination-Role
+              pattern: >-
+                {   "source": ["aws.sagemaker"],   "detail-type": ["SageMaker
+                Transform Job State Change"],   "detail": {    
+                "TransformJobStatus": ["Completed"],     "TransformJobName":
+                [{       "prefix": "churn-transform"     }]   } }
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/eventBus/{eventBus}/customEvents/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Account/operations/updateWithWhere
+          action: updatewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+    action-interface-1:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        DOWNLOAD_OBJECT: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/bucket/{bucketName}/object/operations/DOWNLOAD_OBJECT
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: Account
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Account
+          action: retrievewithwhere
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - set-variable:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      outputPath:
+                        type: string
+                mappings:
+                  - variable:
+                      mappings:
+                        - outputPath:
+                            template: '{{$match($Trigger.detail.TransformOutput.S3OutputPath,/s3:\/\/[^/]+\/(.+)/).groups[0]}}batch_input_accounts.csv.out'
+              name: Set variable 2
+          - custom-action:
+              name: Amazon S3 Retrieve object content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: DOWNLOAD_OBJECT
+              map:
+                mappings:
+                  - Key:
+                      template: '{{$Setvariable2.variable.outputPath}}'
+                  - bucketName:
+                      template: sagemaker-churn-probability
+                  - fileType:
+                      template: Text
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  bucketName: sagemaker-churn-probability
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - parse:
+              parse-format: csv
+              source:
+                template: '{{$AmazonS3Retrieveobjectcontent.content}}'
+                input:
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: |-
+                account_id,churn_probability,risk
+                001d200001xoyjGAAQ,0.998441,High
+                001d200001xoyPuAAI,0.998555,Low
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: array
+                items:
+                  type: object
+                  properties:
+                    account_id:
+                      type: string
+                      order: 0
+                    churn_probability:
+                      type: string
+                      order: 1
+                    risk:
+                      type: string
+                      order: 2
+                title: Parsed CSV
+              name: CSV Parser Parse
+              options:
+                csv-header: true
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '$CSVParserParse '
+                input:
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: CSVParserParse
+                    $ref: '#/node-output/CSV Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: CSV Parser CSVParserParse
+        tags:
+          - incomplete
+    assembly-2:
+      assembly:
+        execute:
+          - update-action:
+              name: Salesforce Update account
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - Churn_probability_score__c:
+                      template: '{{$Foreachitem.churn_probability}}'
+                  - Risk__c:
+                      template: '{{$Foreachitem.risk}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: CSVParserParse
+                    $ref: '#/node-output/CSV Parser Parse/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Id: '{{$Foreachitem.account_id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Setvariable2
+                    $ref: '#/node-output/Set variable 2/response/payload'
+                  - variable: AmazonS3Retrieveobjectcontent
+                    $ref: >-
+                      #/node-output/Amazon S3 Retrieve object
+                      content/response/payload
+                  - variable: CSVParserParse
+                    $ref: '#/node-output/CSV Parser Parse/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: true
+          - if:
+              branch:
+                - condition:
+                    '{{$Foreachitem.risk}}': High
+                  execute:
+                    - retrieve-action:
+                        name: Salesforce Retrieve accounts
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-4'
+                        allow-empty-output: false
+                        filter:
+                          limit: 10
+                          where:
+                            Id: '{{$Foreachitem.account_id}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: Setvariable2
+                              $ref: '#/node-output/Set variable 2/response/payload'
+                            - variable: AmazonS3Retrieveobjectcontent
+                              $ref: >-
+                                #/node-output/Amazon S3 Retrieve object
+                                content/response/payload
+                            - variable: CSVParserParse
+                              $ref: '#/node-output/CSV Parser Parse/response/payload'
+                            - variable: SalesforceUpdateaccount
+                              $ref: >-
+                                #/block/For each/node-output/Salesforce Update
+                                account/response/payload
+                            - variable: SalesforceUpdateaccountMetadata
+                              $ref: >-
+                                #/block/For each/node-output/Salesforce Update
+                                account/response
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        allow-truncation: true
+                        pagination-type: TOKEN
+                    - create-action:
+                        name: Microsoft Teams Send message to channel
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: >-
+                                        Customer:
+                                        {{$SalesforceRetrieveaccounts.Name}}      
+                                        AccountId    
+                                        {{$SalesforceRetrieveaccounts.Id}}                                                                  
+                                        Churn Probability:
+                                        99.86%                                                                                          
+                                        Risk Level: High  This customer has been
+                                        identified as high risk for churn based
+                                        on the latest ML
+                                        prediction.                                                                                      
+                                        Action taken:Customer churn score has
+                                        been updated in Salesforce.The account
+                                        has been automatically enrolled in the
+                                        Retention Workflow.                 👉
+                                        Recommended action: Please review the
+                                        account and initiate the appropriate
+                                        retention outreach.This alert was
+                                        generated automatically by the Customer
+                                        Churn Prediction workflow.
+                            - channelId:
+                                template: 19:KAk1b1MAPcs5i86DD6ZUlu28HQ0n_l31wcpyInmOUns1@thread.tacv2
+                            - subject:
+                                template: 🚨 High Churn Risk Alert
+                            - teamId:
+                                template: ced480f6-8c97-4eb6-9a0f-3ef2654d8ade
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Setvariable2
+                              $ref: '#/node-output/Set variable 2/response/payload'
+                            - variable: CSVParserParse
+                              $ref: '#/node-output/CSV Parser Parse/response/payload'
+                            - variable: Foreachitem
+                              $ref: '#/block/For each/current-item'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Setvariable2
+                  $ref: '#/node-output/Set variable 2/response/payload'
+                - variable: CSVParserParse
+                  $ref: '#/node-output/CSV Parser Parse/response/payload'
+                - variable: Foreachitem
+                  $ref: '#/block/For each/current-item'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+  name: Process SageMaker inference results to write churn scores to Salesforce and alert high-risk accounts via MS Teams alerts
+models: {}
