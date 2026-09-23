@@ -1,0 +1,229 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                interval:
+                  unit: minute
+                  value: 1
+                  runOnceOncheck: true
+                  days:
+                    - MON
+                    - TUE
+                    - WED
+                    - THU
+                    - FRI
+                    - SAT
+                    - SUN
+                  timeZone: UTC
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-4:
+      type: api-action
+      business-object: Custom NRQL
+      connector-type: newrelic
+      actions:
+        executeCustomNrql: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Accounts/{accountId}/Custom%20NRQL/operations/executeCustomNrql
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Incidents
+      connector-type: newrelic
+      actions:
+        searchIncidents: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Accounts/{accountId}/Incidents/operations/searchIncidents
+          action: retrievewithwhere
+    action-interface-1:
+      type: api-action
+      business-object: Issues
+      connector-type: newrelic
+      actions:
+        searchIssues: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Accounts/{accountId}/Issues/operations/searchIssues
+          action: retrievewithwhere
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: New Relic Retrieve issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: searchIssues
+              map:
+                mappings:
+                  - accountId:
+                      template: '{{$accountId}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  accountId: '{{$accountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 10
+              allow-truncation: true
+              allow-empty-output: true
+              pagination-type: TOKEN
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+              source:
+                expression: '$NewRelicRetrieveissues.incidentIds '
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRetrieveissues
+                    $ref: '#/node-output/New Relic Retrieve issues/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: New Relic incidentIds
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: New Relic Retrieve incidents
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: searchIncidents
+              map:
+                mappings:
+                  - accountId:
+                      template: '{{$accountId}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRetrieveissues
+                    $ref: '#/node-output/New Relic Retrieve issues/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - ids: '{{$Foreachitem}}'
+                    - accountId: '{{$accountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              allow-empty-output: true
+          - custom-action:
+              name: New Relic Run custom NRQL query
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: executeCustomNrql
+              map:
+                mappings:
+                  - accountId:
+                      template: '{{$accountId}}'
+                  - nrqlQuery:
+                      template: SELECT *FROM NrAiIncident WHERE incidentId = '{{$Foreachitem}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRetrieveissues
+                    $ref: '#/node-output/New Relic Retrieve issues/response/payload'
+                  - variable: NewRelicRetrieveincidents
+                    $ref: '#/block/For each/node-output/New Relic Retrieve incidents/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  accountId: '{{$accountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRetrieveissues
+                    $ref: '#/node-output/New Relic Retrieve issues/response/payload'
+                  - variable: NewRelicRetrieveincidents
+                    $ref: '#/block/For each/node-output/New Relic Retrieve incidents/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Body:
+                      template: Data enrichment - {{$string($NewRelicRuncustomNRQLquery.data, true)}}
+                  - Subject:
+                      template: Enrichment for Incident - {{$NewRelicRetrieveincidents.incidentId}}
+                  - To:
+                      template: user@example.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRetrieveissues
+                    $ref: '#/node-output/New Relic Retrieve issues/response/payload'
+                  - variable: NewRelicRetrieveincidents
+                    $ref: '#/block/For each/node-output/New Relic Retrieve incidents/response/payload'
+                  - variable: NewRelicRuncustomNRQLquery
+                    $ref: '#/block/For each/node-output/New Relic Run custom NRQL query/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Retrieve New Relic issues and incident details on a schedule and send enrichment emails via Gmail
+models: {}
