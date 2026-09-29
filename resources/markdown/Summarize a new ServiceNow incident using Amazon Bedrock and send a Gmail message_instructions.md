@@ -5,6 +5,6 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 1. Click **Use this template** to start using the template.
 2. Connect to the following accounts by using your credentials:
    - [ServiceNow](https://ibm.biz/acservicenow)
-   - [Amazon Bedrock](https://ibm.biz/acawsbedrock)
+   - [Amazon Bedrock](https://ibm.biz/acamazonbedrock)
    - [Gmail](https://ibm.biz/acgmail)
 3. To start the flow, in the banner, click **Start flow**.
