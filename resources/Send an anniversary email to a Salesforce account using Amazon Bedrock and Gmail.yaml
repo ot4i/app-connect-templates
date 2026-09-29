@@ -64,14 +64,8 @@ integration:
               allow-empty-output: false
               filter:
                 where:
-                  CreatedDate: 2026-07-22T11:48:31.000+0000
+                  Email: '{{$Request.email}}'
                 input:
-                  - variable: SalesforceRetrievecontacts
-                    $ref: >-
-                      #/node-output/Salesforce Retrieve
-                      contacts/response/payload
-                  - variable: SalesforceRetrievecontactsMetadata
-                    $ref: '#/node-output/Salesforce Retrieve contacts/response'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
                   - variable: Request
@@ -87,27 +81,22 @@ integration:
                 mappings:
                   - inputPayload:
                       expression: >-
-                        {  "schemaVersion": "messages-v1",  "system": [   
-                        {      "text": "You are a
-                        professional                        customer engagement
-                        assistant. Generate warm, personalized, and concise
-                        customer emails. Return                        only the
-                        email body. Do not include a subject line, markdown,
-                        greetings outside the email, or                       
+                        {  "schemaVersion": "messages-v1",  "system": [    {
+                        "text": "You are a professional customer engagement
+                        assistant. Generate personalized and concise customer
+                        emails. Return only the email body. Do not include a
+                        subject line, markdown, greetings outside the email, or
                         explanations."    }  ],  "messages": [    {      "role":
-                        "user",      "content": [                              
-                        {          "text": "Customer Name: Himani. Write a
-                        professional and friendly
-                        congratulatory                        email celebrating
-                        their anniversary. Thank them for being a valued
-                        customer, express                        appreciation
-                        for their trust, and mention that you look forward to
-                        continuing to serve them.                        Keep
-                        the email between 120 and 180 words. Return only the
-                        email body."        }      ]    } 
-                        ],                         "inferenceConfig": {   
-                        "maxTokens": 300,    "temperature": 0.7,    "topP": 0.9 
-                        }}
+                        "user",      "content": [        {          "text":
+                        "Customer Name: {{$SalesforceRetrieveaccounts.Name}}.
+                        Write a professional and friendly congratulatory email
+                        celebrating their anniversary. Thank them for being a
+                        valued customer, express appreciation for their trust,
+                        and mention that you look forward to continuing to serve
+                        them. Keep the email between 120 and 180 words. Return
+                        only the email body."        }      ]    }  ],
+                        "inferenceConfig": {    "maxTokens": 300,    "temperature":
+                        0.7,    "topP": 0.9  }}
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: SalesforceRetrieveaccounts
@@ -142,9 +131,9 @@ integration:
                 mappings:
                   - Body:
                       template: >-
-                        {{$AWSBedrockInvokeModel.model.output.message.content[0].text}}
+                        {{$AmazonBedrockInvokemodel.model.output.message.content[0].text}}
                   - Subject:
-                      template: Here's to Another Great Year Together!
+                      template: Anniversary email from your account team
                   - To:
                       template: '{{$Request.email}}'
                 $map: http://ibm.com/appconnect/map/v1
@@ -175,8 +164,8 @@ integration:
                           accounts/response/payload
                       - variable: SalesforceRetrieveaccountsMetadata
                         $ref: '#/node-output/Salesforce Retrieve accounts/response'
-                      - variable: AWSBedrockInvokeModel
-                        $ref: '#/node-output/AWS Bedrock InvokeModel/response/payload'
+                      - variable: AmazonBedrockInvokemodel
+                        $ref: '#/node-output/Amazon Bedrock Invoke model/response/payload'
                       - variable: GmailSendemail
                         $ref: '#/node-output/Gmail Send email/response/payload'
                       - variable: flowDetails
@@ -185,7 +174,7 @@ integration:
                         $ref: '#/trigger/payload'
                     mappings:
                       - email:
-                          template: Email sent!!
+                          template: Email sent
   name: Send an anniversary email to a Salesforce account using Amazon Bedrock and Gmail
 models:
   demo:

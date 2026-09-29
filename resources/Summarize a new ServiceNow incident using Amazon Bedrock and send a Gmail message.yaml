@@ -139,9 +139,9 @@ integration:
                   - Body:
                       template: '{{$AWSBedrockConverse.output.message.content[0].text}}'
                   - Subject:
-                      template: A new ServiceNow ticket is created!!
+                      template: New ServiceNow incident summary
                   - To:
-                      template: himani.bhardwaj1@ibm.com
+                      template: '{{$Trigger.opened_by.email}}'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
