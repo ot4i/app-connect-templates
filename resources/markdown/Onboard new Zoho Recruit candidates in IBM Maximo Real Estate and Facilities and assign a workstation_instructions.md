@@ -1,6 +1,6 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/HR%20Onboarding%20Workplace%20Provisioning%20Flow_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Onboard%20new%20Zoho%20Recruit%20candidates%20in%20IBM%20Maximo%20Real%20Estate%20and%20Facilities%20and%20assign%20a%20workstation_instructions.md) (opens in a new window).
 
-This flow triggers when a new candidate record is created in Zoho Recruit. It creates a new person record in IBM Maximo Real Estate and Facilities, retrieves the corresponding employee record, finds an available workstation, creates a move work task to assign the workstation, and sends a confirmation email via Gmail.
+Use this template to create a person record in IBM Maximo Real Estate and Facilities when a new candidate is created in Zoho Recruit, retrieve the corresponding employee record, find an available workstation, create a move work task to assign the workstation, and send a confirmation email via Gmail.
 
 1. Click **Use this template** to start using the template.
 2. Click the **Zoho Recruit** trigger node, and if you're not already connected, connect to your [Zoho Recruit account](https://ibm.biz/aczohorecruit).
@@ -10,4 +10,4 @@ This flow triggers when a new candidate record is created in Zoho Recruit. It cr
 6. Click the **Gmail** send email node, and if you're not already connected, connect to your [Gmail account](https://ibm.biz/acgmail). Update the **To** field with your preferred recipient email address.
 7. To start the flow, in the banner click **Start flow**.
 
-The flow is started when a new candidate is created in Zoho Recruit. It automatically provisions a workstation by creating a move work task in IBM Maximo Real Estate and Facilities and sends a confirmation email with the work task details via Gmail.
+The flow starts when a new candidate is created in Zoho Recruit. It provisions a workstation by creating a move work task in IBM Maximo Real Estate and Facilities and sends a confirmation email with the work task details via Gmail.

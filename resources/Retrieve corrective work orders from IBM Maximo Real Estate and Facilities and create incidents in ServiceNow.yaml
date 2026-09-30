@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -135,7 +135,7 @@ integration:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
               source:
-                expression: '$IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource '
+                expression: '$IBMMaximoRealEstateandFacilitiesRetrieveallworktaskresource'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -335,7 +335,7 @@ integration:
                   - Subject:
                       template: '{{$IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource."dcterms:title"}}'
                   - To:
-                      template: calisha.noronha@ibm.com
+                      template: your.email@example.com
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
@@ -362,5 +362,5 @@ integration:
                     $ref: '#/block/For each/current-item'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: Facilities Work Order Triage Flow
+  name: Retrieve corrective work orders from IBM Maximo Real Estate and Facilities and create incidents in ServiceNow
 models: {}

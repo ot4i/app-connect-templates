@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -263,7 +263,7 @@ integration:
                   - Subject:
                       template: '{{$IBMMaximoRealEstateandFacilitiesRetrieveworktaskresource."dcterms:title"}}'
                   - To:
-                      template: calisha.noronha@ibm.com
+                      template: your.email@example.com
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
@@ -280,5 +280,5 @@ integration:
                     $ref: '#/node-output/IBM Maximo Real Estate and Facilities Retrieve work task resource/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: HR Onboarding Workplace Provisioning Flow
+  name: Onboard new Zoho Recruit candidates in IBM Maximo Real Estate and Facilities and assign a workstation
 models: {}
