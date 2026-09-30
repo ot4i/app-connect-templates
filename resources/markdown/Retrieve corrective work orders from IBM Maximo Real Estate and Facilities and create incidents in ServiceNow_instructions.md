@@ -4,7 +4,7 @@ Use this template to retrieve corrective work orders from IBM Maximo Real Estate
 
 1. Click **Use this template** to start using the template.
 2. Click the **Scheduler** trigger node, and configure the schedule interval and time zone to match your requirements.
-3. Click the **IBM Maximo Real Estate and Facilities** retrieve node, and if you're not already connected, connect to your [IBM Maximo Real Estate and Facilities account](https://ibm.biz/acibmmaximo).
+3. Click the **IBM Maximo Real Estate and Facilities** retrieve node, and if you're not already connected, connect to your [IBM Maximo Real Estate and Facilities account](https://ibm.biz/acmaximorealestateandfacilities).
 4. Click the **ServiceNow** create incident node, and if you're not already connected, connect to your [ServiceNow account](https://ibm.biz/acservicenow).
 5. Click the **IBM Maximo Real Estate and Facilities** update node, and verify the account connection is the same Maximo account used in step 3.
 6. Click the **Gmail** send email node, and if you're not already connected, connect to your [Gmail account](https://ibm.biz/acgmail). Update the **To** field with your preferred recipient email address.

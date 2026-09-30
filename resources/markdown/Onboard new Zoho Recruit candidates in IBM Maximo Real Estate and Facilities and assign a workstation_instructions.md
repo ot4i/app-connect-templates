@@ -4,7 +4,7 @@ Use this template to create a person record in IBM Maximo Real Estate and Facili
 
 1. Click **Use this template** to start using the template.
 2. Click the **Zoho Recruit** trigger node, and if you're not already connected, connect to your [Zoho Recruit account](https://ibm.biz/aczohorecruit).
-3. Click the **IBM Maximo Real Estate and Facilities** create person node, and if you're not already connected, connect to your [IBM Maximo Real Estate and Facilities account](https://ibm.biz/acibmmaximo).
+3. Click the **IBM Maximo Real Estate and Facilities** create person node, and if you're not already connected, connect to your [IBM Maximo Real Estate and Facilities account](https://ibm.biz/acmaximorealestateandfacilities).
 4. Click the **IBM Maximo Real Estate and Facilities** retrieve space node, and verify the account connection points to your Maximo instance that contains space data.
 5. Click the **IBM Maximo Real Estate and Facilities** create work task node, and verify the account connection is the same Maximo account used in step 3.
 6. Click the **Gmail** send email node, and if you're not already connected, connect to your [Gmail account](https://ibm.biz/acgmail). Update the **To** field with your preferred recipient email address.
