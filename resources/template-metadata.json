@@ -4174,8 +4174,25 @@
   "targetApps": ["box", "huggingface", "gmail"],
   "tags": ["box", "huggingface", "gmail"],
   "offerings": ["app connect professional"]
+},
+{
+  "name": "Retrieve corrective work orders from IBM Maximo Real Estate and Facilities and create incidents in ServiceNow",
+  "description": "Runs on a schedule to retrieve corrective work orders from IBM Maximo Real Estate and Facilities, creates a corresponding incident in ServiceNow for each work order, updates the Maximo work order with the ServiceNow incident ID, and sends a summary email via Gmail.",
+  "summary": "Scheduler to 3 applications",
+  "sourceApp": "scheduler",
+  "targetApps": ["ibmmref", "servicenow", "gmail"],
+  "tags": ["ibmmref", "ibmmaximo", "servicenow", "gmail", "scheduler", "work-order", "facilities"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Onboard new Zoho Recruit candidates in IBM Maximo Real Estate and Facilities and assign a workstation",
+  "description": "Triggers when a new candidate is created in Zoho Recruit. Creates a person record in IBM Maximo Real Estate and Facilities (IBM Maximo REF), retrieves the corresponding employee record, finds an available workstation, creates a move work task to assign the workstation, and sends a confirmation email via Gmail.",
+  "summary": "Zoho Recruit to 2 applications",
+  "sourceApp": "zohorecruit",
+  "targetApps": ["ibmmref", "gmail"],
+  "tags": ["zohorecruit", "ibmmref", "ibmmaximo", "gmail", "hr", "onboarding"],
+  "offerings": ["app connect professional"]
 }
 ]
 }
-
 
