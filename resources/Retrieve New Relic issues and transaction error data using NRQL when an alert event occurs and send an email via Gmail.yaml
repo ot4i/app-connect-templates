@@ -1,0 +1,154 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: newrelic
+      triggers:
+        newRelicAlertEvent:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Alert events
+          options:
+            webhookURLSuffix: default
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Alert%20events/operations/newRelicAlertEvent/subscribe
+              action: created
+  action-interfaces:
+    action-interface-2:
+      type: api-action
+      business-object: Custom NRQL
+      connector-type: newrelic
+      actions:
+        executeCustomNrql: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Accounts/{accountId}/Custom%20NRQL/operations/executeCustomNrql
+          action: custom
+    action-interface-1:
+      type: api-action
+      business-object: Issues
+      connector-type: newrelic
+      actions:
+        searchIssues: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Accounts/{accountId}/Issues/operations/searchIssues
+          action: retrievewithwhere
+    action-interface-3:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - logging:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - logLevel:
+                      template: Info
+                  - logMessage:
+                      template: '{{$Trigger.event.data.body.id}}'
+              name: Log
+          - custom-action:
+              name: New Relic Retrieve issues
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              allow-empty-output: true
+              filter:
+                limit: 10
+                where:
+                  and:
+                    - ids: '{{$Trigger.event.data.body.id}}'
+                    - accountId: '{{$accountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: true
+              pagination-type: TOKEN
+              action: searchIssues
+              map:
+                mappings:
+                  - accountId:
+                      template: '{{$accountId}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: New Relic Run custom NRQL query
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: executeCustomNrql
+              map:
+                mappings:
+                  - accountId:
+                      template: '{{$accountId}}'
+                  - nrqlQuery:
+                      template: >-
+                        SELECT * FROM TransactionError WHERE entity.guid =
+                        '{{$NewRelicRetrieveissues[0].entityGuids[0]}}' SINCE
+                        '{{$fromMillis($toMillis($NewRelicRetrieveissues[0].createdAt) - 1800000)}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  accountId: '{{$accountId}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRetrieveissues
+                    $ref: '#/node-output/New Relic Retrieve issues/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Body:
+                      template: |-
+                        TransactionError Data: 
+                        {{$string($NewRelicRuncustomNRQLquery.data, true)}}
+                  - Subject:
+                      template: 'new issue created: {{$NewRelicRetrieveissues.issueId}}'
+                  - To:
+                      template: user@example.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: NewRelicRuncustomNRQLquery
+                    $ref: '#/node-output/New Relic Run custom NRQL query/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Retrieve New Relic issues and transaction error data using NRQL when an alert event occurs and send an email via Gmail
+models: {}
