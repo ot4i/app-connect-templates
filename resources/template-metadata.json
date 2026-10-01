@@ -4131,6 +4131,69 @@
  "offerings": ["app connect professional"]
 },
 {
+ "name": "Summarize a new ServiceNow incident using Amazon Bedrock and send a Gmail message",
+ "description": "Use this template to summarize new ServiceNow incident tickets by using Amazon Bedrock (Amazon Nova Pro model). When a ticket is created, the flow sends the ticket details to Amazon Bedrock, which generates an analysis that covers the incident summary, business impact, likely root cause, recommended resolution steps, and a customer-facing response. The flow then sends the summary by email via Gmail to the support team.",
+ "summary": "ServiceNow to 2 applications",
+ "sourceApp": "servicenow",
+ "targetApps": ["awsbedrock", "gmail"],
+ "tags": ["servicenow", "awsbedrock", "gmail", "ai", "support", "ticket", "summarization", "incident", "email"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Send an anniversary email to a Salesforce account using Amazon Bedrock and Gmail",
+ "description": "Use this template to generate and send personalized account anniversary emails. The flow is triggered by an API call, retrieves account details from Salesforce, uses Amazon Bedrock (Amazon Nova Pro model) to generate a customized email body, and sends the email to the customer via Gmail.",
+ "summary": "API to 3 applications",
+ "sourceApp": "api",
+ "targetApps": ["salesforce", "awsbedrock", "gmail"],
+ "tags": ["salesforce", "awsbedrock", "gmail", "ai", "email", "personalization", "anniversary", "customer engagement"],
+ "offerings": ["app connect professional"]
+},                
+{
+  "name": "Analyze the sentiment of Slack messages using Hugging Face and post the results to a Slack channel",
+  "description": "Use this template to analyze the sentiment of Slack messages using Hugging Face and post the results to a Slack channel.",
+  "summary": "1 flow to 2 applications",
+  "sourceApp": "api",
+  "targetApps": ["huggingface", "slack"],
+  "tags": ["slack", "huggingface"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Reply to a Microsoft Teams channel message with an AI-generated response from Hugging Face",
+  "description": "Use this template to automatically generate AI-powered chat responses via Hugging Face whenever a new message is posted to a Microsoft Teams channel.",
+  "summary": "Microsoft Teams to 2 applications",
+  "sourceApp": "msteams",
+  "targetApps": ["huggingface", "msteams"],
+  "tags": ["msteams", "huggingface"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Summarize the content of a Box file using Hugging Face and send the summary in a Gmail message",
+  "description": "Use this template to summarize the content of a Box file using Hugging Face and send the summary in a Gmail message.",
+  "summary": "1 flow to 3 applications",
+  "sourceApp": "api",
+  "targetApps": ["box", "huggingface", "gmail"],
+  "tags": ["box", "huggingface", "gmail"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Retrieve corrective work orders from IBM Maximo Real Estate and Facilities and create incidents in ServiceNow",
+  "description": "Runs on a schedule to retrieve corrective work orders from IBM Maximo Real Estate and Facilities, creates a corresponding incident in ServiceNow for each work order, updates the Maximo work order with the ServiceNow incident ID, and sends a summary email via Gmail.",
+  "summary": "Scheduler to 3 applications",
+  "sourceApp": "scheduler",
+  "targetApps": ["ibmmref", "servicenow", "gmail"],
+  "tags": ["ibmmref", "ibmmaximo", "servicenow", "gmail", "scheduler", "work-order", "facilities"],
+  "offerings": ["app connect professional"]
+},
+{
+  "name": "Onboard new Zoho Recruit candidates in IBM Maximo Real Estate and Facilities and assign a workstation",
+  "description": "Triggers when a new candidate is created in Zoho Recruit. Creates a person record in IBM Maximo Real Estate and Facilities (IBM Maximo REF), retrieves the corresponding employee record, finds an available workstation, creates a move work task to assign the workstation, and sends a confirmation email via Gmail.",
+  "summary": "Zoho Recruit to 2 applications",
+  "sourceApp": "zohorecruit",
+  "targetApps": ["ibmmref", "gmail"],
+  "tags": ["zohorecruit", "ibmmref", "ibmmaximo", "gmail", "hr", "onboarding"],
+  "offerings": ["app connect professional"]
+},
+{                
   "name": "Use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices",
   "description": "Use this template to use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices.",
   "summary": "gmail to 5 applications",
@@ -4138,8 +4201,8 @@
   "targetApps": ["amazonsagemaker", "gmail", "servicenow", "salesforce", "coupa"],
   "tags": ["amazonsagemaker", "gmail", "servicenow", "salesforce", "coupa", "JSON parse", "if"],
   "offerings": ["app connect professional"]
- },
- {
+},
+{
   "name": "Classify new Salesforce leads as Hot or Warm or Cold using Amazon SageMaker then update probability and create a task",
   "description": "Use this template to classify new Salesforce leads as Hot or Warm or Cold using Amazon SageMaker then update probability and create a task.",
   "summary": "salesforce to 3 applications",
@@ -4147,8 +4210,8 @@
   "targetApps": ["amazonsagemaker", "salesforce", "msteams"],
   "tags": ["amazonsagemaker", "salesforce", "msteams", "JSON parse", "if"],
   "offerings": ["app connect professional"]
- },
- {
+},
+{
   "name": "Retrieve customer usage support and billing data from Amazon S3 then invoke SageMaker for churn probability scoring",
   "description": "Use this template to retrieve customer usage support and billing data from Amazon S3 then invoke SageMaker for churn probability scoring.",
   "summary": "streaming connector scheduler to amazonsagemaker",
@@ -4156,8 +4219,8 @@
   "targetApps": ["amazonsagemaker"],
   "tags": ["amazonsagemaker", "scheduler"],
   "offerings": ["app connect professional"]
- },
- {
+},
+{
   "name": "Process SageMaker inference results to write churn scores to Salesforce and alert high-risk accounts via MS Teams alerts",
   "description": "Use this template to process SageMaker inference results to write churn scores to Salesforce and alert high-risk accounts via MS Teams alerts.",
   "summary": "amazoneventbridge to 3 applications",
@@ -4165,6 +4228,7 @@
   "targetApps": ["amazons3", "salesforce", "msteams"],
   "tags": ["amazons3", "salesforce", "msteams", "amazoneventbridge", "CSV parser", "for each", "if"],
   "offerings": ["app connect professional"]
- } 
+}                
 ]
 }
+
