@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -67,11 +67,11 @@ integration:
                                     - S3DataType:
                                         template: S3Prefix
                                     - S3Uri:
-                                        template: s3://sagemaker-churn-probability/churn-salesforce-poc-v2/data/batch_input_accounts.csv
+                                        template: s3://your-s3-bucket-name/your-prefix/data/batch_input_accounts.csv
                         - SplitType:
                             template: Line
                   - TransformJobName:
-                      template: churn-probality-score-job
+                      template: your-sagemaker-transform-job-name
                   - TransformOutput:
                       mappings:
                         - Accept:
@@ -79,7 +79,7 @@ integration:
                         - AssembleWith:
                             template: Line
                         - S3OutputPath:
-                            template: 's3://sagemaker-churn-probability/churn-salesforce-poc-v2/churn-risk-job-demo15/ '
+                            template: 's3://your-s3-bucket-name/your-prefix/output/'
                   - TransformResources:
                       mappings:
                         - InstanceCount:

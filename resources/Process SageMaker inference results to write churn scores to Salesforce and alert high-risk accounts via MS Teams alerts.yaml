@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -12,15 +12,15 @@ integration:
           input-context:
             data: customEvents
           options:
-            eventBus: arn:aws:events:us-east-1:871715985317:event-bus/default
+            eventBus: 'arn:aws:events:your-region:your-account-id:event-bus/default'
             parentFilter:
-              eventBus: arn:aws:events:us-east-1:871715985317:event-bus/default
-            webhookURLSuffix: trhMPh9x0gzHa2cHcu_NvmxP89MPSbW7PMH1DLcKSrQRBRJa05XrXViKbvZG1P1A-1G_fA63nQSYjZ7eBSNlhoylw5xejBWTwxHbzMrlVEk
+              eventBus: 'arn:aws:events:your-region:your-account-id:event-bus/default'
+            webhookURLSuffix: your-webhook-url-suffix
             subscription:
-              roleArn: arn:aws:iam::871715985317:role/Eventbridge-Apidestination-Role
+              roleArn: 'arn:aws:iam::your-account-id:role/your-eventbridge-role-name'
               pattern: >-
                 {   "source": ["aws.sagemaker"],   "detail-type": ["SageMaker
-                Transform Job State Change"],   "detail": {    
+                Transform Job State Change"],   "detail": {
                 "TransformJobStatus": ["Completed"],     "TransformJobName":
                 [{       "prefix": "churn-transform"     }]   } }
             connectorServiceOptions:
@@ -104,7 +104,7 @@ integration:
                   - Key:
                       template: '{{$Setvariable2.variable.outputPath}}'
                   - bucketName:
-                      template: sagemaker-churn-probability
+                      template: your-s3-bucket-name
                   - fileType:
                       template: Text
                 $map: http://ibm.com/appconnect/map/v1
@@ -115,7 +115,7 @@ integration:
                     $ref: '#/flowDetails'
               filter:
                 where:
-                  bucketName: sagemaker-churn-probability
+                  bucketName: your-s3-bucket-name
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -174,8 +174,6 @@ integration:
               assembly:
                 $ref: '#/integration/assemblies/assembly-2'
               display-name: CSV Parser CSVParserParse
-        tags:
-          - incomplete
     assembly-2:
       assembly:
         execute:
@@ -268,30 +266,30 @@ integration:
                                   - content:
                                       template: >-
                                         Customer:
-                                        {{$SalesforceRetrieveaccounts.Name}}      
-                                        AccountId    
-                                        {{$SalesforceRetrieveaccounts.Id}}                                                                  
+                                        {{$SalesforceRetrieveaccounts.Name}}
+                                        AccountId:
+                                        {{$SalesforceRetrieveaccounts.Id}}
                                         Churn Probability:
                                         99.86%                                                                                          
                                         Risk Level: High  This customer has been
                                         identified as high risk for churn based
                                         on the latest ML
                                         prediction.                                                                                      
-                                        Action taken:Customer churn score has
+                                        Action taken: Customer churn score has
                                         been updated in Salesforce.The account
                                         has been automatically enrolled in the
                                         Retention Workflow.                 👉
                                         Recommended action: Please review the
                                         account and initiate the appropriate
-                                        retention outreach.This alert was
+                                        retention outreach. This alert was
                                         generated automatically by the Customer
                                         Churn Prediction workflow.
                             - channelId:
-                                template: 19:KAk1b1MAPcs5i86DD6ZUlu28HQ0n_l31wcpyInmOUns1@thread.tacv2
+                                template: your-ms-teams-channel-id
                             - subject:
                                 template: 🚨 High Churn Risk Alert
                             - teamId:
-                                template: ced480f6-8c97-4eb6-9a0f-3ef2654d8ade
+                                template: your-ms-teams-team-id
                           $map: http://ibm.com/appconnect/map/v1
                           input:
                             - variable: Setvariable2

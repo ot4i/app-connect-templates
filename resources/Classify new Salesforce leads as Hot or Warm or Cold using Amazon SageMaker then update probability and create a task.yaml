@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -101,7 +101,7 @@ integration:
                   - ContentType:
                       template: text
                   - EndpointName:
-                      template: DND-salesforce-lead-endpoint
+                      template: your-sagemaker-endpoint-name
                   - MimeType:
                       template: application/json
                 $map: http://ibm.com/appconnect/map/v1
@@ -315,11 +315,11 @@ integration:
                         - content:
                             template: A new {{$JSONParserParse.label}} lead added. Please check the salesforce task
                   - channelId:
-                      template: 19:406c1c85266b468685b82aca1d9022af@thread.tacv2
+                      template: your-ms-teams-channel-id
                   - subject:
                       template: A new {{$JSONParserParse.label}} lead added
                   - teamId:
-                      template: ced480f6-8c97-4eb6-9a0f-3ef2654d8ade
+                      template: your-ms-teams-team-id
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
