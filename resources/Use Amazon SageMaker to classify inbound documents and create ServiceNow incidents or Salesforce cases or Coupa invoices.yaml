@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -255,9 +255,9 @@ integration:
                                             check incident id -->
                                             {{$ServiceNowCreateincident.sys_id}}
                                       - Subject:
-                                          template: Incidentt created
+                                          template: Incident created
                                       - To:
-                                          template: xxx@gmail.com
+                                          template: your.email@example.com
                                     $map: http://ibm.com/appconnect/map/v1
                                     input:
                                       - variable: AmazonSageMakerInvokeendpoint
@@ -321,9 +321,9 @@ integration:
                                             check.Case id is --->
                                             {{$SalesforceCreatecase.Id}}
                                       - Subject:
-                                          template: 'Case created '
+                                          template: Case created
                                       - To:
-                                          template: xxx@gmail.com
+                                          template: your.email@example.com
                                     $map: http://ibm.com/appconnect/map/v1
                                     input:
                                       - variable: AmazonSageMakerInvokeendpoint
@@ -387,7 +387,7 @@ integration:
                                       - Subject:
                                           template: Invoice created
                                       - To:
-                                          template: xxx@gmail.com
+                                          template: your.email@example.com
                                     $map: http://ibm.com/appconnect/map/v1
                                     input:
                                       - variable: AmazonSageMakerInvokeendpoint
@@ -420,7 +420,5 @@ integration:
               input:
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-        tags:
-          - incomplete
-  name: Use Amazon SageMaker to classify and extract information from inbound documents, then automatically create incidents in ServiceNow, cases in Salesforce, or invoices in Coupa
+  name: Use Amazon SageMaker to classify inbound documents and create ServiceNow incidents or Salesforce cases or Coupa invoices
 models: {}
