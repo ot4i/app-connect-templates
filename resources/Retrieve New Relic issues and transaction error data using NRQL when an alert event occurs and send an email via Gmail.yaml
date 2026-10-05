@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -136,10 +136,10 @@ integration:
                 mappings:
                   - Body:
                       template: |-
-                        TransactionError Data: 
+                        TransactionError Data:
                         {{$string($NewRelicRuncustomNRQLquery.data, true)}}
                   - Subject:
-                      template: 'new issue created: {{$NewRelicRetrieveissues.issueId}}'
+                      template: 'New issue created: {{$NewRelicRetrieveissues.issueId}}'
                   - To:
                       template: user@example.com
                 $map: http://ibm.com/appconnect/map/v1

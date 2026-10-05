@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -94,7 +94,7 @@ integration:
                   - accountId:
                       template: '{{$accountId}}'
                   - nrqlQuery:
-                      template: '  SELECT  count(*) AS ''errors'',  percentage(count(*), WHERE error IS TRUE) AS ''errorRate'' FROM Transaction WHERE entity.guid = ''{{$NewRelicRetrieveissues.entityGuids[0]}}'' SINCE ''{{$fromMillis($toMillis($NewRelicRetrieveissues[0].createdAt) - 1800000)}}'''
+                      template: 'SELECT count(*) AS ''errors'', percentage(count(*), WHERE error IS TRUE) AS ''errorRate'' FROM Transaction WHERE entity.guid = ''{{$NewRelicRetrieveissues.entityGuids[0]}}'' SINCE ''{{$fromMillis($toMillis($NewRelicRetrieveissues[0].createdAt) - 1800000)}}'''
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
@@ -120,7 +120,7 @@ integration:
               map:
                 mappings:
                   - Body:
-                      template: Following contains the details of the De duplicated Issue {{$Trigger.event.data.body}}
+                      template: 'Following contains the details of the deduplicated issue: {{$string($Trigger.event.data.body, true)}}'
                   - CC:
                       template: user@example.com
                   - Subject:
