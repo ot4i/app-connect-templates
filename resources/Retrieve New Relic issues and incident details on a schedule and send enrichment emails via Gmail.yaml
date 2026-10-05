@@ -1,4 +1,4 @@
-$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
 integration:
   type: trigger-action
   trigger-interfaces:
@@ -112,7 +112,7 @@ integration:
                 $map: http://ibm.com/appconnect/map/v1
                 mappings: []
               source:
-                expression: '$NewRelicRetrieveissues.incidentIds '
+                expression: '$NewRelicRetrieveissues.incidentIds'
                 input:
                   - variable: Trigger
                     $ref: '#/trigger/payload'
@@ -172,7 +172,7 @@ integration:
                   - accountId:
                       template: '{{$accountId}}'
                   - nrqlQuery:
-                      template: SELECT *FROM NrAiIncident WHERE incidentId = '{{$Foreachitem}}'
+                      template: SELECT * FROM NrAiIncident WHERE incidentId = '{{$Foreachitem}}'
                 $map: http://ibm.com/appconnect/map/v1
                 input:
                   - variable: Trigger
