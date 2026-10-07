@@ -1,0 +1,83 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: worksheetRow
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            spreadsheetID: 1caCPDz7f4Tn6izIXV2dGBXlq3wBPYM8Mfyl90FsZ56s
+            worksheetID: Sheet1
+            parentFilter:
+              spreadsheetID: 1caCPDz7f4Tn6izIXV2dGBXlq3wBPYM8Mfyl90FsZ56s
+              worksheetID: Sheet1
+      connector-type: googlesheet
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Tasks
+      actions:
+        CREATE: {}
+      connector-type: asana
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      actions:
+        CREATE: {}
+      connector-type: msteams
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Asana Create task
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Trigger.fields."1"}}'
+                  - project:
+                      template: '1160915618874788'
+                  - team-id:
+                      template: '1160305558369133'
+                  - workspace-id:
+                      template: '1160305558369131'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: '{{$Trigger.fields."5"}}'
+                  - channelId:
+                      template: 19:0acba4f1911b465192bf17388a08b351@thread.tacv2
+                  - subject:
+                      template: '{{$Trigger.fields."8"}}'
+                  - teamId:
+                      template: 94c30026-bd4b-47b4-9af4-a8f93cf0b877
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: AsanaCreatetask
+                    $ref: '#/node-output/Asana Create task/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: >-
+    Create task in Asana whenever a new row is appended in Google Sheets
+models: {}

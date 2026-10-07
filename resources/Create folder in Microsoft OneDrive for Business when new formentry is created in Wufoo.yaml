@@ -1,0 +1,47 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: FormEntry
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            Hash: q1z0scqf0z2bi37
+            parentFilter:
+              Hash: q1z0scqf0z2bi37
+      connector-type: wufoo
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      actions:
+        CREATE: {}
+      connector-type: msonedrive
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Microsoft OneDrive for Business Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Trigger.Field15}}'
+                  - parentDriveId:
+                      template: >-
+                        b!IVS9LIKswUmMWgPnv4pZ86hP7E_zr_JGjFPslt9UXguBS2ZYjHacTr21sYavjp2a
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create folder in Microsoft OneDrive for Business when new formentry is created in Wufoo
+models: {}
