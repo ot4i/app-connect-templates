@@ -1,0 +1,73 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED:
+          input-context:
+            data: Opportunity
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options: {}
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      actions:
+        CREATE: {}
+      connector-type: box
+    action-interface-2:
+      type: api-action
+      business-object: mail
+      actions:
+        CREATEEMAIL: {}
+      connector-type: email
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Email Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: CREATEEMAIL
+              map:
+                mappings:
+                  - attachmentForCreate:
+                      foreach:
+                        input: $Trigger.Id
+                        iterator: attachmentForCreateItem
+                        mappings:
+                          - contentType:
+                              template: application/octet-stream
+                  - toFilter:
+                      template: validMail@gmail.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Box Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - name:
+                      template: '{{$Trigger.Name}}'
+                  - parent_id:
+                      template: '0'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: EmailSendemail
+                    $ref: '#/node-output/Email Send email/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create folder in Box when new opportunity created in Salesforce
+models: {}
