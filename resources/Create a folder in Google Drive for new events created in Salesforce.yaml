@@ -1,0 +1,48 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      triggers:
+        CREATED_POLLER:
+          input-context:
+            data: Event
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          options:
+            subscription:
+              timeZone: UTC
+              pollingInterval: 5
+      connector-type: salesforce
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Folder
+      connector-type: googledrive
+      actions:
+        CREATE: {}
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - create-action:
+              name: Google Drive Create folder
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              map:
+                mappings:
+                  - createdTime:
+                      template: '{{$Trigger.CreatedDate}}'
+                  - description:
+                      template: '{{$Trigger.Description}}'
+                  - name:
+                      template: '{{$Trigger.Subject}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Create a folder in Google Drive for new events created in Salesforce
+models: {}
