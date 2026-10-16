@@ -4255,7 +4255,25 @@
  "targetApps": ["newrelic", "gmail"],
  "tags": ["newrelic", "gmail"],
  "offerings": ["app connect professional"]
-}  
+},
+{
+ "name": "AI-Enhanced Support Ticket Resolution",
+ "description": "Triggered when a new case is created in Salesforce. Retrieves the case description, generates embeddings using IBM watsonx.ai, and queries Qdrant for relevant context. The context is used by IBM watsonx.ai to generate a resolution comment, which is posted back to the Salesforce case. A notification is sent to a Slack channel and a summary email is sent via Gmail.",
+ "summary": "Salesforce to 4 applications",
+ "sourceApp": "salesforce",
+ "targetApps": ["salesforce", "ibmwatsonxai", "qdrant", "slack", "gmail"],
+ "tags": ["salesforce", "ibmwatsonxai", "qdrant", "slack", "gmail", "rag", "ai"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Compliance Document Similarity and Risk Flagging",
+ "description": "Triggered when a new document is uploaded to a CMIS repository folder. Downloads the document, extracts its text using Google Gemini, generates embeddings with IBM watsonx.ai, and queries Qdrant for semantically similar high-risk compliance documents. A weighted risk score is computed and the document is classified as high, medium, or low risk. A Salesforce case is created and a compliance alert email is sent via Gmail.",
+ "summary": "CMIS to 4 applications",
+ "sourceApp": "cmis",
+ "targetApps": ["googlegemini", "ibmwatsonxai", "qdrant", "salesforce", "gmail"],
+ "tags": ["cmis", "googlegemini", "ibmwatsonxai", "qdrant", "salesforce", "gmail", "compliance", "rag", "ai"],
+ "offerings": ["app connect professional"]
+}
 ]
 }
 
