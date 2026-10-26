@@ -12,12 +12,12 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 
     - On the Google Gemini "Analyze document content" node, confirm the **Model ID** (for example, `models/gemini-2.5-pro`).
     - The node receives the binary document content downloaded from CMIS and extracts its text.
-1. Click on the **IBM watsonx.ai** node (Generate embeddings), and if you're not already connected, connect to your [IBM watsonx.ai account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-watsonxai).
+1. Click on the **IBM watsonx.ai** node (Generate embeddings), and if you're not already connected, connect to your [IBM watsonx.ai account](https://ibm.biz/acibmwatsonxai).
 
     - Select or confirm the **Model ID** for embedding generation (for example, `ibm/granite-embedding-278m-multilingual`).
     - Enter your watsonx.ai **Project ID**.
     - The node uses the text extracted by Google Gemini as its input.
-1. Click on the **Qdrant** node, and if you're not already connected, connect to your [Qdrant account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-qdrant).
+1. Click on the **Qdrant** node, and if you're not already connected, connect to your [Qdrant account](https://ibm.biz/acqdrant).
 
     - On the Qdrant "Query points in batch" node, select or confirm the **Collection** to search against — this collection holds your compliance knowledge base (for example, `compliance_docs_watsonx`).
     - The search applies a minimum similarity score threshold of **0.70** and filters for documents with a `risk_score` of **7 or above** in your collection.
@@ -31,8 +31,8 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
         - **Weighted risk score < 5 (Low risk):** A Salesforce case is created with **Status: Escalated** and **Priority: High**, and a low-risk compliance alert email is sent via Gmail.
 
     - **If no matches are found**, the flow ends without creating a case.
-1. On each **Salesforce Create case** node, confirm the connection to your [Salesforce account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-salesforce). The case subject is set to `COMPLIANCE RISK` and the supplied name includes the document filename and its computed risk score.
-1. On each **Gmail Send email** node, and if you're not already connected, connect to your [Gmail account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-gmail).
+1. On each **Salesforce Create case** node, confirm the connection to your [Salesforce account](https://ibm.biz/ach2salesforce). The case subject is set to `COMPLIANCE RISK` and the supplied name includes the document filename and its computed risk score.
+1. On each **Gmail Send email** node, and if you're not already connected, connect to your [Gmail account](https://ibm.biz/acgmail).
 
     - Update the **To** field on each Gmail node with the email address that should receive compliance alerts.
 1. Click **Done**.
