@@ -397,5 +397,5 @@ integration:
                     $ref: '#/node-output/Slack Send message/response/payload'
                   - variable: flowDetails
                     $ref: '#/flowDetails'
-  name: AI-Enhanced Support Ticket Resolution
+  name: Resolve new Salesforce cases by using Qdrant and IBM watsonx ai and send Slack and Gmail notifications
 models: {}
