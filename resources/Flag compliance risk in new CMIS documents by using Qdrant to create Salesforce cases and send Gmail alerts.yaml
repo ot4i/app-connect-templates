@@ -601,5 +601,5 @@ integration:
                   $ref: '#/node-output/Qdrant Query points in batch/response/payload'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Compliance Document Similarity and Risk Flagging
+  name: Flag compliance risk in new CMIS documents by using Qdrant to create Salesforce cases and send Gmail alerts
 models: {}

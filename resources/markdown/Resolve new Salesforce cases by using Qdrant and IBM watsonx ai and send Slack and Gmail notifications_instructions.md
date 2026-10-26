@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/AI-Enhanced%20Support%20Ticket%20Resolution_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Resolve%20new%20Salesforce%20cases%20by%20using%20Qdrant%20and%20IBM%20watsonx%20ai%20and%20send%20Slack%20and%20Gmail%20notifications_instructions.md) (opens in a new window).
 
 
 ## Using the template

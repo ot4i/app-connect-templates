@@ -1,4 +1,4 @@
-To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Compliance%20Document%20Similarity%20and%20Risk%20Flagging_instructions.md) (opens in a new window).
+To refer to these instructions while editing the flow, open [the GitHub page](https://github.com/ot4i/app-connect-templates/blob/main/resources/markdown/Flag%20compliance%20risk%20in%20new%20CMIS%20documents%20by%20using%20Qdrant%20to%20create%20Salesforce%20cases%20and%20send%20Gmail%20alerts_instructions.md) (opens in a new window).
 
 
 ## Using the template
