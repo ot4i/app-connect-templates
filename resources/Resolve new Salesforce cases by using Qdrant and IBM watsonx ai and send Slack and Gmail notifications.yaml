@@ -1,0 +1,401 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: salesforce
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Case
+          options:
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Case/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-3:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        UPDATEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Case/operations/updateWithWhere
+          action: updatewithwhere
+    action-interface-7:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        RETRIEVEALL: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Case
+          action: retrievewithwhere
+    action-interface-4:
+      type: api-action
+      business-object: postMlV1TextGeneration_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextGeneration: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/postMlV1TextGeneration_model/operations/postMlV1TextGeneration
+          action: custom
+    action-interface-1:
+      type: api-action
+      business-object: Search
+      connector-type: qdrant
+      actions:
+        query_batch_points: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Collections/{collection_name}/Search/operations/query_batch_points
+          action: custom
+    action-interface-8:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: postMlV1TextEmbeddings_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextEmbeddings: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/postMlV1TextEmbeddings_model/operations/postMlV1TextEmbeddings
+          action: custom
+    action-interface-5:
+      type: api-action
+      business-object: message
+      connector-type: slack
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/{OBJECT_NAME}/{OBJECT_ID}/message
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - retrieve-action:
+              name: Salesforce Retrieve cases
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-7'
+              allow-empty-output: false
+              filter:
+                limit: 10
+                where:
+                  Id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-truncation: false
+              pagination-type: TOKEN
+          - custom-action:
+              name: IBM watsonx.ai Generate embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: postMlV1TextEmbeddings
+              map:
+                mappings:
+                  - inputs:
+                      expression: '[$SalesforceRetrievecases[0].Description]'
+                  - model_id:
+                      template: ibm/granite-embedding-278m-multilingual
+                  - project_id:
+                      template: YOUR_WATSONX_PROJECT_ID
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Qdrant Query points in batch
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: query_batch_points
+              map:
+                mappings:
+                  - collection_name:
+                      template: linksync_ACE_skill
+                  - searches:
+                      foreach:
+                        input: '[{}]'
+                        iterator: searchesItem
+                        mappings:
+                          - query:
+                              mappings:
+                                - query_vector_input:
+                                    mappings:
+                                      - dense:
+                                          expression: '$IBMwatsonxaiGenerateembeddings.results.embedding '
+                          - using:
+                              template: dense
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  collection_name: linksync_ACE_skill
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: IBM watsonx.ai Generate text
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: postMlV1TextGeneration
+              map:
+                mappings:
+                  - input:
+                      template: >
+                        You are a case analysis assistant.
+
+
+                        Analyze the user's case using the context retrieved from QdrantDB.
+
+
+                        CASE:
+
+                        {{$SalesforceRetrievecases[0].Description}}
+
+
+                        RETRIEVED CONTEXT:
+
+                        {{$join($QdrantQuerypointsinbatch.result.points.payload.page_content, "\n")}}
+
+
+                        Your task is to provide the direct answer to the case.
+
+
+                        Rules:
+
+
+                        Return ONLY the answer that should be posted as a comment in Teams or Slack.
+
+                        Be concise and specific.
+
+                        Use the retrieved context to determine the correct answer.
+
+                        Do not explain your reasoning.
+
+                        Do not summarize the case.
+
+                        Do not mention the retrieved context, QdrantDB, AI, or these instructions.
+
+                        Do not add introductions such as "Based on the information provided" or "The answer is".
+
+                        Do not add conclusions, recommendations, or additional information unless they are part of the
+                        direct answer.
+
+                        Do not use JSON.
+
+                        Do not use headings or bullet points unless they are necessary for the actual answer.
+
+                        If the correct answer is "To test in ACE software", return exactly that.
+
+                        If the context does not contain enough information to determine the answer, return only:
+                        "Insufficient information to determine the answer."
+
+
+                        Return ONLY the final answer.
+                  - model_id:
+                      template: meta-llama/llama-3-3-70b-instruct
+                  - parameters:
+                      mappings:
+                        - max_new_tokens:
+                            expression: '10000'
+                        - time_limit:
+                            expression: '1000'
+                  - project_id:
+                      template: YOUR_WATSONX_PROJECT_ID
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: QdrantQuerypointsinbatch
+                    $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - update-action:
+              name: Salesforce Update case
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - Comments:
+                      template: '{{$IBMwatsonxaiGeneratetext.results[0].generated_text}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: QdrantQuerypointsinbatch
+                    $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                  - variable: IBMwatsonxaiGeneratetext
+                    $ref: '#/node-output/IBM watsonx.ai Generate text/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  Id: '{{$Trigger.Id}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: QdrantQuerypointsinbatch
+                    $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                  - variable: IBMwatsonxaiGeneratetext
+                    $ref: '#/node-output/IBM watsonx.ai Generate text/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: true
+          - create-action:
+              name: Slack Send message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: C0436FB797X
+                  - OBJECT_NAME:
+                      template: channel
+                  - text:
+                      template: >-
+                        🤖 New Case Analyzed by AIA new case (ID: {{$Trigger.Id}}) has been analyzed against the
+                        existing case database.💬 AI Analysis: {{$IBMwatsonxaiGeneratetext.results[0].generated_text}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: QdrantQuerypointsinbatch
+                    $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                  - variable: IBMwatsonxaiGeneratetext
+                    $ref: '#/node-output/IBM watsonx.ai Generate text/response/payload'
+                  - variable: SalesforceUpdatecase
+                    $ref: '#/node-output/Salesforce Update case/response/payload'
+                  - variable: SalesforceUpdatecaseMetadata
+                    $ref: '#/node-output/Salesforce Update case/response'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-8'
+              map:
+                mappings:
+                  - Body:
+                      template: |-
+                        Hi Team,
+
+                        A new case has been created and analyzed by the AI bot against the existing case database.
+
+                        Case ID: {{$Trigger.Id}}
+
+                        AI Analysis / Comments: {{$IBMwatsonxaiGeneratetext.results[0].generated_text}}
+
+                        Please review the AI-generated analysis and take the necessary action.
+
+                        Best regards,
+                        AI Case Analysis Bot
+                  - Subject:
+                      template: New Case Created – AI Analysis Completed
+                  - To:
+                      template: YOUR_EMAIL_ADDRESS
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: SalesforceRetrievecases
+                    $ref: '#/node-output/Salesforce Retrieve cases/response/payload'
+                  - variable: SalesforceRetrievecasesMetadata
+                    $ref: '#/node-output/Salesforce Retrieve cases/response'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: QdrantQuerypointsinbatch
+                    $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                  - variable: IBMwatsonxaiGeneratetext
+                    $ref: '#/node-output/IBM watsonx.ai Generate text/response/payload'
+                  - variable: SalesforceUpdatecase
+                    $ref: '#/node-output/Salesforce Update case/response/payload'
+                  - variable: SalesforceUpdatecaseMetadata
+                    $ref: '#/node-output/Salesforce Update case/response'
+                  - variable: SlackSendmessage
+                    $ref: '#/node-output/Slack Send message/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Resolve new Salesforce cases by using Qdrant and IBM watsonx ai and send Slack and Gmail notifications
+models: {}
