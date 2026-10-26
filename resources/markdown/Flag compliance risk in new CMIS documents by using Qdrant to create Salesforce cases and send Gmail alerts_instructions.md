@@ -4,11 +4,11 @@ To refer to these instructions while editing the flow, open [the GitHub page](ht
 ## Using the template
 
 1. Click **Use this template** to start using the template.
-1. Connect to your [CMIS account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-cmis).
+1. Connect to your [CMIS account](https://ibm.biz/ach2cmis).
 
     **Note:** The flow polls for newly created **Document** objects in the configured CMIS repository folder. It triggers automatically whenever a new document is uploaded.
 1. On the CMIS "New document" event node, select the **Repository** and the **Folder** to monitor for new document uploads.
-1. Click on the **Google Gemini** node, and if you're not already connected, connect to your [Google Gemini account](https://www.ibm.com/docs/en/app-connect/saas?topic=apps-google-gemini).
+1. Click on the **Google Gemini** node, and if you're not already connected, connect to your [Google Gemini account](https://ibm.biz/acgooglegemini).
 
     - On the Google Gemini "Analyze document content" node, confirm the **Model ID** (for example, `models/gemini-2.5-pro`).
     - The node receives the binary document content downloaded from CMIS and extracts its text.
