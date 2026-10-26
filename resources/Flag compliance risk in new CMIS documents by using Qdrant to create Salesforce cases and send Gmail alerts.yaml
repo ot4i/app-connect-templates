@@ -1,0 +1,605 @@
+$integration: http://ibm.com/appconnect/integration/v2/integrationFile
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: cmis
+      triggers:
+        CREATED_POLLER:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Document
+          options:
+            repository: '-default-'
+            folder: eda871f8-bf0b-4cb7-a871-f8bf0bccb78b
+            parentFilter:
+              repository: '-default-'
+              folder: eda871f8-bf0b-4cb7-a871-f8bf0bccb78b
+            subscription:
+              timeFormat: YYYY-MM-DDTHH:mm:ssZ
+              timeZone: UTC
+              pollingInterval: 1
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/repository/{repository}/Folder/{folder}/Document/operations/CREATED_POLLER/subscribe
+              action: created_poller
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Document analysis
+      connector-type: googlegemini
+      actions:
+        postDocumentAnalysisByModelId: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Document%20analysis/operations/postDocumentAnalysisByModelId
+          action: custom
+    action-interface-2:
+      type: api-action
+      business-object: Document
+      connector-type: cmis
+      actions:
+        DOWNLOADFILE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Document/operations/DOWNLOADFILE
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: postMlV1TextEmbeddings_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextEmbeddings: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/postMlV1TextEmbeddings_model/operations/postMlV1TextEmbeddings
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: Search
+      connector-type: qdrant
+      actions:
+        query_batch_points: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Collections/{collection_name}/Search/operations/query_batch_points
+          action: custom
+    action-interface-5:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Case
+          action: create
+    action-interface-8:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-6:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Case
+          action: create
+    action-interface-7:
+      type: api-action
+      business-object: Case
+      connector-type: salesforce
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Case
+          action: create
+    action-interface-12:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+    action-interface-13:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: CMIS Download document content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: DOWNLOADFILE
+              map:
+                mappings:
+                  - cmis_objectId:
+                      template: '{{$Trigger.cmis_objectId}}'
+                  - contentType:
+                      template: Binary
+                  - repository:
+                      template: '-default-'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Google Gemini Analyze document content
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postDocumentAnalysisByModelId
+              map:
+                mappings:
+                  - inline_data:
+                      mappings:
+                        - data:
+                            template: '{{$CMISDownloaddocumentcontent.content}}'
+                        - mime_type:
+                            template: '{{$Trigger.cmis_contentStreamMimeType}}'
+                  - modelId:
+                      template: models/gemini-2.5-pro
+                  - prompt:
+                      template: Just extract the content
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CMISDownloaddocumentcontent
+                    $ref: '#/node-output/CMIS Download document content/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: IBM watsonx.ai Generate embeddings
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: postMlV1TextEmbeddings
+              map:
+                mappings:
+                  - inputs:
+                      expression: '[$GoogleGeminiAnalyzedocumentcontent.candidates.content.parts[0].text]'
+                  - model_id:
+                      template: ibm/granite-embedding-278m-multilingual
+                  - parameters:
+                      mappings:
+                        - truncate_input_tokens:
+                            expression: '512'
+                  - project_id:
+                      template: YOUR_WATSONX_PROJECT_ID
+                  - version:
+                      template: '2024-03-14'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CMISDownloaddocumentcontent
+                    $ref: '#/node-output/CMIS Download document content/response/payload'
+                  - variable: GoogleGeminiAnalyzedocumentcontent
+                    $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - custom-action:
+              name: Qdrant Query points in batch
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              action: query_batch_points
+              map:
+                mappings:
+                  - collection_name:
+                      template: compliance_docs_watsonx
+                  - searches:
+                      foreach:
+                        input: '[{}]'
+                        iterator: searchesItem
+                        mappings:
+                          - filter:
+                              mappings:
+                                - must:
+                                    foreach:
+                                      input: '[{}]'
+                                      iterator: mustItem
+                                      mappings:
+                                        - key:
+                                            template: risk_score
+                                        - range:
+                                            mappings:
+                                              - gte:
+                                                  template: '7'
+                          - limit:
+                              expression: '5'
+                          - query:
+                              mappings:
+                                - query_vector_input:
+                                    expression: '$IBMwatsonxaiGenerateembeddings.results.embedding '
+                          - score_threshold:
+                              expression: '0.70'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CMISDownloaddocumentcontent
+                    $ref: '#/node-output/CMIS Download document content/response/payload'
+                  - variable: GoogleGeminiAnalyzedocumentcontent
+                    $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  collection_name: compliance_docs_watsonx
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: CMISDownloaddocumentcontent
+                    $ref: '#/node-output/CMIS Download document content/response/payload'
+                  - variable: GoogleGeminiAnalyzedocumentcontent
+                    $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                  - variable: IBMwatsonxaiGenerateembeddings
+                    $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - if:
+              branch:
+                - condition:
+                    '{{$count($QdrantQuerypointsinbatch.result.points)}}':
+                      gt: '0'
+                  execute:
+                    - set-variable:
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: CMISDownloaddocumentcontent
+                              $ref: '#/node-output/CMIS Download document content/response/payload'
+                            - variable: GoogleGeminiAnalyzedocumentcontent
+                              $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                            - variable: IBMwatsonxaiGenerateembeddings
+                              $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                            - variable: QdrantQuerypointsinbatch
+                              $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          customSchemas:
+                            properties.`variable`:
+                              type: object
+                              properties:
+                                weighted_risk_score:
+                                  type: string
+                          mappings:
+                            - variable:
+                                mappings:
+                                  - weighted_risk_score:
+                                      template: >-
+                                        {{$round($sum($QdrantQuerypointsinbatch.result.points.(score * score *
+                                        payload.risk_score)) / $sum($QdrantQuerypointsinbatch.result.points.(score *
+                                        score)), 2)}}
+                        name: Set variable
+                    - if:
+                        branch:
+                          - condition:
+                              '{{$Setvariable.variable.weighted_risk_score}}':
+                                gte: '7'
+                            execute:
+                              - create-action:
+                                  name: Salesforce Create case
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-5'
+                                  map:
+                                    mappings:
+                                      - Description:
+                                          template: >-
+                                            {{$Trigger.cmis_name}} file in CMIS -default- repository, Guest Home Folder
+                                            has risk score: {{$Setvariable.variable.weighted_risk_score}} 
+                                      - IsEscalated:
+                                          expression: 'true'
+                                      - Origin:
+                                          template: Email
+                                      - Priority:
+                                          template: Low
+                                      - Reason:
+                                          template: Feedback
+                                      - Status:
+                                          template: Escalated
+                                      - Subject:
+                                          template: COMPLIANCE RISK
+                                      - SuppliedName:
+                                          template: >-
+                                            [COMPLIANCE RISK] {{$Trigger.cmis_name}} - Score
+                                            {{$Setvariable.variable.weighted_risk_score}}/10
+                                      - Type:
+                                          template: Structural
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: CMISDownloaddocumentcontent
+                                        $ref: '#/node-output/CMIS Download document content/response/payload'
+                                      - variable: GoogleGeminiAnalyzedocumentcontent
+                                        $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                                      - variable: IBMwatsonxaiGenerateembeddings
+                                        $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                                      - variable: QdrantQuerypointsinbatch
+                                        $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                                      - variable: Setvariable
+                                        $ref: '#/block/If/node-output/Set variable/response/payload'
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Gmail Send email
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-8'
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            A high-risk compliance document has been detected 🚨 *COMPLIANCE ALERT —
+                                            HIGH RISK DOCUMENT*\n *File:*      {{$Trigger.cmis_name}}\n *Uploaded:* 
+                                            {{$Trigger.cmis_creationDate}} \n *Risk Score:
+                                            {{$Setvariable.variable.weighted_risk_score}} / 10*\n *Case:*     
+                                            {{$SalesforceCreatecase.Id}}\n 
+                                      - Subject:
+                                          template: >-
+                                            [COMPLIANCE ALERT] {{$Trigger.cmis_name}} - Risk Score
+                                            {{$Setvariable.variable.weighted_risk_score}}/10
+                                      - To:
+                                          template: YOUR_EMAIL_ADDRESS
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: CMISDownloaddocumentcontent
+                                        $ref: '#/node-output/CMIS Download document content/response/payload'
+                                      - variable: GoogleGeminiAnalyzedocumentcontent
+                                        $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                                      - variable: IBMwatsonxaiGenerateembeddings
+                                        $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                                      - variable: QdrantQuerypointsinbatch
+                                        $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                                      - variable: Setvariable
+                                        $ref: '#/block/If/node-output/Set variable/response/payload'
+                                      - variable: SalesforceCreatecase
+                                        $ref: '#/block/If 2/node-output/Salesforce Create case/response/payload'
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                          - condition:
+                              '{{$Setvariable.variable.weighted_risk_score}}':
+                                gte: '5'
+                            execute:
+                              - create-action:
+                                  name: Salesforce Create case 2
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-6'
+                                  map:
+                                    mappings:
+                                      - Description:
+                                          template: >-
+                                            {{$Trigger.cmis_name}} file in CMIS -default- repository, Guest Home Folder
+                                            has risk score: {{$Setvariable.variable.weighted_risk_score}} 
+                                      - IsEscalated:
+                                          expression: 'true'
+                                      - Origin:
+                                          template: Email
+                                      - Priority:
+                                          template: Medium
+                                      - Reason:
+                                          template: Feedback
+                                      - Status:
+                                          template: Escalated
+                                      - Subject:
+                                          template: COMPLIANCE RISK
+                                      - SuppliedName:
+                                          template: >-
+                                            [COMPLIANCE RISK] {{$Trigger.cmis_name}} - Score
+                                            {{$Setvariable.variable.weighted_risk_score}}/10
+                                      - Type:
+                                          template: Structural
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: CMISDownloaddocumentcontent
+                                        $ref: '#/node-output/CMIS Download document content/response/payload'
+                                      - variable: GoogleGeminiAnalyzedocumentcontent
+                                        $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                                      - variable: IBMwatsonxaiGenerateembeddings
+                                        $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                                      - variable: QdrantQuerypointsinbatch
+                                        $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                                      - variable: Setvariable
+                                        $ref: '#/block/If/node-output/Set variable/response/payload'
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                              - create-action:
+                                  name: Gmail Send email 3
+                                  target:
+                                    $ref: '#/integration/action-interfaces/action-interface-13'
+                                  map:
+                                    mappings:
+                                      - Body:
+                                          template: >-
+                                            A medium-risk compliance document has been detected 🚨 *COMPLIANCE ALERT —
+                                            MEDIUM RISK DOCUMENT*\n *File:*      {{$Trigger.cmis_name}}\n *Uploaded:* 
+                                            {{$Trigger.cmis_creationDate}} \n *Risk Score:
+                                            {{$Setvariable.variable.weighted_risk_score}} / 10*\n *Case:*     
+                                            {{$SalesforceCreatecase.Id}}\n 
+                                      - Subject:
+                                          template: >-
+                                            [COMPLIANCE ALERT] {{$Trigger.cmis_name}} - Risk Score
+                                            {{$Setvariable.variable.weighted_risk_score}}/10
+                                      - To:
+                                          template: YOUR_EMAIL_ADDRESS
+                                    $map: http://ibm.com/appconnect/map/v1
+                                    input:
+                                      - variable: Trigger
+                                        $ref: '#/trigger/payload'
+                                      - variable: CMISDownloaddocumentcontent
+                                        $ref: '#/node-output/CMIS Download document content/response/payload'
+                                      - variable: GoogleGeminiAnalyzedocumentcontent
+                                        $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                                      - variable: IBMwatsonxaiGenerateembeddings
+                                        $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                                      - variable: QdrantQuerypointsinbatch
+                                        $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                                      - variable: Setvariable
+                                        $ref: '#/block/If/node-output/Set variable/response/payload'
+                                      - variable: SalesforceCreatecase2
+                                        $ref: '#/block/If 2/node-output/Salesforce Create case 2/response/payload'
+                                      - variable: flowDetails
+                                        $ref: '#/flowDetails'
+                        else:
+                          execute:
+                            - create-action:
+                                name: Salesforce Create case 3
+                                target:
+                                  $ref: '#/integration/action-interfaces/action-interface-7'
+                                map:
+                                  mappings:
+                                    - Description:
+                                        template: >-
+                                          {{$Trigger.cmis_name}} file in CMIS -default- repository, Guest Home Folder
+                                          has risk score: {{$Setvariable.variable.weighted_risk_score}} 
+                                    - IsEscalated:
+                                        expression: 'true'
+                                    - Origin:
+                                        template: Email
+                                    - Priority:
+                                        template: High
+                                    - Reason:
+                                        template: Feedback
+                                    - Status:
+                                        template: Escalated
+                                    - Subject:
+                                        template: COMPLIANCE RISK
+                                    - SuppliedName:
+                                        template: >-
+                                          [COMPLIANCE RISK] {{$Trigger.cmis_name}} - Score
+                                          {{$Setvariable.variable.weighted_risk_score}}/10
+                                    - Type:
+                                        template: Structural
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: CMISDownloaddocumentcontent
+                                      $ref: '#/node-output/CMIS Download document content/response/payload'
+                                    - variable: GoogleGeminiAnalyzedocumentcontent
+                                      $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                                    - variable: IBMwatsonxaiGenerateembeddings
+                                      $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                                    - variable: QdrantQuerypointsinbatch
+                                      $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                                    - variable: Setvariable
+                                      $ref: '#/block/If/node-output/Set variable/response/payload'
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                            - create-action:
+                                name: Gmail Send email 2
+                                target:
+                                  $ref: '#/integration/action-interfaces/action-interface-12'
+                                map:
+                                  mappings:
+                                    - Body:
+                                        template: >-
+                                          A low-risk compliance document has been detected 🚨 *COMPLIANCE ALERT — LOW
+                                          RISK DOCUMENT*\n *File:*      {{$Trigger.cmis_name}}\n *Uploaded:* 
+                                          {{$Trigger.cmis_creationDate}} \n *Risk Score:
+                                          {{$Setvariable.variable.weighted_risk_score}} / 10*\n *Case:*     
+                                          {{$SalesforceCreatecase.Id}}\n 
+                                    - Subject:
+                                        template: >-
+                                          [COMPLIANCE ALERT] {{$Trigger.cmis_name}} - Risk Score
+                                          {{$Setvariable.variable.weighted_risk_score}}/10
+                                    - To:
+                                        template: YOUR_EMAIL_ADDRESS
+                                  $map: http://ibm.com/appconnect/map/v1
+                                  input:
+                                    - variable: Trigger
+                                      $ref: '#/trigger/payload'
+                                    - variable: CMISDownloaddocumentcontent
+                                      $ref: '#/node-output/CMIS Download document content/response/payload'
+                                    - variable: GoogleGeminiAnalyzedocumentcontent
+                                      $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                                    - variable: IBMwatsonxaiGenerateembeddings
+                                      $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                                    - variable: QdrantQuerypointsinbatch
+                                      $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                                    - variable: Setvariable
+                                      $ref: '#/block/If/node-output/Set variable/response/payload'
+                                    - variable: SalesforceCreatecase3
+                                      $ref: '#/block/If 2/node-output/Salesforce Create case 3/response/payload'
+                                    - variable: flowDetails
+                                      $ref: '#/flowDetails'
+                        name: If 2
+                        input:
+                          - variable: Trigger
+                            $ref: '#/trigger/payload'
+                          - variable: CMISDownloaddocumentcontent
+                            $ref: '#/node-output/CMIS Download document content/response/payload'
+                          - variable: GoogleGeminiAnalyzedocumentcontent
+                            $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                          - variable: IBMwatsonxaiGenerateembeddings
+                            $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                          - variable: QdrantQuerypointsinbatch
+                            $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                          - variable: Setvariable
+                            $ref: '#/block/If/node-output/Set variable/response/payload'
+                          - variable: flowDetails
+                            $ref: '#/flowDetails'
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: CMISDownloaddocumentcontent
+                  $ref: '#/node-output/CMIS Download document content/response/payload'
+                - variable: GoogleGeminiAnalyzedocumentcontent
+                  $ref: '#/node-output/Google Gemini Analyze document content/response/payload'
+                - variable: IBMwatsonxaiGenerateembeddings
+                  $ref: '#/node-output/IBM watsonx.ai Generate embeddings/response/payload'
+                - variable: QdrantQuerypointsinbatch
+                  $ref: '#/node-output/Qdrant Query points in batch/response/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+  name: Flag compliance risk in new CMIS documents by using Qdrant to create Salesforce cases and send Gmail alerts
+models: {}
