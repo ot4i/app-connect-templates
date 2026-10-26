@@ -4259,7 +4259,7 @@
 {
  "name": "Resolve new Salesforce cases by using Qdrant and IBM watsonx ai and send Slack and Gmail notifications",
  "description": "Triggered when a new case is created in Salesforce. Retrieves the case description, generates embeddings using IBM watsonx.ai, and queries Qdrant for relevant context. The context is used by IBM watsonx.ai to generate a resolution comment, which is posted back to the Salesforce case. A notification is sent to a Slack channel and a summary email is sent via Gmail.",
- "summary": "Salesforce to 4 applications",
+ "summary": "Salesforce to 5 applications",
  "sourceApp": "salesforce",
  "targetApps": ["salesforce", "ibmwatsonxai", "qdrant", "slack", "gmail"],
  "tags": ["salesforce", "ibmwatsonxai", "qdrant", "slack", "gmail", "rag", "ai"],
@@ -4268,7 +4268,7 @@
 {
  "name": "Flag compliance risk in new CMIS documents by using Qdrant to create Salesforce cases and send Gmail alerts",
  "description": "Triggered when a new document is uploaded to a CMIS repository folder. Downloads the document, extracts its text using Google Gemini, generates embeddings with IBM watsonx.ai, and queries Qdrant for semantically similar high-risk compliance documents. A weighted risk score is computed and the document is classified as high, medium, or low risk. A Salesforce case is created and a compliance alert email is sent via Gmail.",
- "summary": "CMIS to 5 applications",
+ "summary": "CMIS to 6 applications",
  "sourceApp": "cmis",
  "targetApps": ["googlegemini", "ibmwatsonxai", "qdrant", "salesforce", "gmail"],
  "tags": ["cmis", "googlegemini", "ibmwatsonxai", "qdrant", "salesforce", "gmail", "compliance", "rag", "ai"],
