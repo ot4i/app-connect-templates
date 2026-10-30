@@ -1,0 +1,286 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 09 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Dashboards
+      connector-type: datadog
+      actions:
+        getDashboard: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Dashboards/operations/getDashboard
+          action: retrieve
+    action-interface-2:
+      type: api-action
+      business-object: Snapshots
+      connector-type: datadog
+      actions:
+        GetGraphSnapshot: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Snapshots/operations/GetGraphSnapshot
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: Snapshots
+      connector-type: datadog
+      actions:
+        DownloadSnapshotImage: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Snapshots/operations/DownloadSnapshotImage
+          action: custom
+    action-interface-4:
+      type: api-action
+      business-object: files
+      connector-type: slack
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/{OBJECT_NAME}/{OBJECT_ID}/files
+          action: create
+    action-interface-5:
+      type: api-action
+      business-object: mail
+      connector-type: gmail
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/mail
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Datadog Retrieve dashboard by ID
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: getDashboard
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings: []
+              filter:
+                where:
+                  dashboard_id: your-dashboard-id
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: false
+          - for-each:
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`output`:
+                    type: object
+                    properties:
+                      title:
+                        type: string
+                      snapshotUrl:
+                        type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: DatadogCreatesnapshotURL
+                    $ref: '#/block/For each/node-output/Datadog Create snapshot URL/response/payload'
+                  - variable: DatadogDownloadsnapshotimage
+                    $ref: '#/block/For each/node-output/Datadog Download snapshot image/response/payload'
+                  - variable: SlackAddfile
+                    $ref: '#/block/For each/node-output/Slack Add file/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - output:
+                      mappings:
+                        - snapshotUrl:
+                            template: '{{$DatadogCreatesnapshotURL.snapshot_url}}'
+                        - title:
+                            template: '{{$Foreachitem.definition.title}}'
+              source:
+                expression: '$DatadogRetrievedashboardbyID.widgets[definition.requests[0].q]'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              mode: sequential
+              continue-on-error: true
+              name: For each
+              assembly:
+                $ref: '#/integration/assemblies/assembly-2'
+              display-name: Datadog widgets
+          - create-action:
+              name: Gmail Send email
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-5'
+              map:
+                mappings:
+                  - Body:
+                      template: |-
+                        Graph snapshots for the last 24 hours from the Datadog dashboard "{{$DatadogRetrievedashboardbyID.title}}":
+
+                        {{$join($Foreach.output[snapshotUrl].(title & ": " & snapshotUrl), "\n")}}
+                  - Subject:
+                      template: 'Daily Datadog dashboard snapshots: {{$DatadogRetrievedashboardbyID.title}}'
+                  - To:
+                      template: user@example.com
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: Foreach
+                    $ref: '#/node-output/For each/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+    assembly-2:
+      assembly:
+        execute:
+          - custom-action:
+              name: Datadog Create snapshot URL
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              action: GetGraphSnapshot
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - end: '{{$now()}}'
+                    - start: '{{$fromMillis($toMillis($now()) - 86400000)}}'
+                    - metric_query: '{{$Foreachitem.definition.requests[0].q}}'
+                    - title: '{{$Foreachitem.definition.title}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              allow-empty-output: false
+          - custom-action:
+              name: Datadog Download snapshot image
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: DownloadSnapshotImage
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: DatadogCreatesnapshotURL
+                    $ref: '#/block/For each/node-output/Datadog Create snapshot URL/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  snapshot_url: '{{$DatadogCreatesnapshotURL.snapshot_url}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: DatadogCreatesnapshotURL
+                    $ref: '#/block/For each/node-output/Datadog Create snapshot URL/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Slack Add file
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-4'
+              map:
+                mappings:
+                  - OBJECT_ID:
+                      template: your-slack-channel-id
+                  - OBJECT_NAME:
+                      template: channel
+                  - content:
+                      template: '{{$DatadogDownloadsnapshotimage.content}}'
+                  - filename:
+                      template: '{{$Foreachitem.definition.title}}.png'
+                  - filetype:
+                      template: binary
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievedashboardbyID
+                    $ref: '#/node-output/Datadog Retrieve dashboard by ID/response/payload'
+                  - variable: DatadogCreatesnapshotURL
+                    $ref: '#/block/For each/node-output/Datadog Create snapshot URL/response/payload'
+                  - variable: DatadogDownloadsnapshotimage
+                    $ref: '#/block/For each/node-output/Datadog Download snapshot image/response/payload'
+                  - variable: Foreachitem
+                    $ref: '#/block/For each/current-item'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Share Datadog dashboard graph snapshots in Slack and email the links via Gmail every day
+  description: >-
+    Runs every day to retrieve a Datadog dashboard and create a graph snapshot of the last 24 hours
+    for each widget that has a metric query. Uploads each snapshot image to a Slack channel and
+    sends an email with links to all the snapshots via Gmail.
+models: {}

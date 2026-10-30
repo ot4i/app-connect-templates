@@ -1,0 +1,182 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: streaming-connector-scheduler
+      triggers:
+        SCHEDULE:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: scheduler
+          options:
+            subscription:
+              scheduleConfiguration:
+                calendar:
+                  cronExp: 00 01 * * *
+                  runOnceOncheck: true
+                  timeZone: UTC
+                  every: day
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/scheduler/operations/SCHEDULE/subscribe
+              action: schedule
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Logs
+      connector-type: datadog
+      actions:
+        searchLogsPost: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Logs/operations/searchLogsPost
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: object
+      connector-type: amazons3
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/bucket/{bucketName}/object
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - custom-action:
+              name: Datadog Retrieve logs
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: searchLogsPost
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                mappings: []
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter:
+                where:
+                  and:
+                    - filter.query: '@usr.id:*'
+                    - filter.from: '{{$fromMillis($toMillis($now()) - 86400000)}}'
+                    - filter.to: '{{$now()}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                limit: 5000
+              allow-truncation: false
+              allow-empty-output: true
+              pagination-type: TOKEN
+          - set-variable:
+              name: Set variable
+              map:
+                $map: http://ibm.com/appconnect/map/v1
+                customSchemas:
+                  properties.`variable`:
+                    type: object
+                    properties:
+                      audit_json:
+                        type: string
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievelogs
+                    $ref: '#/node-output/Datadog Retrieve logs/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+                mappings:
+                  - variable:
+                      mappings:
+                        - audit_json:
+                            template: >-
+                              {{$string([$DatadogRetrievelogs.{"timestamp": attributes.timestamp, "user_id":
+                              attributes.attributes.usr.id, "service": attributes.service, "status": attributes.status,
+                              "action": attributes.attributes.http.method, "resource":
+                              attributes.attributes.http.url_details.path, "outcome":
+                              attributes.attributes.http.status_code, "host": attributes.host }])}}
+          - create-action:
+              name: Amazon S3 Create object
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - ContentType:
+                      template: application/json
+                  - Key:
+                      template: >-
+                        audit/{{$replace($substringBefore($now(), "T"), "-", "/")}}/datadog-audit-{{$replace($substringBefore($substringAfter($now(),
+                        "T"), "."), ":", "")}}.json
+                  - bucketName:
+                      template: your-bucket-name
+                  - content:
+                      template: '{{$Setvariable.variable.audit_json}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievelogs
+                    $ref: '#/node-output/Datadog Retrieve logs/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: |-
+                              Date: {{$substringBefore($now(), "T")}}
+                              Access log records archived: {{$count($DatadogRetrievelogs)}}
+                              Denied requests (401 or 403): {{$count($DatadogRetrievelogs[attributes.attributes.http.status_code in [401, 403]])}}
+                              Archive object: {{$AmazonS3Createobject.Key}}
+                  - channelId:
+                      template: your-ms-teams-channel-id
+                  - subject:
+                      template: Daily Datadog access log archive complete
+                  - teamId:
+                      template: your-ms-teams-team-id
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: DatadogRetrievelogs
+                    $ref: '#/node-output/Datadog Retrieve logs/response/payload'
+                  - variable: Setvariable
+                    $ref: '#/node-output/Set variable/response/payload'
+                  - variable: AmazonS3Createobject
+                    $ref: '#/node-output/Amazon S3 Create object/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+  name: Archive Datadog user access logs to Amazon S3 every day and send a summary to Microsoft Teams
+  description: >-
+    Runs every day to retrieve the Datadog logs from the last 24 hours that identify a user, keeps
+    only the fields that an access audit needs, and archives them as a JSON file in Amazon S3. Posts
+    a summary with the number of records and denied requests to a Microsoft Teams channel.
+models: {}
