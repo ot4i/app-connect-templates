@@ -4273,6 +4273,42 @@
  "targetApps": ["googlegemini", "ibmwatsonxai", "qdrant", "salesforce", "gmail"],
  "tags": ["cmis", "googlegemini", "ibmwatsonxai", "qdrant", "salesforce", "gmail", "compliance", "rag", "ai"],
  "offerings": ["app connect professional"]
+},
+{
+ "name": "Send a Microsoft Teams message and a Slack message when a Datadog monitor alert is received",
+ "description": "Triggered when a Datadog monitor sends an alert notification through a webhook. Sends a Microsoft Teams channel message and a Slack message with the alert transition, title, priority, scope, query, monitor message, and a link to the monitor in Datadog.",
+ "summary": "Datadog to 2 applications",
+ "sourceApp": "datadog",
+ "targetApps": ["msteams", "slack"],
+ "tags": ["datadog", "msteams", "slack", "monitoring", "alerts"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Summarize Datadog error logs with IBM watsonx ai and post the analysis to Microsoft Teams",
+ "description": "Triggered when a Datadog monitor alert is triggered. Retrieves the error logs for the alert scope from the last 15 minutes, groups them by message, and uses IBM watsonx.ai to identify the most likely root cause and the next diagnostic step. Posts the analysis to a Microsoft Teams channel.",
+ "summary": "Datadog to 3 applications",
+ "sourceApp": "datadog",
+ "targetApps": ["datadog", "ibmwatsonxai", "msteams"],
+ "tags": ["datadog", "ibmwatsonxai", "msteams", "logs", "ai"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Create a Datadog deployment event from an Amazon SQS message and notify Microsoft Teams",
+ "description": "Triggered when a CI/CD pipeline sends a deployment message to an Amazon SQS queue. Parses the message, creates a Datadog event that is tagged with the service, environment, version, and pipeline, posts a summary to a Microsoft Teams channel, and removes the message from the queue.",
+ "summary": "Amazon SQS to 3 applications",
+ "sourceApp": "amazonsqs",
+ "targetApps": ["amazonsqs", "datadog", "msteams"],
+ "tags": ["amazonsqs", "datadog", "msteams", "deployment", "json parser"],
+ "offerings": ["app connect professional"]
+},
+{
+ "name": "Archive Datadog user access logs to Amazon S3 every day and send a summary to Microsoft Teams",
+ "description": "Runs every day to retrieve the Datadog logs from the last 24 hours that identify a user, keeps only the fields that an access audit needs, and archives them as a JSON file in Amazon S3. Posts a summary with the number of records and denied requests to a Microsoft Teams channel.",
+ "summary": "Scheduler to 3 applications",
+ "sourceApp": "streaming-connector-scheduler",
+ "targetApps": ["datadog", "amazons3", "msteams"],
+ "tags": ["streaming-connector-scheduler", "datadog", "amazons3", "msteams", "audit", "set variable"],
+ "offerings": ["app connect professional"]
 }
 ]
 }

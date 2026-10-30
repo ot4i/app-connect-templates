@@ -1,0 +1,221 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: amazonsqs
+      triggers:
+        CREATED:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Messages
+          options:
+            subscription:
+              SqsQueueUrl: https://sqs.us-east-1.amazonaws.com/123456789012/your-queue-name
+              PollingInterval: '5000'
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Messages/operations/CREATED/subscribe
+              action: created
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Events
+      connector-type: datadog
+      actions:
+        postEvent: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Events/operations/postEvent
+          action: create
+    action-interface-2:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+    action-interface-3:
+      type: api-action
+      business-object: Messages
+      connector-type: amazonsqs
+      actions:
+        REMOVEMESSAGE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Queue/{QueueUrl}/Messages/operations/REMOVEMESSAGE
+          action: custom
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - parse:
+              parse-format: json
+              source:
+                template: '{{$Trigger.Body}}'
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              sample-data: |-
+                {
+                  "event": "deployment.completed",
+                  "status": "success",
+                  "service": "payments-api",
+                  "version": "2.4.1",
+                  "environment": "prod",
+                  "pipeline": {
+                    "id": "4821",
+                    "url": "https://ci.example.com/job/payments-api/4821/"
+                  },
+                  "commit": {
+                    "sha": "a3f9c21",
+                    "author": "jane.doe",
+                    "message": "Raise connection pool ceiling to 40"
+                  },
+                  "duration_seconds": 214,
+                  "deployed_at": "2026-08-27T10:14:02Z"
+                }
+              output-schema:
+                $schema: http://json-schema.org/draft-04/schema#
+                type: object
+                properties:
+                  event:
+                    type: string
+                  status:
+                    type: string
+                  service:
+                    type: string
+                  version:
+                    type: string
+                  environment:
+                    type: string
+                  pipeline:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      url:
+                        type: string
+                  commit:
+                    type: object
+                    properties:
+                      sha:
+                        type: string
+                      author:
+                        type: string
+                      message:
+                        type: string
+                  duration_seconds:
+                    type: number
+                  deployed_at:
+                    type: string
+                title: Parsed JSON
+              name: JSON Parser Parse
+          - custom-action:
+              name: Datadog Create event
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-1'
+              action: postEvent
+              map:
+                mappings:
+                  - aggregation_key:
+                      template: deploy-{{$JSONParserParse.service}}
+                  - alert_type:
+                      expression: '$JSONParserParse.status = "success" ? "success" : "error"'
+                  - tags:
+                      expression: >-
+                        ["env:" & $JSONParserParse.environment, "service:" & $JSONParserParse.service, "version:" &
+                        $JSONParserParse.version, "pipeline:" & $JSONParserParse.pipeline.id, "source:cicd"]
+                  - text:
+                      template: |-
+                        %%%
+                        **{{$JSONParserParse.service}}** version {{$JSONParserParse.version}} deployed to **{{$JSONParserParse.environment}}** with status **{{$JSONParserParse.status}}**
+
+                        - Commit: {{$JSONParserParse.commit.sha}} - {{$JSONParserParse.commit.message}}
+                        - Author: {{$JSONParserParse.commit.author}}
+                        - Duration: {{$JSONParserParse.duration_seconds}} seconds
+                        - Pipeline: [#{{$JSONParserParse.pipeline.id}}]({{$JSONParserParse.pipeline.url}})
+                        %%%
+                  - title:
+                      template: >-
+                        Deployment {{$JSONParserParse.status}}: {{$JSONParserParse.service}} {{$JSONParserParse.version}}
+                        to {{$JSONParserParse.environment}}
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+          - create-action:
+              name: Microsoft Teams Send message to channel
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-2'
+              map:
+                mappings:
+                  - body:
+                      mappings:
+                        - content:
+                            template: |-
+                              Status: {{$JSONParserParse.status}}
+                              Commit: {{$JSONParserParse.commit.sha}} - {{$JSONParserParse.commit.message}}
+                              Author: {{$JSONParserParse.commit.author}}
+                              Duration: {{$JSONParserParse.duration_seconds}} seconds
+                              Pipeline: {{$JSONParserParse.pipeline.url}}
+                              View in Datadog: {{$DatadogCreateevent.event.url}}
+                  - channelId:
+                      template: your-ms-teams-channel-id
+                  - subject:
+                      template: >-
+                        Deployment {{$JSONParserParse.status}}: {{$JSONParserParse.service}} {{$JSONParserParse.version}}
+                        to {{$JSONParserParse.environment}}
+                  - teamId:
+                      template: your-ms-teams-team-id
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: DatadogCreateevent
+                    $ref: '#/node-output/Datadog Create event/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+          - custom-action:
+              name: Amazon SQS Remove message
+              target:
+                $ref: '#/integration/action-interfaces/action-interface-3'
+              action: REMOVEMESSAGE
+              map:
+                mappings:
+                  - QueueUrl:
+                      template: https://sqs.us-east-1.amazonaws.com/123456789012/your-queue-name
+                  - ReceiptHandle:
+                      template: '{{$Trigger.ReceiptHandle}}'
+                $map: http://ibm.com/appconnect/map/v1
+                input:
+                  - variable: Trigger
+                    $ref: '#/trigger/payload'
+                  - variable: JSONParserParse
+                    $ref: '#/node-output/JSON Parser Parse/response/payload'
+                  - variable: DatadogCreateevent
+                    $ref: '#/node-output/Datadog Create event/response/payload'
+                  - variable: MicrosoftTeamsSendmessagetochannel
+                    $ref: '#/node-output/Microsoft Teams Send message to channel/response/payload'
+                  - variable: flowDetails
+                    $ref: '#/flowDetails'
+              filter: {}
+  name: Create a Datadog deployment event from an Amazon SQS message and notify Microsoft Teams
+models: {}
