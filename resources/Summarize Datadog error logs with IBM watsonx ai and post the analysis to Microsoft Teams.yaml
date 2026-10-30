@@ -1,0 +1,173 @@
+$integration: 'http://ibm.com/appconnect/integration/v2/integrationFile'
+integration:
+  type: trigger-action
+  trigger-interfaces:
+    trigger-interface-1:
+      type: event-trigger
+      connector-type: datadog
+      triggers:
+        newWebhookEvent:
+          assembly:
+            $ref: '#/integration/assemblies/assembly-1'
+          input-context:
+            data: Webhooks
+          options:
+            webhookURLSuffix: default
+            connectorServiceOptions:
+              httpMethod: post
+              path: resources/Webhooks/operations/newWebhookEvent/subscribe
+              action: created
+  action-interfaces:
+    action-interface-1:
+      type: api-action
+      business-object: Logs
+      connector-type: datadog
+      actions:
+        searchLogsPost: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: get
+          path: resources/Logs/operations/searchLogsPost
+          action: retrievewithwhere
+    action-interface-2:
+      type: api-action
+      business-object: postMlV1TextGeneration_model
+      connector-type: ibmwatsonxai
+      actions:
+        postMlV1TextGeneration: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/postMlV1TextGeneration_model/operations/postMlV1TextGeneration
+          action: custom
+    action-interface-3:
+      type: api-action
+      business-object: Message
+      connector-type: msteams
+      actions:
+        CREATE: {}
+      options:
+        connectorServiceOptions:
+          httpMethod: post
+          path: resources/Team/{teamId}/Channel/{channelId}/Message
+          action: create
+  assemblies:
+    assembly-1:
+      assembly:
+        execute:
+          - if:
+              branch:
+                - condition:
+                    or:
+                      - '{{$Trigger.body.alert_transition}}': Triggered
+                      - '{{$Trigger.body.alert_transition}}': Re-Triggered
+                  execute:
+                    - custom-action:
+                        name: Datadog Retrieve logs
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-1'
+                        action: searchLogsPost
+                        map:
+                          $map: http://ibm.com/appconnect/map/v1
+                          mappings: []
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                        filter:
+                          where:
+                            and:
+                              - filter.query: '{{$Trigger.body.alert_scope}} status:error'
+                              - filter.from: '{{$fromMillis($toMillis($now()) - 900000)}}'
+                              - filter.to: '{{$now()}}'
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                          limit: 100
+                        allow-truncation: true
+                        allow-empty-output: true
+                        pagination-type: TOKEN
+                    - custom-action:
+                        name: IBM watsonx.ai Generate text
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-2'
+                        action: postMlV1TextGeneration
+                        map:
+                          mappings:
+                            - input:
+                                template: |-
+                                  You are a site reliability engineering assistant. A Datadog monitor has triggered.
+
+                                  Monitor: {{$Trigger.body.alert_title}}
+                                  Scope: {{$Trigger.body.alert_scope}}
+
+                                  Error logs from the last 15 minutes, grouped by message, with the number of occurrences:
+                                  {{$join($map($distinct($DatadogRetrievelogs.$substring(attributes.message, 0, 120)), function($m) { $string($count($DatadogRetrievelogs[$substring(attributes.message, 0, 120) = $m])) & " x " & $m }), "\n")}}
+
+                                  In under 150 words, state:
+                                  1. The most likely root cause.
+                                  2. Which errors are symptoms of that cause rather than separate problems.
+                                  3. The single most useful next diagnostic step.
+
+                                  Base your answer only on the logs above. If no logs are listed, say that no error logs were found for this scope.
+                            - model_id:
+                                template: meta-llama/llama-3-3-70b-instruct
+                            - parameters:
+                                mappings:
+                                  - max_new_tokens:
+                                      expression: '400'
+                            - project_id:
+                                template: YOUR_WATSONX_PROJECT_ID
+                            - version:
+                                template: '2024-03-14'
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DatadogRetrievelogs
+                              $ref: '#/block/If/node-output/Datadog Retrieve logs/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+                    - create-action:
+                        name: Microsoft Teams Send message to channel
+                        target:
+                          $ref: '#/integration/action-interfaces/action-interface-3'
+                        map:
+                          mappings:
+                            - body:
+                                mappings:
+                                  - content:
+                                      template: |-
+                                        {{$trim($IBMwatsonxaiGeneratetext.results.generated_text)}}
+
+                                        Error logs analyzed: {{$count($DatadogRetrievelogs)}}
+                                        View in Datadog: {{$Trigger.body.link}}
+                            - channelId:
+                                template: your-ms-teams-channel-id
+                            - subject:
+                                template: 'Log analysis: {{$Trigger.body.alert_title}}'
+                            - teamId:
+                                template: your-ms-teams-team-id
+                          $map: http://ibm.com/appconnect/map/v1
+                          input:
+                            - variable: Trigger
+                              $ref: '#/trigger/payload'
+                            - variable: DatadogRetrievelogs
+                              $ref: '#/block/If/node-output/Datadog Retrieve logs/response/payload'
+                            - variable: IBMwatsonxaiGeneratetext
+                              $ref: '#/block/If/node-output/IBM watsonx.ai Generate text/response/payload'
+                            - variable: flowDetails
+                              $ref: '#/flowDetails'
+              else:
+                execute: []
+              name: If
+              input:
+                - variable: Trigger
+                  $ref: '#/trigger/payload'
+                - variable: flowDetails
+                  $ref: '#/flowDetails'
+  name: Summarize Datadog error logs with IBM watsonx ai and post the analysis to Microsoft Teams
+models: {}
