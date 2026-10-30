@@ -4302,15 +4302,6 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Share Datadog dashboard graph snapshots in Slack and email the links via Gmail every day",
- "description": "Runs every day to retrieve a Datadog dashboard and create a graph snapshot of the last 24 hours for each widget that has a metric query. Uploads each snapshot image to a Slack channel and sends an email with links to all the snapshots via Gmail.",
- "summary": "Scheduler to 3 applications",
- "sourceApp": "streaming-connector-scheduler",
- "targetApps": ["datadog", "slack", "gmail"],
- "tags": ["streaming-connector-scheduler", "datadog", "slack", "gmail", "for each"],
- "offerings": ["app connect professional"]
-},
-{
  "name": "Archive Datadog user access logs to Amazon S3 every day and send a summary to Microsoft Teams",
  "description": "Runs every day to retrieve the Datadog logs from the last 24 hours that identify a user, keeps only the fields that an access audit needs, and archives them as a JSON file in Amazon S3. Posts a summary with the number of records and denied requests to a Microsoft Teams channel.",
  "summary": "Scheduler to 3 applications",
