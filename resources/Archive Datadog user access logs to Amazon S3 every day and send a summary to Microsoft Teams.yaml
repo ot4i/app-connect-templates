@@ -175,8 +175,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Archive Datadog user access logs to Amazon S3 every day and send a summary to Microsoft Teams
-  description: >-
-    Runs every day to retrieve the Datadog logs from the last 24 hours that identify a user, keeps
-    only the fields that an access audit needs, and archives them as a JSON file in Amazon S3. Posts
-    a summary with the number of records and denied requests to a Microsoft Teams channel.
 models: {}

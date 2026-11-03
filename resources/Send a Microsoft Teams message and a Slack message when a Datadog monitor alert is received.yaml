@@ -102,8 +102,4 @@ integration:
                   - variable: flowDetails
                     $ref: '#/flowDetails'
   name: Send a Microsoft Teams message and a Slack message when a Datadog monitor alert is received
-  description: >-
-    Triggered when a Datadog monitor sends an alert notification through a webhook. Sends a
-    Microsoft Teams channel message and a Slack message with the alert transition, title, priority,
-    scope, query, monitor message, and a link to the monitor in Datadog.
 models: {}

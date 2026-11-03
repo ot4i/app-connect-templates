@@ -218,8 +218,4 @@ integration:
                     $ref: '#/flowDetails'
               filter: {}
   name: Create a Datadog deployment event from an Amazon SQS message and notify Microsoft Teams
-  description: >-
-    Triggered when a CI/CD pipeline sends a deployment message to an Amazon SQS queue. Parses the
-    message, creates a Datadog event that is tagged with the service, environment, version, and
-    pipeline, posts a summary to a Microsoft Teams channel, and removes the message from the queue.
 models: {}

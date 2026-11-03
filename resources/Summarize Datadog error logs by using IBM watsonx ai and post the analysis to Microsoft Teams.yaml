@@ -78,7 +78,7 @@ integration:
                         filter:
                           where:
                             and:
-                              - filter.query: '{{$Trigger.body.alert_scope}} status:error'
+                              - filter.query: '{{$replace($Trigger.body.alert_scope, ",", " ")}} status:error'
                               - filter.from: '{{$fromMillis($toMillis($now()) - 900000)}}'
                               - filter.to: '{{$now()}}'
                           input:
@@ -169,10 +169,5 @@ integration:
                   $ref: '#/trigger/payload'
                 - variable: flowDetails
                   $ref: '#/flowDetails'
-  name: Summarize Datadog error logs with IBM watsonx ai and post the analysis to Microsoft Teams
-  description: >-
-    Triggered when a Datadog monitor alert is triggered. Retrieves the error logs for the alert
-    scope from the last 15 minutes, groups them by message, and uses IBM watsonx.ai to identify the
-    most likely root cause and the next diagnostic step. Posts the analysis to a Microsoft Teams
-    channel.
+  name: Summarize Datadog error logs by using IBM watsonx ai and post the analysis to Microsoft Teams
 models: {}
