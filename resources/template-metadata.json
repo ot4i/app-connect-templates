@@ -4284,12 +4284,12 @@
  "offerings": ["app connect professional"]
 },
 {
- "name": "Summarize Datadog error logs with IBM watsonx ai and post the analysis to Microsoft Teams",
- "description": "Triggered when a Datadog monitor alert is triggered. Retrieves the error logs for the alert scope from the last 15 minutes, groups them by message, and uses IBM watsonx.ai to identify the most likely root cause and the next diagnostic step. Posts the analysis to a Microsoft Teams channel.",
+ "name": "Summarize Datadog error logs by using IBM watsonx ai and post the analysis to Microsoft Teams",
+ "description": "Triggered when a Datadog monitor sends an alert notification through a webhook. If the alert is triggered, retrieves the error logs for the alert scope from the last 15 minutes, groups them by message, and uses IBM watsonx.ai to identify the most likely root cause and the next diagnostic step. Posts the analysis to a Microsoft Teams channel. Recovery and other notifications are ignored.",
  "summary": "Datadog to 3 applications",
  "sourceApp": "datadog",
  "targetApps": ["datadog", "ibmwatsonxai", "msteams"],
- "tags": ["datadog", "ibmwatsonxai", "msteams", "logs", "ai"],
+ "tags": ["datadog", "ibmwatsonxai", "msteams", "logs", "ai", "if"],
  "offerings": ["app connect professional"]
 },
 {
